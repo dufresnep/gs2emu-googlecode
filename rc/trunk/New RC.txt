@@ -1,0 +1,4 @@
+Joey is making a new RC, details here:
+http://www.antiunixmad.com/forums/showthread.php?t=1058
+
+Source will be SVN'd when a stable version is reached

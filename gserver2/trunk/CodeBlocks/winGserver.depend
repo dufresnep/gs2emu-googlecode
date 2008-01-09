@@ -1,0 +1,403 @@
+# depslib dependency file v1.0
+1188137712 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\caccount.cpp
+	"CAccount.h"
+	"CDatabase.h"
+	"CDatabase.h"
+	"CIni.h"
+	"main.h"
+
+1187038997 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\caccount.h
+	"CString.h"
+	"CStringList.h"
+
+1187038998 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cstring.h
+	"CBuffer.h"
+
+1188832974 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cbuffer.h
+	<cstdlib>
+	<cstring>
+	<cstdio>
+
+1188848541 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cstringlist.h
+	<cstdlib>
+	<cstring>
+	<cstdio>
+	"CList.h"
+	"CBuffer.h"
+
+1187038997 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\clist.h
+	<cstdlib>
+	<cstring>
+	<cstdio>
+
+1188083020 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cdatabase.h
+	"sqlite3.h"
+	"CPacket.h"
+	"CStringList.h"
+	"CPlayer.h"
+	"CAccount.h"
+
+1187038998 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\sqlite3.h
+	<stdarg.h>
+
+1188075016 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cpacket.h
+	"CBuffer.h"
+
+1188144961 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cplayer.h
+	"CString.h"
+	"CStringList.h"
+	"CSocket.h"
+	"CPacket.h"
+	"CLevel.h"
+	"CAccount.h"
+	"CMap.h"
+	"crypt.h"
+
+1187038997 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\csocket.h
+	<windows.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<arpa/inet.h>
+	<netdb.h>
+	<fcntl.h>
+	<unistd.h>
+	<errno.h>
+	"CBuffer.h"
+
+1187038998 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\clevel.h
+	"CString.h"
+	"CList.h"
+	"CStringList.h"
+	"CPacket.h"
+	"COther.h"
+	"CBaddy.h"
+
+1187038997 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cother.h
+	<windows.h>
+	<unistd.h>
+
+1187038998 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cbaddy.h
+	"CString.h"
+	"CStringList.h"
+	"CPacket.h"
+	"COther.h"
+
+1187038998 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cmap.h
+	"CString.h"
+	"CStringList.h"
+	"CList.h"
+	"CLevel.h"
+
+1187038997 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\crypt.h
+	<stdint.h>
+	<cstdlib>
+
+1187038997 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cini.h
+	<cstdio>
+	<cstring>
+	<cstdlib>
+	"CList.h"
+
+1188838406 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\main.h
+	"CList.h"
+	"CString.h"
+	"CStringList.h"
+	"CPlayer.h"
+	"CNpc.h"
+	<time.h>
+
+1187038997 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cnpc.h
+	"CString.h"
+	"CLevel.h"
+	"CPacket.h"
+
+1187038997 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cbaddy.cpp
+	"CBaddy.h"
+	"main.h"
+
+1188832923 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cbuffer.cpp
+	"CBuffer.h"
+
+1188086902 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cdatabase.cpp
+	"CDatabase.h"
+	"main.h"
+
+1187038998 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cini.cpp
+	"CIni.h"
+
+1187184245 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\clevel.cpp
+	"CLevel.h"
+	"main.h"
+	"CNpc.h"
+	"CBaddy.h"
+	"CMap.h"
+	"CPlayer.h"
+
+1187038997 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\clinkedlist.cpp
+	"CLinkedList.h"
+
+1187038997 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\clinkedlist.h
+
+1188213569 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\clist.cpp
+	"CList.h"
+	<stdio.h>
+
+1187038997 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cmap.cpp
+	"CMap.h"
+	"main.h"
+
+1187038998 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cnpc.cpp
+	"CNpc.h"
+	"main.h"
+
+1187038997 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cpacket.cpp
+	"CPacket.h"
+
+1188865453 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cplayer.cpp
+	"CPlayer.h"
+	"CIni.h"
+	"CWeapon.h"
+	"CBaddy.h"
+	"CDatabase.h"
+	"zlib.h"
+	"main.h"
+	<sys/stat.h>
+
+1187038997 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cweapon.h
+	"CPacket.h"
+	"CString.h"
+
+1187038998 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\zlib.h
+	"zconf.h"
+
+1187038997 c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\zconf.h
+	<windows.h>
+	<sys/types.h>
+	<unistd.h>
+	<unixio.h>
+
+1187038998 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\csocket.cpp
+	"CSocket.h"
+
+1188848567 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cstringlist.cpp
+	"CStringList.h"
+
+1187038998 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\cweapon.cpp
+	"CWeapon.h"
+
+1188848487 source:c:\documents and settings\joey\desktop\graal 2.17\gsvn\gserver2\trunk\src\main.cpp
+	"main.h"
+	"CIni.h"
+	"CPlayer.h"
+	"CSocket.h"
+	"CWeapon.h"
+	"CDatabase.h"
+	"CLevel.h"
+	"CDatabase.h"
+	<time.h>
+	<sys/stat.h>
+	<stdlib.h>
+	<unistd.h>
+	<dirent.h>
+
+1192763237 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\caccount.cpp
+	"CAccount.h"
+	"CDatabase.h"
+	"CDatabase.h"
+	"CIni.h"
+	"main.h"
+
+1192762855 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\caccount.h
+	"CString.h"
+	"CStringList.h"
+
+1192763126 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cstring.h
+	"CBuffer.h"
+
+1192762880 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cbuffer.h
+	<cstdlib>
+	<cstring>
+	<cstdio>
+
+1192763140 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cstringlist.h
+	<cstdlib>
+	<cstring>
+	<cstdio>
+	"CList.h"
+	"CBuffer.h"
+
+1192762953 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\clist.h
+	<cstdlib>
+	<cstring>
+	<cstdio>
+
+1192762894 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cdatabase.h
+	"sqlite3.h"
+	"CPacket.h"
+	"CStringList.h"
+	"CPlayer.h"
+	"CAccount.h"
+
+1192763183 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\sqlite3.h
+	<stdarg.h>
+
+1192763054 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cpacket.h
+	"CBuffer.h"
+
+1192763067 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cplayer.h
+	"CString.h"
+	"CStringList.h"
+	"CSocket.h"
+	"CPacket.h"
+	"CLevel.h"
+	"CAccount.h"
+	"CMap.h"
+	"crypt.h"
+
+1192763120 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\csocket.h
+	<windows.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<arpa/inet.h>
+	<netdb.h>
+	<fcntl.h>
+	<unistd.h>
+	<errno.h>
+	"CBuffer.h"
+
+1192762925 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\clevel.h
+	"CString.h"
+	"CList.h"
+	"CStringList.h"
+	"CPacket.h"
+	"COther.h"
+	"CBaddy.h"
+
+1192763039 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cother.h
+	<windows.h>
+	<unistd.h>
+
+1192762866 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cbaddy.h
+	"CString.h"
+	"CStringList.h"
+	"CPacket.h"
+	"COther.h"
+
+1192762981 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cmap.h
+	"CString.h"
+	"CStringList.h"
+	"CList.h"
+	"CLevel.h"
+
+1192763075 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\crypt.h
+	<stdint.h>
+	<cstdlib>
+
+1192762911 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cini.h
+	<cstdio>
+	<cstring>
+	<cstdlib>
+	"CList.h"
+
+1192978590 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\main.h
+	"CList.h"
+	"CString.h"
+	"CStringList.h"
+	"CPlayer.h"
+	"CNpc.h"
+	<time.h>
+
+1192762996 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cnpc.h
+	"CString.h"
+	"CLevel.h"
+	"CPacket.h"
+
+1192762860 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cbaddy.cpp
+	"CBaddy.h"
+	"main.h"
+
+1192762874 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cbuffer.cpp
+	"CBuffer.h"
+
+1192762887 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cdatabase.cpp
+	"CDatabase.h"
+	"main.h"
+
+1192762901 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cini.cpp
+	"CIni.h"
+
+1192762918 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\clevel.cpp
+	"CLevel.h"
+	"main.h"
+	"CNpc.h"
+	"CBaddy.h"
+	"CMap.h"
+	"CPlayer.h"
+
+1192762933 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\clinkedlist.cpp
+	"CLinkedList.h"
+
+1192762938 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\clinkedlist.h
+
+1192762945 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\clist.cpp
+	"CList.h"
+	<stdio.h>
+
+1192762960 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cmap.cpp
+	"CMap.h"
+	"main.h"
+
+1192762990 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cnpc.cpp
+	"CNpc.h"
+	"main.h"
+
+1192763045 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cpacket.cpp
+	"CPacket.h"
+
+1192763107 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\csocket.cpp
+	"CSocket.h"
+
+1192763134 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cstringlist.cpp
+	"CStringList.h"
+
+1192763151 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cweapon.cpp
+	"CWeapon.h"
+
+1192763158 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cweapon.h
+	"CPacket.h"
+	"CString.h"
+
+1192763165 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\main.cpp
+	"main.h"
+	"CIni.h"
+	"CPlayer.h"
+	"CSocket.h"
+	"CWeapon.h"
+	"CDatabase.h"
+	"CLevel.h"
+	"CDatabase.h"
+	<time.h>
+	<sys/stat.h>
+	<stdlib.h>
+	<unistd.h>
+	<dirent.h>
+
+1192980296 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\cplayer.cpp
+	"CPlayer.h"
+	"CIni.h"
+	"CWeapon.h"
+	"CBaddy.h"
+	"CDatabase.h"
+	"zlib.h"
+	"main.h"
+	<sys/stat.h>
+
+1192763196 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\zlib.h
+	"zconf.h"
+
+1192763190 e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\zconf.h
+	<windows.h>
+	<sys/types.h>
+	<unistd.h>
+	<unixio.h>
+

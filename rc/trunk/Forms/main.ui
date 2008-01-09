@@ -1,0 +1,738 @@
+<ui version="4.0" >
+ <class>CRCLive</class>
+ <widget class="QMainWindow" name="CRCLive" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>608</width>
+    <height>375</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>RemoteControl</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset resource="resource.qrc" >:/RC/remotecontrol.png</iconset>
+  </property>
+  <property name="layoutDirection" >
+   <enum>Qt::LeftToRight</enum>
+  </property>
+  <property name="autoFillBackground" >
+   <bool>true</bool>
+  </property>
+  <property name="styleSheet" >
+   <string/>
+  </property>
+  <widget class="QWidget" name="centralwidget" >
+   <layout class="QGridLayout" >
+    <property name="leftMargin" >
+     <number>0</number>
+    </property>
+    <property name="topMargin" >
+     <number>0</number>
+    </property>
+    <property name="rightMargin" >
+     <number>0</number>
+    </property>
+    <property name="bottomMargin" >
+     <number>0</number>
+    </property>
+    <property name="horizontalSpacing" >
+     <number>0</number>
+    </property>
+    <property name="verticalSpacing" >
+     <number>0</number>
+    </property>
+    <item row="0" column="0" >
+     <layout class="QGridLayout" >
+      <property name="leftMargin" >
+       <number>1</number>
+      </property>
+      <property name="topMargin" >
+       <number>1</number>
+      </property>
+      <property name="rightMargin" >
+       <number>1</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>1</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>1</number>
+      </property>
+      <property name="verticalSpacing" >
+       <number>1</number>
+      </property>
+      <item row="4" column="5" >
+       <widget class="QPushButton" name="pushButton_12" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolTip" >
+         <string>Accounts List</string>
+        </property>
+        <property name="whatsThis" >
+         <string/>
+        </property>
+        <property name="styleSheet" >
+         <string>QPushButton
+{
+  background: url(:/RC/rc_weapons_normal.png);
+}
+
+QPushButton:pressed
+{
+  background: url(:/RC/rc_weapons_pressed.png);
+}</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="4" >
+       <widget class="QLabel" name="lNPCServer" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>0</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>16777215</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="7" >
+       <widget class="QPushButton" name="pushButton_10" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolTip" >
+         <string>Accounts List</string>
+        </property>
+        <property name="whatsThis" >
+         <string/>
+        </property>
+        <property name="styleSheet" >
+         <string>QPushButton
+{
+  background: url(:/RC/rc_levellist_normal.png);
+}
+
+QPushButton:pressed
+{
+  background: url(:/RC/rc_levellist_pressed.png);
+}</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <widget class="QPushButton" name="pushButton_4" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolTip" >
+         <string>Accounts List</string>
+        </property>
+        <property name="whatsThis" >
+         <string/>
+        </property>
+        <property name="styleSheet" >
+         <string>QPushButton
+{
+  background: url(:/RC/rc_toalls_normal.png);
+}
+
+QPushButton:pressed
+{
+  background: url(:/RC/rc_toalls_pressed.png);
+}</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item rowspan="2" row="2" column="7" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="2" column="0" colspan="4" >
+       <widget class="QLabel" name="lServer" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>0</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>16777215</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>Server: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5" >
+       <widget class="QPushButton" name="pushButton_8" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolTip" >
+         <string>Accounts List</string>
+        </property>
+        <property name="whatsThis" >
+         <string/>
+        </property>
+        <property name="styleSheet" >
+         <string>QPushButton
+{
+  background: url(:/RC/rc_options_normal.png);
+}
+
+QPushButton:pressed
+{
+  background: url(:/RC/rc_options_pressed.png);
+}</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QPushButton" name="pushButton_2" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolTip" >
+         <string>Accounts List</string>
+        </property>
+        <property name="whatsThis" >
+         <string/>
+        </property>
+        <property name="styleSheet" >
+         <string>QPushButton
+{
+  background: url(:/RC/rc_accountlist_normal.png);
+}
+
+QPushButton:pressed
+{
+  background: url(:/RC/rc_accountlist_pressed.png);
+}</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="7" >
+       <widget class="QPushButton" name="pushButton_7" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolTip" >
+         <string>Accounts List</string>
+        </property>
+        <property name="whatsThis" >
+         <string/>
+        </property>
+        <property name="styleSheet" >
+         <string>QPushButton
+{
+  background: url(:/RC/rc_serveroptions_normal.png);
+}
+
+QPushButton:pressed
+{
+  background: url(:/RC/rc_serveroptions_pressed.png);
+}</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="4" >
+       <widget class="QLabel" name="lPlayers" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>0</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>16777215</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="text" >
+         <string>Players: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6" >
+       <widget class="QPushButton" name="pushButton_6" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolTip" >
+         <string>Accounts List</string>
+        </property>
+        <property name="whatsThis" >
+         <string/>
+        </property>
+        <property name="styleSheet" >
+         <string>QPushButton
+{
+  background: url(:/RC/rc_serverflags_normal.png);
+}
+
+QPushButton:pressed
+{
+  background: url(:/RC/rc_serverflags_pressed.png);
+}</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QPushButton" name="bFileBrowser" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolTip" >
+         <string>Accounts List</string>
+        </property>
+        <property name="whatsThis" >
+         <string/>
+        </property>
+        <property name="styleSheet" >
+         <string>QPushButton
+{
+  background: url(:/RC/rc_filebrowser_normal.png);
+}
+
+QPushButton:pressed
+{
+  background: url(:/RC/rc_filebrowser_pressed.png);
+}</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QPushButton" name="pushButton" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolTip" >
+         <string>Accounts List</string>
+        </property>
+        <property name="whatsThis" >
+         <string/>
+        </property>
+        <property name="styleSheet" >
+         <string>QPushButton
+{
+  background: url(:/RC/rc_playerlist_normal.png);
+}
+
+QPushButton:pressed
+{
+  background: url(:/RC/rc_playerlist_pressed.png);
+}</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="6" >
+       <widget class="QPushButton" name="pushButton_11" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolTip" >
+         <string>Accounts List</string>
+        </property>
+        <property name="whatsThis" >
+         <string/>
+        </property>
+        <property name="styleSheet" >
+         <string>QPushButton
+{
+  background: url(:/RC/rc_classes_normal.png);
+}
+
+QPushButton:pressed
+{
+  background: url(:/RC/rc_classes_pressed.png);
+}</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="7" >
+       <widget class="QPushButton" name="pushButton_9" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolTip" >
+         <string>Accounts List</string>
+        </property>
+        <property name="whatsThis" >
+         <string/>
+        </property>
+        <property name="styleSheet" >
+         <string>QPushButton
+{
+  background: url(:/RC/rc_folderconfig_normal.png);
+}
+
+QPushButton:pressed
+{
+  background: url(:/RC/rc_folderconfig_pressed.png);
+}</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="4" >
+       <widget class="QPushButton" name="pushButton_15" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolTip" >
+         <string>Accounts List</string>
+        </property>
+        <property name="whatsThis" >
+         <string/>
+        </property>
+        <property name="styleSheet" >
+         <string>QPushButton
+{
+  background: url(:/RC/rc_npcs_normal.png);
+}
+
+QPushButton:pressed
+{
+  background: url(:/RC/rc_npcs_pressed.png);
+}</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="1" column="0" >
+     <layout class="QGridLayout" >
+      <property name="leftMargin" >
+       <number>0</number>
+      </property>
+      <property name="topMargin" >
+       <number>0</number>
+      </property>
+      <property name="rightMargin" >
+       <number>0</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>0</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>0</number>
+      </property>
+      <property name="verticalSpacing" >
+       <number>0</number>
+      </property>
+      <item row="0" column="0" >
+       <widget class="QTabWidget" name="tabWidget" >
+        <property name="currentIndex" >
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tab" >
+         <attribute name="title" >
+          <string>Tab 1</string>
+         </attribute>
+        </widget>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLineEdit" name="lineEdit" >
+        <property name="styleSheet" >
+         <string>background: green</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>pushButton</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>pushButton_4</tabstop>
+  <tabstop>pushButton_8</tabstop>
+  <tabstop>pushButton_6</tabstop>
+  <tabstop>pushButton_9</tabstop>
+  <tabstop>bFileBrowser</tabstop>
+  <tabstop>pushButton_7</tabstop>
+  <tabstop>pushButton_15</tabstop>
+  <tabstop>pushButton_12</tabstop>
+  <tabstop>pushButton_11</tabstop>
+  <tabstop>pushButton_10</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>lineEdit</tabstop>
+ </tabstops>
+ <resources>
+  <include location="resource.qrc" />
+ </resources>
+ <connections/>
+</ui>
