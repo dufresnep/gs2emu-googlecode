@@ -829,3 +829,223 @@
 	"main.h"
 	"CWordFilter.h"
 
+1168676094 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\caccount.cpp
+	"CAccount.h"
+	"CDatabase.h"
+	"CIni.h"
+	"main.h"
+
+1168676094 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\caccount.h
+	"CString.h"
+	"CStringList.h"
+
+1192759526 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cstring.h
+	"CBuffer.h"
+
+1198490732 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cbuffer.h
+	<cstdlib>
+	<cstring>
+	<cstdio>
+
+1197192274 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cstringlist.h
+	<cstdlib>
+	<cstring>
+	<cstdio>
+	"CList.h"
+	"CBuffer.h"
+
+1195440966 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\clist.h
+	<cstdlib>
+	<cstring>
+	<cstdio>
+
+1168676094 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cdatabase.h
+	"CPacket.h"
+	"CStringList.h"
+	"CPlayer.h"
+	"CAccount.h"
+
+1188071416 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cpacket.h
+	"CBuffer.h"
+
+1168676094 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cplayer.h
+	"CString.h"
+	"CStringList.h"
+	"CSocket.h"
+	"CPacket.h"
+	"CLevel.h"
+	"CAccount.h"
+	"CMap.h"
+	"crypt.h"
+
+1190087734 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\csocket.h
+	<windows.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<arpa/inet.h>
+	<netdb.h>
+	<fcntl.h>
+	<unistd.h>
+	<errno.h>
+	"CBuffer.h"
+
+1192759324 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\clevel.h
+	"CString.h"
+	"CList.h"
+	"CStringList.h"
+	"CPacket.h"
+	"COther.h"
+	"CBaddy.h"
+
+1194061068 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cother.h
+	<windows.h>
+	<unistd.h>
+
+1192759266 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cbaddy.h
+	"CString.h"
+	"CStringList.h"
+	"CPacket.h"
+	"COther.h"
+
+1192759380 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cmap.h
+	"CString.h"
+	"CStringList.h"
+	"CList.h"
+	"CLevel.h"
+
+1168676094 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\crypt.h
+	<stdint.h>
+	<cstdlib>
+
+1192759310 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cini.h
+	<cstdio>
+	<cstring>
+	<cstdlib>
+	"CList.h"
+
+1168676094 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\main.h
+	"CList.h"
+	"CListServer.h"
+	"CString.h"
+	"CStringList.h"
+	"CNpc.h"
+	"CPlayer.h"
+	"CWordFilter.h"
+	<dir.h>
+	<unistd.h>
+	<dirent.h>
+	<time.h>
+
+1199122198 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\clistserver.h
+	"CBuffer.h"
+	"CList.h"
+	"CPacket.h"
+	"CSocket.h"
+	"CStringList.h"
+
+1192759396 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cnpc.h
+	"CString.h"
+	"CLevel.h"
+	"CPacket.h"
+
+1198579134 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cwordfilter.h
+
+1192759260 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cbaddy.cpp
+	"CBaddy.h"
+	"main.h"
+
+1168676094 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cbuffer.cpp
+	"CBuffer.h"
+	"CStringList.h"
+
+1194262956 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cdatabase.cpp
+	"CDatabase.h"
+	"main.h"
+
+1192759300 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cini.cpp
+	"CIni.h"
+
+1168676094 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\clevel.cpp
+	"CLevel.h"
+	"main.h"
+	"CNpc.h"
+	"CBaddy.h"
+	"CMap.h"
+	"CPlayer.h"
+	"CList.h"
+
+1192759332 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\clinkedlist.cpp
+	"CLinkedList.h"
+
+1192759338 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\clinkedlist.h
+
+1195440788 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\clist.cpp
+	"CList.h"
+	<stdio.h>
+
+1199162008 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\clistserver.cpp
+	"CListServer.h"
+	"main.h"
+
+1192759360 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cmap.cpp
+	"CMap.h"
+	"main.h"
+
+1168676094 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cnpc.cpp
+	"CNpc.h"
+	"main.h"
+
+1187035396 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cpacket.cpp
+	"CPacket.h"
+
+1168676094 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cplayer.cpp
+	"CBaddy.h"
+	"CDatabase.h"
+	"CIni.h"
+	"CListServer.h"
+	"CPlayer.h"
+	"CWeapon.h"
+	"zlib.h"
+	"main.h"
+	<sys/stat.h>
+
+1192759558 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cweapon.h
+	"CPacket.h"
+	"CString.h"
+
+1192759596 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\zlib.h
+	"zconf.h"
+
+1192759590 c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\zconf.h
+	<windows.h>
+	<sys/types.h>
+	<unistd.h>
+	<unixio.h>
+
+1168676094 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\csocket.cpp
+	"CSocket.h"
+
+1197192274 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cstringlist.cpp
+	"CStringList.h"
+
+1192759550 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cweapon.cpp
+	"CWeapon.h"
+
+1168676094 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\cwordfilter.cpp
+	"main.h"
+	"CWordFilter.h"
+
+1168676094 source:c:\documents and settings\administrator\my documents\svn\gserver217\trunk\src\main.cpp
+	"main.h"
+	"CIni.h"
+	"CPlayer.h"
+	"CSocket.h"
+	"CWeapon.h"
+	"CDatabase.h"
+	"CLevel.h"
+	<time.h>
+	<sys/stat.h>
+	<stdlib.h>
+	<unistd.h>
+	<dirent.h>
+

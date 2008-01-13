@@ -295,7 +295,7 @@ void CPlayer::main()
 		unsigned int len = (((unsigned int)(unsigned char)receiveBuff[0]) << 8) + (unsigned int)(unsigned char)receiveBuff[1];
 
 		// Packet might not be fully in yet.
-		if ( len > receiveBuff.length() - 2 )
+		if ( len > (unsigned int)receiveBuff.length() - 2 )
 			break;
 /*
 		if(len > receiveBuff.length() - 2 || len < 0)
@@ -1060,7 +1060,7 @@ void CPlayer::setAccPropsRc(CPacket& pPacket)
 		// Attempt to fix the funky client bomb capitalization issue.
 		if ( myWeapons[i] == "bomb" )
 			temp << (char)SDELNPCWEAPON << "Bomb" << "\n";
-	}	
+	}
 	sendPacket(temp);
 
 	myFlags.clear();
@@ -1288,7 +1288,7 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, int pModTime)
 		if (forwardLocal[i])
 		{
 			packet << (char)i << getProp(i);
-/*		
+/*
 			// Limit the packet to only 5 props
 			if ( (pl+1) % 5 == 0 )
 			{
@@ -1781,9 +1781,9 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
     forwardBuff << (char) OTHERPLPROPS << (short)id;
 
     // This allows for correct RC login.
-    if ( id == -1 && pForward ) pForward = false;
+    if (id == -1 && pForward)
+		pForward = false;
 
-    int pl = 0;
     while (pProps.bytesLeft())
     {
 //        int startpos = pProps.getRead();
@@ -2141,7 +2141,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			*/
 			forwardBuff << (char)index << getProp(index);
 			/*
-			if ( (pl+1) % 5 == 0 ) 
+			if ( (pl+1) % 5 == 0 )
 			{
 				forwardBuff << "\n";
 				forwardBuff << (char)OTHERPLPROPS << (short)id;
@@ -3759,7 +3759,7 @@ void CPlayer::msgDSETRIGHTS(CPacket& pPacket)
 
 	player->adminRights = (int)pPacket.readByte5();
 	player->adminIp = pPacket.readChars((unsigned char)pPacket.readByte1());
-	
+
 	// Untokenize and load the directories.
 	CString temp(pPacket.readChars(pPacket.readByte2()));
 	temp.untokenize();
@@ -3908,7 +3908,7 @@ void CPlayer::msgDWANTFTP(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
 		return;
-	
+
 	sendPacket(CPacket() << (char)SFOLDERFTP << myFolders.join("\n").tokenize());
 	sendPacket(CPacket() << (char)STEXTFTP << "Welcome to the FileBrowser");
 
