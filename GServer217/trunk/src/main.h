@@ -10,13 +10,18 @@
 #include "CNpc.h"
 #include "CPlayer.h"
 #include "CWordFilter.h"
-#include <dir.h>
+#ifdef WIN32
+	#include <dir.h>
+#else
+	#include <unistd.h>
+	#include <dirent.h>
+#endif
 #include <time.h>
 
-#define GSERVER_REVISION 52
-#define STORE_SQL false
+#define GSERVER_REVISION 53
+//#define STORE_SQL
 
-extern bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, lsConnected, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, showQuery, staffOnly, vasesDrop, warptoforall;
+extern bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, lsConnected, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, showQuery, staffOnly, vasesDrop, warptoforall, defaultweapons;
 extern char fSep[], dataDir[];
 extern CLevel *NOLEVEL;
 extern CList newPlayers, playerList, playerIds, settingList, weaponList, npcList, npcIds, levelList;
@@ -40,7 +45,7 @@ CString getTimeStr(int pType = 0);
 int createPlayerId(CPlayer* pPlayer);
 int createNpcId(CNpc* pNpc);
 int getFileSize(char* pFile);
-long int getFileModTime(char* pFile);
+long long getFileModTime(char* pFile);
 void CalculateMD5(char *buffer, int length, char *checksum);
 void errorOut(char *pFile, CBuffer pError, bool pWrite = false);
 void getSubDirs(char* dir);

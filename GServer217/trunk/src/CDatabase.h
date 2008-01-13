@@ -6,7 +6,7 @@
 #include "CPlayer.h"
 #include "CAccount.h"
 
-#if STORE_SQL
+#ifdef STORE_SQL
 	extern sqlite3 *gserverDB;
 
 	bool openDatabase(char* pFileName);

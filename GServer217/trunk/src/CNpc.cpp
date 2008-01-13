@@ -59,7 +59,7 @@ CString CNpc::getFunctionParameter(char* pName)
 	if(pos >= 0)
 	{
 		pos += (int)strlen(pName);
-		int len = clientCode.findToken(";§}", pos) - pos;
+		int len = clientCode.findToken(";\xa7}", pos) - pos;
 		if(len > 0)
 			retVal = clientCode.copy(pos, len);
 	}
@@ -76,7 +76,7 @@ void CNpc::removeComments()
 	    //check for urls (http://)
 	    if(pos > 0 && clientCode[pos-1] == ':')
             break;
-		int len = clientCode.find('§', pos)-pos;
+		int len = clientCode.find((char)0xa7, pos)-pos;
 		if(len > 0)
 			clientCode.remove(pos, len);
 		else break;

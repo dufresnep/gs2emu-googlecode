@@ -87,8 +87,8 @@ enum {
   SEMPTY60,     // 60
   SSERVERFLAGS, // 61
   SSENDRIGHTS,  // 62
-  SSENDCOM,     // 63 return of the account comments to RC (rückgabe der Account Commentare zum RC schnupp)
-  SSENDBAN,     // 64 return of the ban to RC (rückgabe der Ban zum RC schnupp)
+  SSENDCOM,     // 63 return of the account comments to RC (rï¿½ckgabe der Account Commentare zum RC schnupp)
+  SSENDBAN,     // 64 return of the ban to RC (rï¿½ckgabe der Ban zum RC schnupp)
   SFOLDERFTP,     // 65  show ftp folder (ftp ordner anzeigen)
   SSENDFTP,     // 66  Found by Twizted =o send FTP shit to rc
   STEXTFTP,     // 67  bottom ftp box (ftp feld unten)
@@ -209,7 +209,7 @@ enum {
   DWANTRIGHTS,        // 83
   DSETRIGHTS,        // 84 set rights schnuppie  .. RC -> Server (rights setzen schnuppie  .. RC -> Server)
   DWANTCOM,        // 85 request comments (kommentare anfordern)
-  DSETCOM,		// 86 change comments (kommentare ändern)
+  DSETCOM,		// 86 change comments (kommentare ï¿½ndern)
   DEDITBAN,        // 87 request ban (ban anfordern)
   DSETBAN,        // 88 set ban (ban setzen)
   DWANTFTP,        //89 found by twitzed
@@ -350,13 +350,13 @@ enum {
 class CPlayer : public CAccount
 {
     public:
-		bool firstPacket, deleteMe, firstLevel;
+		bool firstPacket, deleteMe, firstLevel, allowBomb;
 		CBuffer bowImage, chatMsg, guildName, language, outBuff, sendBuff, version;
 		CLevel *level;
 		CList enteredLevels, fileList;
 		CSocket *playerSock;
 		CStringList weaponSend;
-		int additionalFlags, carrySprite, failAttempts, key, iterator, id, lastCheck, lastData, lastMessage, lastMovement, lastNick, lastSave, packCount, rating, statusMsg, udpPort;
+		int additionalFlags, carrySprite, failAttempts, key, iterator, id, lastCheck, lastData, lastMessage, lastMovement, lastNick, lastSave, loginTime, packCount, rating, statusMsg, udpPort;
 		#ifdef GSERV22
 			codec mcodec;
 		#endif

@@ -13,11 +13,21 @@ CAccount::CAccount()
     adminIp = "0.0.0.0";
 }
 
-bool CAccount::loadDBAccount(CString pAccount)
+bool CAccount::loadDBAccount(CString pAccount, bool fromAccount)
 {
-	accountName = pAccount;
-	CBuffer fileName = CString() << "accounts" << fSep << accountName << ".txt";
 	CStringList file;
+	CBuffer fileName;
+
+	// File loading logic.
+	if ( fromAccount == true )
+	{
+		accountName = pAccount;
+		fileName = CString() << "accounts" << fSep << accountName << ".txt";
+	}
+	else
+		fileName = CString() << "accounts" << fSep << pAccount << ".txt";
+
+	// Load and check if the file is valid.
 	if (!file.load(fileName.text()) || file[0] != "GRACC001")
 		return false;
 
@@ -56,6 +66,8 @@ bool CAccount::loadDBAccount(CString pAccount)
 		else if (section == "ONSECS") onlineSecs = atoi(val.text());
 		else if (section == "IP") lastIp = atoi(val.text());
 		else if (section == "LANGUAGE") language = val;
+		else if (section == "KILLS") kills = atoi(val.text());
+		else if (section == "DEATHS") deaths = atoi(val.text());
 		else if (section == "FLAG") myFlags.add(val);
 		else if (section == "ATTR1") myAttr[0] = val; // could trim these 30 lines into one.. but it'd probably go slower then a simple compare.. who knows.
 		else if (section == "ATTR2") myAttr[1] = val;
@@ -113,45 +125,8 @@ bool CAccount::loadDBAccount(CString pAccount)
 
 bool CAccount::loadWorldPropsIni()
 {
-	CIni ini;
-    if (!ini.load("newaccount.ini"))
-        return false;
-
-    nickName = ini.readString("main", "nickName", "unknown");
-    x = (float)ini.readReal("main", "x", 32);
-    y = (float)ini.readReal("main", "y", 32);
-    levelName = ini.readString("main", "level", "startlevel.graal");
-    maxPower = (float)ini.readReal("main", "maxHP", 3);
-    power = (float)ini.readReal("main", "hp", maxPower);
-    rubins = (int)ini.readReal("main", "rupees", 0);
-    darts = (int)ini.readReal("main", "arrows", 10);
-    bombs = (int)ini.readReal("main", "bombs", 5);
-    glovePower = (int)ini.readReal("main", "glovePower", 0);
-    swordPower = (int)ini.readReal("main", "swordPower", 0);
-    shieldPower = (int)ini.readReal("main", "shieldPower", 0);
-    headImage = ini.readString("main", "headImage", "head0.png");
-    bodyImage = ini.readString("main", "bodyImage", "body.png");
-    swordImage = ini.readString("main", "swordImage", "sword1.png");
-    shieldImage = ini.readString("main", "shieldImage", "shield1.png");
-    CString colorStr = ini.readString("main", "colors", "cakes");
-    for (int i = 0; i < colorStr.length() && i < 5; i++)
-        colors[i] = (int)colorStr[i]-'a';
-
-    sprite = (int)ini.readReal("main", "sprite", 0);
-    status = (int)ini.readReal("main", "status", 20);
-    horseImage = ini.readString("main", "horseImage", "");
-    horseBushes = (int)ini.readReal("main", "horseBushes", 0);
-    magicPoints = (int)ini.readReal("main", "magic", 0);
-    kills = (int)ini.readReal("main", "kills", 0);
-    deaths = (int)ini.readReal("main", "deaths", 0);
-    //onlineSecs = (int)ini.readReal("main", "onlineTime", 0);
-    //lastIp = (int)ini.readReal("main", "lastIp", 0);
-    ap = (int)ini.readReal("main", "alignment", 50);
-    myWeapons.load(ini.readString("main", "weapons", ""), ",");
-    myChests.load(ini.readString("main", "chests", ""), ",");
-    myFlags.load(ini.readString("main", "flags", ""), "§");
-    apCounter = (int)ini.readReal("main", "apCounter", 0);
-    return true;
+	// accounts/defaultaccount.txt
+	return loadDBAccount( "defaultaccount", false );
 }
 
 void CAccount::saveAccount(bool pAttributes)
@@ -161,11 +136,11 @@ void CAccount::saveAccount(bool pAttributes)
 
 	CAccount oldAccount;
 	CBuffer fileName = CString() << "accounts" << fSep << accountName << ".txt";
-	CBuffer newFile, oldFile;
-	oldFile.load(fileName.text());
+	CBuffer newFile;
 
 	if (pAttributes)
-		oldAccount.loadDBAccount(accountName);
+		if ( oldAccount.loadDBAccount(accountName) == false )
+			return;
 
 	newFile << "GRACC001\n";
 	newFile << "NAME " << accountName << "\n";
@@ -195,6 +170,8 @@ void CAccount::saveAccount(bool pAttributes)
 	newFile << "ONSECS " << toString((pAttributes ? oldAccount.onlineSecs : onlineSecs)) << "\n";
 	newFile << "IP " << toString(lastIp) << "\n";
 	newFile << "LANGUAGE " << (pAttributes ? oldAccount.language : language) << "\n";
+    newFile << "KILLS " << toString(kills) << "\n";
+	newFile << "DEATHS " << toString(deaths) << "\n";
 //	newFile << "PLATFORM " << platform << "\n";
 //	newFile << "CODEPAGE " << name << "\n";
 	for (int i = 0; i < (int)(sizeof((pAttributes ? oldAccount.myAttr : myAttr)) / 20); i++)

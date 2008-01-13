@@ -22,7 +22,8 @@
     char dataDir[] = "world/";
 #endif
 
-bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, hasShutdown = false, lsConnected = false, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, staffOnly, vasesDrop, warptoforall;
+bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, hasShutdown = false, lsConnected = false, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, staffOnly, vasesDrop, warptoforall,
+defaultweapons = true;
 const char* __admin[]   = {"description", "listport", "listip", "language", "maxplayers", "myip", "name", "serverport", "sharefolder", "showconsolepackets", "url", "worldname"};
 const char* __colours[] = {"white", "yellow", "orange", "pink", "red", "darkred", "lightgreen", "green", "darkgreen", "lightblue", "blue", "darkblue", "brown", "cynober", "purple", "darkpurple", "lightgray", "gray", "black", "transparent"};
 const char* __cloths[]  = {"setskin", "setcoat", "setsleeve", "setshoe", "setbelt", "setsleeves", "setshoes"};
@@ -217,11 +218,11 @@ void doTimer()
 				continue;
 			}
 
-			if (time(NULL) - player->lastCheck > cheatwindowstime)
+			/*if (time(NULL) - player->lastCheck > cheatwindowstime)
 			{
 				player->lastCheck = time(NULL);
 				player->sendPacket(CPacket() << (char)SPROCCESSES << (char)73);
-			}
+			}*/
 
 			player->onlineSecs++;
 
@@ -302,8 +303,8 @@ bool updateFile(char *pFile)
 
 bool loadSettings(char* pFile)
 {
-    CStringList settings;
-    if (!settings.load(pFile))
+	CStringList settings;
+	if (!settings.load(pFile))
 		return false;
 
 	for (int i = 0; i < settingList.count(); i++)
@@ -311,6 +312,7 @@ bool loadSettings(char* pFile)
 		delete (SettingKey *)settingList[i];
 		i--;
 	}
+	settingList.clear();
 
 	for (int i = 0; i < settings.count(); i++)
 	{
@@ -336,10 +338,11 @@ bool loadSettings(char* pFile)
 	apSystem = CHECK_BOOL(findKey("apsystem", "true"));
 	bushesDrop = CHECK_BOOL(findKey("bushitems", "true"));
 	cheatwindowsban = CHECK_BOOL(findKey("cheatwindowsban", "false"));
+	defaultweapons = CHECK_BOOL(findKey("defaultweapons", "true"));
 	dontaddserverflags = CHECK_BOOL(findKey("dontaddserverflags", "false"));
 	dontchangekills = CHECK_BOOL(findKey("dontchangekills", "false"));
-    dropItemsDead = CHECK_BOOL(findKey("dropitemsdead", "true"));
-    globalGuilds = CHECK_BOOL(findKey("globalguilds", "true"));
+	dropItemsDead = CHECK_BOOL(findKey("dropitemsdead", "true"));
+	globalGuilds = CHECK_BOOL(findKey("globalguilds", "true"));
 	idleDisconnect = CHECK_BOOL(findKey("disconnectifnotmoved", "true"));
 	noExplosions = CHECK_BOOL(findKey("noexplosions", "false"));
 	setbodyallowed = CHECK_BOOL(findKey("setbodyallowed", "true"));
@@ -360,7 +363,7 @@ bool loadSettings(char* pFile)
 	baddyRespawn = atoi(findKey("baddyrespawntime"));
 	cheatwindowstime = atoi(findKey("cheatwindowstime", "60"));
 	heartLimit = atoi(findKey("heartlimit", "20"));
-	horseLife = atoi(findKey("horselife"));
+	horseLife = atoi(findKey("horselifetime"));
 	listServerFields[3] = toString(GSERVER_REVISION);
 	listServerPort = atoi(findKey("listport", "14900"));
 	maxNoMovement = atoi(findKey("maxnomovement", "1200"));
@@ -374,17 +377,17 @@ bool loadSettings(char* pFile)
 
 	/* TEXT Server-Options */
 	unstickmeLevel = findKey("unstickmelevel", "onlinestartlocal.nw");
-    listServerIp = findKey("listip", "listserver.graal.in");
-    listServerFields[0] = findKey("name", "My Server");
-    listServerFields[1] = findKey("description", "My Server");
-    listServerFields[2] = findKey("language", "English");
-    listServerFields[4] = findKey("url", "http://www.graal.in");
-    listServerFields[5] = findKey("myip", "AUTO");
-    shareFolder = findKey("sharefolder");
-    staffHead = findKey("staffhead", "head25.png");
+	listServerIp = findKey("listip", "listserver.graal.in");
+	listServerFields[0] = findKey("name", "My Server");
+	listServerFields[1] = findKey("description", "My Server");
+	listServerFields[2] = findKey("language", "English");
+	listServerFields[4] = findKey("url", "http://www.graal.in");
+	listServerFields[5] = findKey("myip", "AUTO");
+	shareFolder = findKey("sharefolder");
+	staffHead = findKey("staffhead", "head25.png");
 	worldName = findKey("worldname", "main");
 
-    return true;
+	return true;
 }
 
 #ifdef WIN32
@@ -473,7 +476,7 @@ bool loadWeapons(char* pFile)
 	if(!weaponData.load(pFile))
 		return false;
 
-    weaponList.clear();
+	weaponList.clear();
 	for(int i = 0; i < weaponData.count(); i++)
 	{
 		CString word = weaponData[i].readString(" ");
@@ -486,11 +489,15 @@ bool loadWeapons(char* pFile)
 
 			CWeapon* weapon = new CWeapon;
 			weapon->name = parameters[0].trim();
-			weapon->image = parameters[1].trim();
-			weapon->modTime = (int)atoi(parameters[2].trim().text());
 
+			// Special case with the weapon image.
+			if ( parameters[1].trim() == "-" ) weapon->image = CString();
+			else weapon->image = parameters[1].trim();
+
+			weapon->modTime = (long long)atol(parameters[2].trim().text());
+			weapon->code = "";
 			for(i++; i < weaponData.count() && weaponData[i] != "ENDWEAPON"; i++)
-				weapon->code << weaponData[i] << "§";
+				weapon->code << weaponData[i] << "\xa7";
 			weaponList.add(weapon);
 		}
 	}
@@ -509,13 +516,23 @@ void saveWeapons(char* pFile)
 		CWeapon* weapon = (CWeapon*)weaponList[i];
 		index = weaponData.add("NEWWEAPON ");
 		sprintf(modTime, "%li", (long int)weapon->modTime);
-		weaponData[index] << weapon->name << "," << weapon->image << "," << modTime;
+
+		// Save name.
+		weaponData[index] << weapon->name << ",";
+
+		// If the NPC doesn't have an image, write a hyphen.
+		if ( weapon->image.length() == 0 ) weaponData[index] << "-" << ",";
+		else weaponData[index] << weapon->image << ",";
+
+		// Write the modification time.
+		weaponData[index] << modTime;
+
 		code = weapon->code;
-		char* line = strtok(code.text(), "§");
+		char* line = strtok(code.text(), "\xa7");
 		while(line != NULL)
 		{
 			weaponData.add(line);
-			line = strtok(NULL, "§");
+			line = strtok(NULL, "\xa7");
 		}
 		weaponData.add("ENDWEAPON\r\n");
 	}
@@ -541,7 +558,7 @@ char* getDataFile(char* pFile)
 	return path;
 }
 
-long int getFileModTime(char* pFile)
+long long getFileModTime(char* pFile)
 {
 	struct stat fileStat;
 	if(strlen(pFile) <=0)
@@ -785,5 +802,9 @@ char *findKey(CString pName, char *pDefault)
 			return key->value.text();
 	}
 
-	return pDefault;
+	// Workaround an odd bug.
+	if ( pDefault )
+		return pDefault;
+	else
+		return "0";
 }

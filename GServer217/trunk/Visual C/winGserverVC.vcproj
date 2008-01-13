@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="winGserverVC"
 	ProjectGUID="{3E06A31E-5390-4196-92BB-F35D3F654D76}"
 	RootNamespace="winGserverVC"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -69,6 +70,8 @@
 				GenerateMapFile="true"
 				SubSystem="1"
 				LinkTimeCodeGeneration="0"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="0"
 			/>
 			<Tool
@@ -88,9 +91,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -144,7 +144,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lib\zdll.lib lib\sqlite3.lib wsock32.lib"
+				AdditionalDependencies="lib/zdll.lib wsock32.lib"
 				LinkIncremental="1"
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
@@ -152,6 +152,8 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				LinkTimeCodeGeneration="0"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="0"
 			/>
 			<Tool
@@ -171,9 +173,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -213,7 +212,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\CLinkedList.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\CList.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\CListServer.cpp"
 				>
 			</File>
 			<File
@@ -222,6 +229,14 @@
 			</File>
 			<File
 				RelativePath="..\src\CNpc.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\codec.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\COther.cpp"
 				>
 			</File>
 			<File
@@ -246,6 +261,10 @@
 			</File>
 			<File
 				RelativePath="..\src\CWeapon.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\CWordFilter.cpp"
 				>
 			</File>
 			<File
@@ -287,7 +306,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\CLinkedList.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\CList.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\CListServer.h"
 				>
 			</File>
 			<File
@@ -311,6 +338,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\crypt.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\CServerBot.h"
 				>
 			</File>
@@ -331,7 +362,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\CWordFilter.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\main.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sqlite3.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\zconf.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\zlib.h"
 				>
 			</File>
 		</Filter>

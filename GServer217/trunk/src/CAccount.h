@@ -19,7 +19,7 @@ class CAccount
 		CStringList myChests, myFlags, myFolders, myWeapons;
 
 		// Load Graal Account
-		bool loadDBAccount(CString pAccount);
+		bool loadDBAccount(CString pAccount, bool fromAccount = true);
 		bool loadWorldPropsIni();
 		void saveAccount(bool pAttributes = false);
 };

@@ -4,7 +4,13 @@
 #ifndef ENC_CODEC_HPP
 #define ENC_CODEC_HPP
 
+#if defined(_MSC_VER)
+#define		uint8_t		unsigned __int8
+#define		uint32_t	unsigned __int32
+#else
 #include <stdint.h>
+#endif
+
 #include <cstdlib>
 
 class codec {

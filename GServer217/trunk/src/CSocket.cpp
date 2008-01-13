@@ -182,25 +182,25 @@ int CSocket::receiveBytes(CBuffer& pDestination, int pCount, int pMode)
 	fd_set set;
 	struct timeval tm;
 	pDestination.clear();
-    tm.tv_sec = 0;
-    tm.tv_usec = 0;
+	tm.tv_sec = 0;
+	tm.tv_usec = 0;
 	while(size < pCount)
 	{
-	    if(!blocking)
-	    {
-            FD_ZERO(&set);
-            FD_SET((unsigned int)sockId,&set);
-            select(sockId+1,&set,NULL,NULL,&tm);
-            if (!FD_ISSET(sockId,&set))
-                return size;
-	    }
+		if(!blocking)
+		{
+			FD_ZERO(&set);
+			FD_SET((unsigned int)sockId,&set);
+			select(sockId+1,&set,NULL,NULL,&tm);
+			if (!FD_ISSET(sockId,&set))
+				return size;
+		}
 		int len = pCount - size;
 		if(len > 8192)
 			len = 8192;
 		if(len < 0)
 			return size;
 
-		int a =recv(sockId, buff, len, 0);
+		int a = recv(sockId, buff, len, 0);
 		if(a == 0)
 			return -1;
 		if(a < 0)
@@ -212,7 +212,7 @@ int CSocket::receiveBytes(CBuffer& pDestination, int pCount, int pMode)
 		size+=a;
 		pDestination.writeBytes(buff, a);
 		if(udp)
-            break;
+			break;
 	}
 	return size;
 }

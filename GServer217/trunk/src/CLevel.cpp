@@ -7,6 +7,7 @@
 #include "CBaddy.h"
 #include "CMap.h"
 #include "CPlayer.h"
+#include "CList.h"
 
 CString base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 CString signText = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -16,6 +17,10 @@ int ctablen[] = {1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1};
 int ctabindex[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 16};
 int ctab[] = {91, 92, 93, 94, 77, 78, 79, 80, 74, 75, 71, 72, 73, 86, 87, 88, 67};
 extern char* itemNames[];
+
+// Store join command stuff.
+CList joinList;
+
 CLevel::CLevel(CString& pFileName)
 {
     map = NULL;
@@ -123,7 +128,7 @@ bool CLevel::loadNW(CString& pFileName)
             {
                 if(words.count() <= 3)
                     continue;
-                CString image, code;
+                CString image, code, code2;
                 float x, y;
                 if(words[1] != "-")
                     image = words[1];
@@ -131,9 +136,43 @@ bool CLevel::loadNW(CString& pFileName)
                 x = (float)atof(words[2].text());
                 y = (float)atof(words[3].text());
                 for(i++; i < levelData.count() && levelData[i] != "NPCEND"; i++)
-                    code << processNpcLine(levelData[i]) << "§";
+                    code << levelData[i] << "\xa7";
 
-                npcs.add(new CNpc(image, code, x, y, this));
+		// Create the new NPC.  Do this before parsing the join commands.
+		// The CNpc constructor will remove all comments.
+		CNpc* jnpc = new CNpc( image, code, x, y, this );
+
+		// Now filter out the join commands.
+		CStringList npcData;
+		npcData.load( jnpc->clientCode.text(), "\xa7" );
+		for ( int j = 0; j < npcData.count(); ++j )
+			code2 << processNpcLine( npcData[j] ) << "\xa7";
+		jnpc->clientCode = code2;
+
+		// Now, add all the joined files to the code.
+		if ( joinList.count() > 0 )
+		{
+			CString* file = 0;
+			while ( (file = (CString*)joinList[0]) != 0 )
+			{
+				// Load the source file into memory.
+				CString dataFile = getDataFile(file->text());
+				if(dataFile.length())
+				{
+					// Append to the end of the script.
+					CString retVal;
+					retVal.load(dataFile.text());
+					retVal.replaceAll("\r\n", "\xa7");
+					retVal.replaceAll("\n", "\xa7");
+					jnpc->clientCode << retVal << "\xa7";
+				}
+				delete (CString*)joinList[0];
+				joinList.remove(0);
+			}
+		}
+		joinList.clear();
+
+		npcs.add( jnpc );
             } else if(words[0] == "BADDY")
             {
                 if(words.count() <= 3)
@@ -179,33 +218,49 @@ bool CLevel::loadNW(CString& pFileName)
 
     return true;
 }
+
 CString CLevel::processNpcLine(CString& pLine)
 {
 	//Find join codes
-	CString retVal;
-	retVal = pLine;
-	if(pLine.find("join ") >= 0)
+	CString retVal(pLine);
+	while ( retVal.find("join ") >= 0 )
 	{
-		pLine.trimLeft();
-		if(pLine.find("join ") == 0)
+		// Trim the line.
+		retVal.trimLeft();
+
+		// See if join is now the first character on the line.
+		if ( retVal.find("join ") == 0 )
 		{
-			int pos = pLine.find(';', 5);
-			if(pos >= 0)
+			// Find the semi-colon and add the text file name to 'script'
+			int s_pos = retVal.find(';');
+			CString* script = new CString();
+			*script = "";
+			*script << retVal.copy(5, s_pos-5);
+
+			// See if the file was already added or not.
+			bool found = false;
+			for ( int i = 0; i < joinList.count(); ++i )
 			{
-				CString script;
-				script << pLine.copy(5, pos-5) << ".txt";
-				CString dataFile = getDataFile(script.text());
-				if(dataFile.length())
+				if ( *((CString *)joinList[i]) == *script )
 				{
-					retVal = "";
-					retVal.load(dataFile.text());
-					retVal.replaceAll("\n", "§");
+					found = true;
+					break;
 				}
 			}
+			if ( !found )
+			{
+				// Save the name of the text file and replace join with a semi-colon.
+				retVal.remove( (CString() << "join " << *script).text() );
+				*script << ".txt";
+				joinList.add( (void *)script );
+			}
+			else
+				delete script;
 		}
 	}
 	return retVal;
 }
+
 void CLevel::saveNpcs()
 {
 	return;
@@ -517,7 +572,7 @@ void CLevel::addNewNpc(CString& pImage, CString& pCodeFile, float pX, float pY)
 	if(!codeData.load(dataFile))
 		return;
 	for(int i = 0; i < codeData.count(); i++)
-		code << codeData[i] << "§";
+		code << codeData[i] << "\xa7";
 
 	CNpc* npc = new CNpc(pImage, code, pX, pY, this);
 	npcs.add(npc);

@@ -1,4 +1,5 @@
 #include "CBuffer.h"
+#include "CStringList.h"
 
 CBuffer CBuffer::retBuffer(20);
 CBuffer::CBuffer(const char* pStr)
@@ -588,61 +589,98 @@ CBuffer& CBuffer::replaceAll(const char* pString, const char* pNewString)
     return *this;
 }
 
-/* Best I could do to immitate graal's stupid tokenize - Joey*/
+/* Best I could do to immitate graal's stupid tokenize - Joey */
+/* Don't need to immitate it perfectly.  Rely on Graal's stupidness.  Put quotations around everything! */
 CBuffer& CBuffer::tokenize()
 {
 	CBuffer retVal;
-	int pos = 0;
-	if (data[count] != '\n')
-		writeChar('\n');
+	int pos[] = { 0, 0 };
 
-	for (int i = 0; i <= count; i++)
+	// Add a trailing \n to the line if one doesn't already exist.
+	if ( data[ count - 1 ] != '\n' ) writeChar( '\n' );
+
+	// Do the tokenization stuff.
+	while ( (pos[0] = find( "\n", pos[1] )) != -1 )
 	{
-		if (data[i] == '\n')
-		{
-			CBuffer temp = copy(pos, i - pos);
-			retVal << (temp.find(' ') >= 0 || temp == "" ? CString() << "\"" << temp << "\"" : temp) << ",";
-			pos = i + 1;
-		}
-			else if (data[i] == '\"')
-		{
-			insert(i, "\"");
-			i++;
-		}
+		CBuffer temp;
+		temp << copy( pos[1], pos[0] - pos[1] );
+		temp.replaceAll( "\"", "\"\"" );	// Change all " to ""
+		retVal << "\"" << temp << "\",";
+		pos[1] = pos[0] + 1;
 	}
 
+	// Write it back to the buffer now killing the trailing comma.
 	clear();
 	writeBuffer(retVal.remove(retVal.length() - 1, 1));
-    return *this;
+	return *this;
 }
 
-/* Fix double-line stuff */
 CBuffer& CBuffer::untokenize()
 {
-	CBuffer retVal;
-	bool inside = false;
-	int pos = 0;
-	if (data[count] != ',')
-		writeChar(',');
+	CStringList temp;
+	int pos[] = { 0, 1 };
 
-	for (int i = 0; i <= count; i++)
+	// Copy the buffer data to a working copy and trim it.
+	CBuffer nData( data );
+	nData.trim();
+
+	// Check to see if it starts with a quotation mark.  If not, set pos[1] to 0.
+	if ( nData[0] != '\"' ) pos[1] = 0;
+
+	// Untokenize.
+	while ( ((pos[0] = nData.find( "\",\"", pos[1] )) != -1) ||
+		((pos[0] = nData.find( ",", pos[1] )) != -1 ) )
 	{
-		if (data[i] == '\"' && (data[i - 1] == ',' || data[i + 1] == ',' || i == 0))
-			inside = !inside;
+		// "test",test
+		if ( pos[0] > 0 && nData[pos[0]] == ',' && nData[ pos[0] - 1 ] == '\"' )
+			pos[0]--;
 
-		if (!inside && (data[i] == ',' || i == count))
+		// Copy the string.
+		temp.add( nData.copy( pos[1], pos[0] - pos[1] ).text() );
+		int tempEnd = temp.count() - 1;
+		temp[ tempEnd ].replaceAll( "\"\"", "\"" );	// Replace "" with "
+		temp[ tempEnd ].removeAll( "\n" );
+
+		// Move forward the correct number of spaces.
+		if ( nData[pos[0]] == ',' )
 		{
-			CBuffer temp = (data[i - 1] == '\"' ? copy(pos + 1, i - pos - 2) : copy(pos, i - pos));
-			temp.replaceAll("\"\"", "\"");
-			temp.removeAll("\n");
-			retVal << temp << "\n";
-			pos = i + 1;
+			if ( pos[0] + 1 != nData.length() && nData[pos[0] + 1] == '\"' )
+				pos[1] = pos[0] + strlen( ",\"" );	// test,"test
+			else
+				pos[1] = pos[0] + strlen( "," );	// test,test
+		}
+ 		else if ( nData[pos[0]] == '\"' )
+		{
+			if ( pos[0] + 2 != nData.length() && nData[pos[0] + 2] == '\"' )
+				pos[1] = pos[0] + strlen( "\",\"" );	// test","test
+			else
+				pos[1] = pos[0] + strlen( "\"," );	// test",test
 		}
 	}
 
+	// Try and grab the very last element.
+	if ( pos[1] != nData.length() )
+	{
+		// If the end is a quotation mark, remove it.
+		if ( nData[ nData.length() - 1 ] == '\"' )
+			nData.remove( nData.length() - 1, 1 );
+
+		// Sanity check.
+		if ( pos[1] != nData.length() )
+		{
+			temp.add( nData.copy( pos[1] ).text() );
+			int tempEnd = temp.count() - 1;
+			temp[ tempEnd ].replaceAll( "\"\"", "\"" );	// Replace "" with "
+			temp[ tempEnd ].removeAll( "\n" );
+		}
+	}
+
+	// Write the correct string out.
 	clear();
-	writeBuffer(retVal.remove(retVal.length() - 1, 1));
-    return *this;
+	for ( int i = 0; i < temp.count(); ++i )
+		*this << (CBuffer)temp[i] << "\n";
+
+	return *this;
 }
 
 bool CBuffer::match(const char* pMask)

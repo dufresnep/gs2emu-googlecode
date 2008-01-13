@@ -78,7 +78,7 @@ bool sendInit[] =
     true,  true,  true,  true,  true,  true,  // 54-59
 	true,  true,  true,  true,  true,  true,  // 60-65
     true,  true,  true,  true,  true,  true,  // 66-71
-    true,  true,  true, false, false, false,  // 72-78
+    true,  true,  true, false, false, false,  // 72-77
 };
 
 /*
@@ -111,7 +111,7 @@ bool udpDontForward[propscount + 3] =
     false, false, false, false, false, false, // 54-59
     false, false, false, false, false, false, // 60-65
     false, false, false, false, false, false, // 66-71
-    false, false, false, false, false, false, // 72-78
+    false, false, false, false, false, false, // 72-77
 };
 //Props that will be forwarded to people in the same level as you
 bool forwardLocal[propscount + 3] =
@@ -128,7 +128,7 @@ bool forwardLocal[propscount + 3] =
 	true,  true,  true,  true,  true,  true,  // 54-59
 	true,  true,  true,  true,  true,  true,  // 60-65
 	true,  true,  true,  true,  true,  true,  // 66-71
-	true,  true,  true,  false, false, false, // 72-78
+	true,  true,  true,  false, false, false, // 72-77
 };
 
 //Other players props that will be forwarded to you when you log in
@@ -146,7 +146,7 @@ bool sendOthersInit[propscount + 3] =
     false, false, false, false, false, false, // 54-59
     false, false, false, false, false, false, // 60-65
     false, false, false, false, false, false, // 66-71
-    false, false, false, false, false, false, // 72-78
+    false, false, false, false, false, false, // 72-77
 };
 
 bool sendRcProps[propscount] =
@@ -174,22 +174,25 @@ char* itemNames[] = {
 CPlayer::CPlayer(CSocket* pSocket)
 {
     playerSock = pSocket;
-	loadOnly = deleteMe = false;
+	loadOnly = deleteMe = allowBomb = false;
     firstPacket = firstLevel = true;
     key = adminRights =  0;
-    lastData = lastMovement = lastSave = time(NULL);
+    lastData = lastMovement = lastSave = loginTime = time(NULL);
     lastNick = 0;
 
     iterator = 0x04A80B38;
     x = y = 32;
     z = 0;
-    rubins = darts = bombs = 99;
+	darts = 10;
+	bombs = 5;
+	rubins = 0;
     glovePower = bombPower = swordPower = shieldPower = 1;
     power = maxPower = 3;
     kills = deaths = udpPort = statusMsg= rating =0;
     sprite = 2;
-    status = 16;
-    onlineSecs = ap = horseBushes = magicPoints = 0;
+    status = 20;
+	ap = 50;
+    onlineSecs = horseBushes = magicPoints = 0;
     apCounter = 100;
     type = lastIp = additionalFlags = 0;
     memset(colors, 0, sizeof(colors));
@@ -266,16 +269,16 @@ CPlayer::~CPlayer()
 
 void CPlayer::main()
 {
-    char packets[65536];
-    CBuffer receiveBuff;
-    int size=0;
-    if ((size = playerSock->receiveBytes(receiveBuff, 65536)) < 0)
-    {
-        errorOut("rclog.txt", CString() << "Client " << accountName << " disconnected with sock error: " << toString(size));
-        deleteMe = true;
-        compressAndSend();
-        return;
-    }
+	char packets[65536];
+	CBuffer receiveBuff;
+	int size=0;
+	if ((size = playerSock->receiveBytes(receiveBuff, 65536)) < 0)
+	{
+		errorOut("rclog.txt", CString() << "Client " << accountName << " disconnected with sock error: " << toString(size));
+		deleteMe = true;
+		compressAndSend();
+		return;
+	}
 
 	if (receiveBuff.length() >= 128*1024)
 	{
@@ -285,22 +288,28 @@ void CPlayer::main()
 		return;
 	}
 
-    while (receiveBuff.length() >= 2)
-    {
-        lastData = time(NULL);
-        int error, cLen = sizeof(packets);
-        int len = (((unsigned int)(unsigned char)receiveBuff[0]) << 8) + (unsigned int)(unsigned char)receiveBuff[1];
+	while (receiveBuff.length() >= 2)
+	{
+		lastData = time(NULL);
+		int error, cLen = sizeof(packets);
+		unsigned int len = (((unsigned int)(unsigned char)receiveBuff[0]) << 8) + (unsigned int)(unsigned char)receiveBuff[1];
+
+		// Packet might not be fully in yet.
+		if ( len > receiveBuff.length() - 2 )
+			break;
+/*
 		if(len > receiveBuff.length() - 2 || len < 0)
 		{
 			errorOut("rclog.txt", CString() << "Client " << accountName << " sent a wrong data package length: " << toString(len) << "->" << toString(receiveBuff.length()));
-			//sendPacket(CPacket() << (char)DISMESSAGE << "Your Graal.exe has sent a wrong data package length.");
-			//deleteMe = true;
+			sendPacket(CPacket() << (char)DISMESSAGE << "Your Graal.exe has sent a wrong data package length.");
+			deleteMe = true;
 			return;
 		}
+*/
 
-        if ((error = uncompress((Bytef*)packets,(uLongf*)&cLen,(const Bytef*)receiveBuff.text()+2, len)) == Z_OK)
-        {
-            CPacket lines;
+		if ((error = uncompress((Bytef*)packets,(uLongf*)&cLen,(const Bytef*)receiveBuff.text()+2, len)) == Z_OK)
+		{
+			CPacket lines;
 			if(cLen <= 0)
 			{
 				errorOut("rclog.txt", CString() << "Client " << accountName << " sent an empty package.");
@@ -309,27 +318,27 @@ void CPlayer::main()
 				return;
 			}
 
-            lines.writeBytes(packets, cLen);
-            while(lines.bytesLeft())
-            {
-                packCount++;
+			lines.writeBytes(packets, cLen);
+			while(lines.bytesLeft())
+			{
+				packCount++;
 
-                if(firstPacket)
-                {
+				if(firstPacket)
+				{
 					processLogin(CPacket() << lines.readString("\n"));
-                }
-					else
-                {
-                	//parsePacket(CPacket() << lines.readString("\n"));
-                	int id = lines.readByte1();
-                	lines.setRead(lines.getRead() - 1);
+				}
+				else
+				{
+					//parsePacket(CPacket() << lines.readString("\n"));
+					int id = lines.readByte1();
+					lines.setRead(lines.getRead() - 1);
 
-                	if (type == CLIENTRC && id == 93)
-                	{
+					if (type == CLIENTRC && id == 93)
+					{
 						parsePacket(CPacket() << lines.copy(lines.getRead()));
 						lines.setRead(lines.length());
-                	}
-						else
+					}
+					else
 					{
 						parsePacket(CPacket() << lines.readString("\n"));
 					}
@@ -337,23 +346,21 @@ void CPlayer::main()
 
 				if(deleteMe)
 					return;
-            }
-            receiveBuff.remove(0, len+2);
-        }
-        else
-        {
-            errorOut("rclog.txt", CString() << "Decompression error for player " <<
-				accountName);
-            deleteMe = true;
-            sendPacket(CPacket() << (char)DISMESSAGE << "Decompression error\n");
-            return;
-        }
-    }
+			}
+			receiveBuff.remove(0, len+2);
+		}
+		else
+		{
+			errorOut("rclog.txt", CString() << "Decompression error for player " << accountName);
+			deleteMe = true;
+			sendPacket(CPacket() << (char)DISMESSAGE << "Decompression error\n");
+			return;
+		}
+	}
 
-
-    sendWeapons();
-    sendFiles();
-    compressAndSend();
+	sendWeapons();
+	sendFiles();
+	compressAndSend();
 }
 
 void CPlayer::processLogin(CPacket& pPacket)
@@ -414,195 +421,210 @@ void CPlayer::processLogin(CPacket& pPacket)
 
 void CPlayer::sendAccount()
 {
-    CPacket packet;
-    if (loadAccount())  //Do login check
-    {
-    	ListServer_Send(CPacket() << (char)SLSPLAYERADD << (char)accountName.length() << accountName << getProp(NICKNAME) << getProp(CURLEVEL) << getProp(PLAYERX) << getProp(PLAYERY) << getProp(PALIGNMENT) << (char)type);
+	CPacket packet;
+	if (!loadAccount())  //Do login check
+	{
+		errorOut("rclog.txt", CString() << accountName << " is not allowed on server");
+		deleteMe = true;
+		lastIp = inet_addr(playerSock->tcpIp());
+		return;
+	}
 
-        //Server signiture. Allows more than 8 players
-        sendPacket(CPacket() << (char)UNLIMITEDSIG << (char)73);
-        if (!loadOnly)
-        {
-            CPlayer* player = findPlayerId(accountName);
-            if(player != NULL)
-            {
-                if(type == player->type)
-                {
-                    if (time(NULL) - player->lastData > 30)
-                    {
-                        errorOut("rclog.txt", CString() << "No data for 30 secs from " << player->accountName);
-                        player->sendPacket(CPacket() << (char)DISMESSAGE << "Someone else has logged into your account.");
-                        player->deleteMe = true;
-                    }
-						else
-                    {
-                        errorOut("rclog.txt", accountName << " account is already in use.");
-                        sendPacket(CPacket() << (char) DISMESSAGE << "This account is already in use.");
-                        deleteMe = true;
-                        return;
-                    }
-                }
-            }
-        }
+	loginTime = time(NULL);
+	ListServer_Send(CPacket() << (char)SLSPLAYERADD << (char)accountName.length() << accountName << getProp(NICKNAME) << getProp(CURLEVEL) << getProp(PLAYERX) << getProp(PLAYERY) << getProp(PALIGNMENT) << (char)type);
 
-        errorOut("rclog.txt", CString() << "New player: " << accountName);
-        id = createPlayerId(this);
-		saveAccount();
+	//Server signiture. Allows more than 8 players
+	sendPacket(CPacket() << (char)UNLIMITEDSIG << (char)73);
 
+	if (!loadOnly)
+	{
+		CPlayer* player = findPlayerId(accountName);
+		if(player != NULL)
+		{
+			if(type == player->type)
+			{
+				if (time(NULL) - player->lastData > 30)
+				{
+					errorOut("rclog.txt", CString() << "No data for 30 secs from " << player->accountName);
+					player->sendPacket(CPacket() << (char)DISMESSAGE << "Someone else has logged into your account.");
+					player->deleteMe = true;
+				}
+				else
+				{
+					errorOut("rclog.txt", accountName << " account is already in use.");
+					sendPacket(CPacket() << (char) DISMESSAGE << "This account is already in use.");
+					deleteMe = true;
+					return;
+				}
+			}
+		}
+	}
+
+	errorOut("rclog.txt", CString() << "New player: " << accountName);
+	id = createPlayerId(this);
+	saveAccount();
+
+	if(type == CLIENTPLAYER)
+	{
+		sendPacket(CPacket() << (char)UNLIMITEDSIG << (char)73);
+
+		CPacket staff;
+		staff << (char)SSTAFFGUILDS;
+		for(int i = 0; i < staffGuilds.count(); i++)
+			staff << "\"" << staffGuilds[i] << "\",";
+		sendPacket(staff);
+
+		CPacket statusl;
+		statusl << (char)SSTATUSLIST;
+		for(int i = 0; i < statusList.count(); i++)
+			statusl << "\"" << statusList[i] << "\",";
+		sendPacket(statusl);
+
+		packet << (char)SPLAYERPROPS;
+		for (int i = 0; i < propscount; i++)
+		{
+			if (sendInit[i])
+				packet << (char)i << getProp(i);
+		}
+
+		packet << (char)SRPGWINDOW << "\"Welcome to " << listServerFields[0] << "\",\"Graal Reborn - Coded by 39ster, Agret, and Joey\"";
+		sendPacket(packet);
+	}
+
+	if (type == CLIENTPLAYER)
+	{
+		sendPacket(CPacket() << (char)PLAYERWARPED << getProp(PLAYERX) << getProp(PLAYERY) << levelName);
+		sendPacket(CPacket() << (char)LEVELNAME << levelName);
+
+		if (!sendLevel(levelName, x, y, 0))
+		{
+			if (!sendLevel(unstickmeLevel, x, y, 0))
+				deleteMe = true;
+		}
+
+		sendPacket(CPacket() << (char)STARTMESSAGE << serverMessage);
+	}
+	else
+	{
+		// If the nickname wasn't specified, set it to the account name.
+		if ( nickName.length() <= 0 )
+			nickName = accountName;
+		headImage = staffHead;
+		for(int i = 0; i < RCMessage.count(); i++)
+			sendPacket(CPacket() << (char)DRCLOG << RCMessage[i]);
+	}
+
+	//Create property list for clients
+	CPacket playerProps;
+	playerProps << (char)OTHERPLPROPS << (short)id << (char)50 << (char)1;
+	for (int i = 0; i < propscount; i ++)
+	{
+		if (sendOthersInit[i])
+			playerProps << (char)i << getProp(i);
+	}
+	//create property list for rcs
+	CPacket rcProps;
+	rcProps << (char)SADDPLAYER << (short)id;
+	rcProps << (char)accountName.length() << accountName;
+	rcProps << (char)CURLEVEL << getProp(CURLEVEL);
+	rcProps << (char)NICKNAME << getProp(NICKNAME);
+	rcProps << (char)HEADGIF << getProp(HEADGIF);
+	rcProps << (char)BODYIMG << getProp(BODYIMG);
+
+	for (int i = 0; i < playerList.count(); i++)
+	{
+		CPlayer* other = (CPlayer*)playerList[i];
+		if(other == this)
+			continue;
 		if(type == CLIENTPLAYER)
 		{
-			sendPacket(CPacket() << (char)UNLIMITEDSIG << (char)73);
-
-			CPacket staff;
-			staff << (char)SSTAFFGUILDS;
-			for(int i = 0; i < staffGuilds.count(); i++)
-				staff << "\"" << staffGuilds[i] << "\",";
-			sendPacket(staff);
-
-			CPacket statusl;
-			statusl << (char)SSTATUSLIST;
-			for(int i = 0; i < statusList.count(); i++)
-				statusl << "\"" << statusList[i] << "\",";
-			sendPacket(statusl);
-
-			packet << (char)SPLAYERPROPS;
-			for (int i = 0; i < propscount; i++)
+			CPacket otherProps;
+			otherProps << (char)OTHERPLPROPS << (short)other->id << (char)50 << (char)1;
+			for (int ii = 0; ii < propscount; ii ++)
 			{
-				if (sendInit[i])
-					packet << (char)i << getProp(i);
+				if (sendOthersInit[ii])
+					otherProps << (char) ii << other->getProp(ii);
 			}
-
-			packet << (char)SRPGWINDOW << "\"Welcome to " << listServerFields[0] << "\",\"Graal Reborn - Coded by 39ster, Agret, and Joey\"";
-			sendPacket(packet);
-		}
-
-        if (type == CLIENTPLAYER)
+			sendPacket(otherProps);
+		} else if(type == CLIENTRC)
 		{
-			sendPacket(CPacket() << (char)PLAYERWARPED << getProp(PLAYERX) << getProp(PLAYERY) << levelName);
-			sendPacket(CPacket() << (char)LEVELNAME << levelName);
-
-			if (!sendLevel(levelName, x, y, 0))
-			{
-				if (!sendLevel(unstickmeLevel, x, y, 0))
-					deleteMe = true;
-			}
-
-			sendPacket(CPacket() << (char)STARTMESSAGE << serverMessage);
+			CPacket otherProps;
+			otherProps << (char)SADDPLAYER << (short)other->id;
+			otherProps << (char)other->accountName.length() << other->accountName;
+			otherProps << (char)CURLEVEL << other->getProp(CURLEVEL);
+			otherProps << (char)NICKNAME << other->getProp(NICKNAME);
+			otherProps << (char)HEADGIF << other->getProp(HEADGIF);
+			otherProps << (char)BODYIMG << other->getProp(BODYIMG);
+			sendPacket(otherProps);
 		}
-			else
+
+		if(other->type == CLIENTRC)
 		{
-		    nickName = accountName;
-		    headImage = staffHead;
-		    for(int i = 0; i < RCMessage.count(); i++)
-                sendPacket(CPacket() << (char)DRCLOG << RCMessage[i]);
-		}
-
-		//Create property list for clients
-		CPacket playerProps;
-		playerProps << (char)OTHERPLPROPS << (short)id << (char)50 << (char)1;
-		for (int i = 0; i < propscount; i ++)
-		{
-			if (sendOthersInit[i])
-				playerProps << (char)i << getProp(i);
-		}
-		//create property list for rcs
-		CPacket rcProps;
-		rcProps << (char)SADDPLAYER << (short)id;
-		rcProps << (char)accountName.length() << accountName;
-        rcProps << (char)CURLEVEL << getProp(CURLEVEL);
-        rcProps << (char)NICKNAME << getProp(NICKNAME);
-        rcProps << (char)HEADGIF << getProp(HEADGIF);
-        rcProps << (char)BODYIMG << getProp(BODYIMG);
-
-		for (int i = 0; i < playerList.count(); i++)
-        {
-            CPlayer* other = (CPlayer*)playerList[i];
-            if(other == this)
-                continue;
-			if(type == CLIENTPLAYER)
+			other->sendPacket(rcProps);
+			if(type == CLIENTRC)
 			{
-			    CPacket otherProps;
-				otherProps << (char)OTHERPLPROPS << (short)other->id << (char)50 << (char)1;
-				for (int ii = 0; ii < propscount; ii ++)
-				{
-					if (sendOthersInit[ii])
-						otherProps << (char) ii << other->getProp(ii);
-				}
-				sendPacket(otherProps);
-			} else if(type == CLIENTRC)
-			{
-			    CPacket otherProps;
-				otherProps << (char)SADDPLAYER << (short)other->id;
-				otherProps << (char)other->accountName.length() << other->accountName;
-                otherProps << (char)CURLEVEL << other->getProp(CURLEVEL);
-                otherProps << (char)NICKNAME << other->getProp(NICKNAME);
-                otherProps << (char)HEADGIF << other->getProp(HEADGIF);
-				otherProps << (char)BODYIMG << other->getProp(BODYIMG);
-				sendPacket(otherProps);
+				other->sendPacket(CPacket() << (char)DRCLOG << "New RC: " << nickName << " (" << accountName << ")");
+				sendPacket(CPacket() << (char)DRCLOG << "New RC: " << other->nickName << " (" << other->accountName << ")");
 			}
+		}
+		else if(other->type == CLIENTPLAYER)
+			other->sendPacket(playerProps);
+	}
 
-			if(other->type == CLIENTRC)
-			{
-				other->sendPacket(rcProps);
-				if(type == CLIENTRC)
-				{
-					other->sendPacket(CPacket() << (char)DRCLOG << "New RC: " << nickName << " (" << accountName << ")");
-					sendPacket(CPacket() << (char)DRCLOG << "New RC: " << other->nickName << " (" << other->accountName << ")");
-				}
-			}
-			else if(other->type == CLIENTPLAYER)
-				other->sendPacket(playerProps);
-        }
-        if(type == CLIENTPLAYER)
-        {
-            for (int i = 0; i < myWeapons.count(); i++)
-                weaponSend.add(myWeapons[i]);
+	if (type == CLIENTPLAYER)
+	{
+		for (int i = 0; i < myWeapons.count(); i++)
+			weaponSend.add(myWeapons[i]);
+		myWeapons.clear();
 
-            for (int i = 0; i < myFlags.count(); i++)
-                sendPacket(CPacket() << (char)SSETFLAG << myFlags[i]);
+		for (int i = 0; i < myFlags.count(); i++)
+			sendPacket(CPacket() << (char)SSETFLAG << myFlags[i]);
 
-            for (int i = 0; i < serverFlags.count(); i++)
-                sendPacket(CPacket() << (char)SSETFLAG << serverFlags[i]);
-        }
-        newPlayers.remove(this);
-        playerList.add(this);
-    } else
-    {
-        errorOut("rclog.txt", CString() << accountName << " is not allowed on server");
-        deleteMe = true;
-    }
-    lastIp = inet_addr(playerSock->tcpIp());
+		for (int i = 0; i < serverFlags.count(); i++)
+			sendPacket(CPacket() << (char)SSETFLAG << serverFlags[i]);
+
+		// Delete that pesky bomb.
+		sendPacket(CPacket() << (char)SDELNPCWEAPON << "Bomb");
+	}
+
+	newPlayers.remove(this);
+	playerList.add(this);
+	lastIp = inet_addr(playerSock->tcpIp());
 }
 
 void CPlayer::parsePacket(CPacket& pPacket)
 {
 	if(pPacket.length() <= 0)
 		return;
-    CPacket packet;
+	CPacket packet;
 
-    #ifdef GSERV22
-		mcodec.apply(reinterpret_cast<uint8_t*>(pPacket.text()), pPacket.length());
-    #endif
+#ifdef GSERV22
+	mcodec.apply(reinterpret_cast<uint8_t*>(pPacket.text()), pPacket.length());
+#endif
 
-    //Decrypt packet
-    if (type == CLIENTPLAYER)
-    {
-        iterator *= 0x8088405;
-        iterator += key;
-        int pos = ((iterator & 0x0FFFF) % pPacket.length())+1;
-        packet.writeBytes(pPacket.text(), pos-1);
-        packet.writeBytes(pPacket.text()+pos, pPacket.length()-pos);
-    }else
-        packet = pPacket;
+	//Decrypt packet
+	if (type == CLIENTPLAYER)
+	{
+		iterator *= 0x8088405;
+		iterator += key;
+		int pos = ((iterator & 0x0FFFF) % pPacket.length())+1;
+		packet.writeBytes(pPacket.text(), pos-1);
+		packet.writeBytes(pPacket.text()+pos, pPacket.length()-pos);
+	}
+	else
+		packet = pPacket;
 
-    int messageId = packet.readByte1();
-    if(id < 0 && messageId != 37 && messageId != 39)
-        return;
+	int messageId = packet.readByte1();
 
-    if(messageId != BADDYPROPS && messageId != NPCPROPS && showConsolePackets)
-        printf("NEW PACKET: %i: %s\n", messageId, packet.text()+1);
+	// If the player is not yet fully created, only allow LANGUAGE, MAPINFO,
+	// and PLAYERPROP packets through.
+	if(id < 0 && messageId != 37 && messageId != 39 && messageId != 2)
+		return;
 
-    if (messageId >= 0 &&  messageId < clientpackages)
+	if(messageId != BADDYPROPS && messageId != NPCPROPS && showConsolePackets)
+		printf("NEW PACKET: %i: %s\n", messageId, packet.text()+1);
+
+	if (messageId >= 0 &&  messageId < clientpackages)
 		(*this.*msgFuncs[messageId])(packet);
 	else if(messageId < 0)
 	{
@@ -616,9 +638,18 @@ void CPlayer::parsePacket(CPacket& pPacket)
 
 void CPlayer::sendPacket(CPacket& pPacket)
 {
-    outBuff << pPacket << "\n";
-    if (outBuff.length() > 4*1024)
-        compressAndSend();
+	// If the player doesn't have a socket, they have been loaded
+	// by an RC for offline editing.
+	if ( playerSock == 0 )
+		return;
+
+	// Store the packet in outBuff adding a newline if one doesn't exist.
+	outBuff << pPacket;
+	if ( pPacket[ pPacket.length() - 1 ] != '\n' )
+		outBuff << "\n";
+
+	if (outBuff.length() > 4*1024)
+		compressAndSend();
 }
 
 void CPlayer::compressAndSend()
@@ -680,7 +711,7 @@ void CPlayer::warp(CString& pLevel, float pX, float pY, int pModTime)
 
     if (pLevel != levelName)
     {
-    	//sendPacket(CPacket() << (char)PLAYERWARPED << getProp(PLAYERX) << getProp(PLAYERY) << levelName);
+    	if (pModTime == 0) sendPacket(CPacket() << (char)PLAYERWARPED << getProp(PLAYERX) << getProp(PLAYERY) << pLevel);
         sendPacket(CPacket() << (char)LEVELNAME << pLevel);
 
         if (!sendLevel(pLevel, x, y, pModTime))
@@ -958,26 +989,26 @@ void CPlayer::setNick(CString& pNewNick, bool pVerifyGuild)
 	WordFilter.apply(this, pNewNick, FILTERC_NICK);
 
 	CString tmpGuild, tmpNick;
-    tmpNick = (pNewNick.length() > 200 ? pNewNick.copy(0, 200) : pNewNick);
+	tmpNick = (pNewNick.length() > 200 ? pNewNick.copy(0, 200) : pNewNick);
 	while (tmpNick[0] == '*' || tmpNick[0] == ' ')
-        tmpNick = tmpNick.copy(1, tmpNick.length()-1);
+		tmpNick = tmpNick.copy(1, tmpNick.length()-1);
 
-    // Guild Authentication
-    int guildStart = tmpNick.find('(') + 1;
-    int guildLen = tmpNick.find(')', guildStart) - guildStart;
+	// Guild Authentication
+	int guildStart = tmpNick.find('(') + 1;
+	int guildLen = tmpNick.find(')', guildStart) - guildStart;
 
-    if (guildStart > 0)
-    {
-        tmpGuild = (guildLen > 0 ? tmpNick.copy(guildStart, guildLen) : "");
-        tmpNick = tmpNick.copy(0, guildStart - 1);
-        tmpNick.trim();
+	if (guildStart > 0)
+	{
+		tmpGuild = (guildLen > 0 ? tmpNick.copy(guildStart, guildLen) : "");
+		tmpNick = tmpNick.copy(0, guildStart - 1);
+		tmpNick.trim();
 
-        if (pVerifyGuild)
-        {
+		if (pVerifyGuild)
+		{
 			if (!guildMemberExists(tmpGuild, accountName, tmpNick))
 			{
-                ListServer_Send(CPacket() << (char)SLSGUILD << (short)id << (char)accountName.length() << accountName << (char)tmpNick.length() << tmpNick << (char)tmpGuild.length() << tmpGuild);
-                tmpGuild = "";
+				ListServer_Send(CPacket() << (char)SLSGUILD << (short)id << (char)accountName.length() << accountName << (char)tmpNick.length() << tmpNick << (char)tmpGuild.length() << tmpGuild);
+				tmpGuild = "";
 			}
 		}
 	}
@@ -989,18 +1020,25 @@ void CPlayer::setNick(CString& pNewNick, bool pVerifyGuild)
 	if (tmpGuild.length() > 0)
 		tmpNick << " (" << tmpGuild << ")";
 
-    nickName  = tmpNick;
+	nickName  = tmpNick;
 	guildName = tmpGuild;
 
 	ListServer_Send(CPacket() << (char)SLSNICKNAME << (char)accountName.length() << accountName << getProp(NICKNAME));
-    sendPacket(CPacket() << (char)SPLAYERPROPS << (char)NICKNAME << getProp(NICKNAME));
-    for (int i = 0; i < playerList.count(); i++)
-    {
-        CPlayer*other = (CPlayer*)playerList[i];
-        if (other != this)
-            other->sendPacket(CPacket() << (char)OTHERPLPROPS << (short)id << (char)NICKNAME << getProp(NICKNAME));
-    }
+	sendPacket(CPacket() << (char)SPLAYERPROPS << (char)NICKNAME << getProp(NICKNAME));
+
+	// When RC's log in, they will send their nickname.  When that happens, they still have
+	// an ID of -1.  Don't send information to any clients in that case.
+	if ( id != -1 && type == CLIENTPLAYER )
+	{
+		for (int i = 0; i < playerList.count(); i++)
+		{
+			CPlayer*other = (CPlayer*)playerList[i];
+			if (other != this)
+				other->sendPacket(CPacket() << (char)OTHERPLPROPS << (short)id << (char)NICKNAME << getProp(NICKNAME));
+		}
+	}
 }
+
 
 void CPlayer::setAccPropsRc(CPacket& pPacket)
 {
@@ -1014,18 +1052,26 @@ void CPlayer::setAccPropsRc(CPacket& pPacket)
 
 	// Clear Flags + Weapons
 	for (int i = 0; i < myFlags.count(); i++)
-	    temp << (char)SUNSETFLAG << myFlags[i];
+		temp << (char)SUNSETFLAG << myFlags[i] << "\n";
 	for (int i = 0; i < myWeapons.count(); i++)
-	    temp << (char)SDELNPCWEAPON << myWeapons[i];
+	{
+		temp << (char)SDELNPCWEAPON << myWeapons[i] << "\n";
+
+		// Attempt to fix the funky client bomb capitalization issue.
+		if ( myWeapons[i] == "bomb" )
+			temp << (char)SDELNPCWEAPON << "Bomb" << "\n";
+	}	
 	sendPacket(temp);
 
 	myFlags.clear();
 	for(int i = pPacket.readByte2(); i >0; i--)
 	{
 		int len = (unsigned char)pPacket.readByte1();
-        if (len > 0)
-            myFlags.add(pPacket.readChars(len));
+		if (len > 0)
+			myFlags.add(pPacket.readChars(len));
 	}
+	for ( int i = 0; i < myFlags.count(); ++i )
+		sendPacket( CPacket() << (char)SSETFLAG << myFlags[i] );
 
 	myChests.clear();
 	for(int i = pPacket.readByte2(); i > 0; i--)
@@ -1041,10 +1087,14 @@ void CPlayer::setAccPropsRc(CPacket& pPacket)
 	{
 		int len = pPacket.readByte1();
 		if(len <= 0)
-            continue;
+			continue;
 		CString wpn = pPacket.readChars(len);
 		weaponSend.add(wpn);
 	}
+	sendWeapons();
+
+	// Re-send the level to the player to update chests and whatnot.
+	sendLevel( levelName, x, y, level->modTime );
 }
 
 CPacket CPlayer::getAccPropsRC()
@@ -1129,7 +1179,7 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, int pModTime)
     CString newLevel = pLevel;
 	if(!pLevel.length())
 		return false;
-    int pos = newLevel.find('§');
+    int pos = newLevel.find((char)0xa7);
     if(pos >= 0)
         newLevel = newLevel.copy(pos+1, newLevel.length()-pos-1);
 
@@ -1192,7 +1242,8 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, int pModTime)
         {
             sendPacket(CPacket() << (char)LEVELCHEST << (char)1 << (char)chest->x << (char)chest->y);
         }
-        else sendPacket(CPacket() << (char)LEVELCHEST << (char)0 << (char)chest->x << (char)chest->y << (char)chest->item << (char)chest->signIndex);
+        else
+		sendPacket(CPacket() << (char)LEVELCHEST << (char)0 << (char)chest->x << (char)chest->y << (char)chest->item << (char)chest->signIndex);
     }
 
     //send horses
@@ -1228,37 +1279,62 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, int pModTime)
             other->sendPacket(packet);
     }
 
-    //get props
-    packet.clear();
-    packet << (char)OTHERPLPROPS << (short)id << (char)50 << (char)1;
-    for (int i = 0; i < propscount; i++)
-    {
-        if (forwardLocal[i])
-            packet << (char)i << getProp(i);
-    }
+	//get props
+//	int pl = 0;
+	packet.clear();
+	packet << (char)OTHERPLPROPS << (short)id << (char)50 << (char)1;
+	for (int i = 0; i < propscount; i++)
+	{
+		if (forwardLocal[i])
+		{
+			packet << (char)i << getProp(i);
+/*		
+			// Limit the packet to only 5 props
+			if ( (pl+1) % 5 == 0 )
+			{
+				packet << "\n";
+				packet << (char)OTHERPLPROPS << (short)id;// << (char)50 << (char)1;
+			}
+			pl++;
+*/
+		}
+	}
+//packet.save( "props.raw" );
 
-    //send props
-    for (int i = 0; i < level->players.count(); i++)
-    {
-        CPlayer*other = (CPlayer*)level->players[i];
-        if (other == this)
-            continue;
+	//send props
+	for (int i = 0; i < level->players.count(); i++)
+	{
+		CPlayer*other = (CPlayer*)level->players[i];
+		if (other == this)
+			continue;
 
 		CPacket otherProps;
 		otherProps << (char)OTHERPLPROPS << (short)other->id << (char)50 << (char)1;
 
+		//pl = 0;
 		for (int ii = 0; ii < propscount; ii++)
 		{
 			if (forwardLocal[ii])
+			{
 				otherProps << (char)ii << other->getProp(ii);
+/*
+				// Limit the packet to only 5 props
+				if ( (pl+1) % 5 == 0 )
+				{
+					otherProps << "\n";
+					otherProps << (char)OTHERPLPROPS << (short)other->id;// << (char)50 << (char)1;
+					pl++;
+				}
+*/
+			}
 		}
 		sendPacket(otherProps);
-        other->sendPacket(packet);
+		other->sendPacket(packet);
+	}
 
-    }
-    compressAndSend();
+	compressAndSend();
 	if (level->players.count() == 1)
-        sendPacket(CPacket() << (char)ISLEADER);
+		sendPacket(CPacket() << (char)ISLEADER);
 	return true;
 }
 
@@ -1295,67 +1371,87 @@ void CPlayer::leaveLevel()
 
 void CPlayer::sendWeapons()
 {
-    for (int i = 0; i < weaponSend.count(); i++)
-    {
-        if (myWeapons.find(weaponSend[i].text()) < 0)
-            myWeapons.add(weaponSend[i]);
+	for (int i = 0; i < weaponSend.count(); i++)
+	{
+		int fIndex = myWeapons.find( weaponSend[i].text() );
 
-        bool defaultWeapon = false;
-        for (int ii = 0; ii < itemcount; ii++)
-        {
-            if (weaponSend[i] == itemNames[ii])
-            {
-                defaultWeapon = true;
-                sendPacket(CPacket() << (char)SADDDEFWEAPON << (char)ii);
-                break;
-            }
-        }
-        if (defaultWeapon)
-            continue;
-        for (int ii = 0; ii < weaponList.count(); ii++)
-        {
-            CWeapon* weapon = (CWeapon*)weaponList[ii];
-            if (weapon->name == weaponSend[i])
-            {
-                sendPacket(CPacket() << (char)SADDNPCWEAPON <<
-                           weapon->getSendData());
-                break;
-            }
-        }
-    }
-    weaponSend.clear();
+		bool defaultWeapon = false;
+		for (int ii = 0; ii < itemcount; ii++)
+		{
+			if (weaponSend[i] == itemNames[ii])
+			{
+				defaultWeapon = true;
+
+				// Only send if we allow default weapons.
+				if ( defaultweapons == true )
+				{
+					myWeapons.add(weaponSend[i]);
+					sendPacket(CPacket() << (char)SADDDEFWEAPON << (char)ii);
+				}
+				break;
+			}
+		}
+
+		if ( fIndex < 0 && !defaultWeapon )
+			myWeapons.add(weaponSend[i]);
+
+		if (defaultWeapon)
+			continue;
+
+		for (int ii = 0; ii < weaponList.count(); ii++)
+		{
+			CWeapon* weapon = (CWeapon*)weaponList[ii];
+			if (weapon->name == weaponSend[i])
+			{
+				// Delete the weapon if it has changed and the player already has it.
+				// This forces the client to refresh that weapon.
+				if ( fIndex >= 0 )
+				{
+//					if ( myWeapons[fIndex].modTime != weapon->modTime )
+//					{
+//						myWeapons.remove(fIndex);
+//						myWeapons.add(weaponSend[i]);
+						sendPacket( CPacket() << (char)SDELNPCWEAPON << weapon->name );
+//					}
+				}
+				sendPacket(CPacket() << (char)SADDNPCWEAPON << weapon->getSendData());
+				break;
+			}
+		}
+	}
+	weaponSend.clear();
 }
 
 void CPlayer::sendFiles()
 {
-    for (int i = 0; i < fileList.count(); i++)
-    {
-        long long modTime;
-        bool failed = true;
-        COutFile* file = (COutFile*)fileList[i];
-        CBuffer fileData;
+	for (int i = 0; i < fileList.count(); i++)
+	{
+		long long modTime;
+		bool failed = true;
+		COutFile* file = (COutFile*)fileList[i];
+		CBuffer fileData;
 		CString shortName = file->fileName;
 		CString longName = (file->longName.length() > 0 ? file->longName : getDataFile(shortName.text()));
 
 		if(longName.length())
 		{
-            modTime = getFileModTime(longName.text());
-            if (modTime != file->modTime)
-            {
-                if (fileData.load(longName.text()) && fileData.length() <= 64500)
-                {
-                    failed = false;
-                    int len = 1 + 5 + 1 + shortName.length() + fileData.length() + 1;
-                    sendPacket(CPacket() << (char)100 << (int)len);
-                    sendPacket(CPacket() << (char)102 << (long long)modTime << (char)shortName.length() << shortName << fileData);
-                }
-            }
+			modTime = getFileModTime(longName.text());
+			if (modTime != file->modTime)
+			{
+				if (fileData.load(longName.text()) && fileData.length() <= 64500)
+				{
+					failed = false;
+					int len = 1 + 5 + 1 + shortName.length() + fileData.length() + 1;
+					sendPacket(CPacket() << (char)100 << (int)len);
+					sendPacket(CPacket() << (char)102 << (long long)modTime << (char)shortName.length() << shortName << fileData << "\n");
+				}
+			}
 		}
 		if(failed)
-            sendPacket(CPacket() << (char)GIFFAILED << shortName);
-        delete file;
-    }
-    fileList.clear();
+			sendPacket(CPacket() << (char)GIFFAILED << shortName);
+		delete file;
+	}
+	fileList.clear();
 }
 
 int CPlayer::getLeavingTime(CLevel* pLevel)
@@ -1683,6 +1779,11 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
     int len;
     CPacket forwardBuff;
     forwardBuff << (char) OTHERPLPROPS << (short)id;
+
+    // This allows for correct RC login.
+    if ( id == -1 && pForward ) pForward = false;
+
+    int pl = 0;
     while (pProps.bytesLeft())
     {
 //        int startpos = pProps.getRead();
@@ -1879,16 +1980,6 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
             //TO DO: add hack check
             break;
 
-        case EFFECTCOLORS:
-			pProps.readByte5();
-            break;
-
-        case CARRYNPC:
-            pProps.readByte3();
-            //this doesnt work even when i add the correct code...:/
-            //TO DO: add hack check
-            break;
-
         case APCOUNTER:
             apCounter = pProps.readByte2();
             //TO DO: add hack check
@@ -1911,6 +2002,16 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
             //Why should any1 be able to change deaths?
             break;
 
+        case CARRYNPC:
+            pProps.readByte3();
+            //this doesnt work even when i add the correct code...:/
+            //TO DO: add hack check
+            break;
+
+        case EFFECTCOLORS:
+            pProps.readByte5();
+            break;
+
         case ONLINESECS:
             //onlineSecs = pProps.readByte3();
             pProps.readByte3();
@@ -1921,6 +2022,11 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
             //lastIp = (int)pProps.readByte5();
             pProps.readByte5();
             //Why should any1 be able to change last ip?
+            break;
+
+        case PALIGNMENT:
+            ap = CLIP(pProps.readByte1(), 0, 100);
+            //TO DO: add hack check
             break;
 
         case UDPPORT:
@@ -1940,11 +2046,6 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
                         (short)id << (char)UDPPORT << (int)udpPort);
                 }
             }
-            //TO DO: add hack check
-            break;
-
-        case PALIGNMENT:
-            ap = CLIP(pProps.readByte1(), 0, 100);
             //TO DO: add hack check
             break;
 
@@ -1969,6 +2070,10 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 
         case PSTATUSMSG:
             statusMsg = pProps.readByte1();
+
+	    // Allows proper RC login.
+	    if ( id == -1 ) break;
+
             for(int i = 0; i < playerList.count(); i++)
             {
                 CPlayer*other = (CPlayer*)playerList[i];
@@ -2024,22 +2129,33 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
             return;
         }
 
-        if (pForward)
-        {
-            /*
-            int len2 = pProps.getRead() - startpos;
-            if (!(udpPort && udpDontForward[index]))
-            {
-                if (forwardLocal[index])
-                    forwardBuff.writeBytes(pProps.text()+startpos, len2);
-            }
-            */
-            forwardBuff << (char)index << getProp(index);
-        }
-    }
+		if (pForward)
+		{
+			/*
+			int len2 = pProps.getRead() - startpos;
+			if (!(udpPort && udpDontForward[index]))
+			{
+				if (forwardLocal[index])
+				forwardBuff.writeBytes(pProps.text()+startpos, len2);
+			}
+			*/
+			forwardBuff << (char)index << getProp(index);
+			/*
+			if ( (pl+1) % 5 == 0 ) 
+			{
+				forwardBuff << "\n";
+				forwardBuff << (char)OTHERPLPROPS << (short)id;
+			}
+			pl++;
+			*/
+		}
+	}
 
-    if (pForward && forwardBuff.length() > 0)
-        sendLocally(forwardBuff);
+	if (pForward && forwardBuff.length() > 0)
+	{
+		sendLocally(forwardBuff);
+		compressAndSend();
+	}
 }
 
 
@@ -2470,12 +2586,12 @@ void CPlayer::msgCLAIMPKER(CPacket& pPacket)
 
 	if (apSystem)
 	{
-		if (other->ap > 0)
+		if (other->ap > 0 && ap > 19)
 		{
-			int o = other->ap;
-			other->ap = MIN(other->ap - ((other->ap/20+1)*(ap/20)), 0);
+			other->ap -= ((other->ap/20+1)*(ap/20));
+			if (other->ap < 0) other->ap = 0;
 			other->apCounter = (other->ap < 20 ? aptime[0] : (other->ap < 40 ? aptime[1] : (other->ap < 60 ? aptime[2] : (other->ap < 80 ? aptime[3] : aptime[4]))));
-			if (o != other->ap) other->updateProp(PALIGNMENT);
+            other->updateProp(PALIGNMENT);
 		}
 	}
 }
@@ -2528,13 +2644,13 @@ void CPlayer::msgADDBADDY(CPacket& pPacket)
 
 void CPlayer::msgSETFLAG(CPacket& pPacket)
 {
-    CString flagName = pPacket.readString("=");
-    CString flagNameValue = pPacket.readString("");
+    CString flagNameValue = pPacket.text() + 1;
+    CString flagName;
 
-    //int pos = flagNameValue.find('=');
-    //if (pos >= 0)
-    //    flagName = flagNameValue.copy(0, pos);
-    //else flagName = flagNameValue;
+    int pos = flagNameValue.find('=');
+    if (pos >= 0)
+        flagName = flagNameValue.copy(0, pos);
+    else flagName = flagNameValue;
 
 	/* Depreciated?
 	if(flagName.length() > 999 || myFlags.count() > 999)
@@ -2620,25 +2736,25 @@ void CPlayer::msgUNSETFLAG(CPacket& pPacket)
 
 void CPlayer::msgOPENCHEST(CPacket& pPacket)
 {
-    int cX = pPacket.readByte1();
-    int cY = pPacket.readByte1();
+	int cX = pPacket.readByte1();
+	int cY = pPacket.readByte1();
 	CString chest = CString() << toString(cX) << ":" << toString(cY)
 		<< ":" << levelName;
 	if(myChests.findI(chest) >= 0)
 		return;
 
 
-    for (int i = 0; i < level->chests.count(); i++)
-    {
-        CChest* chest = (CChest*)level->chests[i];
-        if (chest->x == cX && chest->y == cY)
-        {
-            getItem(chest->item);
+	for (int i = 0; i < level->chests.count(); i++)
+	{
+		CChest* chest = (CChest*)level->chests[i];
+		if (chest->x == cX && chest->y == cY)
+		{
+			getItem(chest->item);
 			myChests.add(CString() << toString(cX) << ":" << toString(cY) << ":" << levelName);
-            break;
-        }
+			break;
+		}
 
-    }
+	}
 }
 
 void CPlayer::msgADDNPC(CPacket& pPacket)
@@ -2682,7 +2798,7 @@ void CPlayer::msgWANTFILE(CPacket& pPacket)
 
 void CPlayer::msgNPCWEAPONIMG(CPacket& pPacket)
 {
-    sendLocally(CPacket() << (char)SNPCWEAPONIMG << (short)id << pPacket.text()+1);
+	sendLocally(CPacket() << (char)SNPCWEAPONIMG << (short)id << pPacket.text()+1);
 }
 
 void CPlayer::msgEMPTY25(CPacket& pPacket)
@@ -2713,7 +2829,7 @@ void CPlayer::msgPRIVMESSAGE(CPacket& pPacket)
 	if(getTime() - lastMessage <= 4)
 	{
 		sendPacket(CPacket() << (char)SADMINMSG <<
-                   "Server message:§You can only send messages once every four seconds.");
+                   "Server message:\xa7You can only send messages once every four seconds.");
 		return;
 	}
 
@@ -2729,7 +2845,7 @@ void CPlayer::msgPRIVMESSAGE(CPacket& pPacket)
     CString message = pPacket.text() + 3 + (playerCount*2);
     if (message.length() > 1024)
     {
-        sendPacket(CPacket() << (char)SADMINMSG << "Server message:§Your message was too long.");
+        sendPacket(CPacket() << (char)SADMINMSG << "Server message:\xa7Your message was too long.");
         return;
     }
 
@@ -2783,50 +2899,57 @@ void CPlayer::msgPACKCOUNT(CPacket& pPacket)
 
 void CPlayer::msgADDWEAPON2(CPacket& pPacket)
 {
-    CString name;
-    int type = pPacket.readByte1();
+	CString name;
+	int type = pPacket.readByte1();
+	if (type == 0) //basic weapon (bomb, bow, etc)
+	{
+		int item = pPacket.readByte1();
 
-    if (type == 0) //basic weapon (bomb, bow, etc)
-    {
-        int item = pPacket.readByte1();
-        if (item < 0 || item >= itemcount-1)
-            return;
+		// The client tries to add the bomb when it connects.  Prevent this.
+		if ( item == 8 && !allowBomb )
+		{
+			allowBomb = true;
+			return;
+		}
+
+		if (item < 0 || item >= itemcount-1)
+			return;
 		if(myWeapons.findI(itemNames[item]) < 0)
 			weaponSend.add(itemNames[item]);
-    } else		//Npc weapon
-    {
-        int npcId = pPacket.readByte3();
-        CNpc* npc = (CNpc*)npcIds[npcId];
-        if (npc == NULL)
-            return;
-        name = npc->weaponName;
-        if (!name.length())
-            return;
+	} else		//Npc weapon
+	{
+		int npcId = pPacket.readByte3();
+		CNpc* npc = (CNpc*)npcIds[npcId];
+		if (npc == NULL)
+			return;
+		name = npc->weaponName;
+		if (!name.length())
+			return;
 
-        weaponSend.add(name);
-        CWeapon* weapon = NULL;
-        for (int i = 0; i < weaponList.count(); i++)
-        {
-            weapon = (CWeapon*)weaponList[i];
-            if (weapon->name == name)
-            {
-                if (weapon->modTime == level->modTime)
-                    return;
-                else break;
-            }
-            weapon = NULL;
-        }
-        if (weapon == NULL)
-        {
-            weapon = new CWeapon;
-            weaponList.add(weapon);
-        }
-        weapon->name = name;
-        weapon->image = npc->image;
-        weapon->modTime = level->modTime;
-        weapon->code = npc->clientCode;
-        saveWeapons("weapons.txt");
-    }
+		weaponSend.add(name);
+		CWeapon* weapon = NULL;
+		for (int i = 0; i < weaponList.count(); i++)
+		{
+			weapon = (CWeapon*)weaponList[i];
+			if (weapon->name == name)
+			{
+				if (weapon->modTime == level->modTime)
+					return;
+				else break;
+			}
+			weapon = NULL;
+		}
+		if (weapon == NULL)
+		{
+			weapon = new CWeapon;
+			weaponList.add(weapon);
+		}
+		weapon->name = name;
+		weapon->image = npc->image;
+		weapon->modTime = level->modTime;
+		weapon->code = npc->clientCode;
+		saveWeapons("weapons.txt");
+	}
 }
 void CPlayer::msgUPDATEFILE(CPacket& pPacket)
 {
@@ -2882,7 +3005,7 @@ void CPlayer::msgEMPTY43(CPacket& pPacket)
 {}
 
 void CPlayer::msgSLISTPROCESSES(CPacket& pPacket)
-{
+{/*
 	if (cheatwindows.count() <= 0)
 		return;
 
@@ -2908,7 +3031,7 @@ void CPlayer::msgSLISTPROCESSES(CPacket& pPacket)
 			deleteMe = true;
 			break;
 		}
-	}
+	}*/
 }
 
 void CPlayer::msgEMPTY45(CPacket& pPacket)
@@ -3128,7 +3251,7 @@ void CPlayer::msgADMINMSG(CPacket& pPacket)
 	{
 		CPlayer* player = (CPlayer*)playerList[i];
 		if(player != this)
-            player->sendPacket(CPacket() << (char)SADMINMSG << "Administrator " << accountName << ":§" << message);
+            player->sendPacket(CPacket() << (char)SADMINMSG << "Administrator " << accountName << ":\xa7" << message);
 	}
 }
 
@@ -3190,6 +3313,13 @@ void CPlayer::msgSETSFLAGS(CPacket& pPacket)
 	{
 		CString flag = pPacket.readChars(pPacket.readByte1());
 		serverFlags.add(flag);
+
+		// Send the new flags to all the players.
+		for ( int j = 0; j < playerList.count(); ++j )
+		{
+			CPlayer* other = (CPlayer*)playerList[j];
+			other->sendPacket(CPacket() << (char)SSETFLAG << flag);
+		}
 	}
 	sendPacket(CPacket() << (char)DRCLOG << accountName << " has updated the server flags.");
 }
@@ -3629,7 +3759,14 @@ void CPlayer::msgDSETRIGHTS(CPacket& pPacket)
 
 	player->adminRights = (int)pPacket.readByte5();
 	player->adminIp = pPacket.readChars((unsigned char)pPacket.readByte1());
-	player->myFolders.load(CString(pPacket.readChars((unsigned char)pPacket.readByte2())).untokenize().text(), "\n");
+	
+	// Untokenize and load the directories.
+	CString temp(pPacket.readChars(pPacket.readByte2()));
+	temp.untokenize();
+	myFolders.clear();
+	player->myFolders.load(temp.text(), "\n");
+
+	// Remove any invalid directories.
 	for (int i = 0; i < player->myFolders.count(); i++)
 	{
 		if (player->myFolders[i].find(':') >= 0 || player->myFolders[i].find("..") >= 0 || player->myFolders[i].find(" /*") >= 0)
@@ -3741,10 +3878,10 @@ void CPlayer::msgDSETBAN(CPacket& pPacket)
 		return;
 	}
 
-    int len = pPacket.readByte1();
-    if (len > 0)
-    {
-        CString accname = pPacket.readChars(len);
+	int len = pPacket.readByte1();
+	if (len > 0)
+	{
+		CString accname = pPacket.readChars(len);
 		bool ban = (pPacket.readByte1() > 0);
 		CString reason = pPacket.readString("");
 		CPlayer *player = findPlayerId(accname, true);
@@ -3764,16 +3901,16 @@ void CPlayer::msgDSETBAN(CPacket& pPacket)
 		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " has set the ban of " << accname);
 		if (player->id == -1)
 			delete player;
-    }
+	}
 }
 
 void CPlayer::msgDWANTFTP(CPacket& pPacket)
 {
-    if (type != CLIENTRC || !hasStaff())
-        return;
-
-    sendPacket(CPacket() << (char)SFOLDERFTP << myFolders.join("\n").tokenize());
-    sendPacket(CPacket() << (char)STEXTFTP << "Welcome to the FileBrowser");
+	if (type != CLIENTRC || !hasStaff())
+		return;
+	
+	sendPacket(CPacket() << (char)SFOLDERFTP << myFolders.join("\n").tokenize());
+	sendPacket(CPacket() << (char)STEXTFTP << "Welcome to the FileBrowser");
 
 	if (myFolders.count() > 0)
 	{
@@ -3784,12 +3921,13 @@ void CPlayer::msgDWANTFTP(CPacket& pPacket)
 		sendPacket(CPacket() << (char)SSENDFTP << (char)folder.length() << folder << listFiles(folder.text(), rights.text()));
 		ftpOn = true;
 	}
+	myFolders[0].setRead(0);
 }
 
 void CPlayer::msgDCHANGEFTP(CPacket& pPacket)
 {
-    if (type != CLIENTRC || !hasStaff())
-        return;
+	if (type != CLIENTRC || !hasStaff())
+		return;
 
 	CBuffer rights, folder, temp;
 	temp = pPacket.text()+1;
@@ -3813,26 +3951,26 @@ void CPlayer::msgDCHANGEFTP(CPacket& pPacket)
 
 void CPlayer::msgDENDFTP(CPacket& pPacket)
 {
-    if (type != CLIENTRC || !hasStaff())
-        return;
+	if (type != CLIENTRC || !hasStaff())
+		return;
 
 	ftpOn = false;
 }
 
 void CPlayer::msgDFILEFTPDOWN(CPacket& pPacket)
 {
-    if (type != CLIENTRC || !hasStaff())
-        return;
+	if (type != CLIENTRC || !hasStaff())
+		return;
 
-    CString shortName = pPacket.text() + 1;
-    fileList.add(new COutFile(CString() << lastFolder << shortName));
-    sendPacket(CPacket() << (char)STEXTFTP << "Downloaded file " << shortName);
+	CString shortName = pPacket.text() + 1;
+	fileList.add(new COutFile(CString() << lastFolder << shortName));
+	sendPacket(CPacket() << (char)STEXTFTP << "Downloaded file " << shortName);
 }
 
 void CPlayer::msgDFILEFTPUP(CPacket& pPacket)
 {
-    if (type != CLIENTRC || !hasStaff())
-        return;
+	if (type != CLIENTRC || !hasStaff())
+		return;
 
 	CBuffer shortName, fileData, fileName;
 	shortName = pPacket.readChars((unsigned char)pPacket.readByte1());
@@ -3846,8 +3984,8 @@ void CPlayer::msgDFILEFTPUP(CPacket& pPacket)
 void CPlayer::msgDFILEFTPMOV(CPacket& pPacket)
 {
 	// learn 2 fucking order...
-    if (type != CLIENTRC || !hasStaff())
-        return;
+	if (type != CLIENTRC || !hasStaff())
+		return;
 
 	CBuffer f1, f2, f3, f4;
 	f1 = pPacket.readChars((unsigned char)pPacket.readByte1());
@@ -3863,8 +4001,8 @@ void CPlayer::msgDFILEFTPMOV(CPacket& pPacket)
 
 void CPlayer::msgDFILEFTPDEL(CPacket& pPacket)
 {
-    if (type != CLIENTRC || !hasStaff())
-        return;
+	if (type != CLIENTRC || !hasStaff())
+		return;
 	// no security.. oh well
 	CString fileName = CString() << lastFolder << pPacket.text() + 1;
 	remove(fileName.text());
@@ -3873,8 +4011,8 @@ void CPlayer::msgDFILEFTPDEL(CPacket& pPacket)
 
 void CPlayer::msgDFILEFTPREN(CPacket& pPacket)
 {
-    if(type != CLIENTRC)
-        return;
+	if(type != CLIENTRC)
+		return;
 	// no security.. oh well
 	CString f1 = CString() << lastFolder << pPacket.readChars((unsigned char)pPacket.readByte1());
 	CString f2 = CString() << lastFolder << pPacket.readChars((unsigned char)pPacket.readByte1());
