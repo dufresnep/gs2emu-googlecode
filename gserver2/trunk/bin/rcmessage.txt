@@ -1,1 +1,0 @@
-Welcome to the Windows GServer2 for Graal 2.1.7.1
