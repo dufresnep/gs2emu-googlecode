@@ -367,7 +367,7 @@
 	"CPacket.h"
 	"CString.h"
 
-1192763165 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\main.cpp
+1192981504 source:e:\meh\junk\graal 2.17\gsvn\gserver2\trunk\src\main.cpp
 	"main.h"
 	"CIni.h"
 	"CPlayer.h"
@@ -400,4 +400,432 @@
 	<sys/types.h>
 	<unistd.h>
 	<unixio.h>
+
+1194644445 source:e:\coding\gsvn\gserver2\trunk\src\caccount.cpp
+	"CAccount.h"
+	"CDatabase.h"
+	"CIni.h"
+	"main.h"
+
+1194579948 e:\coding\gsvn\gserver2\trunk\src\caccount.h
+	"CString.h"
+	"CStringList.h"
+
+1192759526 e:\coding\gsvn\gserver2\trunk\src\cstring.h
+	"CBuffer.h"
+
+1197445450 e:\coding\gsvn\gserver2\trunk\src\cbuffer.h
+	<cstdlib>
+	<cstring>
+	<cstdio>
+
+1197192275 e:\coding\gsvn\gserver2\trunk\src\cstringlist.h
+	<cstdlib>
+	<cstring>
+	<cstdio>
+	"CList.h"
+	"CBuffer.h"
+
+1195440966 e:\coding\gsvn\gserver2\trunk\src\clist.h
+	<cstdlib>
+	<cstring>
+	<cstdio>
+
+1194262941 e:\coding\gsvn\gserver2\trunk\src\cdatabase.h
+	"CPacket.h"
+	"CStringList.h"
+	"CPlayer.h"
+	"CAccount.h"
+
+1192759583 e:\coding\gsvn\gserver2\trunk\src\sqlite3.h
+	<stdarg.h>
+
+1188071416 e:\coding\gsvn\gserver2\trunk\src\cpacket.h
+	"CBuffer.h"
+
+1194660905 e:\coding\gsvn\gserver2\trunk\src\cplayer.h
+	"CString.h"
+	"CStringList.h"
+	"CSocket.h"
+	"CPacket.h"
+	"CLevel.h"
+	"CAccount.h"
+	"CMap.h"
+	"crypt.h"
+
+1190087734 e:\coding\gsvn\gserver2\trunk\src\csocket.h
+	<windows.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<arpa/inet.h>
+	<netdb.h>
+	<fcntl.h>
+	<unistd.h>
+	<errno.h>
+	"CBuffer.h"
+
+1192759325 e:\coding\gsvn\gserver2\trunk\src\clevel.h
+	"CString.h"
+	"CList.h"
+	"CStringList.h"
+	"CPacket.h"
+	"COther.h"
+	"CBaddy.h"
+
+1194061069 e:\coding\gsvn\gserver2\trunk\src\cother.h
+	<windows.h>
+	<unistd.h>
+
+1192759266 e:\coding\gsvn\gserver2\trunk\src\cbaddy.h
+	"CString.h"
+	"CStringList.h"
+	"CPacket.h"
+	"COther.h"
+
+1192759381 e:\coding\gsvn\gserver2\trunk\src\cmap.h
+	"CString.h"
+	"CStringList.h"
+	"CList.h"
+	"CLevel.h"
+
+1192759475 e:\coding\gsvn\gserver2\trunk\src\crypt.h
+	<stdint.h>
+	<cstdlib>
+
+1192759311 e:\coding\gsvn\gserver2\trunk\src\cini.h
+	<cstdio>
+	<cstring>
+	<cstdlib>
+	"CList.h"
+
+1197447729 e:\coding\gsvn\gserver2\trunk\src\main.h
+	"CList.h"
+	"CListServer.h"
+	"CString.h"
+	"CStringList.h"
+	"CPlayer.h"
+	"CNpc.h"
+	<dir.h>
+	<time.h>
+
+1192759396 e:\coding\gsvn\gserver2\trunk\src\cnpc.h
+	"CString.h"
+	"CLevel.h"
+	"CPacket.h"
+
+1192759260 source:e:\coding\gsvn\gserver2\trunk\src\cbaddy.cpp
+	"CBaddy.h"
+	"main.h"
+
+1192759301 source:e:\coding\gsvn\gserver2\trunk\src\cini.cpp
+	"CIni.h"
+
+1197444835 source:e:\coding\gsvn\gserver2\trunk\src\clevel.cpp
+	"CLevel.h"
+	"main.h"
+	"CNpc.h"
+	"CBaddy.h"
+	"CMap.h"
+	"CPlayer.h"
+
+1192759333 source:e:\coding\gsvn\gserver2\trunk\src\clinkedlist.cpp
+	"CLinkedList.h"
+
+1192759338 e:\coding\gsvn\gserver2\trunk\src\clinkedlist.h
+
+1195440788 source:e:\coding\gsvn\gserver2\trunk\src\clist.cpp
+	"CList.h"
+	<stdio.h>
+
+1192759360 source:e:\coding\gsvn\gserver2\trunk\src\cmap.cpp
+	"CMap.h"
+	"main.h"
+
+1192759390 source:e:\coding\gsvn\gserver2\trunk\src\cnpc.cpp
+	"CNpc.h"
+	"main.h"
+
+1187035397 source:e:\coding\gsvn\gserver2\trunk\src\cpacket.cpp
+	"CPacket.h"
+
+1196830262 source:e:\coding\gsvn\gserver2\trunk\src\csocket.cpp
+	"CSocket.h"
+
+1197192275 source:e:\coding\gsvn\gserver2\trunk\src\cstringlist.cpp
+	"CStringList.h"
+
+1192759551 source:e:\coding\gsvn\gserver2\trunk\src\cweapon.cpp
+	"CWeapon.h"
+
+1192759558 e:\coding\gsvn\gserver2\trunk\src\cweapon.h
+	"CPacket.h"
+	"CString.h"
+
+1197445412 source:e:\coding\gsvn\gserver2\trunk\src\cbuffer.cpp
+	"CBuffer.h"
+
+1194262957 source:e:\coding\gsvn\gserver2\trunk\src\cdatabase.cpp
+	"CDatabase.h"
+	"main.h"
+
+1197573511 source:e:\coding\gsvn\gserver2\trunk\src\cplayer.cpp
+	"CBaddy.h"
+	"CDatabase.h"
+	"CIni.h"
+	"CListServer.h"
+	"CPlayer.h"
+	"CWeapon.h"
+	"zlib.h"
+	"main.h"
+	<sys/stat.h>
+
+1192759596 e:\coding\gsvn\gserver2\trunk\src\zlib.h
+	"zconf.h"
+
+1192759590 e:\coding\gsvn\gserver2\trunk\src\zconf.h
+	<windows.h>
+	<sys/types.h>
+	<unistd.h>
+	<unixio.h>
+
+1197447593 source:e:\coding\gsvn\gserver2\trunk\src\main.cpp
+	"main.h"
+	"CIni.h"
+	"CPlayer.h"
+	"CSocket.h"
+	"CWeapon.h"
+	"CDatabase.h"
+	"CLevel.h"
+	<time.h>
+	<sys/stat.h>
+	<stdlib.h>
+	<unistd.h>
+	<dirent.h>
+
+1194492860 source:e:\coding\gsvn\gserver2\trunk\src\clistserver.cpp
+	"CListServer.h"
+	"main.h"
+
+1194490234 e:\coding\gsvn\gserver2\trunk\src\clistserver.h
+	"CBuffer.h"
+	"CList.h"
+	"CPacket.h"
+	"CSocket.h"
+	"CStringList.h"
+
+1198537999 source:d:\coding\gsvn\gserver2\trunk\src\caccount.cpp
+	"CAccount.h"
+	"CDatabase.h"
+	"CIni.h"
+	"main.h"
+
+1198445207 d:\coding\gsvn\gserver2\trunk\src\caccount.h
+	"CString.h"
+	"CStringList.h"
+
+1192759526 d:\coding\gsvn\gserver2\trunk\src\cstring.h
+	"CBuffer.h"
+
+1198490732 d:\coding\gsvn\gserver2\trunk\src\cbuffer.h
+	<cstdlib>
+	<cstring>
+	<cstdio>
+
+1197192275 d:\coding\gsvn\gserver2\trunk\src\cstringlist.h
+	<cstdlib>
+	<cstring>
+	<cstdio>
+	"CList.h"
+	"CBuffer.h"
+
+1195440966 d:\coding\gsvn\gserver2\trunk\src\clist.h
+	<cstdlib>
+	<cstring>
+	<cstdio>
+
+1194262941 d:\coding\gsvn\gserver2\trunk\src\cdatabase.h
+	"CPacket.h"
+	"CStringList.h"
+	"CPlayer.h"
+	"CAccount.h"
+
+1188071416 d:\coding\gsvn\gserver2\trunk\src\cpacket.h
+	"CBuffer.h"
+
+1198533463 d:\coding\gsvn\gserver2\trunk\src\cplayer.h
+	"CString.h"
+	"CStringList.h"
+	"CSocket.h"
+	"CPacket.h"
+	"CLevel.h"
+	"CAccount.h"
+	"CMap.h"
+	"crypt.h"
+
+1190087734 d:\coding\gsvn\gserver2\trunk\src\csocket.h
+	<windows.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<arpa/inet.h>
+	<netdb.h>
+	<fcntl.h>
+	<unistd.h>
+	<errno.h>
+	"CBuffer.h"
+
+1192759325 d:\coding\gsvn\gserver2\trunk\src\clevel.h
+	"CString.h"
+	"CList.h"
+	"CStringList.h"
+	"CPacket.h"
+	"COther.h"
+	"CBaddy.h"
+
+1194061069 d:\coding\gsvn\gserver2\trunk\src\cother.h
+	<windows.h>
+	<unistd.h>
+
+1192759266 d:\coding\gsvn\gserver2\trunk\src\cbaddy.h
+	"CString.h"
+	"CStringList.h"
+	"CPacket.h"
+	"COther.h"
+
+1192759381 d:\coding\gsvn\gserver2\trunk\src\cmap.h
+	"CString.h"
+	"CStringList.h"
+	"CList.h"
+	"CLevel.h"
+
+1192759475 d:\coding\gsvn\gserver2\trunk\src\crypt.h
+	<stdint.h>
+	<cstdlib>
+
+1192759311 d:\coding\gsvn\gserver2\trunk\src\cini.h
+	<cstdio>
+	<cstring>
+	<cstdlib>
+	"CList.h"
+
+1199122257 d:\coding\gsvn\gserver2\trunk\src\main.h
+	"CList.h"
+	"CListServer.h"
+	"CString.h"
+	"CStringList.h"
+	"CNpc.h"
+	"CPlayer.h"
+	"CWordFilter.h"
+	<dir.h>
+	<time.h>
+
+1199122198 d:\coding\gsvn\gserver2\trunk\src\clistserver.h
+	"CBuffer.h"
+	"CList.h"
+	"CPacket.h"
+	"CSocket.h"
+	"CStringList.h"
+
+1192759396 d:\coding\gsvn\gserver2\trunk\src\cnpc.h
+	"CString.h"
+	"CLevel.h"
+	"CPacket.h"
+
+1192759260 source:d:\coding\gsvn\gserver2\trunk\src\cbaddy.cpp
+	"CBaddy.h"
+	"main.h"
+
+1198490839 source:d:\coding\gsvn\gserver2\trunk\src\cbuffer.cpp
+	"CBuffer.h"
+
+1194262957 source:d:\coding\gsvn\gserver2\trunk\src\cdatabase.cpp
+	"CDatabase.h"
+	"main.h"
+
+1192759301 source:d:\coding\gsvn\gserver2\trunk\src\cini.cpp
+	"CIni.h"
+
+1197444835 source:d:\coding\gsvn\gserver2\trunk\src\clevel.cpp
+	"CLevel.h"
+	"main.h"
+	"CNpc.h"
+	"CBaddy.h"
+	"CMap.h"
+	"CPlayer.h"
+
+1192759333 source:d:\coding\gsvn\gserver2\trunk\src\clinkedlist.cpp
+	"CLinkedList.h"
+
+1192759338 d:\coding\gsvn\gserver2\trunk\src\clinkedlist.h
+
+1195440788 source:d:\coding\gsvn\gserver2\trunk\src\clist.cpp
+	"CList.h"
+	<stdio.h>
+
+1199160818 source:d:\coding\gsvn\gserver2\trunk\src\clistserver.cpp
+	"CListServer.h"
+	"main.h"
+
+1192759360 source:d:\coding\gsvn\gserver2\trunk\src\cmap.cpp
+	"CMap.h"
+	"main.h"
+
+1192759390 source:d:\coding\gsvn\gserver2\trunk\src\cnpc.cpp
+	"CNpc.h"
+	"main.h"
+
+1187035397 source:d:\coding\gsvn\gserver2\trunk\src\cpacket.cpp
+	"CPacket.h"
+
+1199121612 source:d:\coding\gsvn\gserver2\trunk\src\cplayer.cpp
+	"CBaddy.h"
+	"CDatabase.h"
+	"CIni.h"
+	"CListServer.h"
+	"CPlayer.h"
+	"CWeapon.h"
+	"zlib.h"
+	"main.h"
+	<sys/stat.h>
+
+1192759558 d:\coding\gsvn\gserver2\trunk\src\cweapon.h
+	"CPacket.h"
+	"CString.h"
+
+1192759596 d:\coding\gsvn\gserver2\trunk\src\zlib.h
+	"zconf.h"
+
+1192759590 d:\coding\gsvn\gserver2\trunk\src\zconf.h
+	<windows.h>
+	<sys/types.h>
+	<unistd.h>
+	<unixio.h>
+
+1196830262 source:d:\coding\gsvn\gserver2\trunk\src\csocket.cpp
+	"CSocket.h"
+
+1197192275 source:d:\coding\gsvn\gserver2\trunk\src\cstringlist.cpp
+	"CStringList.h"
+
+1192759551 source:d:\coding\gsvn\gserver2\trunk\src\cweapon.cpp
+	"CWeapon.h"
+
+1199161900 source:d:\coding\gsvn\gserver2\trunk\src\main.cpp
+	"main.h"
+	"CIni.h"
+	"CPlayer.h"
+	"CSocket.h"
+	"CWeapon.h"
+	"CDatabase.h"
+	"CLevel.h"
+	<time.h>
+	<sys/stat.h>
+	<stdlib.h>
+	<unistd.h>
+	<dirent.h>
+
+1198579135 d:\coding\gsvn\gserver2\trunk\src\cwordfilter.h
+
+1198876491 source:d:\coding\gsvn\gserver2\trunk\src\cwordfilter.cpp
+	"main.h"
+	"CWordFilter.h"
 

@@ -1,99 +1,109 @@
-<?xml version="1.0"?>
-<!DOCTYPE CodeBlocks_layout_file>
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<File name="..\src\CAccount.cpp" open="0" top="0">
-		<Cursor position="6362" topLine="155"/>
+	<ActiveTarget name="Release" />
+	<File name="..\src\CAccount.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="7380" topLine="141" />
 	</File>
-	<File name="..\src\CAccount.h" open="0" top="0">
-		<Cursor position="105" topLine="9"/>
+	<File name="..\src\CAccount.h" open="0" top="0" tabpos="7">
+		<Cursor position="612" topLine="0" />
 	</File>
-	<File name="..\src\CBaddy.cpp" open="0" top="0">
-		<Cursor position="1979" topLine="83"/>
+	<File name="..\src\CBaddy.cpp" open="0" top="0" tabpos="12">
+		<Cursor position="1979" topLine="83" />
 	</File>
-	<File name="..\src\CBaddy.h" open="0" top="0">
-		<Cursor position="57" topLine="0"/>
+	<File name="..\src\CBaddy.h" open="0" top="0" tabpos="14">
+		<Cursor position="57" topLine="0" />
 	</File>
-	<File name="..\src\CBuffer.cpp" open="0" top="0">
-		<Cursor position="0" topLine="175"/>
+	<File name="..\src\CBuffer.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="12898" topLine="564" />
 	</File>
-	<File name="..\src\CBuffer.h" open="0" top="0">
-		<Cursor position="5776" topLine="211"/>
+	<File name="..\src\CBuffer.h" open="0" top="0" tabpos="2">
+		<Cursor position="5083" topLine="156" />
 	</File>
-	<File name="..\src\CDatabase.cpp" open="1" top="0">
-		<Cursor position="6529" topLine="202"/>
+	<File name="..\src\CDatabase.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="3244" topLine="87" />
 	</File>
-	<File name="..\src\CDatabase.h" open="0" top="0">
-		<Cursor position="812" topLine="0"/>
+	<File name="..\src\CDatabase.h" open="0" top="0" tabpos="3">
+		<Cursor position="243" topLine="0" />
 	</File>
-	<File name="..\src\CIni.cpp" open="0" top="0">
-		<Cursor position="2578" topLine="56"/>
+	<File name="..\src\CIni.cpp" open="0" top="0" tabpos="10">
+		<Cursor position="1199" topLine="18" />
 	</File>
-	<File name="..\src\CIni.h" open="0" top="0">
-		<Cursor position="912" topLine="28"/>
+	<File name="..\src\CIni.h" open="0" top="0" tabpos="11">
+		<Cursor position="912" topLine="28" />
 	</File>
-	<File name="..\src\CLevel.cpp" open="0" top="0">
-		<Cursor position="1380" topLine="24"/>
+	<File name="..\src\CLevel.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="17119" topLine="618" />
 	</File>
-	<File name="..\src\CLevel.h" open="0" top="0">
-		<Cursor position="285" topLine="6"/>
+	<File name="..\src\CLevel.h" open="0" top="0" tabpos="3">
+		<Cursor position="1647" topLine="31" />
 	</File>
-	<File name="..\src\CList.cpp" open="0" top="0">
-		<Cursor position="415" topLine="30"/>
+	<File name="..\src\CList.cpp" open="0" top="0" tabpos="19">
+		<Cursor position="415" topLine="30" />
 	</File>
-	<File name="..\src\CList.h" open="0" top="0">
-		<Cursor position="185" topLine="0"/>
+	<File name="..\src\CList.h" open="0" top="0" tabpos="0">
+		<Cursor position="829" topLine="10" />
 	</File>
-	<File name="..\src\CMap.cpp" open="0" top="0">
-		<Cursor position="1306" topLine="84"/>
+	<File name="..\src\CListServer.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="278" topLine="0" />
 	</File>
-	<File name="..\src\CMap.h" open="0" top="0">
-		<Cursor position="527" topLine="6"/>
+	<File name="..\src\CListServer.h" open="0" top="0" tabpos="0">
+		<Cursor position="618" topLine="0" />
 	</File>
-	<File name="..\src\CNpc.cpp" open="0" top="0">
-		<Cursor position="6268" topLine="274"/>
+	<File name="..\src\CMap.cpp" open="0" top="0" tabpos="22">
+		<Cursor position="1306" topLine="84" />
 	</File>
-	<File name="..\src\CNpc.h" open="0" top="0">
-		<Cursor position="1102" topLine="33"/>
+	<File name="..\src\CMap.h" open="0" top="0" tabpos="1">
+		<Cursor position="527" topLine="6" />
 	</File>
-	<File name="..\src\COther.h" open="0" top="0">
-		<Cursor position="686" topLine="25"/>
+	<File name="..\src\CNpc.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="1584" topLine="353" />
 	</File>
-	<File name="..\src\CPacket.cpp" open="0" top="0">
-		<Cursor position="757" topLine="0"/>
+	<File name="..\src\CNpc.h" open="0" top="0" tabpos="15">
+		<Cursor position="1102" topLine="33" />
 	</File>
-	<File name="..\src\CPacket.h" open="0" top="0">
-		<Cursor position="2131" topLine="70"/>
+	<File name="..\src\COther.h" open="0" top="0" tabpos="8">
+		<Cursor position="181" topLine="5" />
 	</File>
-	<File name="..\src\CPlayer.cpp" open="1" top="0">
-		<Cursor position="96616" topLine="3285"/>
+	<File name="..\src\CPacket.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="14" topLine="0" />
 	</File>
-	<File name="..\src\CPlayer.h" open="0" top="0">
-		<Cursor position="7226" topLine="239"/>
+	<File name="..\src\CPacket.h" open="0" top="0" tabpos="11">
+		<Cursor position="112" topLine="0" />
 	</File>
-	<File name="..\src\CSocket.cpp" open="0" top="0">
-		<Cursor position="5978" topLine="231"/>
+	<File name="..\src\CPlayer.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="15262" topLine="365" />
 	</File>
-	<File name="..\src\CSocket.h" open="0" top="0">
-		<Cursor position="1588" topLine="49"/>
+	<File name="..\src\CPlayer.h" open="0" top="0" tabpos="1">
+		<Cursor position="10603" topLine="356" />
 	</File>
-	<File name="..\src\CStringList.cpp" open="0" top="0">
-		<Cursor position="2171" topLine="79"/>
+	<File name="..\src\CSocket.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="5531" topLine="222" />
 	</File>
-	<File name="..\src\CStringList.h" open="0" top="0">
-		<Cursor position="1084" topLine="26"/>
+	<File name="..\src\CSocket.h" open="0" top="0" tabpos="10">
+		<Cursor position="1588" topLine="49" />
 	</File>
-	<File name="..\src\CWeapon.cpp" open="1" top="1">
-		<Cursor position="246" topLine="0"/>
+	<File name="..\src\CStringList.cpp" open="0" top="0" tabpos="20">
+		<Cursor position="1192" topLine="34" />
 	</File>
-	<File name="..\src\CWeapon.h" open="0" top="0">
-		<Cursor position="366" topLine="20"/>
+	<File name="..\src\CStringList.h" open="0" top="0" tabpos="21">
+		<Cursor position="255" topLine="32" />
 	</File>
-	<File name="..\src\main.cpp" open="1" top="0">
-		<Cursor position="5831" topLine="154"/>
+	<File name="..\src\CWeapon.cpp" open="0" top="0" tabpos="21">
+		<Cursor position="246" topLine="0" />
 	</File>
-	<File name="..\src\main.h" open="0" top="0">
-		<Cursor position="2249" topLine="41"/>
+	<File name="..\src\CWeapon.h" open="0" top="0" tabpos="22">
+		<Cursor position="366" topLine="20" />
 	</File>
-	<Expand folder="/Sources/src"/>
-	<Expand folder="/Sources"/>
+	<File name="..\src\CWordFilter.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="800" topLine="78" />
+	</File>
+	<File name="..\src\CWordFilter.h" open="0" top="0" tabpos="2">
+		<Cursor position="783" topLine="36" />
+	</File>
+	<File name="..\src\main.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="19706" topLine="691" />
+	</File>
+	<File name="..\src\main.h" open="0" top="0" tabpos="7">
+		<Cursor position="834" topLine="0" />
+	</File>
 </CodeBlocks_layout_file>
