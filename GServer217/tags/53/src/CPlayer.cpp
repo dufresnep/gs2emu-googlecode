@@ -621,6 +621,9 @@ void CPlayer::parsePacket(CPacket& pPacket)
 	if(id < 0 && messageId != 37 && messageId != 39 && messageId != 2)
 		return;
 
+	if (id == -1 && type == CLIENTPLAYER)
+		return;
+
 	if(messageId != BADDYPROPS && messageId != NPCPROPS && showConsolePackets)
 		printf("NEW PACKET: %i: %s\n", messageId, packet.text()+1);
 
@@ -1028,7 +1031,7 @@ void CPlayer::setNick(CString& pNewNick, bool pVerifyGuild)
 
 	// When RC's log in, they will send their nickname.  When that happens, they still have
 	// an ID of -1.  Don't send information to any clients in that case.
-	if ( id != -1 && type == CLIENTPLAYER )
+	if ( id != -1 )
 	{
 		for (int i = 0; i < playerList.count(); i++)
 		{
@@ -1094,7 +1097,8 @@ void CPlayer::setAccPropsRc(CPacket& pPacket)
 	sendWeapons();
 
 	// Re-send the level to the player to update chests and whatnot.
-	sendLevel( levelName, x, y, level->modTime );
+	if ( id != -1 )
+		sendLevel( levelName, x, y, level->modTime );
 }
 
 CPacket CPlayer::getAccPropsRC()
@@ -1801,6 +1805,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
             len = pProps.readByte1();
             if (len <= 0 || len > 224)
                 break;
+
             setNick(CString() << pProps.readChars(len), true);
         }
         break;
@@ -1937,6 +1942,8 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
         {
             int oldStatus = status;
             status = pProps.readByte1();
+
+			if ( id == -1 ) break;
             if ((oldStatus & 8) == 0)
             {
                 if ((status & 8) > 0) // dead
@@ -2037,15 +2044,17 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
                     "This server doesnt support UDP. Please disable UDP in general settings.");
                 deleteMe = true;
             }
-            for(int i = 0; i < playerList.count(); i++)
-            {
-                CPlayer* other = (CPlayer*)playerList[i];
-                if(other != this)
-                {
-                    other->sendPacket(CPacket() << (char)OTHERPLPROPS <<
-                        (short)id << (char)UDPPORT << (int)udpPort);
-                }
-            }
+
+			if ( id == -1 ) break;
+			for(int i = 0; i < playerList.count(); i++)
+			{
+				CPlayer* other = (CPlayer*)playerList[i];
+				if(other != this)
+				{
+					other->sendPacket(CPacket() << (char)OTHERPLPROPS <<
+						(short)id << (char)UDPPORT << (int)udpPort);
+				}
+			}
             //TO DO: add hack check
             break;
 
@@ -2424,6 +2433,7 @@ void CPlayer::msgNPCPROPS(CPacket& pPacket)
 
 void CPlayer::msgADDBOMB(CPacket& pPacket)
 {
+	if ( id == -1 ) return;
     CPacket bombData;
     bombData << (char)SADDBOMB << (short)id << pPacket.text() + 1;
     for (int i = 0; i < level->players.count(); i++)
@@ -2450,6 +2460,7 @@ void CPlayer::msgTOALLMSG(CPacket& pPacket)
 {
     if (jailLevels.find(levelName) >= 0)
         return;
+	if ( id == -1 ) return;
 
     CPacket message;
     message << (char)STOALLMSG << (short)id << pPacket.text()+1;
@@ -2497,6 +2508,8 @@ void CPlayer::msgDELHORSE(CPacket& pPacket)
 }
 void CPlayer::msgADDARROW(CPacket& pPacket)
 {
+	if ( id == -1 ) return;
+
     CPacket arrowData;
     arrowData << (char)SADDARROW<< (short)id << pPacket.text() + 1;
     for (int i = 0; i < level->players.count(); i++)
@@ -2509,6 +2522,8 @@ void CPlayer::msgADDARROW(CPacket& pPacket)
 
 void CPlayer::msgFIRESPY(CPacket& pPacket)
 {
+	if ( id == -1 ) return;
+
     CPacket fireData;
     fireData << (char)SFIRESPY << (short)id << pPacket.text() + 1;
     for (int i = 0; i < level->players.count(); i++)
@@ -2520,6 +2535,7 @@ void CPlayer::msgFIRESPY(CPacket& pPacket)
 }
 void CPlayer::msgCARRYTHROWN(CPacket& pPacket)
 {
+	if ( id == -1 ) return;
     sendLocally(CPacket() << (char)SCARRYTHROWN << (short)id << pPacket.text()+1);
 }
 void CPlayer::msgADDEXTRA(CPacket& pPacket)
@@ -2598,6 +2614,7 @@ void CPlayer::msgCLAIMPKER(CPacket& pPacket)
 
 void CPlayer::msgBADDYPROPS(CPacket& pPacket)
 {
+	if ( id == -1 ) return;
     CBaddy* baddy = (CBaddy*)level->baddyIds[pPacket.readByte1()];
     if (baddy == NULL)
         return;
@@ -2798,6 +2815,7 @@ void CPlayer::msgWANTFILE(CPacket& pPacket)
 
 void CPlayer::msgNPCWEAPONIMG(CPacket& pPacket)
 {
+	if ( id == -1 ) return;
 	sendLocally(CPacket() << (char)SNPCWEAPONIMG << (short)id << pPacket.text()+1);
 }
 
@@ -2805,6 +2823,7 @@ void CPlayer::msgEMPTY25(CPacket& pPacket)
 {}
 void CPlayer::msgHURTPLAYER(CPacket& pPacket)
 {
+	if ( id == -1 ) return;
     int pId = pPacket.readByte2();
     CPlayer* other = (CPlayer*)playerIds[pId];
     if (other == NULL)
@@ -2818,6 +2837,7 @@ void CPlayer::msgEXPLOSION(CPacket& pPacket)
 {
 	if (noExplosions)
 		return;
+	if ( id == -1 ) return;
 
     CPacket packet;
     packet << (char)SEXPLOSION  << (short)id << pPacket.text()+1;
@@ -2826,6 +2846,7 @@ void CPlayer::msgEXPLOSION(CPacket& pPacket)
 
 void CPlayer::msgPRIVMESSAGE(CPacket& pPacket)
 {
+	if ( id == -1 ) return;
 	if(getTime() - lastMessage <= 4)
 	{
 		sendPacket(CPacket() << (char)SADMINMSG <<
@@ -2969,6 +2990,7 @@ void CPlayer::msgLANGUAGE(CPacket& pPacket)
 }
 void CPlayer::msgTRIGGERACTION(CPacket& pPacket)
 {
+	if ( id == -1 ) return;
     //Uncomment below if you need these values for
     //NPC server
 	//int npcId = pPacket.readByte3();
@@ -2988,6 +3010,7 @@ void CPlayer::msgEMPTY39(CPacket& pPacket)
 {}
 void CPlayer::msgCSHOOT(CPacket& pPacket)
 {
+	if ( id == -1 ) return;
     CPacket packet;
     packet << (char)SSHOOT << (short)id << pPacket.text() + 1;
     for(int i = 0; i < level->players.count(); i++)
@@ -3677,6 +3700,7 @@ void CPlayer::msgDRCCHAT(CPacket& pPacket)
 //reminder
 void CPlayer::msgDGETPROFILE(CPacket& pPacket)
 {
+	if ( id == -1 ) return;
 	ListServer_Send(CPacket() << (char)SLSPROFREQ << (short)id << pPacket);
 }
 

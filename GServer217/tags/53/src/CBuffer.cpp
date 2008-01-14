@@ -605,7 +605,9 @@ CBuffer& CBuffer::tokenize()
 		CBuffer temp;
 		temp << copy( pos[1], pos[0] - pos[1] );
 		temp.replaceAll( "\"", "\"\"" );	// Change all " to ""
-		retVal << "\"" << temp << "\",";
+		temp.removeAll( "\r" );
+		if ( temp.length() > 0 )
+			retVal << "\"" << temp << "\",";
 		pos[1] = pos[0] + 1;
 	}
 
@@ -628,38 +630,61 @@ CBuffer& CBuffer::untokenize()
 	if ( nData[0] != '\"' ) pos[1] = 0;
 
 	// Untokenize.
-	while ( ((pos[0] = nData.find( "\",\"", pos[1] )) != -1) ||
-		((pos[0] = nData.find( ",", pos[1] )) != -1 ) )
+	while (	(pos[0] = nData.find( ",", pos[1] )) != -1  )
 	{
-		// "test",test
-		if ( pos[0] > 0 && nData[pos[0]] == ',' && nData[ pos[0] - 1 ] == '\"' )
-			pos[0]--;
+		// Don't parse empty blocks.
+		if ( pos[0] == pos[1] )
+		{
+			pos[1]++;
+			continue;
+		}
 
-		// Copy the string.
-		temp.add( nData.copy( pos[1], pos[0] - pos[1] ).text() );
-		int tempEnd = temp.count() - 1;
-		temp[ tempEnd ].replaceAll( "\"\"", "\"" );	// Replace "" with "
-		temp[ tempEnd ].removeAll( "\n" );
+		// Check for ,,"""
+		if ( nData[pos[1]] == '\"' && nData[pos[1]+1] != '\"' ) pos[1]++;
+
+		// Check and see if the comma is outside or inside of the thing string.
+		// If pos[1] points to a quotation mark we have to find the closing quotation mark.
+		if ( pos[1] > 0 && nData[pos[1] - 1] == '\"' )
+		{
+			while ( true )
+			{
+				if ( pos[0] == -1 ) break;
+				if (	(nData[pos[0]-1] != '\"') ||
+					(nData[pos[0]-1] == '\"' && nData[pos[0]-2] == '\"') )
+					pos[0] = nData.find( ",", pos[0] + 1 );
+				else
+					break;
+			}
+		}
+
+		// Exit out if we previously failed to find the end.
+		if ( pos[0] == -1 ) break;
+
+		// "test",test
+		CString t2;
+		if ( pos[0] > 0 && nData[ pos[0] - 1 ] == '\"' )
+			t2 = nData.copy(pos[1], pos[0] - pos[1] - 1);
+		else
+			t2 = nData.copy(pos[1], pos[0] - pos[1]);
+
+		// Check if the string is valid and if it is, copy it.
+		t2.replaceAll( "\"\"", "\"" );
+		t2.removeAll( "\n" );
+		t2.removeAll( "\r" );
+
+		// If we still have something left, we can add it.
+		if ( t2.length() > 0 )
+			temp.add( t2.text() );
 
 		// Move forward the correct number of spaces.
-		if ( nData[pos[0]] == ',' )
-		{
-			if ( pos[0] + 1 != nData.length() && nData[pos[0] + 1] == '\"' )
-				pos[1] = pos[0] + strlen( ",\"" );	// test,"test
-			else
-				pos[1] = pos[0] + strlen( "," );	// test,test
-		}
- 		else if ( nData[pos[0]] == '\"' )
-		{
-			if ( pos[0] + 2 != nData.length() && nData[pos[0] + 2] == '\"' )
-				pos[1] = pos[0] + strlen( "\",\"" );	// test","test
-			else
-				pos[1] = pos[0] + strlen( "\"," );	// test",test
-		}
+		if ( pos[0] + 1 != nData.length() && nData[pos[0] + 1] == '\"' )
+			pos[1] = pos[0] + strlen( ",\"" );	// test,"test
+		else
+			pos[1] = pos[0] + strlen( "," );	// test,test
 	}
 
 	// Try and grab the very last element.
-	if ( pos[1] != nData.length() )
+	if ( pos[1] < nData.length() )
 	{
 		// If the end is a quotation mark, remove it.
 		if ( nData[ nData.length() - 1 ] == '\"' )
@@ -672,6 +697,7 @@ CBuffer& CBuffer::untokenize()
 			int tempEnd = temp.count() - 1;
 			temp[ tempEnd ].replaceAll( "\"\"", "\"" );	// Replace "" with "
 			temp[ tempEnd ].removeAll( "\n" );
+			temp[ tempEnd ].removeAll( "\r" );
 		}
 	}
 
