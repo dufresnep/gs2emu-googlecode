@@ -1200,7 +1200,7 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, int pModTime)
 	y = pY;
 	levelName = nextLevel->fileName;
 	firstLevel = false;
-	int time = getLeavingTime(level);
+	time_t time = getLeavingTime(level);
 	if(time <= 0)
 	{
 		if (pModTime != level->modTime)
@@ -1461,7 +1461,7 @@ void CPlayer::sendFiles()
 	fileList.clear();
 }
 
-int CPlayer::getLeavingTime(CLevel* pLevel)
+time_t CPlayer::getLeavingTime(CLevel* pLevel)
 {
 	for (int i = 0; i < enteredLevels.count(); i++)
 	{
@@ -2019,7 +2019,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			break;
 
 		case EFFECTCOLORS:
-			len = pProps.readByte(1);
+			len = pProps.readByte1();
 			if ( len > 0 )
 				pProps.readByte4();
 //			pProps.readByte5();

@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lib\zdll.lib lib\sqlite3.lib wsock32.lib"
+				AdditionalDependencies="lib\zdll.lib wsock32.lib"
 				LinkIncremental="0"
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"

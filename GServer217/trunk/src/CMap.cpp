@@ -49,14 +49,14 @@ bool CMap::loadTXT(CString& pFileName)
 
 	fileName = pFileName;
 	height = 0;
-    for(int i = 0; i < mapData.count(); i++)
-    {
-        if(mapData[i].length())
-        {
-            parseLevelNames(mapData[i]);
-            height++;
-        }
-    }
+	for(int i = 0; i < mapData.count(); i++)
+	{
+		if(mapData[i].length())
+		{
+			parseLevelNames(mapData[i]);
+			height++;
+		}
+	}
 
 	return true;
 }
@@ -84,14 +84,14 @@ bool CMap::loadGMap(CString& pFileName)
 			height = atoi(words[1].text());
 		} else if(words[0] == "LEVELNAMES")
 		{
-		    height = 0;
+			height = 0;
 			for(i++; i < levelData.count() && levelData[i] != "LEVELNAMESEND"; i++)
 			{
-			    if(levelData[i].length())
-			    {
-                    parseLevelNames(levelData[i]);
-                    height++;
-			    }
+				if(levelData[i].length())
+				{
+					parseLevelNames(levelData[i]);
+					height++;
+				}
 			}
 		} else if(words[0] == "LOADFULLMAP")
 			loadFull = true;
@@ -101,21 +101,21 @@ bool CMap::loadGMap(CString& pFileName)
 	if(loadFull)
 	{
 		for(int i = 0; i < levelList.count(); i++)
-            CLevel::openMap(levelList[i]);
+			CLevel::openMap(levelList[i]);
 	}
 	return true;
 }
 
 void CMap::parseLevelNames(CString& pLevelNames)
 {
-    CStringList names;
-    names.load(pLevelNames.text(), ",");
-    width = 0;
-    for(int i = 0; i < names.count(); i++)
-    {
-        levelList.add(names[i].removeAll("\"").trim());
-        width++;
-    }
+	CStringList names;
+	names.load(pLevelNames.text(), ",");
+	width = 0;
+	for(int i = 0; i < names.count(); i++)
+	{
+		levelList.add(names[i].removeAll("\"").trim());
+		width++;
+	}
 
 }
 int CMap::getLevelpos(CString& pLevelName)

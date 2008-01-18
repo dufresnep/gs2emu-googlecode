@@ -15,13 +15,13 @@ int CList::add(void* pItem)
 
 CList::~CList()
 {
-    free(items);
+	free(items);
 }
 
 void CList::remove(int pIndex)
 {
 	if(pIndex < 0 || pIndex >= itemCount)
-        return;
+		return;
 	if(itemCount > 1)
 	{
 		memmove(&items[pIndex], &items[pIndex+1], (itemCount-pIndex-1)*sizeof(void*));
@@ -55,7 +55,7 @@ void CList::resize(int pBuffSize)
 
 int CList::find(void* pItem)
 {
-    for(int i = 0; i < itemCount; i++)
+	for(int i = 0; i < itemCount; i++)
 	{
 		if(items[i] == pItem)
 			return i;
@@ -66,7 +66,7 @@ int CList::find(void* pItem)
 void* CList::item(int i)
 {
 	if(i >= 0 && i < itemCount)
-        return items[i];
+		return items[i];
 	return NULL;
 
 }

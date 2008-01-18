@@ -45,7 +45,7 @@ CNpc::~CNpc()
 	npcIds.replace(id, NULL);
 }
 
-CPacket CNpc::getPropertyList(int newTime)
+CPacket CNpc::getPropertyList(time_t newTime)
 {
 	CPacket retVal;
 	for(int i =0; i <npcpropcount; i++)
@@ -98,7 +98,7 @@ void CNpc::removeComments()
 CPacket CNpc::getProperty(int pId)
 {
 	CPacket retVal;
-	con_print( "CNpc::getProperty\n );
+	con_print( "CNpc::getProperty\n" );
 	switch(pId)
 	{
 		case NPCGIF:

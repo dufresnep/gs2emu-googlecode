@@ -41,119 +41,119 @@ void ListServer_Main()
 	if (!lsConnected)
 		return;
 
-    CBuffer receiveBuff;
-    if (listServer.receiveBytes(receiveBuff, 65536) < 0)
-    {
-        errorOut("rclog.txt", "Disconnected from list server");
-        lsConnected = false;
-        return;
-    }
+	CBuffer receiveBuff;
+	if (listServer.receiveBytes(receiveBuff, 65536) < 0)
+	{
+		errorOut("rclog.txt", "Disconnected from list server");
+		lsConnected = false;
+		return;
+	}
 
-    CStringList lines;
-    lines.load(receiveBuff.text(), "\n");
-    for (int i = 0; i < lines.count(); i++)
-    {
-        CPacket line = CPacket() << lines[i];
-        int messageId = line.readByte1();
+	CStringList lines;
+	lines.load(receiveBuff.text(), "\n");
+	for (int i = 0; i < lines.count(); i++)
+	{
+		CPacket line = CPacket() << lines[i];
+		int messageId = line.readByte1();
 
-        switch (messageId)
-        {
-            case GSVOLD:
-            {
-				printf("*** SERVER VERSION CHECK ***\nYou're running an old version of the GServer.\nYou're running GServer Revision %i while GServer Revision %i is the latest.\n*** SERVER VERSION CHECK ***\n", GSERVER_REVISION, line.readByte2());
+		switch (messageId)
+		{
+			case GSVOLD:
+			{
+				printf("*** SERVER VERSION CHECK ***\nYou're running an old version of the GServer.\nYou're running GServer Revision %i while GServer Revision %i is the latest.\n*** SERVER VERSION CHECK ***\n", GSERVER_BUILD, line.readByte2());
 				break;
-            }
+			}
 
-            case GSVCURRENT:
-            {
-                 printf("*** SERVER VERSION CHECK ***\nYou're running an up-to-date server. :)\n*** SERVER VERSION CHECK ***\n");
-                 break;
-            }
+			case GSVCURRENT:
+			{
+				 printf("*** SERVER VERSION CHECK ***\nYou're running an up-to-date server. :)\n*** SERVER VERSION CHECK ***\n");
+				 break;
+			}
 
-            case GSVACCOUNT:
-            {
-                CString accountName = line.readChars(line.readByte1());
-                CString errorMsg = line.readString("");
+			case GSVACCOUNT:
+			{
+				CString accountName = line.readChars(line.readByte1());
+				CString errorMsg = line.readString("");
 
-                for (int i = 0; i < newPlayers.count(); i++)
-                {
-                    CPlayer *player = (CPlayer *)newPlayers[i];
+				for (int i = 0; i < newPlayers.count(); i++)
+				{
+					CPlayer *player = (CPlayer *)newPlayers[i];
 
-                    if (player->accountName == accountName)
-                    {
-                        if (errorMsg == "SUCCESS")
-                        {
-                            player->sendAccount();
-                        }
-                            else
-                        {
-                            player->sendPacket(CPacket() << (char)DISMESSAGE << errorMsg);
-                            player->deleteMe = true;
-                        }
+					if (player->accountName == accountName)
+					{
+						if (errorMsg == "SUCCESS")
+						{
+							player->sendAccount();
+						}
+							else
+						{
+							player->sendPacket(CPacket() << (char)DISMESSAGE << errorMsg);
+							player->deleteMe = true;
+						}
 
-                        break;
-                    }
-                }
+						break;
+					}
+				}
 
-                break;
-            }
+				break;
+			}
 
-            case GSVGUILD:
-            {
-                int playerId = line.readByte2();
-                CPlayer *player = (CPlayer *)playerIds[playerId];
+			case GSVGUILD:
+			{
+				int playerId = line.readByte2();
+				CPlayer *player = (CPlayer *)playerIds[playerId];
 
-                if (player != NULL)
-                {
-                    CString nick = line.readChars((unsigned char)line.readByte1());
-                    player->setNick(nick, false);
-                }
+				if (player != NULL)
+				{
+					CString nick = line.readChars((unsigned char)line.readByte1());
+					player->setNick(nick, false);
+				}
 
-                break;
-            }
+				break;
+			}
 
-            case GSVFILEC:
-            {
+			case GSVFILEC:
+			{
 				CString fileData, fileName = CString() << dataDir << "global" << fSep << line.readChars(line.readByte1());
 				fileData.save(fileName.text());
 
 				break;
-            }
+			}
 
-            case GSVFILED:
-            {
+			case GSVFILED:
+			{
 				CString fileName = line.readChars(line.readByte1());
 				CPlayer *player = (CPlayer *)playerIds[line.readByte2()];
 
-                switch (line.readByte1())
-                {
-                    case 0: // head
-                        player->headImage = fileName;
-                        player->updateProp(HEADGIF);
-                    break;
+				switch (line.readByte1())
+				{
+					case 0: // head
+						player->headImage = fileName;
+						player->updateProp(HEADGIF);
+					break;
 
-                    case 1: // body
-                        player->bodyImage = fileName;
-                        player->updateProp(BODYIMG);
-                    break;
+					case 1: // body
+						player->bodyImage = fileName;
+						player->updateProp(BODYIMG);
+					break;
 
-                    case 2: // sword
-                        player->swordImage = fileName;
-                        player->updateProp(SWORDPOWER);
-                    break;
+					case 2: // sword
+						player->swordImage = fileName;
+						player->updateProp(SWORDPOWER);
+					break;
 
-                    case 3: // shield
-                        player->shieldImage = fileName;
-                        player->updateProp(SHIELDPOWER);
-                    break;
-                }
+					case 3: // shield
+						player->shieldImage = fileName;
+						player->updateProp(SHIELDPOWER);
+					break;
+				}
 
 				break;
-            }
+			}
 
 			case GSVFILES:
 			{
-                CString fileData, fileName, newData, shortName;
+				CString fileData, fileName, newData, shortName;
 				shortName = line.readChars(line.readByte1());
 				int pos = shortName.find("Revision");
 
@@ -187,7 +187,7 @@ void ListServer_Main()
 				if (player1 == NULL || player2 == NULL)
 					return;
 
-                profile << (char)player2->accountName.length() << player2->accountName << line.readString("");
+				profile << (char)player2->accountName.length() << player2->accountName << line.readString("");
 
 				int time = player2->onlineSecs;
 				CString line;
@@ -260,11 +260,11 @@ void ListServer_Main()
 				printf("%s\n", line.readString(""));
 			break;
 
-            default:
-                printf("Invalid List Server Message: %i\n", messageId);
-            break;
-        }
-    }
+			default:
+				printf("Invalid List Server Message: %i\n", messageId);
+			break;
+		}
+	}
 }
 
 void ListServer_Send(CPacket &pPacket)

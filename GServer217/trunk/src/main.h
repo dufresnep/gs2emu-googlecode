@@ -10,15 +10,9 @@
 #include "CNpc.h"
 #include "CPlayer.h"
 #include "CWordFilter.h"
-#ifdef WIN32
-	#include <dir.h>
-#else
-	#include <unistd.h>
-	#include <dirent.h>
-#endif
 #include <time.h>
 
-#define GSERVER_REVISION 53
+#define GSERVER_BUILD 54
 //#define STORE_SQL
 
 extern bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, lsConnected, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, showQuery, staffOnly, vasesDrop, warptoforall, defaultweapons;
@@ -57,13 +51,13 @@ void shutdownServer();
 
 inline char* removeGifExtension(char* pFileName)
 {
-    CString tmp = pFileName;
-    return removeGifExtension(tmp);
+	CString tmp = pFileName;
+	return removeGifExtension(tmp);
 }
 
 inline int getTime()
 {
-    return gameTime;
+	return gameTime;
 }
 
 inline int getNWTime()

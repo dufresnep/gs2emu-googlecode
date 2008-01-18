@@ -8,21 +8,21 @@
 
 enum
 {
-    GREENRUPEE,
-    BLUERUPEE,
-    REDRUPEE,
-    BOMBS,
-    DARTS,
-    HEART,
-    GLOVE1,
-    BOW,
-    BOMB,
-    SHIELD,
-    SWORD,
-    FULLHEART,
-    SUPERBOMB,
-    BATTLEAXE,
-    GOLDENSWORD,
+	GREENRUPEE,
+	BLUERUPEE,
+	REDRUPEE,
+	BOMBS,
+	DARTS,
+	HEART,
+	GLOVE1,
+	BOW,
+	BOMB,
+	SHIELD,
+	SWORD,
+	FULLHEART,
+	SUPERBOMB,
+	BATTLEAXE,
+	GOLDENSWORD,
 	MIRRORSHIELD,
 	GLOVE2,
 	LIZARDSHIELD,
@@ -36,10 +36,10 @@ enum
 };
 class CWeapon
 {
-    public:
-    CString code, name, image;
-    long long modTime;
-    CPacket getSendData();
+	public:
+	CString code, name, image;
+	long long modTime;
+	CPacket getSendData();
 };
 
 #endif // CWEAPONH

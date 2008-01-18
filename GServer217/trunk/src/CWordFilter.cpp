@@ -97,9 +97,9 @@ bool CWordFilter::load(char *pFile)
 		delete (WordMatch *)WordList[i];
 	WordList.clear();
 	CStringList lines;
-    lines.load(pFile);
-    if(lines.count() < 1)
-        return false;
+	lines.load(pFile);
+	if(lines.count() < 1)
+		return false;
 
 	for (int i = 0; i < lines.count(); i++)
 	{

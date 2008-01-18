@@ -8,7 +8,7 @@
 
 class CAccount
 {
-    public:
+	public:
 		CAccount();
 
 		bool banned, ftpOn, loadOnly;

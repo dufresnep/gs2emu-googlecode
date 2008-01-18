@@ -15,45 +15,45 @@ class CMap;
 class CHorse;
 class CLevel
 {
-    public:
-    CString playerWorld, fileName;
-    CList links, baddies, npcs, players, horses, chests, items, boardChanges;
+	public:
+	CString playerWorld, fileName;
+	CList links, baddies, npcs, players, horses, chests, items, boardChanges;
 	CList baddyIds;
-    CStringList signs;
-    CMap* map;
-    int levelIndex;
-    long long modTime;
+	CStringList signs;
+	CMap* map;
+	int levelIndex;
+	long long modTime;
 	short saveCounter;
-    bool opened, sparZone;
-    short tiles[64*64];
+	bool opened, sparZone;
+	short tiles[64*64];
 	CLevel(CString& pFileName);
 	CLevel()
 	{
-        map = NULL;
-        levelIndex = 0;
-        sparZone = opened = false;
-        baddyIds.add(0);
-    }
+		map = NULL;
+		levelIndex = 0;
+		sparZone = opened = false;
+		baddyIds.add(0);
+	}
 	~CLevel();
-    static CLevel* openMap(CString& pFileName);
-    static CLevel* find(CString& pFileName);
-    static void updateLevel(CString& pFileName);
+	static CLevel* openMap(CString& pFileName);
+	static CLevel* find(CString& pFileName);
+	static void updateLevel(CString& pFileName);
 
-    bool loadNW(CString& pFileName);
-    bool loadGraal(CString& pFileName);
-    void loadTiles(CPacket& levelData, CString& pVersion);
-    void loadLinks(CPacket& levelData);
-    void loadBaddies(CPacket& levelData);
-    void loadNpcs(CPacket& levelData);
-    void loadChests(CPacket& levelData);
-    void loadSigns(CPacket& levelData);
-    void reset();
+	bool loadNW(CString& pFileName);
+	bool loadGraal(CString& pFileName);
+	void loadTiles(CPacket& levelData, CString& pVersion);
+	void loadLinks(CPacket& levelData);
+	void loadBaddies(CPacket& levelData);
+	void loadNpcs(CPacket& levelData);
+	void loadChests(CPacket& levelData);
+	void loadSigns(CPacket& levelData);
+	void reset();
 	void animate();
 	void saveNpcs();
 	void addNewNpc(CString& pImage, CString& pCodeFile, float pX, float pY);
 	void addHorse(CHorse* pHorse);
 	void removeHorse(float pX, float pY);
-    CString getSignCode(CString& pText);
+	CString getSignCode(CString& pText);
 	static CString processNpcLine(CString& pLine);
 	bool changeBoard(CPacket& pTileData, int pX, int pY, int pWidth, int pHeight);
 	CPacket applyChange(CPacket& pTileData, int pX, int pY, int pWidth, int pHeight);
@@ -64,33 +64,33 @@ class CLevel
 //Level objects
 class CLink
 {
-    public:
-    CString nextMap;
-    int x, y, width, height;
-    CString warpX, warpY;
-    const char* getLinkString();
-    CLink(CString& pNextMap, int pX, int pY, int pWidth, int pHeight, CString& pNextX, CString& pNextY)
-    {
-        nextMap = pNextMap;
-        x = CLIP(pX, 0, 63);
+	public:
+	CString nextMap;
+	int x, y, width, height;
+	CString warpX, warpY;
+	const char* getLinkString();
+	CLink(CString& pNextMap, int pX, int pY, int pWidth, int pHeight, CString& pNextX, CString& pNextY)
+	{
+		nextMap = pNextMap;
+		x = CLIP(pX, 0, 63);
 		y = CLIP(pY, 0, 63);
 		width = CLIP(pWidth, 0, 63);
 		height = CLIP(pHeight, 0, 63);
-        warpX = pNextX;
-        warpY = pNextY;
-    }
+		warpX = pNextX;
+		warpY = pNextY;
+	}
 };
 
 class CChest
 {
-    public:
+	public:
 	int x, y, signIndex, item;
 	CChest(int pX, int pY, int pSign, int pItem)
 	{
-	    x = CLIP(pX, 0, 63);
+		x = CLIP(pX, 0, 63);
 		y = CLIP(pY, 0, 63);
-	    signIndex = pSign;
-	    item = pItem;
+		signIndex = pSign;
+		item = pItem;
 	}
 };
 

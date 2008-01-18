@@ -22,36 +22,36 @@ bool CServerBot::connect(char* pServer, int pPort)
 bool CServerBot::main()
 {
 	/*
-    char uncompressedData[9001];
+	char uncompressedData[9001];
 	CBuffer receiveBuff;
-    if (botSock->receiveBytes(receiveBuff, 9000) < 0)
-    {
-        return false;
-    }
+	if (botSock->receiveBytes(receiveBuff, 9000) < 0)
+	{
+		return false;
+	}
 
-    for (int i = 0; i < receiveBuff.length(); i+= 2)
-    {
-        int error, cLen = 9000;
-        int len = (((unsigned char)receiveBuff[i]) << 8) + (unsigned char)receiveBuff[i+1];
-        if ((error = uncompress((Bytef*)uncompressedData,(uLongf*)&cLen,(const Bytef*)&receiveBuff.text()[i+2], len)) == Z_OK)
-        {
-            i += len;
-            CBuffer encrypted;
-            encrypted.writeBytes(uncompressedData, cLen);
-            while (encrypted.bytesLeft())
-            {
-                CBuffer line = encrypted.readString("\n");
-                if (!line.length())
-                    break;
-                parsePacket((CPacket&)line);
+	for (int i = 0; i < receiveBuff.length(); i+= 2)
+	{
+		int error, cLen = 9000;
+		int len = (((unsigned char)receiveBuff[i]) << 8) + (unsigned char)receiveBuff[i+1];
+		if ((error = uncompress((Bytef*)uncompressedData,(uLongf*)&cLen,(const Bytef*)&receiveBuff.text()[i+2], len)) == Z_OK)
+		{
+			i += len;
+			CBuffer encrypted;
+			encrypted.writeBytes(uncompressedData, cLen);
+			while (encrypted.bytesLeft())
+			{
+				CBuffer line = encrypted.readString("\n");
+				if (!line.length())
+					break;
+				parsePacket((CPacket&)line);
 			}
-        }
-        else
-        {
-            printf("Compression error in server bot\n");
-            return false;
-        }
-    }*/
+		}
+		else
+		{
+			printf("Compression error in server bot\n");
+			return false;
+		}
+	}*/
 	CBuffer receiveBuff;
 	if(botSock->receiveBytes(receiveBuff, 9000) < 0)
 		return false;
@@ -66,12 +66,12 @@ void CServerBot::parsePacket(CPacket& pPacket)
 }
 void CServerBot::sendPacket(CPacket& pPacket)
 {
-    char buffer[65535];
-    unsigned long clen = 65535;
-    compress((unsigned char*)buffer,&clen,(unsigned char*)pPacket.text(), pPacket.length());
-    CBuffer sendString;
-    sendString.writeByte((char)((clen >> 8) & 0xFF));
-    sendString.writeByte((char)(clen & 0xFF));
-    sendString.writeBytes(buffer, clen);
-    botSock->sendBuffer(sendString);
+	char buffer[65535];
+	unsigned long clen = 65535;
+	compress((unsigned char*)buffer,&clen,(unsigned char*)pPacket.text(), pPacket.length());
+	CBuffer sendString;
+	sendString.writeByte((char)((clen >> 8) & 0xFF));
+	sendString.writeByte((char)(clen & 0xFF));
+	sendString.writeBytes(buffer, clen);
+	botSock->sendBuffer(sendString);
 }

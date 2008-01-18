@@ -7,9 +7,9 @@
 ** The author disclaims copyright to this source code.  In place of
 ** a legal notice, here is a blessing:
 **
-**    May you do good and not evil.
-**    May you find forgiveness for yourself and forgive others.
-**    May you share freely, never taking more than you give.
+**	May you do good and not evil.
+**	May you find forgiveness for yourself and forgive others.
+**	May you share freely, never taking more than you give.
 **
 *************************************************************************
 ** This header file defines the interface that the SQLite library
@@ -19,7 +19,7 @@
 */
 #ifndef _SQLITE3_H_
 #define _SQLITE3_H_
-#include <stdarg.h>     /* Needed for the definition of va_list */
+#include <stdarg.h>	 /* Needed for the definition of va_list */
 
 /*
 ** Make sure we can call this stuff from C++.
@@ -34,7 +34,7 @@ extern "C" {
 #ifdef SQLITE_VERSION
 # undef SQLITE_VERSION
 #endif
-#define SQLITE_VERSION         "3.3.17"
+#define SQLITE_VERSION		 "3.3.17"
 
 /*
 ** The format of the version string is "X.Y.Z<trailing string>", where
@@ -159,46 +159,46 @@ typedef int (*sqlite3_callback)(void*,int,char**, char**);
 ** and sqlite3_busy_timeout() functions below.)
 */
 int sqlite3_exec(
-  sqlite3*,                     /* An open database */
-  const char *sql,              /* SQL to be executed */
-  sqlite3_callback,             /* Callback function */
-  void *,                       /* 1st argument to callback function */
-  char **errmsg                 /* Error msg written here */
+  sqlite3*,					 /* An open database */
+  const char *sql,			  /* SQL to be executed */
+  sqlite3_callback,			 /* Callback function */
+  void *,					   /* 1st argument to callback function */
+  char **errmsg				 /* Error msg written here */
 );
 
 /*
 ** Return values for sqlite3_exec() and sqlite3_step()
 */
-#define SQLITE_OK           0   /* Successful result */
+#define SQLITE_OK		   0   /* Successful result */
 /* beginning-of-error-codes */
-#define SQLITE_ERROR        1   /* SQL error or missing database */
-#define SQLITE_INTERNAL     2   /* NOT USED. Internal logic error in SQLite */
-#define SQLITE_PERM         3   /* Access permission denied */
-#define SQLITE_ABORT        4   /* Callback routine requested an abort */
-#define SQLITE_BUSY         5   /* The database file is locked */
-#define SQLITE_LOCKED       6   /* A table in the database is locked */
-#define SQLITE_NOMEM        7   /* A malloc() failed */
-#define SQLITE_READONLY     8   /* Attempt to write a readonly database */
-#define SQLITE_INTERRUPT    9   /* Operation terminated by sqlite3_interrupt()*/
-#define SQLITE_IOERR       10   /* Some kind of disk I/O error occurred */
-#define SQLITE_CORRUPT     11   /* The database disk image is malformed */
-#define SQLITE_NOTFOUND    12   /* NOT USED. Table or record not found */
-#define SQLITE_FULL        13   /* Insertion failed because database is full */
-#define SQLITE_CANTOPEN    14   /* Unable to open the database file */
-#define SQLITE_PROTOCOL    15   /* NOT USED. Database lock protocol error */
-#define SQLITE_EMPTY       16   /* Database is empty */
-#define SQLITE_SCHEMA      17   /* The database schema changed */
-#define SQLITE_TOOBIG      18   /* NOT USED. Too much data for one row */
+#define SQLITE_ERROR		1   /* SQL error or missing database */
+#define SQLITE_INTERNAL	 2   /* NOT USED. Internal logic error in SQLite */
+#define SQLITE_PERM		 3   /* Access permission denied */
+#define SQLITE_ABORT		4   /* Callback routine requested an abort */
+#define SQLITE_BUSY		 5   /* The database file is locked */
+#define SQLITE_LOCKED	   6   /* A table in the database is locked */
+#define SQLITE_NOMEM		7   /* A malloc() failed */
+#define SQLITE_READONLY	 8   /* Attempt to write a readonly database */
+#define SQLITE_INTERRUPT	9   /* Operation terminated by sqlite3_interrupt()*/
+#define SQLITE_IOERR	   10   /* Some kind of disk I/O error occurred */
+#define SQLITE_CORRUPT	 11   /* The database disk image is malformed */
+#define SQLITE_NOTFOUND	12   /* NOT USED. Table or record not found */
+#define SQLITE_FULL		13   /* Insertion failed because database is full */
+#define SQLITE_CANTOPEN	14   /* Unable to open the database file */
+#define SQLITE_PROTOCOL	15   /* NOT USED. Database lock protocol error */
+#define SQLITE_EMPTY	   16   /* Database is empty */
+#define SQLITE_SCHEMA	  17   /* The database schema changed */
+#define SQLITE_TOOBIG	  18   /* NOT USED. Too much data for one row */
 #define SQLITE_CONSTRAINT  19   /* Abort due to contraint violation */
-#define SQLITE_MISMATCH    20   /* Data type mismatch */
-#define SQLITE_MISUSE      21   /* Library used incorrectly */
-#define SQLITE_NOLFS       22   /* Uses OS features not supported on host */
-#define SQLITE_AUTH        23   /* Authorization denied */
-#define SQLITE_FORMAT      24   /* Auxiliary database format error */
-#define SQLITE_RANGE       25   /* 2nd parameter to sqlite3_bind out of range */
-#define SQLITE_NOTADB      26   /* File opened that is not a database file */
-#define SQLITE_ROW         100  /* sqlite3_step() has another row ready */
-#define SQLITE_DONE        101  /* sqlite3_step() has finished executing */
+#define SQLITE_MISMATCH	20   /* Data type mismatch */
+#define SQLITE_MISUSE	  21   /* Library used incorrectly */
+#define SQLITE_NOLFS	   22   /* Uses OS features not supported on host */
+#define SQLITE_AUTH		23   /* Authorization denied */
+#define SQLITE_FORMAT	  24   /* Auxiliary database format error */
+#define SQLITE_RANGE	   25   /* 2nd parameter to sqlite3_bind out of range */
+#define SQLITE_NOTADB	  26   /* File opened that is not a database file */
+#define SQLITE_ROW		 100  /* sqlite3_step() has another row ready */
+#define SQLITE_DONE		101  /* sqlite3_step() has finished executing */
 /* end-of-error-codes */
 
 /*
@@ -211,7 +211,7 @@ int sqlite3_exec(
 ** To extract the primary result code from an extended result code,
 ** simply mask off the lower 8 bits.
 **
-**        primary = extended & 0xff;
+**		primary = extended & 0xff;
 **
 ** New result error codes may be added from time to time.  Software
 ** that uses the extended result codes should plan accordingly and be
@@ -224,16 +224,16 @@ int sqlite3_exec(
 ** as a prefix.  Primary result codes only contain a single "_"
 ** character.  Extended result codes contain two or more "_" characters.
 */
-#define SQLITE_IOERR_READ          (SQLITE_IOERR | (1<<8))
-#define SQLITE_IOERR_SHORT_READ    (SQLITE_IOERR | (2<<8))
-#define SQLITE_IOERR_WRITE         (SQLITE_IOERR | (3<<8))
-#define SQLITE_IOERR_FSYNC         (SQLITE_IOERR | (4<<8))
-#define SQLITE_IOERR_DIR_FSYNC     (SQLITE_IOERR | (5<<8))
-#define SQLITE_IOERR_TRUNCATE      (SQLITE_IOERR | (6<<8))
-#define SQLITE_IOERR_FSTAT         (SQLITE_IOERR | (7<<8))
-#define SQLITE_IOERR_UNLOCK        (SQLITE_IOERR | (8<<8))
-#define SQLITE_IOERR_RDLOCK        (SQLITE_IOERR | (9<<8))
-#define SQLITE_IOERR_DELETE        (SQLITE_IOERR | (10<<8))
+#define SQLITE_IOERR_READ		  (SQLITE_IOERR | (1<<8))
+#define SQLITE_IOERR_SHORT_READ	(SQLITE_IOERR | (2<<8))
+#define SQLITE_IOERR_WRITE		 (SQLITE_IOERR | (3<<8))
+#define SQLITE_IOERR_FSYNC		 (SQLITE_IOERR | (4<<8))
+#define SQLITE_IOERR_DIR_FSYNC	 (SQLITE_IOERR | (5<<8))
+#define SQLITE_IOERR_TRUNCATE	  (SQLITE_IOERR | (6<<8))
+#define SQLITE_IOERR_FSTAT		 (SQLITE_IOERR | (7<<8))
+#define SQLITE_IOERR_UNLOCK		(SQLITE_IOERR | (8<<8))
+#define SQLITE_IOERR_RDLOCK		(SQLITE_IOERR | (9<<8))
+#define SQLITE_IOERR_DELETE		(SQLITE_IOERR | (10<<8))
 
 /*
 ** Enable or disable the extended result codes.
@@ -386,23 +386,23 @@ int sqlite3_busy_timeout(sqlite3*, int ms);
 **
 ** As an example, suppose the query result where this table:
 **
-**        Name        | Age
-**        -----------------------
-**        Alice       | 43
-**        Bob         | 28
-**        Cindy       | 21
+**		Name		| Age
+**		-----------------------
+**		Alice	   | 43
+**		Bob		 | 28
+**		Cindy	   | 21
 **
 ** If the 3rd argument were &azResult then after the function returns
 ** azResult will contain the following data:
 **
-**        azResult[0] = "Name";
-**        azResult[1] = "Age";
-**        azResult[2] = "Alice";
-**        azResult[3] = "43";
-**        azResult[4] = "Bob";
-**        azResult[5] = "28";
-**        azResult[6] = "Cindy";
-**        azResult[7] = "21";
+**		azResult[0] = "Name";
+**		azResult[1] = "Age";
+**		azResult[2] = "Alice";
+**		azResult[3] = "43";
+**		azResult[4] = "Bob";
+**		azResult[5] = "28";
+**		azResult[6] = "Cindy";
+**		azResult[7] = "21";
 **
 ** Notice that there is an extra row of data containing the column
 ** headers.  But the *nrow return value is still 3.  *ncolumn is
@@ -419,12 +419,12 @@ int sqlite3_busy_timeout(sqlite3*, int ms);
 ** The return value of this routine is the same as from sqlite3_exec().
 */
 int sqlite3_get_table(
-  sqlite3*,               /* An open database */
-  const char *sql,       /* SQL to be executed */
-  char ***resultp,       /* Result written to a char *[]  that this points to */
-  int *nrow,             /* Number of result rows written here */
-  int *ncolumn,          /* Number of result columns written here */
-  char **errmsg          /* Error msg written here */
+  sqlite3*,			   /* An open database */
+  const char *sql,	   /* SQL to be executed */
+  char ***resultp,	   /* Result written to a char *[]  that this points to */
+  int *nrow,			 /* Number of result rows written here */
+  int *ncolumn,		  /* Number of result columns written here */
+  char **errmsg		  /* Error msg written here */
 );
 
 /*
@@ -451,23 +451,23 @@ void sqlite3_free_table(char **result);
 **
 ** For example, so some string variable contains text as follows:
 **
-**      char *zText = "It's a happy day!";
+**	  char *zText = "It's a happy day!";
 **
 ** We can use this text in an SQL statement as follows:
 **
-**      char *z = sqlite3_mprintf("INSERT INTO TABLES('%q')", zText);
-**      sqlite3_exec(db, z, callback1, 0, 0);
-**      sqlite3_free(z);
+**	  char *z = sqlite3_mprintf("INSERT INTO TABLES('%q')", zText);
+**	  sqlite3_exec(db, z, callback1, 0, 0);
+**	  sqlite3_free(z);
 **
 ** Because the %q format string is used, the '\'' character in zText
 ** is escaped and the SQL generated is as follows:
 **
-**      INSERT INTO table1 VALUES('It''s a happy day!')
+**	  INSERT INTO table1 VALUES('It''s a happy day!')
 **
 ** This is correct.  Had we used %s instead of %q, the generated SQL
 ** would have looked like this:
 **
-**      INSERT INTO table1 VALUES('It's a happy day!');
+**	  INSERT INTO table1 VALUES('It's a happy day!');
 **
 ** This second example is an SQL syntax error.  As a general rule you
 ** should always use %q instead of %s when inserting text into a string 
@@ -515,40 +515,40 @@ int sqlite3_set_authorizer(
 ** the access attempt or NULL if this access attempt is directly from 
 ** input SQL code.
 **
-**                                          Arg-3           Arg-4
+**										  Arg-3		   Arg-4
 */
-#define SQLITE_COPY                  0   /* Table Name      File Name       */
-#define SQLITE_CREATE_INDEX          1   /* Index Name      Table Name      */
-#define SQLITE_CREATE_TABLE          2   /* Table Name      NULL            */
-#define SQLITE_CREATE_TEMP_INDEX     3   /* Index Name      Table Name      */
-#define SQLITE_CREATE_TEMP_TABLE     4   /* Table Name      NULL            */
-#define SQLITE_CREATE_TEMP_TRIGGER   5   /* Trigger Name    Table Name      */
-#define SQLITE_CREATE_TEMP_VIEW      6   /* View Name       NULL            */
-#define SQLITE_CREATE_TRIGGER        7   /* Trigger Name    Table Name      */
-#define SQLITE_CREATE_VIEW           8   /* View Name       NULL            */
-#define SQLITE_DELETE                9   /* Table Name      NULL            */
-#define SQLITE_DROP_INDEX           10   /* Index Name      Table Name      */
-#define SQLITE_DROP_TABLE           11   /* Table Name      NULL            */
-#define SQLITE_DROP_TEMP_INDEX      12   /* Index Name      Table Name      */
-#define SQLITE_DROP_TEMP_TABLE      13   /* Table Name      NULL            */
-#define SQLITE_DROP_TEMP_TRIGGER    14   /* Trigger Name    Table Name      */
-#define SQLITE_DROP_TEMP_VIEW       15   /* View Name       NULL            */
-#define SQLITE_DROP_TRIGGER         16   /* Trigger Name    Table Name      */
-#define SQLITE_DROP_VIEW            17   /* View Name       NULL            */
-#define SQLITE_INSERT               18   /* Table Name      NULL            */
-#define SQLITE_PRAGMA               19   /* Pragma Name     1st arg or NULL */
-#define SQLITE_READ                 20   /* Table Name      Column Name     */
-#define SQLITE_SELECT               21   /* NULL            NULL            */
-#define SQLITE_TRANSACTION          22   /* NULL            NULL            */
-#define SQLITE_UPDATE               23   /* Table Name      Column Name     */
-#define SQLITE_ATTACH               24   /* Filename        NULL            */
-#define SQLITE_DETACH               25   /* Database Name   NULL            */
-#define SQLITE_ALTER_TABLE          26   /* Database Name   Table Name      */
-#define SQLITE_REINDEX              27   /* Index Name      NULL            */
-#define SQLITE_ANALYZE              28   /* Table Name      NULL            */
-#define SQLITE_CREATE_VTABLE        29   /* Table Name      Module Name     */
-#define SQLITE_DROP_VTABLE          30   /* Table Name      Module Name     */
-#define SQLITE_FUNCTION             31   /* Function Name   NULL            */
+#define SQLITE_COPY				  0   /* Table Name	  File Name	   */
+#define SQLITE_CREATE_INDEX		  1   /* Index Name	  Table Name	  */
+#define SQLITE_CREATE_TABLE		  2   /* Table Name	  NULL			*/
+#define SQLITE_CREATE_TEMP_INDEX	 3   /* Index Name	  Table Name	  */
+#define SQLITE_CREATE_TEMP_TABLE	 4   /* Table Name	  NULL			*/
+#define SQLITE_CREATE_TEMP_TRIGGER   5   /* Trigger Name	Table Name	  */
+#define SQLITE_CREATE_TEMP_VIEW	  6   /* View Name	   NULL			*/
+#define SQLITE_CREATE_TRIGGER		7   /* Trigger Name	Table Name	  */
+#define SQLITE_CREATE_VIEW		   8   /* View Name	   NULL			*/
+#define SQLITE_DELETE				9   /* Table Name	  NULL			*/
+#define SQLITE_DROP_INDEX		   10   /* Index Name	  Table Name	  */
+#define SQLITE_DROP_TABLE		   11   /* Table Name	  NULL			*/
+#define SQLITE_DROP_TEMP_INDEX	  12   /* Index Name	  Table Name	  */
+#define SQLITE_DROP_TEMP_TABLE	  13   /* Table Name	  NULL			*/
+#define SQLITE_DROP_TEMP_TRIGGER	14   /* Trigger Name	Table Name	  */
+#define SQLITE_DROP_TEMP_VIEW	   15   /* View Name	   NULL			*/
+#define SQLITE_DROP_TRIGGER		 16   /* Trigger Name	Table Name	  */
+#define SQLITE_DROP_VIEW			17   /* View Name	   NULL			*/
+#define SQLITE_INSERT			   18   /* Table Name	  NULL			*/
+#define SQLITE_PRAGMA			   19   /* Pragma Name	 1st arg or NULL */
+#define SQLITE_READ				 20   /* Table Name	  Column Name	 */
+#define SQLITE_SELECT			   21   /* NULL			NULL			*/
+#define SQLITE_TRANSACTION		  22   /* NULL			NULL			*/
+#define SQLITE_UPDATE			   23   /* Table Name	  Column Name	 */
+#define SQLITE_ATTACH			   24   /* Filename		NULL			*/
+#define SQLITE_DETACH			   25   /* Database Name   NULL			*/
+#define SQLITE_ALTER_TABLE		  26   /* Database Name   Table Name	  */
+#define SQLITE_REINDEX			  27   /* Index Name	  NULL			*/
+#define SQLITE_ANALYZE			  28   /* Table Name	  NULL			*/
+#define SQLITE_CREATE_VTABLE		29   /* Table Name	  Module Name	 */
+#define SQLITE_DROP_VTABLE		  30   /* Table Name	  Module Name	 */
+#define SQLITE_FUNCTION			 31   /* Function Name   NULL			*/
 
 /*
 ** The return value of the authorization function should be one of the
@@ -634,11 +634,11 @@ void *sqlite3_commit_hook(sqlite3*, int(*)(void*), void*);
 */
 int sqlite3_open(
   const char *filename,   /* Database filename (UTF-8) */
-  sqlite3 **ppDb          /* OUT: SQLite db handle */
+  sqlite3 **ppDb		  /* OUT: SQLite db handle */
 );
 int sqlite3_open16(
   const void *filename,   /* Database filename (UTF-16) */
-  sqlite3 **ppDb          /* OUT: SQLite db handle */
+  sqlite3 **ppDb		  /* OUT: SQLite db handle */
 );
 
 /*
@@ -710,18 +710,18 @@ typedef struct sqlite3_stmt sqlite3_stmt;
 ** On success, SQLITE_OK is returned.  Otherwise an error code is returned.
 */
 int sqlite3_prepare(
-  sqlite3 *db,            /* Database handle */
-  const char *zSql,       /* SQL statement, UTF-8 encoded */
-  int nBytes,             /* Length of zSql in bytes. */
+  sqlite3 *db,			/* Database handle */
+  const char *zSql,	   /* SQL statement, UTF-8 encoded */
+  int nBytes,			 /* Length of zSql in bytes. */
   sqlite3_stmt **ppStmt,  /* OUT: Statement handle */
-  const char **pzTail     /* OUT: Pointer to unused portion of zSql */
+  const char **pzTail	 /* OUT: Pointer to unused portion of zSql */
 );
 int sqlite3_prepare16(
-  sqlite3 *db,            /* Database handle */
-  const void *zSql,       /* SQL statement, UTF-16 encoded */
-  int nBytes,             /* Length of zSql in bytes. */
+  sqlite3 *db,			/* Database handle */
+  const void *zSql,	   /* SQL statement, UTF-16 encoded */
+  int nBytes,			 /* Length of zSql in bytes. */
   sqlite3_stmt **ppStmt,  /* OUT: Statement handle */
-  const void **pzTail     /* OUT: Pointer to unused portion of zSql */
+  const void **pzTail	 /* OUT: Pointer to unused portion of zSql */
 );
 
 /*
@@ -735,18 +735,18 @@ int sqlite3_prepare16(
 ** use used to have to call sqlite3_reset() to get.
 */
 int sqlite3_prepare_v2(
-  sqlite3 *db,            /* Database handle */
-  const char *zSql,       /* SQL statement, UTF-8 encoded */
-  int nBytes,             /* Length of zSql in bytes. */
+  sqlite3 *db,			/* Database handle */
+  const char *zSql,	   /* SQL statement, UTF-8 encoded */
+  int nBytes,			 /* Length of zSql in bytes. */
   sqlite3_stmt **ppStmt,  /* OUT: Statement handle */
-  const char **pzTail     /* OUT: Pointer to unused portion of zSql */
+  const char **pzTail	 /* OUT: Pointer to unused portion of zSql */
 );
 int sqlite3_prepare16_v2(
-  sqlite3 *db,            /* Database handle */
-  const void *zSql,       /* SQL statement, UTF-16 encoded */
-  int nBytes,             /* Length of zSql in bytes. */
+  sqlite3 *db,			/* Database handle */
+  const void *zSql,	   /* SQL statement, UTF-16 encoded */
+  int nBytes,			 /* Length of zSql in bytes. */
   sqlite3_stmt **ppStmt,  /* OUT: Statement handle */
-  const void **pzTail     /* OUT: Pointer to unused portion of zSql */
+  const void **pzTail	 /* OUT: Pointer to unused portion of zSql */
 );
 
 /*
@@ -950,10 +950,10 @@ int sqlite3_data_count(sqlite3_stmt *pStmt);
 ** types.
 */
 #define SQLITE_INTEGER  1
-#define SQLITE_FLOAT    2
+#define SQLITE_FLOAT	2
 /* #define SQLITE_TEXT  3  // See below */
-#define SQLITE_BLOB     4
-#define SQLITE_NULL     5
+#define SQLITE_BLOB	 4
+#define SQLITE_NULL	 5
 
 /*
 ** SQLite version 2 defines SQLITE_TEXT differently.  To allow both
@@ -963,9 +963,9 @@ int sqlite3_data_count(sqlite3_stmt *pStmt);
 #ifdef SQLITE_TEXT
 # undef SQLITE_TEXT
 #else
-# define SQLITE_TEXT     3
+# define SQLITE_TEXT	 3
 #endif
-#define SQLITE3_TEXT     3
+#define SQLITE3_TEXT	 3
 
 /*
 ** The next group of routines returns information about the information
@@ -985,43 +985,43 @@ int sqlite3_data_count(sqlite3_stmt *pStmt);
 ** automatically.  The following table details the conversions that
 ** are applied:
 **
-**    Internal Type    Requested Type     Conversion
-**    -------------    --------------    --------------------------
-**       NULL             INTEGER         Result is 0
-**       NULL             FLOAT           Result is 0.0
-**       NULL             TEXT            Result is an empty string
-**       NULL             BLOB            Result is a zero-length BLOB
-**       INTEGER          FLOAT           Convert from integer to float
-**       INTEGER          TEXT            ASCII rendering of the integer
-**       INTEGER          BLOB            Same as for INTEGER->TEXT
-**       FLOAT            INTEGER         Convert from float to integer
-**       FLOAT            TEXT            ASCII rendering of the float
-**       FLOAT            BLOB            Same as FLOAT->TEXT
-**       TEXT             INTEGER         Use atoi()
-**       TEXT             FLOAT           Use atof()
-**       TEXT             BLOB            No change
-**       BLOB             INTEGER         Convert to TEXT then use atoi()
-**       BLOB             FLOAT           Convert to TEXT then use atof()
-**       BLOB             TEXT            Add a \000 terminator if needed
+**	Internal Type	Requested Type	 Conversion
+**	-------------	--------------	--------------------------
+**	   NULL			 INTEGER		 Result is 0
+**	   NULL			 FLOAT		   Result is 0.0
+**	   NULL			 TEXT			Result is an empty string
+**	   NULL			 BLOB			Result is a zero-length BLOB
+**	   INTEGER		  FLOAT		   Convert from integer to float
+**	   INTEGER		  TEXT			ASCII rendering of the integer
+**	   INTEGER		  BLOB			Same as for INTEGER->TEXT
+**	   FLOAT			INTEGER		 Convert from float to integer
+**	   FLOAT			TEXT			ASCII rendering of the float
+**	   FLOAT			BLOB			Same as FLOAT->TEXT
+**	   TEXT			 INTEGER		 Use atoi()
+**	   TEXT			 FLOAT		   Use atof()
+**	   TEXT			 BLOB			No change
+**	   BLOB			 INTEGER		 Convert to TEXT then use atoi()
+**	   BLOB			 FLOAT		   Convert to TEXT then use atof()
+**	   BLOB			 TEXT			Add a \000 terminator if needed
 **
 ** The following access routines are provided:
 **
-** _type()     Return the datatype of the result.  This is one of
-**             SQLITE_INTEGER, SQLITE_FLOAT, SQLITE_TEXT, SQLITE_BLOB,
-**             or SQLITE_NULL.
-** _blob()     Return the value of a BLOB.
-** _bytes()    Return the number of bytes in a BLOB value or the number
-**             of bytes in a TEXT value represented as UTF-8.  The \000
-**             terminator is included in the byte count for TEXT values.
+** _type()	 Return the datatype of the result.  This is one of
+**			 SQLITE_INTEGER, SQLITE_FLOAT, SQLITE_TEXT, SQLITE_BLOB,
+**			 or SQLITE_NULL.
+** _blob()	 Return the value of a BLOB.
+** _bytes()	Return the number of bytes in a BLOB value or the number
+**			 of bytes in a TEXT value represented as UTF-8.  The \000
+**			 terminator is included in the byte count for TEXT values.
 ** _bytes16()  Return the number of bytes in a BLOB value or the number
-**             of bytes in a TEXT value represented as UTF-16.  The \u0000
-**             terminator is included in the byte count for TEXT values.
+**			 of bytes in a TEXT value represented as UTF-16.  The \u0000
+**			 terminator is included in the byte count for TEXT values.
 ** _double()   Return a FLOAT value.
-** _int()      Return an INTEGER value in the host computer's native
-**             integer representation.  This might be either a 32- or 64-bit
-**             integer depending on the host.
-** _int64()    Return an INTEGER value as a 64-bit signed integer.
-** _text()     Return the value as UTF-8 text.
+** _int()	  Return an INTEGER value in the host computer's native
+**			 integer representation.  This might be either a 32- or 64-bit
+**			 integer depending on the host.
+** _int64()	Return an INTEGER value as a 64-bit signed integer.
+** _text()	 Return the value as UTF-8 text.
 ** _text16()   Return the value as UTF-16 text.
 */
 const void *sqlite3_column_blob(sqlite3_stmt*, int iCol);
@@ -1206,7 +1206,7 @@ void sqlite3_set_auxdata(sqlite3_context*, int, void*, void (*)(void*));
 ** C++ compilers.  See ticket #2191.
 */
 typedef void (*sqlite3_destructor_type)(void*);
-#define SQLITE_STATIC      ((sqlite3_destructor_type)0)
+#define SQLITE_STATIC	  ((sqlite3_destructor_type)0)
 #define SQLITE_TRANSIENT   ((sqlite3_destructor_type)-1)
 
 /*
@@ -1230,12 +1230,12 @@ void sqlite3_result_value(sqlite3_context*, sqlite3_value*);
 ** These are the allowed values for the eTextRep argument to
 ** sqlite3_create_collation and sqlite3_create_function.
 */
-#define SQLITE_UTF8           1
-#define SQLITE_UTF16LE        2
-#define SQLITE_UTF16BE        3
-#define SQLITE_UTF16          4    /* Use native byte order */
-#define SQLITE_ANY            5    /* sqlite3_create_function only */
-#define SQLITE_UTF16_ALIGNED  8    /* sqlite3_create_collation only */
+#define SQLITE_UTF8		   1
+#define SQLITE_UTF16LE		2
+#define SQLITE_UTF16BE		3
+#define SQLITE_UTF16		  4	/* Use native byte order */
+#define SQLITE_ANY			5	/* sqlite3_create_function only */
+#define SQLITE_UTF16_ALIGNED  8	/* sqlite3_create_collation only */
 
 /*
 ** These two functions are used to add new collation sequences to the
@@ -1323,8 +1323,8 @@ int sqlite3_collation_needed16(
 ** of SQLite.
 */
 int sqlite3_key(
-  sqlite3 *db,                   /* Database to be rekeyed */
-  const void *pKey, int nKey     /* The key */
+  sqlite3 *db,				   /* Database to be rekeyed */
+  const void *pKey, int nKey	 /* The key */
 );
 
 /*
@@ -1336,8 +1336,8 @@ int sqlite3_key(
 ** of SQLite.
 */
 int sqlite3_rekey(
-  sqlite3 *db,                   /* Database to be rekeyed */
-  const void *pKey, int nKey     /* The new key */
+  sqlite3 *db,				   /* Database to be rekeyed */
+  const void *pKey, int nKey	 /* The new key */
 );
 
 /*
@@ -1533,14 +1533,14 @@ void sqlite3_thread_cleanup(void);
 ** arguments may be NULL, in which case the corresponding element of meta 
 ** information is ommitted.
 **
-** Parameter     Output Type      Description
+** Parameter	 Output Type	  Description
 ** -----------------------------------
 **
-**   5th         const char*      Data type
-**   6th         const char*      Name of the default collation sequence 
-**   7th         int              True if the column has a NOT NULL constraint
-**   8th         int              True if the column is part of the PRIMARY KEY
-**   9th         int              True if the column is AUTOINCREMENT
+**   5th		 const char*	  Data type
+**   6th		 const char*	  Name of the default collation sequence 
+**   7th		 int			  True if the column has a NOT NULL constraint
+**   8th		 int			  True if the column is part of the PRIMARY KEY
+**   9th		 int			  True if the column is AUTOINCREMENT
 **
 **
 ** The memory pointed to by the character pointers returned for the 
@@ -1555,11 +1555,11 @@ void sqlite3_thread_cleanup(void);
 ** explicitly declared IPK column, then the output parameters are set as 
 ** follows:
 **
-**     data type: "INTEGER"
-**     collation sequence: "BINARY"
-**     not null: 0
-**     primary key: 1
-**     auto increment: 0
+**	 data type: "INTEGER"
+**	 collation sequence: "BINARY"
+**	 not null: 0
+**	 primary key: 1
+**	 auto increment: 0
 **
 ** This function may load one or more schemas from database files. If an
 ** error occurs during this process, or if the requested table or column
@@ -1570,15 +1570,15 @@ void sqlite3_thread_cleanup(void);
 ** SQLITE_ENABLE_COLUMN_METADATA preprocessor symbol defined.
 */
 int sqlite3_table_column_metadata(
-  sqlite3 *db,                /* Connection handle */
-  const char *zDbName,        /* Database name or NULL */
-  const char *zTableName,     /* Table name */
-  const char *zColumnName,    /* Column name */
-  char const **pzDataType,    /* OUTPUT: Declared data type */
-  char const **pzCollSeq,     /* OUTPUT: Collation sequence name */
-  int *pNotNull,              /* OUTPUT: True if NOT NULL constraint exists */
-  int *pPrimaryKey,           /* OUTPUT: True if column part of PK */
-  int *pAutoinc               /* OUTPUT: True if colums is auto-increment */
+  sqlite3 *db,				/* Connection handle */
+  const char *zDbName,		/* Database name or NULL */
+  const char *zTableName,	 /* Table name */
+  const char *zColumnName,	/* Column name */
+  char const **pzDataType,	/* OUTPUT: Declared data type */
+  char const **pzCollSeq,	 /* OUTPUT: Collation sequence name */
+  int *pNotNull,			  /* OUTPUT: True if NOT NULL constraint exists */
+  int *pPrimaryKey,		   /* OUTPUT: True if column part of PK */
+  int *pAutoinc			   /* OUTPUT: True if colums is auto-increment */
 );
 
 /*
@@ -1600,10 +1600,10 @@ int sqlite3_table_column_metadata(
 ****** EXPERIMENTAL - subject to change without notice **************
 */
 int sqlite3_load_extension(
-  sqlite3 *db,          /* Load the extension into this database connection */
-  const char *zFile,    /* Name of the shared library containing extension */
-  const char *zProc,    /* Entry point.  Derived from zFile if 0 */
-  char **pzErrMsg       /* Put error message here if not 0 */
+  sqlite3 *db,		  /* Load the extension into this database connection */
+  const char *zFile,	/* Name of the shared library containing extension */
+  const char *zProc,	/* Entry point.  Derived from zFile if 0 */
+  char **pzErrMsg	   /* Put error message here if not 0 */
 );
 
 /*
@@ -1681,18 +1681,18 @@ typedef struct sqlite3_module sqlite3_module;
 struct sqlite3_module {
   int iVersion;
   int (*xCreate)(sqlite3*, void *pAux,
-               int argc, const char *const*argv,
-               sqlite3_vtab **ppVTab, char**);
+			   int argc, const char *const*argv,
+			   sqlite3_vtab **ppVTab, char**);
   int (*xConnect)(sqlite3*, void *pAux,
-               int argc, const char *const*argv,
-               sqlite3_vtab **ppVTab, char**);
+			   int argc, const char *const*argv,
+			   sqlite3_vtab **ppVTab, char**);
   int (*xBestIndex)(sqlite3_vtab *pVTab, sqlite3_index_info*);
   int (*xDisconnect)(sqlite3_vtab *pVTab);
   int (*xDestroy)(sqlite3_vtab *pVTab);
   int (*xOpen)(sqlite3_vtab *pVTab, sqlite3_vtab_cursor **ppCursor);
   int (*xClose)(sqlite3_vtab_cursor*);
   int (*xFilter)(sqlite3_vtab_cursor*, int idxNum, const char *idxStr,
-                int argc, sqlite3_value **argv);
+				int argc, sqlite3_value **argv);
   int (*xNext)(sqlite3_vtab_cursor*);
   int (*xEof)(sqlite3_vtab_cursor*);
   int (*xColumn)(sqlite3_vtab_cursor*, sqlite3_context*, int);
@@ -1703,8 +1703,8 @@ struct sqlite3_module {
   int (*xCommit)(sqlite3_vtab *pVTab);
   int (*xRollback)(sqlite3_vtab *pVTab);
   int (*xFindFunction)(sqlite3_vtab *pVtab, int nArg, const char *zName,
-                       void (**pxFunc)(sqlite3_context*,int,sqlite3_value**),
-                       void **ppArg);
+					   void (**pxFunc)(sqlite3_context*,int,sqlite3_value**),
+					   void **ppArg);
 };
 
 /*
@@ -1717,7 +1717,7 @@ struct sqlite3_module {
 ** The aConstraint[] array records WHERE clause constraints of the
 ** form:
 **
-**         column OP expr
+**		 column OP expr
 **
 ** Where OP is =, <, <=, >, or >=.  The particular operator is stored
 ** in aConstraint[].op.  The index of the column is stored in 
@@ -1755,35 +1755,35 @@ struct sqlite3_module {
 */
 struct sqlite3_index_info {
   /* Inputs */
-  const int nConstraint;     /* Number of entries in aConstraint */
+  const int nConstraint;	 /* Number of entries in aConstraint */
   const struct sqlite3_index_constraint {
-     int iColumn;              /* Column on left-hand side of constraint */
-     unsigned char op;         /* Constraint operator */
-     unsigned char usable;     /* True if this constraint is usable */
-     int iTermOffset;          /* Used internally - xBestIndex should ignore */
-  } *const aConstraint;      /* Table of WHERE clause constraints */
-  const int nOrderBy;        /* Number of terms in the ORDER BY clause */
+	 int iColumn;			  /* Column on left-hand side of constraint */
+	 unsigned char op;		 /* Constraint operator */
+	 unsigned char usable;	 /* True if this constraint is usable */
+	 int iTermOffset;		  /* Used internally - xBestIndex should ignore */
+  } *const aConstraint;	  /* Table of WHERE clause constraints */
+  const int nOrderBy;		/* Number of terms in the ORDER BY clause */
   const struct sqlite3_index_orderby {
-     int iColumn;              /* Column number */
-     unsigned char desc;       /* True for DESC.  False for ASC. */
-  } *const aOrderBy;         /* The ORDER BY clause */
+	 int iColumn;			  /* Column number */
+	 unsigned char desc;	   /* True for DESC.  False for ASC. */
+  } *const aOrderBy;		 /* The ORDER BY clause */
 
   /* Outputs */
   struct sqlite3_index_constraint_usage {
-    int argvIndex;           /* if >0, constraint is part of argv to xFilter */
-    unsigned char omit;      /* Do not code a test for this constraint */
+	int argvIndex;		   /* if >0, constraint is part of argv to xFilter */
+	unsigned char omit;	  /* Do not code a test for this constraint */
   } *const aConstraintUsage;
-  int idxNum;                /* Number used to identify the index */
-  char *idxStr;              /* String, possibly obtained from sqlite3_malloc */
-  int needToFreeIdxStr;      /* Free idxStr using sqlite3_free() if true */
-  int orderByConsumed;       /* True if output is already ordered */
-  double estimatedCost;      /* Estimated cost of using this index */
+  int idxNum;				/* Number used to identify the index */
+  char *idxStr;			  /* String, possibly obtained from sqlite3_malloc */
+  int needToFreeIdxStr;	  /* Free idxStr using sqlite3_free() if true */
+  int orderByConsumed;	   /* True if output is already ordered */
+  double estimatedCost;	  /* Estimated cost of using this index */
 };
-#define SQLITE_INDEX_CONSTRAINT_EQ    2
-#define SQLITE_INDEX_CONSTRAINT_GT    4
-#define SQLITE_INDEX_CONSTRAINT_LE    8
-#define SQLITE_INDEX_CONSTRAINT_LT    16
-#define SQLITE_INDEX_CONSTRAINT_GE    32
+#define SQLITE_INDEX_CONSTRAINT_EQ	2
+#define SQLITE_INDEX_CONSTRAINT_GT	4
+#define SQLITE_INDEX_CONSTRAINT_LE	8
+#define SQLITE_INDEX_CONSTRAINT_LT	16
+#define SQLITE_INDEX_CONSTRAINT_GE	32
 #define SQLITE_INDEX_CONSTRAINT_MATCH 64
 
 /*
@@ -1793,10 +1793,10 @@ struct sqlite3_index_info {
 ** tables of the module.
 */
 int sqlite3_create_module(
-  sqlite3 *db,               /* SQLite connection to register module with */
-  const char *zName,         /* Name of the module */
-  const sqlite3_module *,    /* Methods for the module */
-  void *                     /* Client data for xCreate/xConnect */
+  sqlite3 *db,			   /* SQLite connection to register module with */
+  const char *zName,		 /* Name of the module */
+  const sqlite3_module *,	/* Methods for the module */
+  void *					 /* Client data for xCreate/xConnect */
 );
 
 /*
@@ -1818,8 +1818,8 @@ int sqlite3_create_module(
 */
 struct sqlite3_vtab {
   const sqlite3_module *pModule;  /* The module for this virtual table */
-  int nRef;                       /* Used internally */
-  char *zErrMsg;                  /* Error message from sqlite3_mprintf() */
+  int nRef;					   /* Used internally */
+  char *zErrMsg;				  /* Error message from sqlite3_mprintf() */
   /* Virtual table implementations will typically add additional fields */
 };
 
@@ -1833,7 +1833,7 @@ struct sqlite3_vtab {
 ** are common to all implementations.
 */
 struct sqlite3_vtab_cursor {
-  sqlite3_vtab *pVtab;      /* Virtual table of this cursor */
+  sqlite3_vtab *pVtab;	  /* Virtual table of this cursor */
   /* Virtual table implementations will typically add additional fields */
 };
 

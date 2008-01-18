@@ -50,11 +50,11 @@ inline float CLIP(float value, float min, float max)
 
 inline void wait(int pMilliseconds)
 {
-    #ifdef WIN32
-    Sleep(pMilliseconds);
-    #else
-    usleep(pMilliseconds*1000);
-    #endif
+	#ifdef WIN32
+	Sleep(pMilliseconds);
+	#else
+	usleep(pMilliseconds*1000);
+	#endif
 }
 
 

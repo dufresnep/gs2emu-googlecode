@@ -10,7 +10,7 @@ class CList
 	int buffsize;
 	int itemCount;
 
-    public:
+	public:
 	CList(int pBuffSize = 5);
 	~CList();
 
@@ -23,7 +23,7 @@ class CList
 	int find(void* pItem);
 
 	void* operator[](int pIndex);
-    void remove(void* pItem);
+	void remove(void* pItem);
 	int count();
 	int size();
 };
@@ -37,21 +37,21 @@ inline CList::CList(int pBuffSize)
 
 inline void* CList::operator[](int pIndex)
 {
-    return item(pIndex);
+	return item(pIndex);
 }
 
 inline void CList::remove(void* pItem)
 {
-    remove(find(pItem));
+	remove(find(pItem));
 }
 
 inline int CList::count()
 {
-    return itemCount;
+	return itemCount;
 }
 
 inline int CList::size()
 {
-    return buffsize;
+	return buffsize;
 }
 #endif // HCLIST

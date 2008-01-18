@@ -355,7 +355,8 @@ class CPlayer : public CAccount
 		CList enteredLevels, fileList;
 		CSocket *playerSock;
 		CStringList weaponSend;
-		int additionalFlags, carrySprite, failAttempts, key, iterator, id, lastCheck, lastData, lastMessage, lastMovement, lastNick, lastSave, loginTime, packCount, rating, statusMsg, udpPort;
+		int additionalFlags, carrySprite, failAttempts, key, iterator, id, packCount, rating, statusMsg, udpPort;
+		time_t lastCheck, lastData, lastMessage, lastMovement, lastNick, lastSave, loginTime;
 		#ifdef GSERV22
 			codec mcodec;
 		#endif
@@ -376,7 +377,7 @@ class CPlayer : public CAccount
 		void setNick(CString& pNewNick, bool pVerifyGuild);
 		void sendWeapons();
 		void sendFiles();
-		int getLeavingTime(CLevel* pLevel);
+		time_t getLeavingTime(CLevel* pLevel);
 		CPacket getProp(int pProp);
 		void setProps(CPacket& pProps, bool pForward);
 		void getItem(int pItem);
@@ -498,9 +499,9 @@ class CEnteredLevel
 {
 	public:
 		CLevel* level;
-		int time;
+		time_t time;
 
-		CEnteredLevel(CLevel* pLevel, int pTime)
+		CEnteredLevel(CLevel* pLevel, time_t pTime)
 		{
 			level = pLevel;
 			time = pTime;

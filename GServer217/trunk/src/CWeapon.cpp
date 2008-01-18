@@ -5,7 +5,7 @@
 
 CPacket CWeapon::getSendData()
 {
-    CPacket pOut;
-    pOut << (char)name.length() << name << (char)0 << (char)image.length() << image << (char)1 << (short)code.length() << code;
-    return pOut;
+	CPacket pOut;
+	pOut << (char)name.length() << name << (char)0 << (char)image.length() << image << (char)1 << (short)code.length() << code;
+	return pOut;
 }

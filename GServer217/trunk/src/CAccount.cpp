@@ -8,9 +8,9 @@
 
 CAccount::CAccount()
 {
-    banned = loadOnly = false;
-    adminRights = 0;
-    adminIp = "0.0.0.0";
+	banned = loadOnly = false;
+	adminRights = 0;
+	adminIp = "0.0.0.0";
 }
 
 bool CAccount::loadDBAccount(CString pAccount, bool fromAccount)
@@ -42,10 +42,10 @@ bool CAccount::loadDBAccount(CString pAccount, bool fromAccount)
 		if (section == "NAME") continue; //accountName = val;
 		else if (section == "NICK") continue; //nickName = val;
 		else if (section == "LEVEL") levelName = val;
-		else if (section == "X") x = atof(val.text());
-		else if (section == "Y") y = atof(val.text());
-		else if (section == "MAXHP") maxPower = atoi(val.text());
-		else if (section == "HP") power = atoi(val.text());
+		else if (section == "X") x = (float)atof(val.text());
+		else if (section == "Y") y = (float)atof(val.text());
+		else if (section == "MAXHP") maxPower = (float)atoi(val.text());
+		else if (section == "HP") power = (float)atoi(val.text());
 		else if (section == "RUPEES") rubins = atoi(val.text());
 		else if (section == "ANI") gAni = val;
 		else if (section == "ARROWS") darts = atoi(val.text());
@@ -101,7 +101,7 @@ bool CAccount::loadDBAccount(CString pAccount, bool fromAccount)
 		else if (section == "ATTR30") myAttr[29] = val;
 		else if (section == "WEAPON") myWeapons.add(val);
 		else if (section == "CHEST") myChests.add(val);
-		else if (section == "BANNED") banned = atoi(val.text());
+		else if (section == "BANNED") banned = (atoi(val.text()) == 0) ? false : true;
 		else if (section == "BANREASON") banReason = val;
 		else if (section == "COMMENTS") comments = val;
 		else if (section == "LOCALRIGHTS") adminRights = atoi(val.text());
@@ -132,7 +132,7 @@ bool CAccount::loadWorldPropsIni()
 void CAccount::saveAccount(bool pAttributes)
 {
 	if (loadOnly || accountName.length() < 1 || type == CLIENTRC)
-        return;
+		return;
 
 	CAccount oldAccount;
 	CBuffer fileName = CString() << "accounts" << fSep << accountName << ".txt";
@@ -170,7 +170,7 @@ void CAccount::saveAccount(bool pAttributes)
 	newFile << "ONSECS " << toString((pAttributes ? oldAccount.onlineSecs : onlineSecs)) << "\n";
 	newFile << "IP " << toString(lastIp) << "\n";
 	newFile << "LANGUAGE " << (pAttributes ? oldAccount.language : language) << "\n";
-    newFile << "KILLS " << toString(kills) << "\n";
+	newFile << "KILLS " << toString(kills) << "\n";
 	newFile << "DEATHS " << toString(deaths) << "\n";
 //	newFile << "PLATFORM " << platform << "\n";
 //	newFile << "CODEPAGE " << name << "\n";

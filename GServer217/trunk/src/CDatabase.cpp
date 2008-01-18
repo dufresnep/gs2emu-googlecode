@@ -44,7 +44,7 @@
 		query << "'" << pPlayerName << "'";
 		if(sqlite3_exec(gserverDB, query.text(), processQuery, &result, &zErrMsg)
 			|| result.count() <= 0)
-			retVal << (char)pPlayerName.length() << pPlayerName << "         ";
+			retVal << (char)pPlayerName.length() << pPlayerName << "		 ";
 		else
 		{
 			retVal << (char)pPlayerName.length() << pPlayerName;
@@ -105,33 +105,33 @@ bool removeGuildMember(CString& pGuildName, CString& pPlayerName)
 	CString guildName = pGuildName;
 	guildName.replaceAll(" ", "_");
 	CString path = CString() << "guilds" << fSep << "guild" << guildName << ".txt";
-    CStringList guildPlayers;
-    if(!guildPlayers.load(path.text()))
-        return false;
-    int pos = guildPlayers.findI(pPlayerName);
-    if(pos >= 0)
-        guildPlayers.remove(pos);
-    guildPlayers.save(path.text());
-    return true;
+	CStringList guildPlayers;
+	if(!guildPlayers.load(path.text()))
+		return false;
+	int pos = guildPlayers.findI(pPlayerName);
+	if(pos >= 0)
+		guildPlayers.remove(pos);
+	guildPlayers.save(path.text());
+	return true;
 }
 
 bool guildExists(CString& pGuildName)
 {
-    CString tmp;
+	CString tmp;
 	CString guildName = pGuildName;
 	guildName.replaceAll(" ", "_");
-    CString path = CString() << "guilds" << fSep << "guild" << guildName << ".txt";
-    return tmp.load(path.text());
+	CString path = CString() << "guilds" << fSep << "guild" << guildName << ".txt";
+	return tmp.load(path.text());
 }
 
 bool guildMemberExists(CString& pGuildName, CString& pAccountName, CString& pNickName)
 {
-    CStringList guildPlayers;
+	CStringList guildPlayers;
 	CString guildName = pGuildName;
 	guildName.replaceAll(" ", "_");
 	CString path = CString() << "guilds" << fSep << "guild" << guildName << ".txt";
-    if(!guildPlayers.load(path.text()))
-        return false;
+	if(!guildPlayers.load(path.text()))
+		return false;
 
 	if (guildPlayers[0] == "TYPE=NICK")
 	{
@@ -150,45 +150,45 @@ bool guildMemberExists(CString& pGuildName, CString& pAccountName, CString& pNic
 
 bool addGuildMember(CString& pGuildName, CString& pPlayerName)
 {
-    CStringList guildPlayers;
+	CStringList guildPlayers;
 	CString guildName = pGuildName;
 	guildName.replaceAll(" ", "_");
 	CString path = CString() << "guilds" << fSep << "guild" << guildName << ".txt";
-    if(!guildPlayers.load(path.text()))
-        return false;
+	if(!guildPlayers.load(path.text()))
+		return false;
 
-    if(guildPlayers.findI(pPlayerName) < 0)
-        guildPlayers.add(pPlayerName);
-    guildPlayers.save(path.text());
-    return true;
+	if(guildPlayers.findI(pPlayerName) < 0)
+		guildPlayers.add(pPlayerName);
+	guildPlayers.save(path.text());
+	return true;
 }
 
 bool addGuild(CString& pGuildName)
 {
-    FILE* file;
-    CString guildName = pGuildName;
+	FILE* file;
+	CString guildName = pGuildName;
 	guildName.replaceAll(" ", "_");
 	CString path = CString() << "guilds" << fSep << "guild" << guildName << ".txt";
-    if((file = fopen(path.text(), "r")) != 0)
-    {
-        fclose(file);
-        return false;
-    }
-    if((file = fopen(path.text(), "w")) != 0)
-    {
-        fclose(file);
-        return true;
-    }
-    return false;
+	if((file = fopen(path.text(), "r")) != 0)
+	{
+		fclose(file);
+		return false;
+	}
+	if((file = fopen(path.text(), "w")) != 0)
+	{
+		fclose(file);
+		return true;
+	}
+	return false;
 }
 
 bool removeGuild(CString& pGuildName)
 {
 	CString guildName = pGuildName;
 	guildName.replaceAll(" ", "_");
-    CString path = CString() << "guilds" << fSep << "guild" << guildName << ".txt";
-    if(remove(path.text()) != 0)
-        return false;
+	CString path = CString() << "guilds" << fSep << "guild" << guildName << ".txt";
+	if(remove(path.text()) != 0)
+		return false;
 	return true;
 }
 

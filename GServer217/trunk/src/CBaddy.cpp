@@ -9,10 +9,10 @@ bool baddyPropsReinit[] = {false, true, true, true, true, true, true, true, fals
 int baddyPower[] = {2,3,4,3,2, 1,1,6,12,8};
 
 char* baddyImages[] = {
-    "baddygray.png", "baddyblue.png", "baddyred.png", "baddyblue.png",
-    "baddygray.png", "baddyhare.png", "baddyoctopus.png", "baddygold.png", "baddylizardon.png",
-    "baddydragon.png"
-    };
+	"baddygray.png", "baddyblue.png", "baddyred.png", "baddyblue.png",
+	"baddygray.png", "baddyhare.png", "baddyoctopus.png", "baddygold.png", "baddylizardon.png",
+	"baddydragon.png"
+	};
 
 void CBaddy::reset()
 {
@@ -61,7 +61,7 @@ CPacket CBaddy::getProperty(int pId)
 		{
 			int verseId = pId-BADDYVERSE1;
 			if(verseId < verses.count())
-                retVal << (char)verses[verseId].length() << verses[verseId];
+				retVal << (char)verses[verseId].length() << verses[verseId];
 		}
 		break;
 	}
@@ -101,9 +101,9 @@ void CBaddy::setProps(CPacket& pPacket)
 				mode = pPacket.readByte1();
 				if(mode == DIE)
 				{
-				    if(respawn)
-                        respawnCount = baddyRespawn;
-                    else respawnCount = -1;
+					if(respawn)
+						respawnCount = baddyRespawn;
+					else respawnCount = -1;
 				}
 			break;
 			case BADDYANISTEP:

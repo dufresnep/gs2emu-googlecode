@@ -13,13 +13,20 @@
 #include <stdlib.h>
 
 #ifdef WIN32
-    char fSep[] = "\\";
-    char dataDir[] = "world\\";
+//	#ifdef _MSC_VER
+		#define WIN32_LEAN_AND_MEAN
+		#include <windows.h>
+//	#else
+//		#include <dir.h>
+//	#endif
+
+	char fSep[] = "\\";
+	char dataDir[] = "world\\";
 #else
-    #include <unistd.h>
-    #include <dirent.h>
-    char fSep[] = "/";
-    char dataDir[] = "world/";
+	#include <unistd.h>
+	#include <dirent.h>
+	char fSep[] = "/";
+	char dataDir[] = "world/";
 #endif
 
 bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, hasShutdown = false, lsConnected = false, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, staffOnly, vasesDrop, warptoforall,
@@ -48,42 +55,42 @@ int main()
 	colourNames.load(__colours, sizeof(__colours) / 4);
 	clothCommands.load(__cloths, sizeof(__cloths) / 4);
 	playerIds.add(0);
-    npcIds.add(0);
+	npcIds.add(0);
 	srand((int)time(NULL));
 
 	/* Load Settings */
-    if (!loadSettings("serveroptions.txt"))
-    {
+	if (!loadSettings("serveroptions.txt"))
+	{
 		errorOut("rclog.txt", "Unable to load server settings..");
-        return 1;
-    }
+		return 1;
+	}
 
 	/* Load Weapons */
-    if (!loadWeapons("weapons.txt"))
-    {
-        errorOut("rclog.txt", "Unable to load weapons from weapons.txt..");
-        return 1;
-    }
+	if (!loadWeapons("weapons.txt"))
+	{
+		errorOut("rclog.txt", "Unable to load weapons from weapons.txt..");
+		return 1;
+	}
 
 	/* Initialize Sockets */
-    CSocket::sockStart();
-    if(!serverSock.listen(serverPort, 20))
-    {
-        errorOut("rclog.txt", CString() << "SOCK ERROR: Unable to listen on port: " << toString(serverPort));
-        return 1;
-    }
+	CSocket::sockStart();
+	if(!serverSock.listen(serverPort, 20))
+	{
+		errorOut("rclog.txt", CString() << "SOCK ERROR: Unable to listen on port: " << toString(serverPort));
+		return 1;
+	}
 
-    serverSock.setSync(false);
+	serverSock.setSync(false);
 
 	/* Sub-Directory Caching */
 	printf("Caching sub dirs\n");
-    getSubDirs(dataDir);
+	getSubDirs(dataDir);
 	if(shareFolder.length()>1)
 		getSubDirs(shareFolder.text());
 
-    /* Load Maps */
-    for(int i = 0; i < mapNames.count(); i++)
-        CMap::openMap(mapNames[i].trim());
+	/* Load Maps */
+	for(int i = 0; i < mapNames.count(); i++)
+		CMap::openMap(mapNames[i].trim());
 
 	/* Load Important Files */
 	updateFile("rchelp.txt");
@@ -94,7 +101,7 @@ int main()
 
 	/* Server Finished Loading */
 	printf("GServer 2 by 39ster\nSpecial thanks to Marlon, Agret, pacMASTA, 39ster and others for porting the \noriginal 1.39 gserver to 2.*\nServer listening on port: %i\nServer version: Revision %s\n\n", serverPort, listServerFields[3].text());
-    atexit(shutdownServer);
+	atexit(shutdownServer);
 	errorOut("rclog.txt", "Server started");
 	serverRunning = true;
 
@@ -103,40 +110,40 @@ int main()
 		ListServer_Connect();
 	}
 
-    while (serverRunning)
-    {
-        long long second = time(NULL);
+	while (serverRunning)
+	{
+		long long second = time(NULL);
 
-        while (second == time(NULL))
-        {
-            acceptNewPlayers(serverSock);
-            for (int i = 0; i < newPlayers.count(); i ++)
-            {
-                CPlayer* player = (CPlayer*)newPlayers[i];
-                player->main();
-                if (player->deleteMe)
-                {
-                    delete player;
-                    i--;
-                }
-            }
+		while (second == time(NULL))
+		{
+			acceptNewPlayers(serverSock);
+			for (int i = 0; i < newPlayers.count(); i ++)
+			{
+				CPlayer* player = (CPlayer*)newPlayers[i];
+				player->main();
+				if (player->deleteMe)
+				{
+					delete player;
+					i--;
+				}
+			}
 
-            for(int i = 0; i < playerList.count(); i++)
-            {
-                CPlayer* player = (CPlayer*)playerList[i];
-                player->main();
-                if(player->deleteMe)
-                {
-                    delete player;
-                    i--;
-                }
-            }
+			for(int i = 0; i < playerList.count(); i++)
+			{
+				CPlayer* player = (CPlayer*)playerList[i];
+				player->main();
+				if(player->deleteMe)
+				{
+					delete player;
+					i--;
+				}
+			}
 
 			// Was moved so it can process faster. - Joey
 			ListServer_Main();
-            wait(100);
-        }
-        doTimer();
+			wait(100);
+		}
+		doTimer();
 		gameTime ++;
 		NOLEVEL->reset();
 
@@ -149,7 +156,7 @@ int main()
 		// Every 10 seconds
 		if (gameTime % 10 == 0)
 		{
-		    CPacket pPacket;
+			CPacket pPacket;
 			CString file;
 
 			for (int i = 0; i < playerList.count(); i++)
@@ -175,7 +182,7 @@ int main()
 				((CPlayer*)playerList[i])->sendPacket(out);
 			}
 		}
-    }
+	}
 }
 
 void doTimer()
@@ -187,15 +194,15 @@ void doTimer()
 	}
 
 	/* Level-Animations */
-    for(int i = 0; i < levelList.count(); i++)
-    {
-        CLevel* level = (CLevel*)levelList[i];
-        level->animate();
-    }
+	for(int i = 0; i < levelList.count(); i++)
+	{
+		CLevel* level = (CLevel*)levelList[i];
+		level->animate();
+	}
 
 	/* Do Player-Timed Actions */
-    for(int i = 0; i < playerList.count(); i++)
-    {
+	for(int i = 0; i < playerList.count(); i++)
+	{
 		CPlayer* player = (CPlayer*)playerList[i];
 
 		if (player->type == CLIENTPLAYER)
@@ -226,11 +233,11 @@ void doTimer()
 
 			player->onlineSecs++;
 
-            if (time(NULL) - player->lastSave <= 0)
-            {
-                player->saveAccount();
-                player->lastSave = time(NULL);
-            }
+			if (time(NULL) - player->lastSave <= 0)
+			{
+				player->saveAccount();
+				player->lastSave = time(NULL);
+			}
 
 			if (apSystem)
 			{
@@ -254,14 +261,14 @@ void doTimer()
 
 void acceptNewPlayers(CSocket& pSocket)
 {
-    CSocket* newSock = pSocket.accept();
-    if(newSock == 0)
-        return;
+	CSocket* newSock = pSocket.accept();
+	if(newSock == 0)
+		return;
 
-    newSock->setSync(false);
+	newSock->setSync(false);
 	newSock->setNagle(false);
-    newPlayers.add(new CPlayer(newSock));
-    printf("Connection accepted...awaiting login details\n");
+	newPlayers.add(new CPlayer(newSock));
+	printf("Connection accepted...awaiting login details\n");
 }
 
 bool updateFile(char *pFile)
@@ -364,7 +371,7 @@ bool loadSettings(char* pFile)
 	cheatwindowstime = atoi(findKey("cheatwindowstime", "60"));
 	heartLimit = atoi(findKey("heartlimit", "20"));
 	horseLife = atoi(findKey("horselifetime"));
-	listServerFields[3] = toString(GSERVER_REVISION);
+	listServerFields[3] = toString(GSERVER_BUILD);
 	listServerPort = atoi(findKey("listport", "14900"));
 	maxNoMovement = atoi(findKey("maxnomovement", "1200"));
 	maxPlayers = atoi(findKey("maxplayers", "128"));
@@ -372,8 +379,8 @@ bool loadSettings(char* pFile)
 	shieldLimit = atoi(findKey("shieldlimit", "3"));
 	swordLimit = atoi(findKey("swordlimit", "4"));
 	tileRespawn = atoi(findKey("tilerespawn"));
-	unstickmeX = atof(findKey("unstickmex", "30"));
-	unstickmeY = atof(findKey("unstickmey", "30.5"));
+	unstickmeX = (float)atof(findKey("unstickmex", "30"));
+	unstickmeY = (float)atof(findKey("unstickmey", "30.5"));
 
 	/* TEXT Server-Options */
 	unstickmeLevel = findKey("unstickmelevel", "onlinestartlocal.nw");
@@ -393,7 +400,7 @@ bool loadSettings(char* pFile)
 #ifdef WIN32
 void getSubDirs(char *pDir)
 {
-    CString searchdir = CString() << pDir << "*";
+	CString searchdir = CString() << pDir << "*";
 	WIN32_FIND_DATA filedata;
 	HANDLE hFind = FindFirstFile(searchdir.text(), &filedata);
 	subDirs.add(pDir);
@@ -418,14 +425,14 @@ void getSubDirs(char *pDir)
 void getSubFiles(char* pDir, CStringList& pOut)
 {
 	CString searchdir = CString() << pDir << "*";
-    WIN32_FIND_DATA filedata;
+	WIN32_FIND_DATA filedata;
 	HANDLE hFind = FindFirstFile(searchdir.text(), &filedata);
-    if(hFind!=NULL)
+	if(hFind!=NULL)
 	{
 		do
 		{
 			if(!(filedata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			    pOut.add(filedata.cFileName);
+				pOut.add(filedata.cFileName);
 		}while(FindNextFile(hFind, &filedata));
 	}
 	FindClose(hFind);
@@ -437,8 +444,8 @@ void getSubDirs(char *pDir)
 	struct stat statx;
 	struct dirent *ent;
 	if ((dir = opendir(pDir)) == NULL)
-        return;
-    subDirs.add(pDir);
+		return;
+	subDirs.add(pDir);
 	while ((ent = readdir(dir)) != NULL)
 	{
 		if (ent->d_name[0] != '.')
@@ -458,7 +465,7 @@ void getSubFiles(char* pDir, CStringList& pOut)
 	struct stat statx;
 	struct dirent *ent;
 	if ((dir = opendir(pDir)) == NULL)
-        return;
+		return;
 	while ((ent = readdir(dir)) != NULL)
 	{
 		CString fullName = CString() << pDir << ent->d_name;
@@ -541,7 +548,7 @@ void saveWeapons(char* pFile)
 
 char* getDataFile(char* pFile)
 {
-    static char path[260];
+	static char path[260];
 	FILE* file;
 	for(int i = 0; i < subDirs.count(); i++)
 	{
@@ -562,45 +569,45 @@ long long getFileModTime(char* pFile)
 {
 	struct stat fileStat;
 	if(strlen(pFile) <=0)
-        return 0;
+		return 0;
 	if(stat(pFile, &fileStat) != -1)
-        return fileStat.st_mtime;
+		return fileStat.st_mtime;
 	return 0;
 }
 
 int getFileSize(char* pFile)
 {
-    struct stat fileStat;
+	struct stat fileStat;
 	if(strlen(pFile) <=0)
-        return 0;
+		return 0;
 	if(stat(pFile, &fileStat) != -1)
-        return fileStat.st_size;
+		return fileStat.st_size;
 	return 0;
 }
 int createPlayerId(CPlayer* pPlayer)
 {
-    for(int i = 1; i < playerIds.count(); i++)
-    {
-        if(playerIds[i] == NULL)
-        {
-            playerIds.replace(i, pPlayer);
-            return i;
-        }
-    }
-    return playerIds.add(pPlayer);
+	for(int i = 1; i < playerIds.count(); i++)
+	{
+		if(playerIds[i] == NULL)
+		{
+			playerIds.replace(i, pPlayer);
+			return i;
+		}
+	}
+	return playerIds.add(pPlayer);
 }
 
 int createNpcId(CNpc* pNpc)
 {
-    for(int i = 1; i < npcIds.count(); i++)
-    {
-        if(npcIds[i] == NULL)
-        {
-            npcIds.replace(i, pNpc);
-            return i;
-        }
-    }
-    return npcIds.add(pNpc);
+	for(int i = 1; i < npcIds.count(); i++)
+	{
+		if(npcIds[i] == NULL)
+		{
+			npcIds.replace(i, pNpc);
+			return i;
+		}
+	}
+	return npcIds.add(pNpc);
 }
 
 void loadServerMessage()
@@ -609,27 +616,27 @@ void loadServerMessage()
 	if(!fileData.load("servermessage.html"))
 		return;
 
-    serverMessage.clear();
+	serverMessage.clear();
 	for(int i = 0; i < fileData.count(); i++)
 		serverMessage << fileData[i] << " ";
 }
 
 CPlayer* findPlayerId(CString pAccountName, bool pOnly)
 {
-    CPlayer* rcFound = NULL;
-    for(int i = 0; i < playerList.count(); i++)
-    {
-        CPlayer* other = (CPlayer*)playerList[i];
-        if(stricmp(other->accountName.text(), pAccountName.text()) == 0)
-        {
-            if(other->type == CLIENTRC)
-            {
-                rcFound = other;
-            } else return other;
-        }
-    }
+	CPlayer* rcFound = NULL;
+	for(int i = 0; i < playerList.count(); i++)
+	{
+		CPlayer* other = (CPlayer*)playerList[i];
+		if(stricmp(other->accountName.text(), pAccountName.text()) == 0)
+		{
+			if(other->type == CLIENTRC)
+			{
+				rcFound = other;
+			} else return other;
+		}
+	}
 
-    return (pOnly ? NULL : rcFound);
+	return (pOnly ? NULL : rcFound);
 }
 
 bool isIpBanned(CString& pIp)
@@ -650,41 +657,41 @@ bool isIpBanned(CString& pIp)
 
 char* removeGifExtension(CString& pFileName)
 {
-    int pos = pFileName.find(".gif", pFileName.length()-5);
-    if(pos >= 0)
-    {
-        CBuffer::retBuffer = pFileName.copy(0, pos);
-    } else CBuffer::retBuffer = pFileName;
-    return CBuffer::retBuffer.text();
+	int pos = pFileName.find(".gif", pFileName.length()-5);
+	if(pos >= 0)
+	{
+		CBuffer::retBuffer = pFileName.copy(0, pos);
+	} else CBuffer::retBuffer = pFileName;
+	return CBuffer::retBuffer.text();
 }
 
 void shutdownServer()
 {
-    if(hasShutdown)
-        return;
-    hasShutdown = true;
-    serverRunning = false;
-    if(lsConnected)
-        ListServer_End();
+	if(hasShutdown)
+		return;
+	hasShutdown = true;
+	serverRunning = false;
+	if(lsConnected)
+		ListServer_End();
 	errorOut("rclog.txt", "Server shutdown..");
-    serverSock.closeSock();
-    saveWeapons("weapons.txt");
-    serverFlags.save("serverflags.txt");
-    for(int i = playerList.count()-1; i >= 0; i--)
-        delete ((CPlayer*)playerList[i]);
+	serverSock.closeSock();
+	saveWeapons("weapons.txt");
+	serverFlags.save("serverflags.txt");
+	for(int i = playerList.count()-1; i >= 0; i--)
+		delete ((CPlayer*)playerList[i]);
 
-    for(int i = 0; i < levelList.count(); i++)
-    {
-        CLevel* level = (CLevel*)levelList[i];
-        level->saveNpcs();
-        delete level;
-    }
+	for(int i = 0; i < levelList.count(); i++)
+	{
+		CLevel* level = (CLevel*)levelList[i];
+		level->saveNpcs();
+		delete level;
+	}
 
-    for(int i = 0; i < CMap::mapList.count(); i++)
-        delete((CMap*)CMap::mapList[i]);
+	for(int i = 0; i < CMap::mapList.count(); i++)
+		delete((CMap*)CMap::mapList[i]);
 
-    for(int i = 0; i < weaponList.count(); i++)
-        delete ((CWeapon*)weaponList[i]);
+	for(int i = 0; i < weaponList.count(); i++)
+		delete ((CWeapon*)weaponList[i]);
 }
 
 void errorOut(char *pFile, CBuffer pError, bool pWrite)
@@ -704,33 +711,33 @@ void errorOut(char *pFile, CBuffer pError, bool pWrite)
 CPacket listFiles(char *pDir, char *pRights)
 {
 	CPacket retVal;
-    CStringList files;
-    struct stat fileStat;
-    getSubFiles(pDir, files);
+	CStringList files;
+	struct stat fileStat;
+	getSubFiles(pDir, files);
 
-    for (int i = 0; i < files.count(); i++)
-    {
-        CPacket dir;
-        CString fullName;
+	for (int i = 0; i < files.count(); i++)
+	{
+		CPacket dir;
+		CString fullName;
 		fullName << pDir << files[i];
-        stat(fullName.text(), &fileStat);
+		stat(fullName.text(), &fileStat);
 		dir << (char)files[i].length() << files[i] << (char)strlen(pRights) << pRights << (long long)fileStat.st_size << (long long)fileStat.st_mtime;
 		retVal << " " << (char)dir.length() << dir;
-    }
+	}
 
-    return retVal;
+	return retVal;
 }
 
 CString getFileExtension(CString& pFileName)
 {
-    CString retVal;
-    int pos = pFileName.find('.');
-    if(pos >= 0)
-    {
-        for(int i = pos; i < pFileName.length(); i++)
-            retVal.writeChar(pFileName[i]);
-    }
-    return retVal;
+	CString retVal;
+	int pos = pFileName.find('.');
+	if(pos >= 0)
+	{
+		for(int i = pos; i < pFileName.length(); i++)
+			retVal.writeChar(pFileName[i]);
+	}
+	return retVal;
 }
 
 CString getTimeStr(int pType)
