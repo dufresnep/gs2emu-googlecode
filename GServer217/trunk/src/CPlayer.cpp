@@ -624,8 +624,8 @@ void CPlayer::parsePacket(CPacket& pPacket)
 	if (id == -1 && type == CLIENTPLAYER)
 		return;
 
-	if(messageId != BADDYPROPS && messageId != NPCPROPS && showConsolePackets)
-		printf("NEW PACKET: %i: %s\n", messageId, packet.text()+1);
+//	if(messageId != BADDYPROPS && messageId != NPCPROPS && showConsolePackets)
+//		printf("NEW PACKET: %i: %s\n", messageId, packet.text()+1);
 
 	if (messageId >= 0 &&  messageId < clientpackages)
 		(*this.*msgFuncs[messageId])(packet);
@@ -707,7 +707,7 @@ void CPlayer::sendOutGoing()
 	}
 }
 
-void CPlayer::warp(CString& pLevel, float pX, float pY, int pModTime)
+void CPlayer::warp(CString& pLevel, float pX, float pY, time_t pModTime)
 {
 	x = pX;
 	y = pY;
@@ -731,7 +731,7 @@ void CPlayer::warp(CString& pLevel, float pX, float pY, int pModTime)
 			}
 		}
 	}
-		else
+	else
 	{
 		updateProp(PLAYERX);
 		updateProp(PLAYERY);
@@ -751,14 +751,12 @@ void CPlayer::processChat(CString& pMessage)
 			warp(unstickmeLevel, unstickmeX, unstickmeY);
 			chatMsg = CString() << "Warped!";
 		}
-			else
-		{
+		else
 			chatMsg = CString() << "Dont move for 30 seconds before doing '" << pMessage + "'!";
-		}
 
 		updateProp(CURCHAT);
 	}
-		else if (pMessage.find("setnick") == 0)
+	else if (pMessage.find("setnick") == 0)
 	{
 		if (time(NULL) - lastNick <= 10)
 		{
@@ -771,7 +769,7 @@ void CPlayer::processChat(CString& pMessage)
 		CString temp = pMessage.text() + 7;
 		setNick(temp, true);
 	}
-		else if (pMessage == "showadmins")
+	else if (pMessage == "showadmins")
 	{
 		chatMsg = CString() << "admins: ";
 
@@ -786,7 +784,7 @@ void CPlayer::processChat(CString& pMessage)
 			chatMsg << "(no one)";
 		updateProp(CURCHAT);
 	}
-		else if (pMessage.find("showguild") == 0)
+	else if (pMessage.find("showguild") == 0)
 	{
 		CString guild = (pMessage == "showguild" ? guildName : pMessage.text() + 9);
 		if (guild.length() > 0)
@@ -803,17 +801,17 @@ void CPlayer::processChat(CString& pMessage)
 		else chatMsg = "(you are not in a guild)";
 		updateProp(CURCHAT);
 	}
-		else if (pMessage == "showdeaths")
+	else if (pMessage == "showdeaths")
 	{
 		chatMsg = CString() << "deaths: " << toString(deaths);
 		updateProp(CURCHAT);
 	}
-		else if (pMessage == "showkills")
+	else if (pMessage == "showkills")
 	{
 		chatMsg = CString() << "kills: " << toString(kills);
 		updateProp(CURCHAT);
 	}
-		else if (pMessage == "showonlinetime")
+	else if (pMessage == "showonlinetime")
 	{
 		chatMsg = CString() << toString(onlineSecs % 60) << "s";
 		if (onlineSecs / 60 > 0) chatMsg = CString() << toString((onlineSecs / 60) % 60) << "m " << chatMsg;
@@ -821,7 +819,7 @@ void CPlayer::processChat(CString& pMessage)
 		chatMsg = CString() << "onlinetime: " << chatMsg;
 		updateProp(CURCHAT);
 	}
-		else if (pMessage.find("toguild:") == 0)
+	else if (pMessage.find("toguild:") == 0)
 	{
 		CString pm = pMessage.text() + 8;
 		pm.trimLeft();
@@ -843,10 +841,8 @@ void CPlayer::processChat(CString& pMessage)
 		chatMsg = CString() << "(" << toString(c) << " guild member" << (c <= 1 ? "" : "s") << " received your message)";
 		updateProp(CURCHAT);
 	}
-		else if (pMessage == "update level" && hasRight(CANUPDATELEVEL))
-	{
+	else if (pMessage == "update level" && hasRight(CANUPDATELEVEL))
 		CLevel::updateLevel(levelName);
-	}
 
 	words.load(pMessage.text(), " ");
 	if (words.count() <= 0)
@@ -892,7 +888,7 @@ void CPlayer::processChat(CString& pMessage)
 		}
 		warp(name, x, y);
 	}
-		else if (words[0] == "summon")
+	else if (words[0] == "summon")
 	{
 		if(words.count() <= 1)
 			return;
@@ -1180,7 +1176,7 @@ bool CPlayer::loadAccount()
 	return true;
 }
 
-bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, int pModTime)
+bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 {
 	CPacket packet;
 	CString newLevel = pLevel;
@@ -1276,6 +1272,9 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, int pModTime)
 			sendPacket(npcProps);
 	}
 
+	if (level->players.count() == 1)
+		sendPacket(CPacket() << (char)ISLEADER);
+
 	//tell others i changed maps
 	packet.clear();
 	packet << (char)OTHERPLPROPS << (short)id << (char)CURLEVEL << getProp(CURLEVEL) << (char)PLAYERX << getProp(PLAYERX) << (char)PLAYERY << getProp(PLAYERY);
@@ -1287,26 +1286,14 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, int pModTime)
 	}
 
 	//get props
-//	int pl = 0;
 	packet.clear();
 	packet << (char)OTHERPLPROPS << (short)id << (char)50 << (char)1;
 	for (int i = 0; i < propscount; i++)
 	{
 		if (forwardLocal[i])
-		{
 			packet << (char)i << getProp(i);
-/*
-			// Limit the packet to only 5 props
-			if ( (pl+1) % 5 == 0 )
-			{
-				packet << "\n";
-				packet << (char)OTHERPLPROPS << (short)id;// << (char)50 << (char)1;
-			}
-			pl++;
-*/
-		}
 	}
-//packet.save( "props.raw" );
+
 
 	//send props
 	for (int i = 0; i < level->players.count(); i++)
@@ -1318,30 +1305,16 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, int pModTime)
 		CPacket otherProps;
 		otherProps << (char)OTHERPLPROPS << (short)other->id << (char)50 << (char)1;
 
-		//pl = 0;
 		for (int ii = 0; ii < propscount; ii++)
 		{
 			if (forwardLocal[ii])
-			{
 				otherProps << (char)ii << other->getProp(ii);
-/*
-				// Limit the packet to only 5 props
-				if ( (pl+1) % 5 == 0 )
-				{
-					otherProps << "\n";
-					otherProps << (char)OTHERPLPROPS << (short)other->id;// << (char)50 << (char)1;
-					pl++;
-				}
-*/
-			}
 		}
 		sendPacket(otherProps);
 		other->sendPacket(packet);
 	}
 
 	compressAndSend();
-	if (level->players.count() == 1)
-		sendPacket(CPacket() << (char)ISLEADER);
 	return true;
 }
 
@@ -2427,6 +2400,8 @@ void CPlayer::msgNPCPROPS(CPacket& pPacket)
 	if(npc->level != level)
 		return;
 
+	pPacket << (char)VISFLAGS << npc->getProperty(VISFLAGS);
+	pPacket << (char)NPCSPRITE << npc->getProperty(NPCSPRITE);
 	packet << (char)SNPCPROPS << pPacket.text() + 1;
 	for (int i = 0; i < level->players.count(); i++)
 	{
@@ -3648,54 +3623,54 @@ void CPlayer::msgDRCCHAT(CPacket& pPacket)
 			}
 		}
 	}
-		else if (words[0] == "/open" && hasRight(CANVIEWATTRIBS))
+	else if (words[0] == "/open" && hasRight(CANVIEWATTRIBS))
 	{
 		words.remove(0);
 		CString account = words.join(" ");
 		msgDWANTACCPLPROPS(CPacket() << (char)account.length() << account);
 	}
-		else if (words[0] == "/openacc" && hasRight(CANVIEWATTRIBS))
+	else if (words[0] == "/openacc" && hasRight(CANVIEWATTRIBS))
 	{
 		words.remove(0);
 		msgDWANTACCOUNT(CPacket() << words.join(" "));
 	}
-		else if (words[0] == "/openban" && hasRight(CANBAN))
+	else if (words[0] == "/openban" && hasRight(CANBAN))
 	{
 		words.remove(0);
 		msgDEDITBAN(CPacket() << words.join(" "));
 	}
-		else if (words[0] == "/opencomments" && hasRight(CANCHANGECOMMENTS))
+	else if (words[0] == "/opencomments" && hasRight(CANCHANGECOMMENTS))
 	{
 		words.remove(0);
 		msgDWANTCOM(CPacket() << words.join(" "));
 	}
-		else if (words[0] == "/openrights" && hasRight(CANCHANGERIGHTS))
+	else if (words[0] == "/openrights" && hasRight(CANCHANGERIGHTS))
 	{
 		words.remove(0);
 		msgDWANTRIGHTS(CPacket() << words.join(" "));
 	}
-		else if (words[0] == "/reset" && hasRight(CANRESETATTRIBS))
+	else if (words[0] == "/reset" && hasRight(CANRESETATTRIBS))
 	{
 		words.remove(0);
 		msgDRESETPLPROPS(CPacket() << words.join(" "));
 	}
-		else if (words[0] == "/refreshfilelist" && hasRight(CANEDITSERVEROPTION))
+	else if (words[0] == "/refreshfilelist" && hasRight(CANEDITSERVEROPTION))
 	{
 		subDirs.clear();
 		getSubDirs(dataDir);
 		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " refreshed the file list.");
 	}
-		else if (words[0] == "/refreshservermessage" && hasRight(CANEDITSERVEROPTION))
+	else if (words[0] == "/refreshservermessage" && hasRight(CANEDITSERVEROPTION))
 	{
 		loadServerMessage();
 		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " reloaded the server message.");
 	}
-		else if(words[0] == "/shutdown" && hasRight(CANCHANGESTAFFACC))
+	else if(words[0] == "/shutdown" && hasRight(CANCHANGESTAFFACC))
 	{
 		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " shutdown the server.");
 		shutdownServer();
 	}
-		else if (words[0] == "/updatelevel" && hasRight(CANUPDATELEVEL))
+	else if (words[0] == "/updatelevel" && hasRight(CANUPDATELEVEL))
 	{
 		CStringList levels;
 		for (int i = 1; i < words.count(); i++)

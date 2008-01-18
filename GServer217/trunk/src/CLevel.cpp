@@ -138,41 +138,41 @@ bool CLevel::loadNW(CString& pFileName)
 				for(i++; i < levelData.count() && levelData[i] != "NPCEND"; i++)
 					code << levelData[i] << "\xa7";
 
-		// Create the new NPC.  Do this before parsing the join commands.
-		// The CNpc constructor will remove all comments.
-		CNpc* jnpc = new CNpc( image, code, x, y, this );
+				// Create the new NPC.  Do this before parsing the join commands.
+				// The CNpc constructor will remove all comments.
+				CNpc* jnpc = new CNpc( image, code, x, y, this );
 
-		// Now filter out the join commands.
-		CStringList npcData;
-		npcData.load( jnpc->clientCode.text(), "\xa7" );
-		for ( int j = 0; j < npcData.count(); ++j )
-			code2 << processNpcLine( npcData[j] ) << "\xa7";
-		jnpc->clientCode = code2;
+				// Now filter out the join commands.
+				CStringList npcData;
+				npcData.load( jnpc->clientCode.text(), "\xa7" );
+				for ( int j = 0; j < npcData.count(); ++j )
+					code2 << processNpcLine( npcData[j] ) << "\xa7";
+				jnpc->clientCode = code2;
 
-		// Now, add all the joined files to the code.
-		if ( joinList.count() > 0 )
-		{
-			CString* file = 0;
-			while ( (file = (CString*)joinList[0]) != 0 )
-			{
-				// Load the source file into memory.
-				CString dataFile = getDataFile(file->text());
-				if(dataFile.length())
+				// Now, add all the joined files to the code.
+				if ( joinList.count() > 0 )
 				{
-					// Append to the end of the script.
-					CString retVal;
-					retVal.load(dataFile.text());
-					retVal.replaceAll("\r\n", "\xa7");
-					retVal.replaceAll("\n", "\xa7");
-					jnpc->clientCode << retVal << "\xa7";
+					CString* file = 0;
+					while ( (file = (CString*)joinList[0]) != 0 )
+					{
+						// Load the source file into memory.
+						CString dataFile = getDataFile(file->text());
+						if(dataFile.length())
+						{
+							// Append to the end of the script.
+							CString retVal;
+							retVal.load(dataFile.text());
+							retVal.replaceAll("\r\n", "\xa7");
+							retVal.replaceAll("\n", "\xa7");
+							jnpc->clientCode << retVal << "\xa7";
+						}
+						delete (CString*)joinList[0];
+						joinList.remove(0);
+					}
 				}
-				delete (CString*)joinList[0];
-				joinList.remove(0);
-			}
-		}
-		joinList.clear();
+				joinList.clear();
 
-		npcs.add( jnpc );
+				npcs.add( jnpc );
 			} else if(words[0] == "BADDY")
 			{
 				if(words.count() <= 3)

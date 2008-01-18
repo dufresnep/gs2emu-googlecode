@@ -371,8 +371,8 @@ class CPlayer : public CAccount
 		void compressAndSend();
 		void sendOutGoing();
 		void dropItems();
-		bool sendLevel(CString& pLevel, float pX, float pY, int pModTime);
-		void warp(CString& pLevel, float pX, float pY, int pModTime = 0);
+		bool sendLevel(CString& pLevel, float pX, float pY, time_t pModTime);
+		void warp(CString& pLevel, float pX, float pY, time_t pModTime = 0);
 		void leaveLevel();
 		void setNick(CString& pNewNick, bool pVerifyGuild);
 		void sendWeapons();

@@ -14,7 +14,7 @@ void codec::apply(uint8_t* buf, size_t len) {
 		&m_iterator);
  
 	for (size_t i = 0; i < len; ++i) {
-		const int i_ = i + m_offset;
+		const size_t i_ = i + m_offset;
 		if (i_ % 4 == 0) {
 			m_iterator *= 0x8088405;
 			m_iterator += m_key;

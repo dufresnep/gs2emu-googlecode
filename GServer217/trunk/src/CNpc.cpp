@@ -38,6 +38,7 @@ CNpc::CNpc(CString& pImage, CString& pCode, float pX, float pY, CLevel* pLevel)
 	modTime[NPCX] = getTime();
 	modTime[NPCY] = getTime();
 	modTime[VISFLAGS] = getTime();
+	modTime[NPCSPRITE] = getTime();
 }
 
 CNpc::~CNpc()
@@ -98,7 +99,7 @@ void CNpc::removeComments()
 CPacket CNpc::getProperty(int pId)
 {
 	CPacket retVal;
-	con_print( "CNpc::getProperty\n" );
+	con_print( "CNpc::getProperty - id: %d\n", id );
 	switch(pId)
 	{
 		case NPCGIF:
@@ -208,7 +209,7 @@ CPacket CNpc::getProperty(int pId)
 		break;
 
 		case NPCSPRITE:
-			retVal << (char)(sprite%4);
+			retVal << (char)(sprite % 4);
 			con_print( "NPCSPRITE\n" );
 		break;
 
@@ -281,7 +282,7 @@ void CNpc::setProps(CPacket& pProps)
 {
 	int len;
 	int previousMessage = 0;
-	con_print( "CNpc::setProps\nPacket: %s\n", pProps.text() );
+	con_print( "CNpc::setProps - id: %d\nPacket: %s\n", id, pProps.text() );
 	while(pProps.bytesLeft())
 	{
 		int index = pProps.readByte1();
@@ -384,6 +385,7 @@ void CNpc::setProps(CPacket& pProps)
 						shieldImage = CString() << "shield" << toString(sp) << ".png";
 					else shieldImage = "";
 				}
+				shieldPower = (sp >= 10) ? (sp - 10) : sp;
 			}
 			break;
 
@@ -424,6 +426,7 @@ void CNpc::setProps(CPacket& pProps)
 
 			case NPCSPRITE:
 				sprite = pProps.readByte1();
+				if ( sprite < 0 || sprite >= 132 ) sprite = 0;
 				con_print( "NPCSPRITE: %d\n", sprite );
 			break;
 
@@ -524,7 +527,7 @@ void CNpc::setProps(CPacket& pProps)
 
 void CNpc::con_print( const char* format, ... )
 {
-	if ( !showConsolePackets )
+	if ( !showConsolePackets )// || (id != 1 && id != 2 && id != 5 && id != 32) )
 		return;
 
 	va_list args;

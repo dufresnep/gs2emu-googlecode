@@ -161,7 +161,7 @@ bool CBuffer::load(const char* pFileName)
 		return false;
 	clear();
 	int size = 0;
-	while((size = fread(buffer, 1, sizeof(buffer), fHandle)) > 0)
+	while((size = (int)fread(buffer, 1, sizeof(buffer), fHandle)) > 0)
 		writeBytes(buffer, size);
 	fclose(fHandle);
 	return true;
@@ -678,9 +678,9 @@ CBuffer& CBuffer::untokenize()
 
 		// Move forward the correct number of spaces.
 		if ( pos[0] + 1 != nData.length() && nData[pos[0] + 1] == '\"' )
-			pos[1] = pos[0] + strlen( ",\"" );	// test,"test
+			pos[1] = pos[0] + (int)strlen( ",\"" );	// test,"test
 		else
-			pos[1] = pos[0] + strlen( "," );	// test,test
+			pos[1] = pos[0] + (int)strlen( "," );	// test,test
 	}
 
 	// Try and grab the very last element.
