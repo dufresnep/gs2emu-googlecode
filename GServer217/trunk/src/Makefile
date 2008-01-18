@@ -4,12 +4,13 @@ CPPS = CAccount.cpp CBaddy.cpp CBuffer.cpp CDatabase.cpp CIni.cpp CLevel.cpp CLi
 OBJS = CAccount.o CBaddy.o CBuffer.o CDatabase.o CIni.o CLevel.o CLinkedList.o CList.o CListServer.o CMap.o CNpc.o COther.o CPacket.o CPlayer.o CServerBot.o CSocket.o CStringList.o CWeapon.o CWordFilter.cpp codec.o main.o md5.o
 
 LD = g++
-SLFLAGS = -lsqlite3 -lz -g
+CLFLAGS = -g
+SLFLAGS = -lz -g
 
 all: $(CPPS) gserver
 
 %.o: %.cpp
-	$(LD) -c $<
+	$(LD) $(CFLAGS) -c $<
 
 gserver: $(OBJS)
 	$(LD) -o ../bin/GServer217 $(OBJS) $(CPPOFDB) $(SLFLAGS)
