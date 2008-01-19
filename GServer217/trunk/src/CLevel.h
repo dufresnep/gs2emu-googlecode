@@ -9,8 +9,10 @@
 #include "CPacket.h"
 #include "COther.h"
 #include "CBaddy.h"
+#include "CPlayer.h"
 extern int horseLife;
 
+class CPlayer;
 class CMap;
 class CHorse;
 class CLevel
@@ -55,7 +57,7 @@ class CLevel
 	void removeHorse(float pX, float pY);
 	CString getSignCode(CString& pText);
 	static CString processNpcLine(CString& pLine);
-	bool changeBoard(CPacket& pTileData, int pX, int pY, int pWidth, int pHeight);
+	bool changeBoard(CPacket& pTileData, int pX, int pY, int pWidth, int pHeight, CPlayer* player);
 	CPacket applyChange(CPacket& pTileData, int pX, int pY, int pWidth, int pHeight);
 	int createBaddyId(CBaddy*pBaddy);
 

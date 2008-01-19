@@ -914,7 +914,7 @@ void CPlayer::processChat(CString& pMessage)
 			headImage = words[1];
 			updateProp(HEADGIF);
 		}
-			else
+		else
 		{
 			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)0 << (char)words[1].length() << words[1]);
 		}
@@ -929,7 +929,7 @@ void CPlayer::processChat(CString& pMessage)
 			bodyImage = words[1];
 			updateProp(BODYIMG);
 		}
-			else
+		else
 		{
 			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)1 << (char)words[1].length() << words[1]);
 		}
@@ -943,7 +943,7 @@ void CPlayer::processChat(CString& pMessage)
 			swordImage = words[1];
 			updateProp(SWORDPOWER);
 		}
-			else
+		else
 		{
 			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)2 << (char)words[1].length() << words[1]);
 		}
@@ -957,7 +957,7 @@ void CPlayer::processChat(CString& pMessage)
 			shieldImage = words[1];
 			updateProp(SHIELDPOWER);
 		}
-			else
+		else
 		{
 			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)3 << (char)words[1].length() << words[1]);
 		}
@@ -1265,6 +1265,10 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	//send npcs
 	for (int i = 0; i < level->npcs.count(); i++)
 	{
+		// Attempt to fix some npc props issues.
+		time_t mtime = time;
+		if ( level->players.count() == 1 ) mtime = 0;
+
 		CPacket npcProps;
 		CNpc* npc = (CNpc*)level->npcs[i];
 		npcProps << (char)SNPCPROPS << (int)npc->id << npc->getPropertyList(time);
@@ -1758,7 +1762,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 {
 	int len;
 	CPacket forwardBuff;
-	forwardBuff << (char) OTHERPLPROPS << (short)id;
+	forwardBuff << (char)OTHERPLPROPS << (short)id;
 
 	// This allows for correct RC login.
 	if (id == -1 && pForward)
@@ -2128,14 +2132,6 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			}
 			*/
 			forwardBuff << (char)index << getProp(index);
-			/*
-			if ( (pl+1) % 5 == 0 )
-			{
-				forwardBuff << "\n";
-				forwardBuff << (char)OTHERPLPROPS << (short)id;
-			}
-			pl++;
-			*/
 		}
 	}
 
@@ -2353,7 +2349,8 @@ void CPlayer::msgBOARDMODIFY(CPacket& pPacket)
 	int bH = pPacket.readByte1();
 	CPacket tileData;
 	tileData << pPacket.copy(5, pPacket.length()-5);
-	level->changeBoard(tileData, bX, bY, bW, bH);
+	if (level->changeBoard(tileData, bX, bY, bW, bH) == false)
+		return;
 
 	if (bX < 0 || bX > 63 || bY < 0 || bY > 63)
 		return;
@@ -2400,8 +2397,6 @@ void CPlayer::msgNPCPROPS(CPacket& pPacket)
 	if(npc->level != level)
 		return;
 
-	pPacket << (char)VISFLAGS << npc->getProperty(VISFLAGS);
-	pPacket << (char)NPCSPRITE << npc->getProperty(NPCSPRITE);
 	packet << (char)SNPCPROPS << pPacket.text() + 1;
 	for (int i = 0; i < level->players.count(); i++)
 	{
@@ -2769,20 +2764,29 @@ void CPlayer::msgADDNPC(CPacket& pPacket)
 
 void CPlayer::msgDELNPC(CPacket& pPacket)
 {
-
-	CNpc* npc = (CNpc*)npcIds[pPacket.readByte3()];
+	int id = pPacket.readByte3();
+//	printf( "msgDELNPC: id: %d\n", id );
+	CNpc* npc = (CNpc*)npcIds[id];
 	if(npc == NULL)
-		return;
-	if(npc->level != level)
-		return;
-
-	for(int i = 0; i < playerList.count(); i++)
 	{
-		((CPlayer*)playerList[i])->sendPacket(CPacket() <<
-			(char)SDELNPC << (int)npc->id);
+//		printf( "msgDELNPC: npc == 0\n" );
+		return;
 	}
+	if(npc->level != level)
+	{
+//		printf( "msgDELNPC: npc->level != level\n" );
+		return;
+	}
+
+	for (int i = 0; i < playerList.count(); i++)
+	{
+		((CPlayer*)playerList[i])->sendPacket(CPacket() << (char)SDELNPC << (int)npc->id);
+//		printf( "msgDELNPC: player: %s, id: %d\n", ((CPlayer*)playerList[i])->accountName.text(), npc->id );
+	}
+//	printf( "\n" );
 	level->npcs.remove(npc);
 	delete npc;
+	compressAndSend();
 }
 
 void CPlayer::msgWANTFILE(CPacket& pPacket)
@@ -3386,7 +3390,7 @@ void CPlayer::msgDWANTPLPROPS(CPacket& pPacket)
 
 void CPlayer::msgDWANTACCPLPROPS(CPacket& pPacket)
 {
-	if (type != CLIENTRC || !hasStaff())
+	if ( type != CLIENTRC || !hasStaff() )
 	{
 		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " prob: not authorized for loading attributes");
 		return;
@@ -3452,6 +3456,13 @@ void CPlayer::msgDSETACCPLPROPS(CPacket& pPacket)
 		return;
 	}
 
+	// Only people with CANCHANGESTAFFACC can alter the default account.
+	if ( !hasRight(CANCHANGESTAFFACC) )
+	{
+		sendRCPacket( CPacket() << (char)DRCLOG << "Server: Not authorized to alter the default account." );
+		return;
+	}
+
 	CPlayer *player = findPlayerId(accname, true);
 	if (player == NULL)
 	{
@@ -3463,6 +3474,7 @@ void CPlayer::msgDSETACCPLPROPS(CPacket& pPacket)
 		}
 	}
 
+	sendPacket(CPacket() << (char)DRCLOG << accountName << " set attributes of player " << player->accountName);
 	player->setAccPropsRc(pPacket);
 	player->saveAccount();
 	if (player->id == -1)

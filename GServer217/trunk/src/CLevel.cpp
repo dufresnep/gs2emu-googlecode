@@ -469,8 +469,42 @@ void CLevel::loadNpcs(CPacket& levelData)
 		float y = line.readByte1();
 		CString image = line.readString("#");
 		CString code = line.readChars(line.bytesLeft());
-		//Add npc
-		npcs.add(new CNpc(image, code, x, y, this));
+
+		// Create the new NPC.  Do this before parsing the join commands.
+		// The CNpc constructor will remove all comments.
+		CString code2;
+		CNpc* jnpc = new CNpc( image, code, x, y, this );
+
+		// Now filter out the join commands.
+		CStringList npcData;
+		npcData.load( jnpc->clientCode.text(), "\xa7" );
+		for ( int j = 0; j < npcData.count(); ++j )
+			code2 << processNpcLine( npcData[j] ) << "\xa7";
+		jnpc->clientCode = code2;
+
+		// Now, add all the joined files to the code.
+		if ( joinList.count() > 0 )
+		{
+			CString* file = 0;
+			while ( (file = (CString*)joinList[0]) != 0 )
+			{
+				// Load the source file into memory.
+				CString dataFile = getDataFile(file->text());
+				if(dataFile.length())
+				{
+					// Append to the end of the script.
+					CString retVal;
+					retVal.load(dataFile.text());
+					retVal.replaceAll("\r\n", "\xa7");
+					retVal.replaceAll("\n", "\xa7");
+					jnpc->clientCode << retVal << "\xa7";
+				}
+				delete (CString*)joinList[0];
+				joinList.remove(0);
+			}
+		}
+		joinList.clear();
+		npcs.add( jnpc );
 	}
 }
 
@@ -574,8 +608,41 @@ void CLevel::addNewNpc(CString& pImage, CString& pCodeFile, float pX, float pY)
 	for(int i = 0; i < codeData.count(); i++)
 		code << codeData[i] << "\xa7";
 
-	CNpc* npc = new CNpc(pImage, code, pX, pY, this);
-	npcs.add(npc);
+	// Create the new NPC.  Do this before parsing the join commands.
+	// The CNpc constructor will remove all comments.
+	CString code2;
+	CNpc* npc = new CNpc( pImage, code, pX, pY, this );
+
+	// Now filter out the join commands.
+	CStringList npcData;
+	npcData.load( npc->clientCode.text(), "\xa7" );
+	for ( int j = 0; j < npcData.count(); ++j )
+		code2 << processNpcLine( npcData[j] ) << "\xa7";
+	npc->clientCode = code2;
+
+	// Now, add all the joined files to the code.
+	if ( joinList.count() > 0 )
+	{
+		CString* file = 0;
+		while ( (file = (CString*)joinList[0]) != 0 )
+		{
+			// Load the source file into memory.
+			CString dataFile = getDataFile(file->text());
+			if(dataFile.length())
+			{
+				// Append to the end of the script.
+				CString retVal;
+				retVal.load(dataFile.text());
+				retVal.replaceAll("\r\n", "\xa7");
+				retVal.replaceAll("\n", "\xa7");
+				npc->clientCode << retVal << "\xa7";
+			}
+			delete (CString*)joinList[0];
+			joinList.remove(0);
+		}
+	}
+	joinList.clear();
+	npcs.add( npc );
 
 	for(int i = 0; i < players.count(); i++)
 	{
@@ -801,12 +868,67 @@ short tileObjects[] = {
   };
 
 
-bool CLevel::changeBoard(CPacket& pTileData, int pX, int pY, int pWidth, int pHeight)
+bool CLevel::changeBoard(CPacket& pTileData, int pX, int pY, int pWidth, int pHeight, CPlayer* player)
 {
 	if(pX < 0 || pY < 0 || pX > 63 || pY > 63 ||
 		pWidth < 1 || pHeight < 1 ||
 		pX + pWidth > 64 || pY + pHeight > 64)
 		return false;
+
+	// Do the check for the push-pull block.
+	if ( pWidth == 4 && pHeight == 4 && clientsidePushPull )
+	{
+		// Try to find the top-left corner tile.
+		int i;
+		for ( i = 0; i < 16; ++i )
+		{
+			short stoneCheck = pTileData.readByte2();
+			if ( stoneCheck == 0x6E4 || stoneCheck == 0x7CE )
+				break;
+		}
+
+		// Check if we found a possible push-pull block.
+		if ( i != 16 && i < 11 )
+		{
+			// Go back one full short so the first readByte2() returns the top-left corner.
+			pTileData.setRead( i * 2 );
+
+			int foundCount = 0;
+			for ( int j = 0; j < 6; ++j )
+			{
+				// Read a piece.
+				short stoneCheck = pTileData.readByte2();
+
+				// A valid stone will have pieces at the following j locations.
+				if ( j == 0 || j == 1 || j == 4 || j == 5 )
+				{
+					switch ( stoneCheck )
+					{
+						// red
+						case 0x6E4:
+						case 0x6E5:
+						case 0x6F4:
+						case 0x6F5:
+						// blue
+						case 0x7CE:
+						case 0x7CF:
+						case 0x7DE:
+						case 0x7DF:
+							foundCount++;
+							break;
+					}
+				}
+			}
+			pTileData.setRead(0);
+
+			// Check if we found a full tile.  If so, don't accept the change.
+			if ( foundCount == 4 )
+			{
+				player->sendPacket( CPacket() << (char)SBOARDMODIFY << (char)pX << (char)pY << (char)pWidth << (char)pHeight << pTileData );
+				return false;
+			}
+		}
+	}
 
 	//Delete any existing changes within the same region
 	for(int i = 0; i < boardChanges.count(); i++)

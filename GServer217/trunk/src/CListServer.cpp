@@ -166,7 +166,7 @@ void ListServer_Main()
 					#endif
 					newData = line.readString("");
 				}
-					else
+				else
 				{
 					fileName = CString() << dataDir << "global" << fSep << shortName.text();
 					newData = line.readString("");

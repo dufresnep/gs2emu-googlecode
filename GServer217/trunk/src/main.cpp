@@ -29,8 +29,8 @@
 	char dataDir[] = "world/";
 #endif
 
-bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, hasShutdown = false, lsConnected = false, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, staffOnly, vasesDrop, warptoforall,
-defaultweapons = true;
+bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, hasShutdown = false, lsConnected = false, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, staffOnly, vasesDrop, warptoforall, defaultweapons;
+bool clientsidePushPull;
 const char* __admin[]   = {"description", "listport", "listip", "language", "maxplayers", "myip", "name", "serverport", "sharefolder", "showconsolepackets", "url", "worldname"};
 const char* __colours[] = {"white", "yellow", "orange", "pink", "red", "darkred", "lightgreen", "green", "darkgreen", "lightblue", "blue", "darkblue", "brown", "cynober", "purple", "darkpurple", "lightgray", "gray", "black", "transparent"};
 const char* __cloths[]  = {"setskin", "setcoat", "setsleeve", "setshoe", "setbelt", "setsleeves", "setshoes"};
@@ -280,27 +280,27 @@ bool updateFile(char *pFile)
 	{
 		CLevel::updateLevel(file);
 	}
-		else if (strcmp(pFile, "rchelp.txt") == 0)
+	else if (strcmp(pFile, "rchelp.txt") == 0)
 	{
 		RCHelpMessage.load(pFile);
 	}
-		else if (strcmp(pFile, "rcmessage.txt") == 0)
+	else if (strcmp(pFile, "rcmessage.txt") == 0)
 	{
 		RCMessage.load(pFile);
 	}
-		else if (strcmp(pFile, "serverflags.txt") == 0)
+	else if (strcmp(pFile, "serverflags.txt") == 0)
 	{
 		serverFlags.load(pFile);
 	}
-		else if (strcmp(pFile, "servermessage.html") == 0)
+	else if (strcmp(pFile, "servermessage.html") == 0)
 	{
 		loadServerMessage();
 	}
-		else if (strcmp(pFile, "rules.txt") == 0)
+	else if (strcmp(pFile, "rules.txt") == 0)
 	{
 		WordFilter.load("rules.txt");
 	}
-		else
+	else
 	{
 		return false;
 	}
@@ -345,6 +345,7 @@ bool loadSettings(char* pFile)
 	apSystem = CHECK_BOOL(findKey("apsystem", "true"));
 	bushesDrop = CHECK_BOOL(findKey("bushitems", "true"));
 	cheatwindowsban = CHECK_BOOL(findKey("cheatwindowsban", "false"));
+	clientsidePushPull = CHECK_BOOL(findKey("clientsidepushpull", "true"));
 	defaultweapons = CHECK_BOOL(findKey("defaultweapons", "true"));
 	dontaddserverflags = CHECK_BOOL(findKey("dontaddserverflags", "false"));
 	dontchangekills = CHECK_BOOL(findKey("dontchangekills", "false"));

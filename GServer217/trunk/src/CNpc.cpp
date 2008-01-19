@@ -527,7 +527,7 @@ void CNpc::setProps(CPacket& pProps)
 
 void CNpc::con_print( const char* format, ... )
 {
-	if ( !showConsolePackets )// || (id != 1 && id != 2 && id != 5 && id != 32) )
+	//if ( !showConsolePackets )// || (id != 1 && id != 2 && id != 5 && id != 32) )
 		return;
 
 	va_list args;

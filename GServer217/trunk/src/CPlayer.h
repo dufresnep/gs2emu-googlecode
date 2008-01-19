@@ -19,6 +19,7 @@
 #define maxAdmin 0xFDFFF
 #define itemcount 25
 
+class CLevel;
 class CPlayer;
 typedef void (CPlayer::*pt2func)(CPacket&);
 
