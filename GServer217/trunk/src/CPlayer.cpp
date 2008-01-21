@@ -2765,25 +2765,22 @@ void CPlayer::msgADDNPC(CPacket& pPacket)
 void CPlayer::msgDELNPC(CPacket& pPacket)
 {
 	int id = pPacket.readByte3();
-//	printf( "msgDELNPC: id: %d\n", id );
 	CNpc* npc = (CNpc*)npcIds[id];
 	if(npc == NULL)
-	{
-//		printf( "msgDELNPC: npc == 0\n" );
 		return;
-	}
 	if(npc->level != level)
-	{
-//		printf( "msgDELNPC: npc->level != level\n" );
 		return;
-	}
 
 	for (int i = 0; i < playerList.count(); i++)
 	{
-		((CPlayer*)playerList[i])->sendPacket(CPacket() << (char)SDELNPC << (int)npc->id);
-//		printf( "msgDELNPC: player: %s, id: %d\n", ((CPlayer*)playerList[i])->accountName.text(), npc->id );
+		// SDELNPC doesn't work, so this terrible hack will do.
+		((CPlayer*)playerList[i])->sendPacket(
+			CPacket() << (char)SNPCPROPS << (int)npc->id <<
+			(char)NPCGIF << (char)0 << (char)ACTIONSCRIPT << (short)0 <<
+			(char)VISFLAGS << (char)0 << (char)BLOCKFLAGS << (char)0 <<
+			(char)NPCMESSAGE << (char)0 );
+		//((CPlayer*)playerList[i])->sendPacket(CPacket() << (char)SDELNPC << (int)npc->id);
 	}
-//	printf( "\n" );
 	level->npcs.remove(npc);
 	delete npc;
 	compressAndSend();

@@ -705,7 +705,13 @@ void CLevel::reset()
 		for(int ii = 0; ii < playerList.count(); ii++)
 		{
 			CPlayer* player = (CPlayer*)playerList[ii];
-			player->sendPacket(CPacket() << (char)SDELNPC << (int)npc->id);
+
+			// SDELNPC doesn't work, so this terrible hack will do.
+			player->sendPacket( CPacket() << (char)SNPCPROPS << (int)npc->id <<
+				(char)NPCGIF << (char)0 << (char)ACTIONSCRIPT << (short)0 <<
+				(char)VISFLAGS << (char)0 << (char)BLOCKFLAGS << (char)0 <<
+				(char)NPCMESSAGE << (char)0 );
+			//player->sendPacket(CPacket() << (char)SDELNPC << (int)npc->id);
 		}
 		delete npc;
 	}

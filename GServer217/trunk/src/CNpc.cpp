@@ -273,6 +273,40 @@ CPacket CNpc::getProperty(int pId)
 			con_print( "NGATTRIB%d\n", index );
 		}
 		break;
+
+		case NGATTRIB6:
+		case NGATTRIB7:
+		case NGATTRIB8:
+		case NGATTRIB9:
+/* Does the client not send gani attribs > 9?
+		case NGATTRIB10:
+		case NGATTRIB11:
+		case NGATTRIB12:
+		case NGATTRIB13:
+		case NGATTRIB14:
+		case NGATTRIB15:
+		case NGATTRIB16:
+		case NGATTRIB17:
+		case NGATTRIB18:
+		case NGATTRIB19:
+		case NGATTRIB20:
+		case NGATTRIB21:
+		case NGATTRIB22:
+		case NGATTRIB23:
+		case NGATTRIB24:
+		case NGATTRIB25:
+		case NGATTRIB26:
+		case NGATTRIB27:
+		case NGATTRIB28:
+		case NGATTRIB29:
+		case NGATTRIB30:
+*/
+		{
+			int index = 6 + pId - NGATTRIB6;
+			retVal << (char)gAttribs[index].length() << gAttribs[index];
+			con_print( "NGATTRIB%d\n", index );
+		}
+		break;
 	}
 	con_print( "Packet: %s\n\n", retVal.text() );
 	return retVal;
@@ -509,6 +543,39 @@ void CNpc::setProps(CPacket& pProps)
 				if(len >= 0)
 					gAttribs[index-NGATTRIB1] = pProps.readChars(len);
 				con_print( "NGATTRIB%d: len: %d attrib: %s\n", index-NGATTRIB1, len, gAttribs[index-NGATTRIB1].text() );
+			break;
+
+			case NGATTRIB6:
+			case NGATTRIB7:
+			case NGATTRIB8:
+			case NGATTRIB9:
+/* Does the client not send gani attribs > 9?
+			case NGATTRIB10:
+			case NGATTRIB11:
+			case NGATTRIB12:
+			case NGATTRIB13:
+			case NGATTRIB14:
+			case NGATTRIB15:
+			case NGATTRIB16:
+			case NGATTRIB17:
+			case NGATTRIB18:
+			case NGATTRIB19:
+			case NGATTRIB20:
+			case NGATTRIB21:
+			case NGATTRIB22:
+			case NGATTRIB23:
+			case NGATTRIB24:
+			case NGATTRIB25:
+			case NGATTRIB26:
+			case NGATTRIB27:
+			case NGATTRIB28:
+			case NGATTRIB29:
+			case NGATTRIB30:
+*/
+				len = pProps.readByte1();
+				if(len >= 0)
+					gAttribs[6+index-NGATTRIB6] = pProps.readChars(len);
+				con_print( "NGATTRIB%d: len: %d attrib: %s\n", 6+index-NGATTRIB6, len, gAttribs[6+index-NGATTRIB6].text() );
 			break;
 
 			default:

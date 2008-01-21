@@ -50,10 +50,42 @@ enum {
 	NGATTRIB2,		// 37
 	NGATTRIB3,		// 38
 	NGATTRIB4,		// 39
-	NGATTRIB5		// 40
+	NGATTRIB5,		// 40
+	NEMPTY41,		// 41
+	NEMPTY42,		// 42
+	NEMPTY43,		// 43
+	NGATTRIB6,		// 44
+	NGATTRIB7,		// 45
+	NGATTRIB8,		// 46
+	NGATTRIB9,		// 47
+
+/* Does the client not send gani attribs > 9?
+	NGATTRIB10,		// 48
+	NGATTRIB11,		// 49
+	NGATTRIB12,		// 50
+	NGATTRIB13,		// 51
+	NGATTRIB14,		// 52
+	NGATTRIB15,		// 53
+	NGATTRIB16,		// 54
+	NGATTRIB17,		// 55
+	NGATTRIB18,		// 56
+	NGATTRIB19,		// 57
+	NGATTRIB20,		// 58
+	NGATTRIB21,		// 59
+	NGATTRIB22,		// 60
+	NGATTRIB23,		// 61
+	NGATTRIB24,		// 62
+	NGATTRIB25,		// 63
+	NGATTRIB26,		// 64
+	NGATTRIB27,		// 65
+	NGATTRIB28,		// 66
+	NGATTRIB29,		// 67
+	NGATTRIB30		// 68
+*/
 };
 
-#define npcpropcount 41
+#define npcpropcount 48
+//#define npcpropcount 69
 class CNpc
 {
 	private:
@@ -63,7 +95,7 @@ class CNpc
 		time_t modTime[npcpropcount];
 		CNpc(CString& pImage, CString& pCode, float pX, float pY, CLevel* pLevel);
 		~CNpc();
-		CString serverCode, clientCode, gAttribs[5];
+		CString serverCode, clientCode, gAttribs[9];
 		CLevel* level;
 		CString image, gAni, swordImage, shieldImage, bowImage, chatMsg, nickName, horseImage, headImage, weaponName, imagePart, bodyImage;
 		char saves[10];
