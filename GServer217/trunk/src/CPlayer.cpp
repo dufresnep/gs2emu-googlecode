@@ -2349,7 +2349,7 @@ void CPlayer::msgBOARDMODIFY(CPacket& pPacket)
 	int bH = pPacket.readByte1();
 	CPacket tileData;
 	tileData << pPacket.copy(5, pPacket.length()-5);
-	if (level->changeBoard(tileData, bX, bY, bW, bH) == false)
+	if (level->changeBoard(tileData, bX, bY, bW, bH, this) == false)
 		return;
 
 	if (bX < 0 || bX > 63 || bY < 0 || bY > 63)
