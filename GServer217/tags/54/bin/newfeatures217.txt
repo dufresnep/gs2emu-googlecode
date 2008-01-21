@@ -1,0 +1,261 @@
+-------------------------------------------
+New features/bug fixes in v2.17 revision 52
+-------------------------------------------
+
+Additions:
+- New Server Options:
+    cheatwindows = array [ list of names to search for in active windows ]
+    cheatwindowsban = bool [ ban if caught above, else disconnect - logged ]
+    cheatwindowstime = int [ time in seconds when client sends cheat windows ]
+- New Word Filter - refer to docu_wordfilter.txt
+- Profiles now work, and has been globalized.
+
+Fixes:
+- AP Counter resets after killing a player.
+- AP should no longer update if there was no change. (ex: kill someone w/ <20 ap)
+- Bandwidth usage should be lower -- no longer sends the entire playerlist every 10 seconds.
+- Chests should now properly save.
+- No longer disconnected from no-movement if you are talking.
+- Sword power should now properly save.
+- Level warping should load new levels. (warpto/summon)
+- Level warping shouldn't double-warp.
+
+RC Additions:
+- /find FILE_NAME (allows wildcard - *)
+
+RC Fixes:
+- RC Rights should properly work now -- also reloads rights on login, and prevents the ability to go beyond the gserver folder.
+- Server Option: maxnomovement should properly work now when disconnecting from no-movement.
+- Set own attributes, and set own attributes properly work now.
+- Viewing files in wordpad should properly show new lines now.
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 51
+-------------------------------------------
+
+Additions:
+- AP Improvements: Can now set the ap intervals between 20,40,60,80,100 ap. (via server options)
+- Gani Attributes (30 available, instead of the 5) -- thanks to beholder
+- New Server Options:
+    aptime(0-4) = integer [ time to gain an ap - intervals of 20 ]
+    dontaddserverflags = bool [ allows disabling adding of server flags ]
+    dontchangekills = bool [ allows disabling playerkills from increasing ]
+    setbodyallowed = bool [ allows disabling body changing ]
+    setheadallowed = bool [ allows disabling head changing ]
+    setswordallowed = bool [ allows disabling sword changing ]
+    setshieldallowed = bool [ allows disabling shield changing ]
+    warptoforall = bool [ allows none-admins to use warpto ]
+
+Fixes:
+- Level Warping has been shortened a tiny-bit.. made the exe 0.5 kb shorter =D
+- Props now save, will no longer lose things like hats (#P1) etc..
+- Settings.ini has been dropped, it has been changed to serveroptions.txt.
+- SQLite has been dropped, accounts are now stored in text files under the directory 'accounts'. Uses the same format as graals account files (with a few additions -- should be easier to edit now too).
+
+RC Additions:
+- Admin Level has been dropped -- uses admin rights only now.
+- Folder Configuration (though currently useless) is editable live with immediate-changes.
+- Full FTP (download, upload, delete, move, and rename files -- currently does not allow rw */* etc.. )
+- Serveroptions now editable -- If you have the right 'changestaffaccounts' you see special variables for the listserver, else they are hidden. (advise keeping to the owner only)
+
+RC Fixes:
+- Admin Rights should work correclty now.
+- AP / Onlinetime is no longer gained while idling on rc.
+- Ban Reason / Comments are now seperated correctly.
+- Status Fixed -- when opening/closing playerlist it will now correctly show your status.
+- Totally redid the RC Commands -- use /help.
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 50
+-------------------------------------------
+
+Additions:
+- added 'setsleeves' and 'setshoes' to list of
+  built-in tailor commands.
+- GServer will get notified if the version is old
+  by listserver. Listserver automatically sends
+  the newest executable.
+
+Fixes:
+- RC will now create the proper filename for 
+  Guilds when using /addguild Guild_Name
+- Setstrings will delete properly now.
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 43
+-------------------------------------------
+
+Additions:
+- server now sends the playerlist to the
+  serverlist -- data can be used for other
+  things if wanted.
+- server now sends nickname changes to the
+  serverlist which will change your forum
+  name (not account)
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 31
+-------------------------------------------
+
+Fixes:
+- I'm proud to announce that the linux gserver
+  now works (and 100% at that)
+- Chest items now properly clip to the max
+  when you open them.
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 30
+-------------------------------------------
+
+Additions:
+- A global database of bodies, heads, shields,
+  and swords has been established. You will
+  be able to upload your heads to this global
+  database and will be able to use it on any
+  server using revision 30+. All global files
+  will be 'cached' on the server itself in
+  the worlds folder called 'globals'. There
+  will soon be a new organized method of 
+  doing this soon ( which will establish
+  the folder configuration )
+- AP Spawning:
+  AP < 20 -> 3 hearts
+  AP < 40 -> 5 hearts
+  Ap >= 40 -> full hearts
+
+Fixes:
+- Memory leak causing the serverlist to crash
+  should be fixed now. =)
+- RemoteControl attribute-editing should no
+  longer crash.
+-------------------------------------------
+New features/bug fixes in v2.17 revision 29
+-------------------------------------------
+
+Additions:
+- ability to have nick-specific guilds or
+  any-nick guilds. By default guilds are
+  NOT nick-specific. To set a guild
+  nick-specific, set the firstline as:
+  TYPE=NICK. For an example, check:
+  'guilds/guildExample.txt'
+- chat is limited to 220 characters, and
+  nick is limited to 200 characters.
+- level protection: When logging on, if your
+  level does not exist, you will be warped
+  to unstick me. If unstick me does not exist,
+  you will see the "Connecting" screen.
+- when setting your nick, it will now have you
+  wait 10 seconds before changing your nickname
+  again.
+- Staff commands like warpto, and summon, will
+  tell you if you're not authorized.
+
+Fixes:
+- accounts can now utilize spaces to log on
+  servers. The serverlist now uses the same
+  method of communicating as server->player.
+  ALL GSERVERS WILL BE REQUIRED TO UPDATE
+  OR THEY WONT BE ABLE TO CONNECT.
+- chat used to cause other props to be
+  'activated'. (example: you warp to a
+  non-existant level) This should no longer
+  happen anymore
+- flag string-arrays (setstring a,b,c,d,e;) now save
+  correctly, only thing is, all your current
+  flags will break when using this update,
+  sorry about that.
+- flags / weapons should be updated immediately
+  after changing players with the rc.
+- global guilds are now nickname-specific, also
+  fixed a bug with being able to set your nick
+  to any guild.
+- guilds now use the old prefix of guild for
+  the filename. Example: guildAccount_Name.txt
+- props now send the correct prop if it gets
+  changed after it recieves a prop. (ex. chat
+  now shows when it changes after processing)
+- toguild messages now display the toguild
+  icon.
+- you can no longer have extra spaces in the
+  front of your nickname or have no name. If
+  attempted, your nickname will be set to
+  'unknown'.
+-------------------------------------------
+New features/bug fixes in v2.17 revision 28
+-------------------------------------------
+
+Fixes:
+- ap shouldn't go below 0 anymore. sorry
+  about that.
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 27
+-------------------------------------------
+
+Fixes:
+ - Shield / Sword limit should now clip
+   correctly, sorry about that.
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 26
+-------------------------------------------
+
+Additions:
+- Merged several text files (jails, staffguilds, and statuslist) into a settings file.
+- All log files will now be saved in the new logs folder.
+- You can now get a copy of the current playerlist in the format of account,nickname,levelname,x,y,ap. Each account is seperated by a line, this file is updated every 10 seconds (same as serverflags.txt)
+
+- Added Profile Vars for custom profile fields in the server options. Format: Name:=VAR - Works for flags as well as several player variables
+- After 20 minutes of idling you will be disconnected, this can be disabled in the server options
+
+- New Server Options:
+  - allowedglobalguilds (string list) - list of global guilds that can bypass disabling global guilds.
+  - globalguilds (bool) - If true, allow global guilds
+  - jaillevels (string list) - jails.txt was moved into this setting.
+  - playerlisticons (string list) - statuslist.txt was moved into this setting.
+  - profilevars (string list) - a list of custom profile fields in the profile.
+  
+  - noexplosions (bool) - If true, disables explosions (only the creator of the explosion will see it)
+  
+  - apsystem (bool) - If true, enables the ap system.
+  - disconnectifnotmoved (bool) - If true, you will be disconnected for no movement every 20 minutes.
+  - heartlimit (int) - Max heart power, should always be an integer, unexpected results may happen if you use a float.
+  - shieldlimit (int) - Max shield power, should always be an integer, unexpected results may happen if you use a float.
+  - swordlimit (int) - Max sword power, should always be an integer, unexpected results may happen if you use a float.
+
+Fixes:
+ - Player hearts are now 'clipped' to the max hearts, when you log on, or when your playerhearts are changed from a client message.
+
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 25
+-------------------------------------------
+
+Additions:
+- You can now view the current guild members of a specific guild or your own guild by using the command 'showguild `guild`'. To show your own guild, just say 'showguild'.
+- You can now send messages to guild members by using 'toguild: `message`'
+- You can now view the current admins by using the command 'showadmins'
+
+Fixes:
+- When setting guilds, with the nickname being your account, a star is correctly placed in the front to indicate you're using your account (and to also move you to the top of the playerlist ;))
+- Levels shouldn't messup when tile[0,0] is placed on a straight line anymore. (entire line would be random tiles)
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 24
+-------------------------------------------
+
+Additions:
+- Ability to set the staff head in settings.ini
+- Ability to make your server staff only in settings.ini
+- A staff list in settings.ini, players must be defined to logon rc / staff-only in there.
+- Displays when a user logs on/off rc instead of just on.
+- RPG Window (F2) now shows.
+
+Fixes:
+- List Server processes faster (for global guilds mainly)
+- New World time no longer starts at 0, and it is also sent every 5 seconds instead of 60.
+- On logon, if your level can't be found, it sends you to unstick me.
+- Player X/Y no longer sets as an integer on login.
+- Sign codes no longer mess up.
+- When you set your nick and put many stars in front, all of them will be removed instead of just one.
