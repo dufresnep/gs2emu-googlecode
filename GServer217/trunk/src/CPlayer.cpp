@@ -3771,7 +3771,15 @@ void CPlayer::msgDSETRIGHTS(CPacket& pPacket)
 		}
 	}
 
-	player->adminRights = (int)pPacket.readByte5();
+	// Don't allow RCs to give rights they don't have.
+	int n_adminRights = (int)pPacket.readByte5();
+	for ( int i = 0; i < 20; ++i )
+	{
+		if ( (this->adminRights & (1<<i)) == 0 )
+			n_adminRights &= ~(1<<i);
+	}
+
+	player->adminRights = n_adminRights;
 	player->adminIp = pPacket.readChars((unsigned char)pPacket.readByte1());
 
 	// Untokenize and load the directories.
