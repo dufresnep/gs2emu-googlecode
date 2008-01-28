@@ -100,7 +100,7 @@ int main()
 	updateFile("servermessage.html");
 
 	/* Server Finished Loading */
-	printf("GServer 2 by 39ster\nSpecial thanks to Marlon, Agret, pacMASTA, 39ster and others for porting the \noriginal 1.39 gserver to 2.*\nServer listening on port: %i\nServer version: Revision %s\n\n", serverPort, listServerFields[3].text());
+	printf("GServer 2 by 39ster\nSpecial thanks to Marlon, Agret, Pac300, 39ster and others for porting the \noriginal 1.39 gserver to 2.1\nServer listening on port: %i\nServer version: Build %s\n\n", serverPort, listServerFields[3].text());
 	atexit(shutdownServer);
 	errorOut("rclog.txt", "Server started");
 	serverRunning = true;
