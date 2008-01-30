@@ -70,6 +70,7 @@ class CBuffer
 	int find(const char* pString, int pStart = 0);
 	int findl(char pChar);
 	int findToken(const char* pTokens, int pStart = 0);
+	int findIn(const char* pString);
 	bool save(const char* pFileName);
 	bool load(const char* pFileName);
 	void setWrite(int pPos);

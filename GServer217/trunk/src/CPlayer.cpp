@@ -1271,7 +1271,7 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 
 		CPacket npcProps;
 		CNpc* npc = (CNpc*)level->npcs[i];
-		npcProps << (char)SNPCPROPS << (int)npc->id << npc->getPropertyList(time);
+		npcProps << (char)SNPCPROPS << (int)npc->id << npc->getPropertyList(mtime);
 		if (npcProps.length() > 3)
 			sendPacket(npcProps);
 	}
@@ -3937,23 +3937,37 @@ void CPlayer::msgDWANTFTP(CPacket& pPacket)
 
 	if (myFolders.count() > 0)
 	{
+		// Set the default folder in case we can't find the last folder.
 		myFolders[0].setRead(0);
 		CBuffer rights = myFolders[0].readString(" ");
 		CBuffer folder = myFolders[0].readString("");
 		folder.remove(folder.length() - 1, 1);
 
-		// If the player has a lastFolder saved, go to that folder.
+		// Now check and see if we can find the last folder
 		bool fLastFolder = false;
-		if ( lastFolder.length() > 0 )
+		if ( lastFolder.length() == 0 )
 		{
-			CString lfFind( lastFolder );
-			lfFind << "*";
-			if ( myFolders.findI(lfFind) != -1 ) fLastFolder = true;
+			// Loop through all the folders.
+			for ( int i = 0; i < myFolders.count() && fLastFolder == false; ++i )
+			{
+				myFolders[i].setRead(0);
+				CBuffer mrights = myFolders[i].readString(" ");
+				CBuffer mfolder = myFolders[i].readString("");
+				mfolder.remove(folder.length() - 1, 1);
+				myFolders[i].setRead(0);
+
+				// Check if lastFolder is equal to our folder.
+				if ( lastFolder == mfolder )
+				{
+					rights = mrights;
+					folder = lastFolder;
+					fLastFolder = true;
+				}
+			}
 		}
-		if ( fLastFolder )
-			sendPacket(CPacket() << (char)SSENDFTP << (char)lastFolder.length() << lastFolder << listFiles(lastFolder.text(), rights.text()));
-		else
-			sendPacket(CPacket() << (char)SSENDFTP << (char)folder.length() << folder << listFiles(folder.text(), rights.text()));
+
+		// Send the folder.
+		sendPacket(CPacket() << (char)SSENDFTP << (char)folder.length() << folder << listFiles(folder.text(), rights.text()));
 
 		ftpOn = true;
 	}

@@ -135,6 +135,15 @@ int CBuffer::findToken(const char* pTokens, int pStart)
 	return -1;
 }
 
+int CBuffer::findIn(const char* pString)
+{
+	char* d_start = data;
+	char* d_end = 0;
+	d_end = strstr(data,pString);
+	if ( d_end == 0 ) return -1;
+	return (int)(d_end - d_start);
+}
+
 void CBuffer::resize(int pSize)
 {
 	if(pSize >= dataLength)
