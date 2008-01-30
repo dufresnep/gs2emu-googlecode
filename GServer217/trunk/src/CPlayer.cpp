@@ -3945,7 +3945,7 @@ void CPlayer::msgDWANTFTP(CPacket& pPacket)
 
 		// Now check and see if we can find the last folder
 		bool fLastFolder = false;
-		if ( lastFolder.length() == 0 )
+		if ( lastFolder.length() > 0 )
 		{
 			// Loop through all the folders.
 			for ( int i = 0; i < myFolders.count() && fLastFolder == false; ++i )
@@ -3953,7 +3953,7 @@ void CPlayer::msgDWANTFTP(CPacket& pPacket)
 				myFolders[i].setRead(0);
 				CBuffer mrights = myFolders[i].readString(" ");
 				CBuffer mfolder = myFolders[i].readString("");
-				mfolder.remove(folder.length() - 1, 1);
+				mfolder.remove(mfolder.length() - 1, 1);
 				myFolders[i].setRead(0);
 
 				// Check if lastFolder is equal to our folder.
