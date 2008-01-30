@@ -1,0 +1,21 @@
+--------------------------------------------
+New features/bug fixes in v2.171 build 55
+--------------------------------------------
+
+Maintenance:
+- Re-did a lot of the RC messages to be less Engrishy and more consistent.
+- Added a new function: CBuffer::findIn().  It basically calls strstr() on
+  the data in the CBuffer class.  Could be useful for GServer modders.
+
+Additions:
+- RCs who have the "change rights" ability can no longer give rights that
+  they themselves do not have.
+- When opening the FileBrowser on RC, it should now properly read the
+  LastFolder line in your account and open that directory.  It used to just
+  open the first directory in your folder rights.
+
+Fixes:
+- Modified the GServer init message to say Build instead of Revision since
+  we aren't using the Revision nomenclature anymore.
+- Fixed NPC props.  Being a bonehead, Nalin wrote code to attempt to fix
+  NPC props in build 54 but never actually called it.
