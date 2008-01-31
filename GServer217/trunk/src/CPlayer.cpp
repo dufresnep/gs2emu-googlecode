@@ -236,7 +236,7 @@ CPlayer::~CPlayer()
 		{
 			saveAccount();
 		}
-			else if (type == CLIENTRC)
+		else if (type == CLIENTRC)
 		{
 			sendRCPacket(CPacket() << (char)DRCLOG << "RC Disconnected: " << accountName);
 		}
@@ -429,11 +429,9 @@ void CPlayer::sendAccount()
 		lastIp = inet_addr(playerSock->tcpIp());
 		return;
 	}
-
 	loginTime = time(NULL);
-	ListServer_Send(CPacket() << (char)SLSPLAYERADD << (char)accountName.length() << accountName << getProp(NICKNAME) << getProp(CURLEVEL) << getProp(PLAYERX) << getProp(PLAYERY) << getProp(PALIGNMENT) << (char)type);
 
-	//Server signiture. Allows more than 8 players
+	//Server signature. Allows more than 8 players
 	sendPacket(CPacket() << (char)UNLIMITEDSIG << (char)73);
 
 	if (!loadOnly)
@@ -590,6 +588,9 @@ void CPlayer::sendAccount()
 	newPlayers.remove(this);
 	playerList.add(this);
 	lastIp = inet_addr(playerSock->tcpIp());
+
+	// Tell the list server that the player connected.
+	ListServer_Send(CPacket() << (char)SLSPLAYERADD << (char)accountName.length() << accountName << getProp(NICKNAME) << getProp(CURLEVEL) << getProp(PLAYERX) << getProp(PLAYERY) << getProp(PALIGNMENT) << (char)type);
 }
 
 void CPlayer::parsePacket(CPacket& pPacket)

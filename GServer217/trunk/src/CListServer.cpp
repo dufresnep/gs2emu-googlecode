@@ -85,7 +85,7 @@ void ListServer_Main()
 						{
 							player->sendAccount();
 						}
-							else
+						else
 						{
 							player->sendPacket(CPacket() << (char)DISMESSAGE << errorMsg);
 							player->deleteMe = true;
