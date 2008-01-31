@@ -418,14 +418,18 @@ void getSubDirs(char *pDir)
 					getSubDirs(directory.text());
 				}
 			}
-		}while(FindNextFile(hFind, &filedata));
+		} while (FindNextFile(hFind, &filedata));
 	}
 	FindClose(hFind);
 }
 
-void getSubFiles(char* pDir, CStringList& pOut)
+void getSubFiles(char* pDir, CStringList& pOut, CString* search)
 {
-	CString searchdir = CString() << pDir << "*";
+	// Assemble the search wildcards.
+	CString searchdir( pDir );
+	if ( search == 0 ) searchdir << "*";
+	else searchdir << search->replaceAll( "%", "*" );
+
 	WIN32_FIND_DATA filedata;
 	HANDLE hFind = FindFirstFile(searchdir.text(), &filedata);
 	if(hFind!=NULL)
@@ -434,7 +438,7 @@ void getSubFiles(char* pDir, CStringList& pOut)
 		{
 			if(!(filedata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 				pOut.add(filedata.cFileName);
-		}while(FindNextFile(hFind, &filedata));
+		} while (FindNextFile(hFind, &filedata));
 	}
 	FindClose(hFind);
 }
@@ -460,7 +464,7 @@ void getSubDirs(char *pDir)
 	closedir(dir);
 }
 
-void getSubFiles(char* pDir, CStringList& pOut)
+void getSubFiles(char* pDir, CStringList& pOut, CString* search)
 {
 	DIR *dir;
 	struct stat statx;
@@ -472,7 +476,16 @@ void getSubFiles(char* pDir, CStringList& pOut)
 		CString fullName = CString() << pDir << ent->d_name;
 		stat(fullName.text(), &statx);
 		if (!(statx.st_mode & S_IFDIR))
-			pOut.add(ent->d_name);
+		{
+			if ( search != 0 )
+			{
+				CString s( *search );
+				CString m( ent->d_name );
+				s.replaceAll( "%", "*" );
+				if ( m.match( s.text() ) == false ) continue;
+			}
+			pOut.add( ent->d_name );
+		}
 	}
 	closedir(dir);
 }

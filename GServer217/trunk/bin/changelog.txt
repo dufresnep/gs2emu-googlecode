@@ -8,6 +8,9 @@ Maintenance:
   the data in the CBuffer class.  Could be useful for GServer modders.
 
 Additions:
+- The "Account name description" field in the "Get Accounts List" dialog
+  box in RC now properly accepts wildcards.  The wild cards %, *, and ? are
+  available, with % being the same as *.
 - RCs who have the "change rights" ability can no longer give rights that
   they themselves do not have.
 - When opening the FileBrowser on RC, it should now properly read the

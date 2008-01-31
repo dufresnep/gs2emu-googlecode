@@ -196,7 +196,10 @@ CPacket getAccountList(CString& pName, CString& pCondition)
 {
 	CPacket retVal;
 	CStringList fileList;
-	getSubFiles("accounts/", fileList);
+	if ( pName.length() > 0 )
+		getSubFiles("accounts/", fileList, &pName);
+	else
+		getSubFiles("accounts/", fileList);
 
 	for (int i = 0; i < fileList.count(); i++)
 	{
@@ -206,25 +209,5 @@ CPacket getAccountList(CString& pName, CString& pCondition)
 		retVal << (char)acc.length() << acc;
 	}
 
-	/*
-	CStringList result;
-	CString query;
-	char *zErrMsg = 0;
-	if(!pName.length())
-		pName = "%";
-	query << "SELECT accname"
-		" FROM accounts WHERE accname LIKE '" << pName << "'";
-	if(pCondition.length())
-		query << " and " << pCondition;
-	query << " LIMIT 0, 5000";
-	if(sqlite3_exec(gserverDB, query.text(), processQuery, &result, &zErrMsg)
-		|| result.count() <= 0)
-		printf("SQL Error: %s\n", sqlite3_errmsg(gserverDB));
-	else
-	{
-		for(int i = 0; i < result.count(); i++)
-			retVal << (char)result[i].length() << result[i];
-	}
-	*/
 	return retVal;
 }

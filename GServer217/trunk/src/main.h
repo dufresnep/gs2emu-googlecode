@@ -44,7 +44,7 @@ long long getFileModTime(char* pFile);
 void CalculateMD5(char *buffer, int length, char *checksum);
 void errorOut(char *pFile, CBuffer pError, bool pWrite = false);
 void getSubDirs(char* dir);
-void getSubFiles(char* pDir, CStringList& pOut);
+void getSubFiles(char* pDir, CStringList& pOut, CString* search = 0);
 void loadServerMessage();
 void saveWeapons(char* pFile);
 void sendRCPacket(CPacket& pPacket);
