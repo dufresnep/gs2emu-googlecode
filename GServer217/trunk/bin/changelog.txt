@@ -19,3 +19,5 @@ Fixes:
   we aren't using the Revision nomenclature anymore.
 - Fixed NPC props.  Being a bonehead, Nalin wrote code to attempt to fix
   NPC props in build 54 but never actually called it.
+- Fixed an issue where attempting to log in twice on the same account
+  would permanently add 1 to the player count.
