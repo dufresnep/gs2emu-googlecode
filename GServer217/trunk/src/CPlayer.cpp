@@ -520,6 +520,7 @@ void CPlayer::sendAccount()
 		if (sendOthersInit[i])
 			playerProps << (char)i << getProp(i);
 	}
+
 	//create property list for rcs
 	CPacket rcProps;
 	rcProps << (char)SADDPLAYER << (short)id;
@@ -529,12 +530,25 @@ void CPlayer::sendAccount()
 	rcProps << (char)HEADGIF << getProp(HEADGIF);
 	rcProps << (char)BODYIMG << getProp(BODYIMG);
 
+	// Add the player now.  Do this here so the player is able to see
+	// themself on RC.
+	newPlayers.remove(this);
+	playerList.add(this);
+	lastIp = inet_addr(playerSock->tcpIp());
+
+	// Send out the connection props to everybody.
 	for (int i = 0; i < playerList.count(); i++)
 	{
 		CPlayer* other = (CPlayer*)playerList[i];
-		if(other == this)
+
+		// Only continue if the player is a client, not an RC.
+		// This let's players see themselves on RC.
+		if (other == this && type == CLIENTPLAYER)
 			continue;
-		if(type == CLIENTPLAYER)
+
+		// If the player is a client, send the init props to other players and
+		// get other player's props.
+		if (type == CLIENTPLAYER)
 		{
 			CPacket otherProps;
 			otherProps << (char)OTHERPLPROPS << (short)other->id << (char)50 << (char)1;
@@ -544,7 +558,9 @@ void CPlayer::sendAccount()
 					otherProps << (char) ii << other->getProp(ii);
 			}
 			sendPacket(otherProps);
-		} else if(type == CLIENTRC)
+		}
+		// If the player is an RC, send the RC specific props.
+		else if (type == CLIENTRC)
 		{
 			CPacket otherProps;
 			otherProps << (char)SADDPLAYER << (short)other->id;
@@ -556,16 +572,19 @@ void CPlayer::sendAccount()
 			sendPacket(otherProps);
 		}
 
-		if(other->type == CLIENTRC)
+		// If the player we are sending to is an RC, send the New RC message.
+		if (other->type == CLIENTRC)
 		{
-			other->sendPacket(rcProps);
+			if ( other != this )
+				other->sendPacket(rcProps);
 			if(type == CLIENTRC)
 			{
-				other->sendPacket(CPacket() << (char)DRCLOG << "New RC: " << nickName << " (" << accountName << ")");
+				if ( other != this )
+					other->sendPacket(CPacket() << (char)DRCLOG << "New RC: " << nickName << " (" << accountName << ")");
 				sendPacket(CPacket() << (char)DRCLOG << "New RC: " << other->nickName << " (" << other->accountName << ")");
 			}
 		}
-		else if(other->type == CLIENTPLAYER)
+		else if (other->type == CLIENTPLAYER)
 			other->sendPacket(playerProps);
 	}
 
@@ -584,10 +603,6 @@ void CPlayer::sendAccount()
 		// Delete that pesky bomb.
 		sendPacket(CPacket() << (char)SDELNPCWEAPON << "Bomb");
 	}
-
-	newPlayers.remove(this);
-	playerList.add(this);
-	lastIp = inet_addr(playerSock->tcpIp());
 
 	// Tell the list server that the player connected.
 	ListServer_Send(CPacket() << (char)SLSPLAYERADD << (char)accountName.length() << accountName << getProp(NICKNAME) << getProp(CURLEVEL) << getProp(PLAYERX) << getProp(PLAYERY) << getProp(PALIGNMENT) << (char)type);

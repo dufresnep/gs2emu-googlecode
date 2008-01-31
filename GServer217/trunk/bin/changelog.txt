@@ -15,6 +15,9 @@ Additions:
   open the first directory in your folder rights.
 
 Fixes:
+- When a player logs into RC, the "Players" field in RC is now correctly
+  incremented, RC announces to the player that they logged in, and the player
+  now correctly appears in the Player List.
 - Modified the GServer init message to say Build instead of Revision since
   we aren't using the Revision nomenclature anymore.
 - Fixed NPC props.  Being a bonehead, Nalin wrote code to attempt to fix
