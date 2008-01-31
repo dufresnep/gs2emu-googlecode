@@ -1163,7 +1163,7 @@ bool CPlayer::loadAccount()
 	//If account doesnt exist yet than use ini file
 	bool createNew = loadDBAccount(accountName);
 
-	if (banned)
+	if ( banned && !hasRight(CANCHANGESTAFFACC) )
 	{
 		sendPacket(CPacket() << (char)DISMESSAGE << "You have been banned from the server");
 		return false;
