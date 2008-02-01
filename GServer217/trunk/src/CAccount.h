@@ -22,5 +22,8 @@ class CAccount
 		bool loadDBAccount(CString pAccount, bool fromAccount = true);
 		bool loadWorldPropsIni();
 		void saveAccount(bool pAttributes = false);
+
+		// Check if account matches conditionals.
+		static bool meetsConditions( CString pAccount, CString conditions );
 };
 #endif

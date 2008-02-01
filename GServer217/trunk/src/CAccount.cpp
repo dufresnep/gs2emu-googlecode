@@ -194,3 +194,54 @@ void CAccount::saveAccount(bool pAttributes)
 	newFile.save(fileName.text());
 	return;
 }
+
+bool CAccount::meetsConditions( CString pAccount, CString conditions )
+{
+	CStringList file;
+	CString fileName;
+	fileName = CString() << "accounts" << fSep << pAccount << ".txt";
+
+	// Load and check if the file is valid.
+	if (!file.load(fileName.text()) || file[0] != "GRACC001")
+		return false;
+
+	// Load the conditions into a string list.
+	CStringList cond;
+	conditions.removeAll( "'" );
+	conditions.replaceAll( "%", "*" );
+	cond.load( conditions.text(), "," );
+
+	// Go through each line of the loaded file.
+	for (int i = 0; i < file.count(); i++)
+	{
+		int sep = file[i].find(' ');
+		CBuffer section = file[i].copy(0, sep);
+		CBuffer val = file[i].copy(sep + 1);
+		section.trim();
+		val.trim();
+
+		// Check each line against the conditions specified.
+		for ( int j = 0; j < cond.count(); ++j )
+		{
+			// Read out the name and value.
+			cond[j].setRead(0);
+			CString cname = cond[j].readString( "=" );
+			CString cvalue = cond[j].readString( "" );
+			cond[j].setRead(0);
+
+			// Now, do a case-insensitive comparison of the section name.
+#ifdef WIN32
+			if ( stricmp( section.text(), cname.text() ) == 0 )
+#else
+			if ( strcasecmp( section.text(), cname.text() ) == 0 )
+#endif
+			{
+				// If we are in a section that was passed as a conditional,
+				// do a mask compare.  If it returns false, don't include this
+				// account in the search.
+				if ( val.match( cvalue.text() ) == false ) return false;
+			}
+		}
+	}
+	return true;
+}

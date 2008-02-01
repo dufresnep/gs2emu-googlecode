@@ -10,9 +10,15 @@ Maintenance:
 Additions:
 - Players who have the "Change Staff Accounts" right can now evade local
   server bans.  Remember to remove that right from any admin you ban.
-- The "Account name description" field in the "Get Accounts List" dialog
-  box in RC now properly accepts wildcards.  The wild cards %, *, and ? are
-  available, with % being the same as *.
+- The "Get Accounts List" dialog in RC is now fully implemented again.  Both
+  the "Account name description" and the "Conditions" field accept wildcard
+  characters.  The wildcard characters %, *, and ? are supported, with %
+  acting the same as *.  The "Conditions" field searches the account .txt
+  files for matches.  "swordp=2" will search for everybody who's "swordp"
+  value in their account .txt file is equal to 2.  "level=rha_*,ap=51" will
+  search for the level value that starts with "rha_" and whose ap value is
+  51.  View the accounts .txt file for all the values.  Note that the values
+  "CHEST", "WEAPON", "FLAG", and "FOLDERRIGHT" don't currently work.
 - RCs who have the "change rights" ability can no longer give rights that
   they themselves do not have.
 - When opening the FileBrowser on RC, it should now properly read the

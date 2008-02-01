@@ -206,7 +206,11 @@ CPacket getAccountList(CString& pName, CString& pCondition)
 		CString acc = fileList[i].copy(0, fileList[i].length() - 4);
 		if (acc.length() < 1)
 			continue;
-		retVal << (char)acc.length() << acc;
+		if ( pCondition.length() > 0 )
+		{
+			if ( CAccount::meetsConditions( acc, pCondition ) == true )
+				retVal << (char)acc.length() << acc;
+		} else retVal << (char)acc.length() << acc;
 	}
 
 	return retVal;
