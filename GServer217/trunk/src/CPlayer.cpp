@@ -177,7 +177,8 @@ CPlayer::CPlayer(CSocket* pSocket)
 	loadOnly = deleteMe = allowBomb = false;
 	firstPacket = firstLevel = true;
 	key = adminRights =  0;
-	lastData = lastMovement = lastSave = loginTime = time(NULL);
+	lastData = lastMovement = lastMessage = lastChat = lastSave = loginTime = time(NULL);
+	idleTimer = 0;
 	lastNick = 0;
 
 	iterator = 0x04A80B38;
@@ -208,7 +209,6 @@ CPlayer::CPlayer(CSocket* pSocket)
 	carrySprite = -1;
 	packCount = failAttempts = 0;
 	banned = false;
-	lastMessage = 0;
 }
 
 CPlayer::~CPlayer()
@@ -1898,7 +1898,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			chatMsg = (chatMsg.length() > 220 ? chatMsg.copy(0, 220) : chatMsg);
 
 			processChat(chatMsg);
-			lastMovement = time(NULL);
+			lastChat = time(NULL);
 	   	break;
 
 		case PLAYERCOLORS:

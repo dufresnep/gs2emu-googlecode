@@ -209,10 +209,11 @@ void doTimer()
 		{
 			if (idleDisconnect)
 			{
-				if (time(NULL) - player->lastMovement > maxNoMovement)
+				if ((time(NULL) - player->lastMovement > maxNoMovement) &&
+					(time(NULL) - player->lastChat > maxNoMovement) )
 				{
-					errorOut("rclog.txt", CString() << "Client " << player->accountName << " didn't move for >20 mins.");
-					player->sendPacket(CPacket() << (char)DISMESSAGE << "You have been disconnected because you didn't move.");
+					errorOut("rclog.txt", CString() << "Client " << player->accountName << " had no activity for over " << toString(maxNoMovement) << " seconds.");
+					player->sendPacket(CPacket() << (char)DISMESSAGE << "You have been disconnected because of inactivity.");
 					player->deleteMe = true;
 					continue;
 				}
