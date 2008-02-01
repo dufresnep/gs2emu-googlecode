@@ -428,7 +428,11 @@ void getSubFiles(char* pDir, CStringList& pOut, CString* search)
 	// Assemble the search wildcards.
 	CString searchdir( pDir );
 	if ( search == 0 ) searchdir << "*";
-	else searchdir << search->replaceAll( "%", "*" );
+	else
+	{
+		searchdir << search->replaceAll( "%", "*" );
+		searchdir << ".txt";
+	}
 
 	WIN32_FIND_DATA filedata;
 	HANDLE hFind = FindFirstFile(searchdir.text(), &filedata);
@@ -482,6 +486,7 @@ void getSubFiles(char* pDir, CStringList& pOut, CString* search)
 				CString s( *search );
 				CString m( ent->d_name );
 				s.replaceAll( "%", "*" );
+				s << ".txt";
 				if ( m.match( s.text() ) == false ) continue;
 			}
 			pOut.add( ent->d_name );
