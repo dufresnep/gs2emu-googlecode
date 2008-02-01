@@ -26,6 +26,8 @@ Additions:
   open the first directory in your folder rights.
 
 Fixes:
+- Logging in to a non-existent level should now properly send the player to
+  the unstickme level.
 - When a player logs into RC, the "Players" field in RC is now correctly
   incremented, RC announces to the player that they logged in, and the player
   now correctly appears in the Player List.

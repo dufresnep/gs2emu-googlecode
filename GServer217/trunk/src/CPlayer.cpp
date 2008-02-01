@@ -496,6 +496,8 @@ void CPlayer::sendAccount()
 
 		if (!sendLevel(levelName, x, y, 0))
 		{
+			sendPacket(CPacket() << (char)PLAYERWARPED << getProp(PLAYERX) << getProp(PLAYERY) << unstickmeLevel);
+			sendPacket(CPacket() << (char)LEVELNAME << unstickmeLevel);
 			if (!sendLevel(unstickmeLevel, x, y, 0))
 				deleteMe = true;
 		}
