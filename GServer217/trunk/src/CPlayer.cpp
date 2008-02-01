@@ -1200,6 +1200,8 @@ bool CPlayer::loadAccount()
 
 bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 {
+	if ( type == CLIENTRC ) return false;
+
 	CPacket packet;
 	CString newLevel = pLevel;
 	if(!pLevel.length())
@@ -1356,12 +1358,12 @@ void CPlayer::leaveLevel()
 	if (level == NOLEVEL)
 		return;
 
-	// Notify the new level leader.
-	if (level->players[0] == this && level->players.count()>1)
-		((CPlayer*)level->players[1])->sendPacket(CPacket() << (char)ISLEADER);
-
-	// Tell everyone the player left.
+	// Leave the level.
 	level->players.remove(this);
+	if ( level->players.count() > 0 )
+		((CPlayer*)level->players[0])->sendPacket(CPacket() << (char)ISLEADER);
+
+	// Tell everyone I left.
 	otherProps << (char)OTHERPLPROPS << (short)id << (char)50 << (char)0;
 	for (int i = 0; i < level->players.count(); i++)
 	{
