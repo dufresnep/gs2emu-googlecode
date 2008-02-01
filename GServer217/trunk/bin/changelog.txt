@@ -26,6 +26,10 @@ Additions:
   open the first directory in your folder rights.
 
 Fixes:
+- Fixed player heart formatting in the player profile menu.  Instead of
+  showing 3.00, it will now show 3.  Instead of 2.50, it now shows 2.5.
+- If the player attempts to log into a non-existent level, they will now
+  be sent correctly to the unstick me level.
 - Chatting doesn't reset the unstick me timer anymore.
 - Logging in to a non-existent level should now properly send the player to
   the unstickme level.

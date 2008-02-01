@@ -496,9 +496,18 @@ void CPlayer::sendAccount()
 
 		if (!sendLevel(levelName, x, y, 0))
 		{
-			sendPacket(CPacket() << (char)PLAYERWARPED << getProp(PLAYERX) << getProp(PLAYERY) << unstickmeLevel);
+			sendPacket(CPacket() << (char)LEVELFAILED);
+
+			// Construct and send special warp packet.
+			CPacket warpPacket;
+			warpPacket << (char)PLAYERWARPED;
+			warpPacket.writeByte1( (char)(unstickmeX * 2) );
+			warpPacket.writeByte1( (char)(unstickmeY * 2) );
+			warpPacket << unstickmeLevel;
+			sendPacket(warpPacket);
+
 			sendPacket(CPacket() << (char)LEVELNAME << unstickmeLevel);
-			if (!sendLevel(unstickmeLevel, x, y, 0))
+			if (!sendLevel(unstickmeLevel, unstickmeX, unstickmeY, 0))
 				deleteMe = true;
 		}
 

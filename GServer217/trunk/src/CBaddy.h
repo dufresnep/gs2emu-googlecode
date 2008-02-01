@@ -14,31 +14,31 @@ extern bool baddyPropsReinit[];
 #define baddypropcount 10
 // Baddy properties types
 enum {
-  BADDYID,	  //  0
-  BADDYX,	   //  1
-  BADDYY,	   //  2
-  BADDYTYPE,	//  3
-  BADDYGIF,	 //  4
-  BADDYMODE,	//  5
-  BADDYANISTEP, //  6
-  BADDYDIR,	 //  7
-  BADDYVERSE1,  //  8
-  BADDYVERSE2,  //  9
-  BADDYVERSE3   // 10
+	BADDYID,	  //  0
+	BADDYX,	   //  1
+	BADDYY,	   //  2
+	BADDYTYPE,	//  3
+	BADDYGIF,	 //  4
+	BADDYMODE,	//  5
+	BADDYANISTEP, //  6
+	BADDYDIR,	 //  7
+	BADDYVERSE1,  //  8
+	BADDYVERSE2,  //  9
+	BADDYVERSE3   // 10
 };
 
 // Baddy modes
 enum {
-  WALK,		// 0
-  LOOK,		// 1
-  HUNT,		// 2
-  HURTED,	  // 3
-  BUMPED,	  // 4
-  DIE,		 // 5
-  SWAMPSHOT,   // 6
-  HAREJUMP,	// 7
-  OCTOSHOT,	// 8
-  DEAD		 // 9
+	WALK,		// 0
+	LOOK,		// 1
+	HUNT,		// 2
+	HURTED,	  // 3
+	BUMPED,	  // 4
+	DIE,		 // 5
+	SWAMPSHOT,   // 6
+	HAREJUMP,	// 7
+	OCTOSHOT,	// 8
+	DEAD		 // 9
 };
 
 class CBaddy

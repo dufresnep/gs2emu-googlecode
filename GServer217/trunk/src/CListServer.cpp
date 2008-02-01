@@ -211,7 +211,15 @@ void ListServer_Main()
 					else if (a[1] == "playerdeaths")
 						n = toString(player2->deaths);
 					else if (a[1] == "playerfullhearts")
-						n = toString(player2->maxPower);
+					{
+						if ( (float)(int)player2->maxPower == (float)player2->maxPower )
+							n = toString((int)player2->maxPower);
+						else
+						{
+							n = toString(player2->maxPower);
+							n = n.copy( 0, n.length() - 1 );
+						}
+					}
 					else if (a[1] == "playerrating")
 						n = toString(player2->rating);
 					else if (a[1] == "playerap")
@@ -223,7 +231,15 @@ void ListServer_Main()
 					else if (a[1] == "canspin")
 						n = (player2->status & 64 ? "true" : "false");
 					else if (a[1] == "playerhearts")
-						n = toString(player2->power);
+					{
+						if ( (float)(int)player2->power == (float)player2->power )
+							n = toString((int)player2->power);
+						else
+						{
+							n = toString(player2->power);
+							n = n.copy( 0, n.length() - 1 );
+						}
+					}
 					else if (a[1] == "playerdarts")
 						n = toString(player2->darts);
 					else if (a[1] == "playerbombs")
