@@ -680,7 +680,7 @@ void CLevel::updateLevel(CString& pFileName)
 	for(int i = 0; i < playerTemp.count(); i++)
 	{
 		CPlayer* player = (CPlayer*)playerTemp[i];
-		for(int ii = 0; ii < player->enteredLevels.count(); ii++)
+		for(int ii = player->enteredLevels.count() - 1; ii >= 0; ii--)
 		{
 			CEnteredLevel* entered = (CEnteredLevel*)player->enteredLevels[ii];
 			if(entered->level == level)
@@ -711,7 +711,7 @@ void CLevel::reset()
 				(char)NPCGIF << (char)0 << (char)ACTIONSCRIPT << (short)0 <<
 				(char)VISFLAGS << (char)0 << (char)BLOCKFLAGS << (char)0 <<
 				(char)NPCMESSAGE << (char)0 );
-			//player->sendPacket(CPacket() << (char)SDELNPC << (int)npc->id);
+			player->sendPacket(CPacket() << (char)SDELNPC << (int)npc->id);
 		}
 		delete npc;
 	}

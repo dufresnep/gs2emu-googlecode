@@ -246,12 +246,7 @@ CPlayer::~CPlayer()
 	delete playerSock;
 
 	//remove me from level
-	if (level != NOLEVEL)
-	{
-		if (level->players.count() > 1 && level->players[0] == this)
-			((CPlayer*)level->players[1])->sendPacket(CPacket() << (char)ISLEADER);
-		level->players.remove(this);
-	}
+	leaveLevel();
 
 	//free entered levels
 	for (int i = 0; i < enteredLevels.count(); i++)
@@ -420,7 +415,7 @@ void CPlayer::processLogin(CPacket& pPacket)
 
 void CPlayer::sendAccount()
 {
-	CPacket packet;
+	//CPacket packet;
 	if (!loadAccount())  //Do login check
 	{
 		errorOut("rclog.txt", CString() << accountName << " is not allowed on server");
@@ -477,15 +472,16 @@ void CPlayer::sendAccount()
 			statusl << "\"" << statusList[i] << "\",";
 		sendPacket(statusl);
 
-		packet << (char)SPLAYERPROPS;
+		CPacket loginProps;
+		loginProps << (char)SPLAYERPROPS;
 		for (int i = 0; i < propscount; i++)
 		{
 			if (sendInit[i])
-				packet << (char)i << getProp(i);
+				loginProps << (char)i << getProp(i);
 		}
+		sendPacket(loginProps);
 
-		packet << (char)SRPGWINDOW << "\"Welcome to " << listServerFields[0] << "\",\"Graal Reborn - Coded by 39ster, Agret, and Joey\"";
-		sendPacket(packet);
+		sendPacket( CPacket() << (char)SRPGWINDOW << "\"Welcome to " << listServerFields[0] << "\",\"Graal Reborn - Coded by 39ster, Agret, and Joey\"" );
 	}
 
 	if (type == CLIENTPLAYER)
@@ -1233,8 +1229,8 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 			packet.writeBytes((char*)level->tiles, 64*64*2);
 			sendPacket(packet);
 		}
-
 		compressAndSend();
+
 		//send links
 		for (int i = 0; i < level->links.count(); i ++)
 		{
@@ -1246,7 +1242,6 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 			sendPacket(CPacket() << (char)LEVELSIGN << level->signs[i]);
 
 		sendPacket(CPacket() << (char)LEVELMODTIME << (long long)level->modTime);
-		enteredLevels.add(new CEnteredLevel(level, getTime()));
 	}
 
 	//Send board changes
@@ -1291,17 +1286,25 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	//send npcs
 	for (int i = 0; i < level->npcs.count(); i++)
 	{
-		// Attempt to fix some npc props issues.
-		time_t mtime = time;
-		if ( level->players.count() == 1 ) mtime = 0;
-
 		CPacket npcProps;
 		CNpc* npc = (CNpc*)level->npcs[i];
-		npcProps << (char)SNPCPROPS << (int)npc->id << npc->getPropertyList(mtime);
+		npcProps << (char)SNPCPROPS << (int)npc->id << npc->getPropertyList(time);
 		if (npcProps.length() > 3)
 			sendPacket(npcProps);
 	}
 
+	// Remove the player from the enteredLevels thingy.
+	for (int i = enteredLevels.count() - 1; i >= 0; i--)
+	{
+		CEnteredLevel* lvl = (CEnteredLevel*)enteredLevels[i];
+		if ( lvl->level == level )
+		{
+			delete lvl;
+			enteredLevels.remove(i);
+		}
+	}
+
+	// If you are the only person in the level, send the ISLEADER packet.
 	if (level->players.count() == 1)
 		sendPacket(CPacket() << (char)ISLEADER);
 
@@ -1323,7 +1326,6 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 		if (forwardLocal[i])
 			packet << (char)i << getProp(i);
 	}
-
 
 	//send props
 	for (int i = 0; i < level->players.count(); i++)
@@ -1354,9 +1356,11 @@ void CPlayer::leaveLevel()
 	if (level == NOLEVEL)
 		return;
 
+	// Notify the new level leader.
 	if (level->players[0] == this && level->players.count()>1)
 		((CPlayer*)level->players[1])->sendPacket(CPacket() << (char)ISLEADER);
 
+	// Tell everyone the player left.
 	level->players.remove(this);
 	otherProps << (char)OTHERPLPROPS << (short)id << (char)50 << (char)0;
 	for (int i = 0; i < level->players.count(); i++)
@@ -1366,16 +1370,12 @@ void CPlayer::leaveLevel()
 		sendPacket(CPacket() << (char)OTHERPLPROPS << (short)other->id << (char)50 << (char)0);
 	}
 
-	for (int i = 0; i < enteredLevels.count(); i++)
-	{
-		CEnteredLevel*l = (CEnteredLevel*)enteredLevels[i];
-		if (l->level == level)
-		{
-			l->time = getTime();
-			l->level = NOLEVEL;
-			break;
-		}
-	}
+	// Remember when the player last visited the level.
+	enteredLevels.add(new CEnteredLevel(level, getTime()));
+
+	// Sad hack to try to fix npcs.
+	if ( level->players.count() == 0 ) CLevel::updateLevel(level->fileName);
+
 	level = NOLEVEL;
 }
 
