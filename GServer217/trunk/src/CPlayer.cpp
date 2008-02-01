@@ -214,6 +214,9 @@ CPlayer::~CPlayer()
 {
 	if (id >= 0)
 	{
+		//remove me from level
+		leaveLevel();
+
 		//remove from playerlist
 		playerList.remove(this);
 		//make player id available
@@ -244,9 +247,6 @@ CPlayer::~CPlayer()
 	}
 	else newPlayers.remove(this);
 	delete playerSock;
-
-	//remove me from level
-	leaveLevel();
 
 	//free entered levels
 	for (int i = 0; i < enteredLevels.count(); i++)
