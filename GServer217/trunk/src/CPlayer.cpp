@@ -649,13 +649,13 @@ void CPlayer::parsePacket(CPacket& pPacket)
 //	if(messageId != BADDYPROPS && messageId != NPCPROPS && showConsolePackets)
 //		printf("NEW PACKET: %i: %s\n", messageId, packet.text()+1);
 
-	if (messageId >= 0 && messageId < clientpackages)
+	if ( messageId >= 0 && messageId < clientpackages )
 		(*this.*msgFuncs[messageId])(packet);
-	else if(messageId < 0)
+	else if ( messageId < 0 )
 	{
 		deleteMe = true;
-		errorOut(CString() << accountName << " sent an incorrect message id [" << toString(messageId) << "]\nPacket: " << pPacket.text() + 1 << "\n");
-		sendPacket(CPacket() << (char)DISMESSAGE << "You sent an incorrect packet");
+		errorOut( "rclog.txt", CString() << accountName << " sent an incorrect message id [" << toString(messageId) << "]\nPacket: " << pPacket.text() + 1 << "\n", true );
+		sendPacket( CPacket() << (char)DISMESSAGE << "You sent an incorrect packet" );
 		return;
 	}
 }
