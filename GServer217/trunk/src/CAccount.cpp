@@ -212,6 +212,7 @@ bool CAccount::meetsConditions( CString pAccount, CString conditions )
 	cond.load( conditions.text(), "," );
 
 	// Go through each line of the loaded file.
+	int conditionsMet = 0;
 	for (int i = 0; i < file.count(); i++)
 	{
 		int sep = file[i].find(' ');
@@ -239,9 +240,21 @@ bool CAccount::meetsConditions( CString pAccount, CString conditions )
 				// If we are in a section that was passed as a conditional,
 				// do a mask compare.  If it returns false, don't include this
 				// account in the search.
-				if ( val.match( cvalue.text() ) == false ) return false;
+				if ( val.match( cvalue.text() ) == false )
+				{
+					CBuffer cnameUp = cname.toUpper();
+					if ( !(cnameUp == "CHEST" || cnameUp == "WEAPON" ||
+						cnameUp == "FLAG" || cnameUp == "FOLDERRIGHT") )
+						return false;
+				}
+				else
+					conditionsMet++;
 			}
 		}
 	}
-	return true;
+	// Check if all the conditions were met.
+	if ( conditionsMet == cond.count() )
+		return true;
+
+	return false;
 }
