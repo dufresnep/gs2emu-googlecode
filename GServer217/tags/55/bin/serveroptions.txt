@@ -1,0 +1,54 @@
+# Server Options
+
+allowedglobalguilds = 
+aptime0 = 30
+aptime1 = 90
+aptime2 = 300
+aptime3 = 600
+aptime4 = 1200
+apsystem = true
+baddyrespawntime = 60
+bushitems = true
+clientsidepushpull = true
+defaultweapons = true
+disconnectifnotmoved = true
+dontaddserverflags = false
+dontchangekills = false
+dropitemsdead = true
+globalguilds = true
+heartlimit = 3
+horselifetime = 10
+jaillevels = police2.graal,police4.graal
+maps = newmainmap.txt
+noexplosions = false
+normaladminscanchangegralats = true
+playerlisticons = Online,Away,DND,Eating,Hiding,No PMs,RPing,Sparring,PKing
+profilevars = Kills:=playerkills,Deaths:=playerdeaths,Maxpower:=playerfullhearts,Rating:=playerrating,Alignment:=playerap,Gralat:=playerrupees,Swordpower:=playerswordpower,Spin Attack:=canspin
+setbodyallowed = true
+setheadallowed = true
+setshieldallowed = true
+setswordallowed = true
+shieldlimit = 3
+staff = (Manager),YOURACCOUNT
+staffguilds = Server,Manager,Owner,Admin,FAQ,LAT,NAT,GAT,GP,GP Chief,Bugs Admin,NPC Admin,Gani Team,GFX Admin,Events Team,Events Admin,Guild Admin
+staffhead = head25.png
+swordlimit = 3
+staffonly = false
+tilerespawn = 15
+unstickmelevel = onlinestartlocal.nw
+unstickmex = 30
+unstickmey = 30.5
+vasesdrop = true
+warptoforall = false
+ 
+# Private-Server Options (changestaffacct required)
+description = My Server
+language = English
+listport = 14900
+listip = listserver.graal.in
+maxplayers = 128
+myip = AUTO
+name = My Server
+serverport = 14802
+sharefolder = 
+showconsolepackets = false
