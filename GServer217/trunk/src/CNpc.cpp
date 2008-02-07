@@ -49,9 +49,9 @@ CNpc::~CNpc()
 CPacket CNpc::getPropertyList(time_t newTime)
 {
 	CPacket retVal;
-	for(int i =0; i <npcpropcount; i++)
+	for ( int i = 0; i < npcpropcount; i++ )
 	{
-		if(modTime[i] >= newTime && modTime[i]>0)
+		if ( modTime[i] >= newTime && modTime[i] > 0 )
 			retVal << (char)i << getProperty(i);
 	}
 	return retVal;
@@ -320,6 +320,7 @@ void CNpc::setProps(CPacket& pProps)
 	while(pProps.bytesLeft())
 	{
 		int index = pProps.readByte1();
+		CPacket oldProp = getProperty(index);
 		switch(index)
 		{
 			case NPCGIF:
@@ -586,8 +587,13 @@ void CNpc::setProps(CPacket& pProps)
 			return;
 		}
 		previousMessage = index;
+
+		// If a prop changed, adjust its mod time.
 		if(index >= 0 && index < npcpropcount)
-			modTime[index] = getTime();
+		{
+			if ( oldProp != getProperty(index) )
+				modTime[index] = getTime();
+		}
 	}
 	con_print( "\n" );
 }

@@ -649,14 +649,14 @@ void CPlayer::parsePacket(CPacket& pPacket)
 //	if(messageId != BADDYPROPS && messageId != NPCPROPS && showConsolePackets)
 //		printf("NEW PACKET: %i: %s\n", messageId, packet.text()+1);
 
-	if (messageId >= 0 &&  messageId < clientpackages)
+	if (messageId >= 0 && messageId < clientpackages)
 		(*this.*msgFuncs[messageId])(packet);
 	else if(messageId < 0)
 	{
-		//deleteMe = true;
-		//errorOut(CString() << accountName << " sent an incorrect message id [" << toString(messageId) << "]\nPacket: " << pPacket.text() + 1 << "\n");
-		//sendPacket(CPacket() << (char)DISMESSAGE << "You sent an incorrect packet");
-		//return;
+		deleteMe = true;
+		errorOut(CString() << accountName << " sent an incorrect message id [" << toString(messageId) << "]\nPacket: " << pPacket.text() + 1 << "\n");
+		sendPacket(CPacket() << (char)DISMESSAGE << "You sent an incorrect packet");
+		return;
 	}
 }
 
@@ -2804,10 +2804,9 @@ void CPlayer::msgDELNPC(CPacket& pPacket)
 		// SDELNPC doesn't work, so this terrible hack will do.
 		((CPlayer*)playerList[i])->sendPacket(
 			CPacket() << (char)SNPCPROPS << (int)npc->id <<
-			(char)NPCGIF << (char)0 << (char)ACTIONSCRIPT << (short)0 <<
-			(char)VISFLAGS << (char)0 << (char)BLOCKFLAGS << (char)0 <<
-			(char)NPCMESSAGE << (char)0 );
-		//((CPlayer*)playerList[i])->sendPacket(CPacket() << (char)SDELNPC << (int)npc->id);
+			(char)ACTIONSCRIPT << (short)0 << (char)VISFLAGS << (char)0 <<
+			(char)BLOCKFLAGS << (char)0 << (char)NPCMESSAGE << (char)0 );
+		((CPlayer*)playerList[i])->sendPacket(CPacket() << (char)SDELNPC << (int)npc->id);
 	}
 	level->npcs.remove(npc);
 	delete npc;

@@ -708,9 +708,8 @@ void CLevel::reset()
 
 			// SDELNPC doesn't work, so this terrible hack will do.
 			player->sendPacket( CPacket() << (char)SNPCPROPS << (int)npc->id <<
-				(char)NPCGIF << (char)0 << (char)ACTIONSCRIPT << (short)0 <<
-				(char)VISFLAGS << (char)0 << (char)BLOCKFLAGS << (char)0 <<
-				(char)NPCMESSAGE << (char)0 );
+				(char)ACTIONSCRIPT << (short)0 << (char)VISFLAGS << (char)0 <<
+				(char)BLOCKFLAGS << (char)0 << (char)NPCMESSAGE << (char)0 );
 			player->sendPacket(CPacket() << (char)SDELNPC << (int)npc->id);
 		}
 		delete npc;

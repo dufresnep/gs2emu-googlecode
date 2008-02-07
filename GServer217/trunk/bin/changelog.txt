@@ -26,7 +26,13 @@ Additions:
   open the first directory in your folder rights.
 
 Fixes:
-- Fixed NPC props for real this time.  Possibly.
+- Some more work on NPC props.  The gserver should now correctly save NPC
+  prop changes and correctly save the time the player left the level.  This
+  results in NPCs that work better and faster level load times; however, the
+  "created" flag is still broken so you should still be working around that.
+  Make use of the isleader flag in your "playerenters" code section work-
+  arounds for changing certain npc props (like the NPC gani) for maximum
+  compatibility.
 - Fixed client login props.  I don't know if there will be any noticeable
   difference or not, but it is fixed.
 - Fixed player heart formatting in the player profile menu.  Instead of
@@ -43,3 +49,4 @@ Fixes:
   we aren't using the Revision nomenclature anymore.
 - Fixed an issue where attempting to log in twice on the same account
   would permanently add 1 to the player count.
+- Re-enabled kicking for bad packets.
