@@ -651,8 +651,8 @@ void CPlayer::parsePacket(CPacket& pPacket)
 
 	if ( messageId >= 0 && messageId < clientpackages )
 	{
-		if ( CPlayer::msgFuncs[messageId] != 0 )
-			(*CPlayer::msgFuncs[messageId])(packet);
+		if ( msgFuncs[messageId] != 0 )
+			(*this.*msgFuncs[messageId])(packet);
 	}
 	else if ( messageId < 0 )
 	{
