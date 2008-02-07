@@ -650,7 +650,10 @@ void CPlayer::parsePacket(CPacket& pPacket)
 //		printf("NEW PACKET: %i: %s\n", messageId, packet.text()+1);
 
 	if ( messageId >= 0 && messageId < clientpackages )
-		(*this.*msgFuncs[messageId])(packet);
+	{
+		if ( CPlayer::msgFuncs[messageId] != 0 )
+			(*CPlayer::msgFuncs[messageId])(packet);
+	}
 	else if ( messageId < 0 )
 	{
 		deleteMe = true;

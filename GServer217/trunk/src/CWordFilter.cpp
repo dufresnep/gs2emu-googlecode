@@ -9,11 +9,13 @@ bool CWordFilter::apply(CPlayer *pPlayer, CBuffer &pBuffer, int pCheck)
 	CStringList found;
 	int pos = 0, wc = 0;
 
+	if ( pPlayer == 0 ) return false;
+
 	for (int i = 0; i < WordList.count(); i++)
 	{
 		WordMatch *word = (WordMatch *)WordList[i];
-		if (!word->check[pCheck])
-			continue;
+		if ( word == 0 ) continue;
+		if (!word->check[pCheck]) continue;
 
 		for (int j = 0; j < pBuffer.length(); j++)
 		{
