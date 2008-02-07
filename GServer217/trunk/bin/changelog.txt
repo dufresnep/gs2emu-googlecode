@@ -18,7 +18,9 @@ Additions:
   searches the account .txt files for matches.  "swordp=2" will search
   for everybody who's "swordp" value in their account .txt file is equal
   to 2.  "level=rha_*,ap=51" will search for the level value that starts
-  with "rha_" and whose ap value is 51.  View the accounts .txt file for
+  with "rha_" and whose ap value is 51.  "ap=51,flag=System_Hearts=1"
+  will search for players whose ap is 51 and who have the flag
+  "System_Hearts=1" in their account.  View the accounts .txt file for
   all the values.
 - RCs who have the "change rights" ability can no longer give rights
   that they themselves do not have.
