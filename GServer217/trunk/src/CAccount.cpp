@@ -252,8 +252,9 @@ bool CAccount::meetsConditions( CString pAccount, CString conditions )
 			}
 		}
 	}
+
 	// Check if all the conditions were met.
-	if ( conditionsMet == cond.count() )
+	if ( conditionsMet >= cond.count() )
 		return true;
 
 	return false;
