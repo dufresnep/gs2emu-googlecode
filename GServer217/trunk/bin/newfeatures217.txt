@@ -1,3 +1,151 @@
+--------------------------------------------
+New features/bug fixes in v2.171 build 56
+--------------------------------------------
+
+Maintenance:
+- Fixed the tiling errors in onlinestartlocal.nw
+
+Additions:
+
+
+Fixes:
+
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 55
+--------------------------------------------
+
+Maintenance:
+- Re-did all of the RC messages to be less Engrishy and more consistent.
+- Added a new function: CBuffer::findIn().  It basically calls strstr()
+  on the data in the CBuffer class.  Could be useful for GServer
+  modders.
+
+Additions:
+- Players who have the "Change Staff Accounts" right can now evade local
+  server bans.  Remember to remove that right from any admin you ban.
+- The "Get Accounts List" dialog in RC is now fully implemented again.
+  Both the "Account name description" and the "Conditions" field accept
+  wildcard characters.  The wildcard characters %, *, and ? are
+  supported, with % acting the same as *.  The "Conditions" field
+  searches the account .txt files for matches.  "swordp=2" will search
+  for everybody who's "swordp" value in their account .txt file is equal
+  to 2.  "level=rha_*,ap=51" will search for the level value that starts
+  with "rha_" and whose ap value is 51.  "ap=51,flag=System_Hearts=1"
+  will search for players whose ap is 51 and who have the flag
+  "System_Hearts=1" in their account.  View the accounts .txt file for
+  all the values.
+- RCs who have the "change rights" ability can no longer give rights
+  that they themselves do not have.
+- When opening the FileBrowser on RC, it should now properly read the
+  LastFolder line in your account and open that directory.  It used to
+  just open the first directory in your folder rights.
+
+Fixes:
+- Some more work on NPC props.  The gserver should now correctly save
+  NPC prop changes and correctly save the time the player left the
+  level.  This results in NPCs that work better and faster level load
+  times; however, the "created" flag is still broken so you should still
+  be working around that.  Make use of the isleader flag in your
+  "playerenters" code section workarounds for changing certain npc props
+  (like the NPC gani) for maximum compatibility.
+- Fixed client login props.  I don't know if there will be any
+  noticeable difference or not, but it is fixed.
+- Fixed player heart formatting in the player profile menu.  Instead of
+  showing 3.00, it will now show 3.  Instead of 2.50, it now shows 2.5.
+- If the player attempts to log into a non-existent level, they will now
+  be sent correctly to the unstick me level.
+- Chatting doesn't reset the unstick me timer anymore.
+- Logging in to a non-existent level should now properly send the player
+  to the unstick me level.
+- When a player logs into RC, the "Players" field in RC is now correctly
+  incremented, RC announces to the player that they logged in, and the
+  player now correctly appears in the Player List.
+- Modified the GServer init message to say Build instead of Revision
+  since we aren't using the Revision nomenclature anymore.
+- Fixed an issue where attempting to log in twice on the same account
+  would permanently add 1 to the player count.
+- Re-enabled kicking for bad packets.
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 54
+--------------------------------------------
+
+Maintenance:
+- Replaced all 4-character spaces with actual tabs in all the source files.
+- Improved Visual Studio compatibility by fixing up some headers and
+  removing some includes.
+
+Additions:
+- Push-pull blocks can now be clientside.  The serveroptions.txt variable
+  clientsidepushpull turns this behavior on and off.  It is a boolean
+  value, so adding clientsidepushpull = false to your serveroptions.txt
+  will allow all players to see push-pull blocks move.
+- NPCs now send gani attributes 6-9.  The client doesn't send props 10-30
+  so it is impossible to use those, for now.
+
+Fixes:
+- Fixed the 'destroy' command not destroying NPCs.  Don't ask how.
+  It isn't pretty.
+- Changed it so only the people who have the "Change staff accounts" right
+  are able to edit the default account.
+- Fixed NPC props.  Sorta.  Shields don't disappear and hopefully other
+  wonky stuff won't happen.  We'll see.
+- The join command will now work in .graal levels and in putnpc npc code.
+- Some other stuff that may or may not fix current/future bugs.  D:
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 53
+--------------------------------------------
+
+Maintenance:
+- Fixed up Linux compile problems and fixed some source issues to improve
+  compatibility.
+- Potentially improved stability.
+- Some formatting and default values were assaulted in an effort to keep
+  myself sane.
+
+Additions:
+- Removed newaccount.ini.  Instead, defaultaccount.txt inside the accounts
+  folder is used to specify the default account attributes of new players.
+  Because of this, you can now change the default account attributes a player
+  starts with through RC (flags, weapons, start level, etc.)  Just modify the
+  account named "defaultaccount" through the accounts list.
+- Added new server option, "defaultweapons".  It is a boolean value that
+  defaults to "true".  If false, it will prevent the client from obtaining any
+  of the default weapons like bow, fireblast, and nukeshot.
+
+Fixes:
+- Thanks to the pure oozing awesomeness of Joey, who is way more awesome than
+  myself (who spent countless hours only to fail), the problem where the Bomb
+  npc loads no matter what was solved in a matter of minutes.  D:
+- Changed "horsetime" to "horselifetime" in the settings loading code to
+  correctly reflect the name in serveroptions.txt and fixed a crash that could
+  result from it.
+- Fixed the loading and saving of NPC weapons with no image to weapons.txt.
+  This fixes problems where hidden system npcs with no image were not being
+  reloaded properly when the gserver was restarted.
+- When a client grabs an updated weapon while an old version exists locally,
+  they will correctly receive the new version.
+- Updating the server flags through RC should now send that change to all
+  clients.
+- Fixed offline attribute editing by RC's.  It now won't erase the player's
+  weapon list.
+- Altering a player's flags and weapons through RC now properly sends the
+  changes to the player.
+- When you log into RC, it now uses the specified nickname instead of your
+  account name.
+- Fixed RC player folder rights saving.  It was previously limited to 255
+  characters worth of directories.
+- Fixed a bug where RC would freeze if you tried to download a file that ended
+  in a newline character.
+- Possibly fixed a bug where you could randomly disconnect while uploading
+  large files through RC.
+- Began work on improving support for the 'join' command.  It now dumps the
+  joined code to the end of the file and leaves a semi-colon in place of the
+  join command.  It also won't be executed from the inside of a multi-line
+  comment anymore.
+
 -------------------------------------------
 New features/bug fixes in v2.17 revision 52
 -------------------------------------------
