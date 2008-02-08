@@ -266,7 +266,7 @@ void CLevel::saveNpcs()
 	return;
 
 	CStringList npcData;
-	printf("SAVING NPCS\n");
+	//printf("SAVING NPCS\n");
 	for(int i = 0; i < npcs.count(); i++)
 	{
 		CNpc* npc = (CNpc*)npcs[i];
@@ -304,24 +304,24 @@ bool CLevel::loadGraal(CString& pFileName)
 	bool v1 = (version == "GR-V1.01");
 	bool v2 = (version == "GR-V1.02");
 	bool v3 = (version == "GR-V1.03");
-	printf("Loading map %s\n", pFileName.text());
-	printf("Loading tiles..\n");
+	//printf("Loading map %s\n", pFileName.text());
+	//printf("Loading tiles..\n");
 	loadTiles(levelData, version);
-	printf("Loading links..\n");
+	//printf("Loading links..\n");
 	loadLinks(levelData);
-	printf("Loading baddies..\n");
+	//printf("Loading baddies..\n");
 	loadBaddies(levelData);
 	if (v0 || v1 || v2 || v3)
 	{
-		printf("Loading npcs..\n");
+		//printf("Loading npcs..\n");
 		loadNpcs(levelData);
 	}
 	if (v1 || v2 || v3)
 	{
-		printf("Loading chests..\n");
+		//printf("Loading chests..\n");
 		loadChests(levelData);
 	}
-	printf("Loading signs..\n");
+	//printf("Loading signs..\n");
 	loadSigns(levelData);
 	return true;
 }
@@ -562,7 +562,7 @@ CLevel* CLevel::openMap(CString& pFileName)
 	}
 
 	levelList.add(level);
-	printf("MAP COUNT: %i\n", levelList.count());
+	if ( detailedconsole ) printf("[%s] MAP COUNT: %i\n", getTimeStr(1).text(), levelList.count());
 	return level;
 }
 

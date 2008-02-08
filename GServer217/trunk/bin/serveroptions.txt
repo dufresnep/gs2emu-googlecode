@@ -43,6 +43,7 @@ warptoforall = false
  
 # Private-Server Options (changestaffacct required)
 description = My Server
+detailedconsole = false
 language = English
 listport = 14900
 listip = listserver.graal.in

@@ -3,10 +3,16 @@ New features/bug fixes in v2.171 build 56
 --------------------------------------------
 
 Maintenance:
-- Fixed the tiling errors in onlinestartlocal.nw
+- Fixed the tiling errors in onlinestartlocal.nw.
+- Re-worked most of the console messages.
+- The log files now display everything on one line.
 
 Additions:
-
+- Added the new serveroptions.txt option "detailedconsole".  It is a
+  boolean value that defaults to false.  If true, it will display the
+  old detailed console messages.
+- The GServer now prints less console messages and in a less detailed
+  format.
 
 Fixes:
 

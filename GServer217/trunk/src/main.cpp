@@ -30,7 +30,7 @@
 #endif
 
 bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, hasShutdown = false, lsConnected = false, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, staffOnly, vasesDrop, warptoforall, defaultweapons;
-bool clientsidePushPull;
+bool clientsidePushPull, detailedconsole;
 const char* __admin[]   = {"description", "listport", "listip", "language", "maxplayers", "myip", "name", "serverport", "sharefolder", "showconsolepackets", "url", "worldname"};
 const char* __colours[] = {"white", "yellow", "orange", "pink", "red", "darkred", "lightgreen", "green", "darkgreen", "lightblue", "blue", "darkblue", "brown", "cynober", "purple", "darkpurple", "lightgray", "gray", "black", "transparent"};
 const char* __cloths[]  = {"setskin", "setcoat", "setsleeve", "setshoe", "setbelt", "setsleeves", "setshoes"};
@@ -83,7 +83,7 @@ int main()
 	serverSock.setSync(false);
 
 	/* Sub-Directory Caching */
-	printf("Caching sub dirs\n");
+	printf("[%s] Caching sub dirs\n",getTimeStr(1).text());
 	getSubDirs(dataDir);
 	if(shareFolder.length()>1)
 		getSubDirs(shareFolder.text());
@@ -269,7 +269,7 @@ void acceptNewPlayers(CSocket& pSocket)
 	newSock->setSync(false);
 	newSock->setNagle(false);
 	newPlayers.add(new CPlayer(newSock));
-	printf("Connection accepted...awaiting login details\n");
+	printf( "[%s] Connection accepted, awaiting login details.\n", getTimeStr(1).text() );
 }
 
 bool updateFile(char *pFile)
@@ -348,6 +348,7 @@ bool loadSettings(char* pFile)
 	cheatwindowsban = CHECK_BOOL(findKey("cheatwindowsban", "false"));
 	clientsidePushPull = CHECK_BOOL(findKey("clientsidepushpull", "true"));
 	defaultweapons = CHECK_BOOL(findKey("defaultweapons", "true"));
+	detailedconsole = CHECK_BOOL(findKey("detailedconsole", "false"));
 	dontaddserverflags = CHECK_BOOL(findKey("dontaddserverflags", "false"));
 	dontchangekills = CHECK_BOOL(findKey("dontchangekills", "false"));
 	dropItemsDead = CHECK_BOOL(findKey("dropitemsdead", "true"));
@@ -724,7 +725,7 @@ void errorOut(char *pFile, CBuffer pError, bool pWrite)
 	char buffer[60] = "logs/";
 	strcpy(buffer+5, pFile);
 	FILE *file = fopen(buffer, "a");
-	fprintf(file, "Time: %s\r\n%s\r\n", getTimeStr(0).text(), pError.text());
+	fprintf(file, "[%s] %s\r\n", getTimeStr(0).text(), pError.text());
 	fclose(file);
 }
 

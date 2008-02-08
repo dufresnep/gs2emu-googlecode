@@ -60,14 +60,14 @@ void ListServer_Main()
 		{
 			case GSVOLD:
 			{
-				printf("*** SERVER VERSION CHECK ***\nYou're running an old version of the GServer.\nYou're running GServer Revision %i while GServer Revision %i is the latest.\n*** SERVER VERSION CHECK ***\n", GSERVER_BUILD, line.readByte2());
+				printf("[%s] SERVER VERSION CHECK - Current: %i, Latest: %i - Old version, please upgrade.\n", getTimeStr(1).text(), GSERVER_BUILD, line.readByte2());
 				break;
 			}
 
 			case GSVCURRENT:
 			{
-				 printf("*** SERVER VERSION CHECK ***\nYou're running an up-to-date server. :)\n*** SERVER VERSION CHECK ***\n");
-				 break;
+				printf("[%s] SERVER VERSION CHECK - Current: %i, Latest: %i - You are up to date :)\n", getTimeStr(1).text(), GSERVER_BUILD, GSERVER_BUILD);
+				break;
 			}
 
 			case GSVACCOUNT:
@@ -273,11 +273,11 @@ void ListServer_Main()
 			}
 
 			case GSVMSG:
-				printf("%s\n", line.readString(""));
+				printf("[%s] %s\n", getTimeStr(1).text(), line.readString(""));
 			break;
 
 			default:
-				printf("Invalid List Server Message: %i\n", messageId);
+				printf("[%s] Invalid List Server Message: %i\n", getTimeStr(1).text(), messageId);
 			break;
 		}
 	}

@@ -378,12 +378,17 @@ void CPlayer::processLogin(CPacket& pPacket)
 	accountName = pPacket.readChars(pPacket.readByte1());
 	CString password = pPacket.readChars(pPacket.readByte1());
 
-	printf("Account login details:\n"
-		   "Key: %i\n"
-		   "Version: %s\n"
-		   "Type: %i\n"
-		   "Account: %s\n"
-		   "Password: ***\n", key, version.text(), type, accountName.text());
+	if ( detailedconsole )
+	{
+		printf("[%s] Account login details:\n"
+			"Key: %i\n"
+			"Version: %s\n"
+			"Type: %i\n"
+			"Account: %s\n"
+			"Password: ***\n", getTimeStr(1).text(), key, version.text(), type, accountName.text());
+	}
+	else
+		printf( "[%s] New %s: %s\n", getTimeStr(1).text(), (type == CLIENTPLAYER) ? "player" : "RC", accountName.text() );
 
 	if (playerList.count() >= maxPlayers)
 	{
