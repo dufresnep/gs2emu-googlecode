@@ -214,7 +214,7 @@ CPacket CNpc::getProperty(int pId)
 		break;
 
 		case NPCCOLORS:
-			retVal << (char)colors[0] << (char)colors[1] << (char)colors[2] << (char)colors[3] << (char)colors[4] << (char)colors[5];
+			retVal << (char)colors[0] << (char)colors[1] << (char)colors[2] << (char)colors[3] << (char)colors[4];// << (char)colors[5];
 			con_print( "NPCCOLORS\n" );
 		break;
 

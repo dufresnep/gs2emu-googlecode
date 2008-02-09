@@ -15,6 +15,7 @@ Additions:
   format.
 
 Fixes:
+- More NPC props fixes.
 
 
 --------------------------------------------
@@ -73,6 +74,7 @@ Fixes:
   would permanently add 1 to the player count.
 - Re-enabled kicking for bad packets.
 
+
 --------------------------------------------
 New features/bug fixes in v2.171 build 54
 --------------------------------------------
@@ -99,6 +101,7 @@ Fixes:
   wonky stuff won't happen.  We'll see.
 - The join command will now work in .graal levels and in putnpc npc code.
 - Some other stuff that may or may not fix current/future bugs.  D:
+
 
 --------------------------------------------
 New features/bug fixes in v2.171 build 53
@@ -152,6 +155,7 @@ Fixes:
   join command.  It also won't be executed from the inside of a multi-line
   comment anymore.
 
+
 -------------------------------------------
 New features/bug fixes in v2.17 revision 52
 -------------------------------------------
@@ -182,6 +186,7 @@ RC Fixes:
 - Server Option: maxnomovement should properly work now when disconnecting from no-movement.
 - Set own attributes, and set own attributes properly work now.
 - Viewing files in wordpad should properly show new lines now.
+
 
 -------------------------------------------
 New features/bug fixes in v2.17 revision 51
@@ -219,6 +224,7 @@ RC Fixes:
 - Status Fixed -- when opening/closing playerlist it will now correctly show your status.
 - Totally redid the RC Commands -- use /help.
 
+
 -------------------------------------------
 New features/bug fixes in v2.17 revision 50
 -------------------------------------------
@@ -235,6 +241,7 @@ Fixes:
   Guilds when using /addguild Guild_Name
 - Setstrings will delete properly now.
 
+
 -------------------------------------------
 New features/bug fixes in v2.17 revision 43
 -------------------------------------------
@@ -247,6 +254,7 @@ Additions:
   serverlist which will change your forum
   name (not account)
 
+
 -------------------------------------------
 New features/bug fixes in v2.17 revision 31
 -------------------------------------------
@@ -256,6 +264,7 @@ Fixes:
   now works (and 100% at that)
 - Chest items now properly clip to the max
   when you open them.
+
 
 -------------------------------------------
 New features/bug fixes in v2.17 revision 30
@@ -282,6 +291,8 @@ Fixes:
   should be fixed now. =)
 - RemoteControl attribute-editing should no
   longer crash.
+
+
 -------------------------------------------
 New features/bug fixes in v2.17 revision 29
 -------------------------------------------
@@ -335,6 +346,8 @@ Fixes:
   front of your nickname or have no name. If
   attempted, your nickname will be set to
   'unknown'.
+
+
 -------------------------------------------
 New features/bug fixes in v2.17 revision 28
 -------------------------------------------
@@ -343,6 +356,7 @@ Fixes:
 - ap shouldn't go below 0 anymore. sorry
   about that.
 
+
 -------------------------------------------
 New features/bug fixes in v2.17 revision 27
 -------------------------------------------
@@ -350,6 +364,7 @@ New features/bug fixes in v2.17 revision 27
 Fixes:
  - Shield / Sword limit should now clip
    correctly, sorry about that.
+
 
 -------------------------------------------
 New features/bug fixes in v2.17 revision 26
@@ -394,6 +409,7 @@ Additions:
 Fixes:
 - When setting guilds, with the nickname being your account, a star is correctly placed in the front to indicate you're using your account (and to also move you to the top of the playerlist ;))
 - Levels shouldn't messup when tile[0,0] is placed on a straight line anymore. (entire line would be random tiles)
+
 
 -------------------------------------------
 New features/bug fixes in v2.17 revision 24
