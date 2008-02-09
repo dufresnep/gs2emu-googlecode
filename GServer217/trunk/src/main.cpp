@@ -269,7 +269,7 @@ void acceptNewPlayers(CSocket& pSocket)
 	newSock->setSync(false);
 	newSock->setNagle(false);
 	newPlayers.add(new CPlayer(newSock));
-	printf( "[%s] Connection accepted, awaiting login details.\n", getTimeStr(1).text() );
+	printf( "[%s] Incoming connection: [%s]\n", getTimeStr(1).text(), newSock->tcpIp() );
 }
 
 bool updateFile(char *pFile)

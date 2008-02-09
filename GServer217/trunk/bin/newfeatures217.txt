@@ -3,7 +3,7 @@ New features/bug fixes in v2.171 build 56
 --------------------------------------------
 
 Maintenance:
-- Fixed the tiling errors in onlinestartlocal.nw.
+- Fixed the tiling errors in the packaged onlinestartlocal.nw.
 - Re-worked most of the console messages.
 - The log files now display everything on one line.
 
