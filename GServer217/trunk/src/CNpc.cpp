@@ -581,7 +581,7 @@ void CNpc::setProps(CPacket& pProps)
 
 			default:
 				if ( detailedconsole )
-					printf("[%s] UNKNOWN NPC PROP: %i, Prev: %i, Value: %s\n", index, previousMessage, (pProps.text() + pProps.getRead()));
+					printf("[%s] UNKNOWN NPC PROP: %i, Prev: %i, Value: %s\n", getTimeStr(1).text(), index, previousMessage, (pProps.text() + pProps.getRead()));
 			return;
 		}
 		previousMessage = index;
