@@ -22,10 +22,12 @@ extern CLevel *NOLEVEL;
 extern CList newPlayers, playerList, playerIds, settingList, weaponList, npcList, npcIds, levelList;
 extern CString listServerFields[6], serverMessage, staffHead, unstickmeLevel, worldName, rev;
 extern CStringList adminNames, cheatwindows, clothCommands, colourNames, globalGuildList, jailLevels, mapNames, profileList, RCBans, RCMessage, RCHelpMessage, serverFlags, staffGuilds, staffList, statusList, subDirs;
+extern CStringList folderConfig;
 extern float unstickmeX, unstickmeY;
 extern int aptime[5], baddyRespawn, cheatwindowstime, gameTime, heartLimit, horseLife, maxNoMovement, maxPlayers, nwTime, serverPort, shieldLimit, swordLimit, tileRespawn;
 extern CWordFilter WordFilter;
 
+bool isValidFile(CBuffer& file, int type);
 bool isIpBanned(CString& pIp);
 bool loadSettings(char* pFile);
 bool loadWeapons(char* pFile);

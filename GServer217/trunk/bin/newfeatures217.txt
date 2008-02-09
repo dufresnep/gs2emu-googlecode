@@ -15,6 +15,11 @@ Additions:
   old detailed console messages.
 - The GServer now prints less console messages and in a less detailed
   format.
+- Folder Configuration is now implemented.  See the foldersconfig.txt
+  file for a list of default options.  The folder configuration is
+  mainly used to restrict files to certain directories, like restricting
+  head images to world/heads/*.  This will prevent players from being
+  able to do odd things like 'sethead pics1.png'.
 
 Fixes:
 - More NPC props fixes.

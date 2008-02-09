@@ -39,6 +39,7 @@ CList newPlayers, playerList, playerIds, settingList, weaponList, npcList, npcId
 CSocket responseSock, serverSock;
 CString listServerFields[6], listServerIp, serverMessage, shareFolder, staffHead, worldName, unstickmeLevel;
 CStringList adminNames, cheatwindows, clothCommands, colourNames, globalGuildList, jailLevels, mapNames, profileList, RCBans, RCMessage, RCHelpMessage, serverFlags, staffGuilds, staffList, statusList, subDirs;
+CStringList folderConfig;
 CWordFilter WordFilter;
 float unstickmeX, unstickmeY;
 int aptime[5], baddyRespawn, cheatwindowstime, gameTime = 1, heartLimit, horseLife, idleDisconnect, listServerPort, maxNoMovement, maxPlayers, nwTime, serverPort, serverTime = 0, shieldLimit, swordLimit, tileRespawn;
@@ -98,6 +99,7 @@ int main()
 	updateFile("rules.txt");
 	updateFile("serverflags.txt");
 	updateFile("servermessage.html");
+	updateFile("foldersconfig.txt");
 
 	/* Server Finished Loading */
 	printf("GServer 2 by 39ster\nSpecial thanks to Marlon, Agret, Pac300, 39ster and others for porting the \noriginal 1.39 gserver to 2.1\nServer listening on port: %i\nServer version: Build %s\n\n", serverPort, listServerFields[3].text());
@@ -278,33 +280,21 @@ bool updateFile(char *pFile)
 	CString file = pFile;
 
 	if (strcmp(ext, ".graal") == 0 || strcmp(ext, ".nw") == 0 || strcmp(ext, ".zelda") == 0)
-	{
 		CLevel::updateLevel(file);
-	}
 	else if (strcmp(pFile, "rchelp.txt") == 0)
-	{
 		RCHelpMessage.load(pFile);
-	}
 	else if (strcmp(pFile, "rcmessage.txt") == 0)
-	{
 		RCMessage.load(pFile);
-	}
 	else if (strcmp(pFile, "serverflags.txt") == 0)
-	{
 		serverFlags.load(pFile);
-	}
 	else if (strcmp(pFile, "servermessage.html") == 0)
-	{
 		loadServerMessage();
-	}
 	else if (strcmp(pFile, "rules.txt") == 0)
-	{
 		WordFilter.load("rules.txt");
-	}
+	else if ( strcmp(pFile, "foldersconfig.txt") == 0 )
+		folderConfig.load( "foldersconfig.txt" );
 	else
-	{
 		return false;
-	}
 
 	return true;
 }
@@ -658,6 +648,59 @@ CPlayer* findPlayerId(CString pAccountName, bool pOnly)
 	}
 
 	return (pOnly ? NULL : rcFound);
+}
+
+bool isValidFile(CBuffer& file, int type)
+{
+	for ( int i = 0; i < folderConfig.count(); ++i )
+	{
+		CString ftype( folderConfig[i].readString( " " ) );
+		CString fmask( folderConfig[i].readString( "" ) );
+		ftype.trim();
+		fmask.trim();
+
+		switch ( type )
+		{
+			case 11:	// HEADGIF
+				if ( ftype == "head" )
+					if ( file.match( fmask.text() ) )
+						return true;
+			break;
+
+			case 35:	// BODYIMG
+				if ( ftype == "body" )
+					if ( file.match( fmask.text() ) )
+						return true;
+			break;
+
+			case 8:		// SWORDPOWER
+				if ( ftype == "sword" )
+					if ( file.match( fmask.text() ) )
+						return true;
+			break;
+
+			case 9:		// SHIELDPOWER
+				if ( ftype == "shield" )
+					if ( file.match( fmask.text() ) )
+						return true;
+			break;
+
+			case 1:		// level
+				if ( ftype == "level" )
+					if ( file.match( fmask.text() ) )
+						return true;
+			break;
+
+			default:
+			case 0:		// file
+				if ( ftype == "file" )
+					if ( file.match( fmask.text() ) )
+						return true;
+			break;
+		}
+	}
+
+	return false;
 }
 
 bool isIpBanned(CString& pIp)

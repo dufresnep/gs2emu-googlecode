@@ -491,25 +491,12 @@ void CPlayer::sendAccount()
 
 	if (type == CLIENTPLAYER)
 	{
-		sendPacket(CPacket() << (char)PLAYERWARPED << getProp(PLAYERX) << getProp(PLAYERY) << levelName);
-		sendPacket(CPacket() << (char)LEVELNAME << levelName);
-
-		if (!sendLevel(levelName, x, y, 0))
-		{
-			sendPacket(CPacket() << (char)LEVELFAILED);
-
-			// Construct and send special warp packet.
-			CPacket warpPacket;
-			warpPacket << (char)PLAYERWARPED;
-			warpPacket.writeByte1( (char)(unstickmeX * 2) );
-			warpPacket.writeByte1( (char)(unstickmeY * 2) );
-			warpPacket << unstickmeLevel;
-			sendPacket(warpPacket);
-
-			sendPacket(CPacket() << (char)LEVELNAME << unstickmeLevel);
-			if (!sendLevel(unstickmeLevel, unstickmeX, unstickmeY, 0))
-				deleteMe = true;
-		}
+		CString level2 = levelName;
+		float x2 = x, y2 = y;
+		levelName = unstickmeLevel;
+		x = unstickmeX;
+		y = unstickmeY;
+		warp( level2, x2, y2, 0 );
 
 		sendPacket(CPacket() << (char)STARTMESSAGE << serverMessage);
 	}
@@ -739,15 +726,25 @@ void CPlayer::sendOutGoing()
 
 void CPlayer::warp(CString& pLevel, float pX, float pY, time_t pModTime)
 {
-	x = pX;
-	y = pY;
+	// Don't let them warp to a level not in the folder configuration path.
+	if ( isValidFile( CBuffer() << getDataFile(pLevel.text()), 1 ) == false )
+	{
+		if ( levelName.length() > 0 )
+			return;
+		else
+		{
+			sendPacket(CPacket() << (char)DISMESSAGE << "No level available");
+			errorOut("rclog.txt", CString() << "Cannot find a level for " << accountName);
+			deleteMe = true;
+		}
+	}
 
 	if (pLevel != levelName)
 	{
 		if (pModTime == 0) sendPacket(CPacket() << (char)PLAYERWARPED << getProp(PLAYERX) << getProp(PLAYERY) << pLevel);
 		sendPacket(CPacket() << (char)LEVELNAME << pLevel);
 
-		if (!sendLevel(pLevel, x, y, pModTime))
+		if (!sendLevel(pLevel, pX, pY, pModTime))
 		{
 			sendPacket(CPacket() << (char)LEVELFAILED);
 			sendPacket(CPacket() << (char)PLAYERWARPED << getProp(PLAYERX) << getProp(PLAYERY) << levelName);
@@ -761,10 +758,13 @@ void CPlayer::warp(CString& pLevel, float pX, float pY, time_t pModTime)
 			}
 		}
 	}
-	else
+	if ( deleteMe == false )
 	{
+		x = pX;
+		y = pY;
 		updateProp(PLAYERX);
 		updateProp(PLAYERY);
+		compressAndSend();
 	}
 }
 
@@ -941,8 +941,11 @@ void CPlayer::processChat(CString& pMessage)
 
 		if(strlen(getDataFile(words[1].text())))
 		{
-			headImage = words[1];
-			updateProp(HEADGIF);
+			if ( isValidFile( CBuffer() << getDataFile(words[1].text()), HEADGIF ) )
+			{
+				headImage = words[1];
+				updateProp(HEADGIF);
+			}
 		}
 		else
 		{
@@ -956,8 +959,11 @@ void CPlayer::processChat(CString& pMessage)
 
 		if(strlen(getDataFile(words[1].text())))
 		{
-			bodyImage = words[1];
-			updateProp(BODYIMG);
+			if ( isValidFile( CBuffer() << getDataFile(words[1].text()), BODYIMG ) )
+			{
+				bodyImage = words[1];
+				updateProp(BODYIMG);
+			}
 		}
 		else
 		{
@@ -970,8 +976,11 @@ void CPlayer::processChat(CString& pMessage)
 
 		if(strlen(getDataFile(words[1].text())))
 		{
-			swordImage = words[1];
-			updateProp(SWORDPOWER);
+			if ( isValidFile( CBuffer() << getDataFile(words[1].text()), SWORDPOWER ) )
+			{
+				swordImage = words[1];
+				updateProp(SWORDPOWER);
+			}
 		}
 		else
 		{
@@ -984,8 +993,11 @@ void CPlayer::processChat(CString& pMessage)
 
 		if (strlen(getDataFile(words[1].text())))
 		{
-			shieldImage = words[1];
-			updateProp(SHIELDPOWER);
+			if ( isValidFile( CBuffer() << getDataFile(words[1].text()), SHIELDPOWER ) )
+			{
+				shieldImage = words[1];
+				updateProp(SHIELDPOWER);
+			}
 		}
 		else
 		{
@@ -1455,15 +1467,30 @@ void CPlayer::sendFiles()
 
 		if(longName.length())
 		{
-			modTime = getFileModTime(longName.text());
-			if (modTime != file->modTime)
+			// Check if the file matches any of the folder config masks.
+			bool foundMatch = false;
+			for ( int j = 0; j < folderConfig.count(); ++j )
 			{
-				if (fileData.load(longName.text()) && fileData.length() <= 64500)
+				CString ftype( folderConfig[i].readString( " " ) );
+				CString fmask( folderConfig[i].readString( "" ) );
+				ftype.trim();
+				fmask.trim();
+				if ( longName.match( fmask.text() ) ) foundMatch = true;
+			}
+
+			// Match found, send file.
+			if ( foundMatch )
+			{
+				modTime = getFileModTime(longName.text());
+				if (modTime != file->modTime)
 				{
-					failed = false;
-					int len = 1 + 5 + 1 + shortName.length() + fileData.length() + 1;
-					sendPacket(CPacket() << (char)100 << (int)len);
-					sendPacket(CPacket() << (char)102 << (long long)modTime << (char)shortName.length() << shortName << fileData << "\n");
+					if (fileData.load(longName.text()) && fileData.length() <= 64500)
+					{
+						failed = false;
+						int len = 1 + 5 + 1 + shortName.length() + fileData.length() + 1;
+						sendPacket(CPacket() << (char)100 << (int)len);
+						sendPacket(CPacket() << (char)102 << (long long)modTime << (char)shortName.length() << shortName << fileData << "\n");
+					}
 				}
 			}
 		}
@@ -3194,6 +3221,7 @@ void CPlayer::msgSETRCFOLDERS(CPacket& pPacket)
 	CString data = pPacket.text() + 1;
 	data.untokenize();//.replaceAll("\n", "\n");
 	data.save("foldersconfig.txt");
+	folderConfig.load( "foldersconfig.txt" );
 	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " has updated the folder configuration.");
 }
 
