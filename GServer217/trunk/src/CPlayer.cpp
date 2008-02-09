@@ -3129,7 +3129,7 @@ void CPlayer::msgSSETOPTIONS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANEDITSERVEROPTION))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to change the server options.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to change the server options.");
 		return;
 	}
 
@@ -3174,7 +3174,7 @@ void CPlayer::msgWANTRCFOLDERS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to view the folder configuration.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to view the folder configuration.");
 		return;
 	}
 
@@ -3187,7 +3187,7 @@ void CPlayer::msgSETRCFOLDERS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANEDITFOLDEROPTION))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to change the folder configuration.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to change the folder configuration.");
 		return;
 	}
 
@@ -3235,7 +3235,7 @@ void CPlayer::msgSETPLPROPS(CPacket& pPacket)
 
 	if (type != CLIENTRC || (player->accountName != accountName && !hasRight(CANSETATTRIBS)) || (player->accountName == accountName && !hasRight(CANSETOWNATTRIBS)))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to set attributes.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to set attributes.");
 		return;
 	}
 
@@ -3248,7 +3248,7 @@ void CPlayer::msgDISPLAYER(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANDISCONNECT))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to disconnect players.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to disconnect players.");
 		return;
 	}
 	CPlayer* other = (CPlayer*)playerIds[pPacket.readByte2()];
@@ -3263,7 +3263,7 @@ void CPlayer::msgUPDLEVELS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANUPDATELEVEL))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to update levels.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to update levels.");
 		return;
 	}
 	int levelCount = pPacket.readByte2();
@@ -3282,7 +3282,7 @@ void CPlayer::msgADMINMSG(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANADMINMSG))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to send admin messages.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to send admin messages.");
 		return;
 	}
 
@@ -3299,7 +3299,7 @@ void CPlayer::msgPRIVADMINMSG(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANADMINMSG))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to send admin messages.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to send admin messages.");
 		return;
 	}
 	CPlayer* other = (CPlayer*)playerIds[pPacket.readByte2()];
@@ -3330,7 +3330,7 @@ void CPlayer::msgLISTSFLAGS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to view the server flags.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to view the server flags.");
 		return;
 	}
 	CPacket packet;
@@ -3344,7 +3344,7 @@ void CPlayer::msgSETSFLAGS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANSETSERVERFLAG))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to change the server flags.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to change the server flags.");
 		return;
 	}
 	int count = pPacket.readByte2();
@@ -3368,7 +3368,7 @@ void CPlayer::msgDADDACCOUNT(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANCHANGESTAFFACC))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to add new accounts.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to add new accounts.");
 		return;
 	}
 
@@ -3390,7 +3390,7 @@ void CPlayer::msgDDELACCOUNT(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANCHANGESTAFFACC))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to delete accounts.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to delete accounts.");
 		return;
 	}
 
@@ -3405,7 +3405,7 @@ void CPlayer::msgDWANTACCLIST(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized for viewing the accounts list.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized for viewing the accounts list.");
 		return;
 	}
 
@@ -3425,7 +3425,7 @@ void CPlayer::msgDWANTACCPLPROPS(CPacket& pPacket)
 {
 	if ( type != CLIENTRC || !hasStaff() )
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to load player attributes.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to load player attributes.");
 		return;
 	}
 
@@ -3451,7 +3451,7 @@ void CPlayer::msgDRESETPLPROPS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANRESETATTRIBS))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to reset accounts.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to reset accounts.");
 		return;
 	}
 
@@ -3485,14 +3485,14 @@ void CPlayer::msgDSETACCPLPROPS(CPacket& pPacket)
 	CString accname = pPacket.readChars(pPacket.readByte1());
 	if (type != CLIENTRC || (accname != accountName && !hasRight(CANSETATTRIBS)) || (accname == accountName && !hasRight(CANSETOWNATTRIBS)))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to change player attributes.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to change player attributes.");
 		return;
 	}
 
 	// Only people with CANCHANGESTAFFACC can alter the default account.
 	if ( !hasRight(CANCHANGESTAFFACC) )
 	{
-		sendPacket( CPacket() << (char)DRCLOG << "Server: Not authorized to alter the default account." );
+		sendRCPacket( CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to alter the default account." );
 		return;
 	}
 
@@ -3518,7 +3518,7 @@ void CPlayer::msgDWANTACCOUNT(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to view the player's account.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to view the player's account.");
 		return;
 	}
 
@@ -3543,7 +3543,7 @@ void CPlayer::msgDSETACCOUNT(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANCHANGESTAFFACC))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to set the player's account.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to set the player's account.");
 		return;
 	}
 
@@ -3600,7 +3600,7 @@ void CPlayer::msgDRCCHAT(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to send RC chat.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to send RC chat.");
 		return;
 	}
 
@@ -3743,7 +3743,7 @@ void CPlayer::msgWARPPLAYER(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANWARPPLAYER))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to warp players.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to warp players.");
 		return;
 	}
 
@@ -3761,7 +3761,7 @@ void CPlayer::msgDWANTRIGHTS(CPacket& pPacket)
 	CString accname = pPacket.readString("");
 	if (type != CLIENTRC || (accname != accountName && !hasRight(CANCHANGERIGHTS)))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to view admin rights.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to view admin rights.");
 		return;
 	}
 
@@ -3791,7 +3791,7 @@ void CPlayer::msgDSETRIGHTS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANCHANGERIGHTS))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to change admin rights.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to change admin rights.");
 		return;
 	}
 
@@ -3849,7 +3849,7 @@ void CPlayer::msgDWANTCOM(CPacket&pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANCHANGECOMMENTS))
 	{
-		sendRCPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to view comments.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to view comments.");
 		return;
 	}
 
@@ -3875,7 +3875,7 @@ void CPlayer::msgDSETCOM(CPacket&pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANCHANGECOMMENTS))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to change admin comments.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to change admin comments.");
 		return;
 	}
 
@@ -3906,7 +3906,7 @@ void CPlayer::msgDEDITBAN(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to view a player's ban.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to view a player's ban.");
 		return;
 	}
 
@@ -3932,7 +3932,7 @@ void CPlayer::msgDSETBAN(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANBAN))
 	{
-		sendPacket(CPacket() << (char)DRCLOG << "Server: Not authorized to ban players.");
+		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to ban players.");
 		return;
 	}
 

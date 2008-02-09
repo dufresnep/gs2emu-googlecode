@@ -6,6 +6,8 @@ Maintenance:
 - Fixed the tiling errors in the packaged onlinestartlocal.nw.
 - Re-worked most of the console messages.
 - The log files now display everything on one line.
+- Re-worked the RC messages again to send to all RC's and to display
+  the account name of the player who sent the packet.
 
 Additions:
 - Added the new serveroptions.txt option "detailedconsole".  It is a
