@@ -215,7 +215,7 @@ CPlayer::~CPlayer()
 {
 	if (id >= 0)
 	{
-		printf( "[%s] Leaving %s: %s\n", getTimeStr(1).text(), (type == CLIENTPLAYER) ? "player" : "RC", accountName );
+		printf( "[%s] Leaving %s: %s\n", getTimeStr(1).text(), (type == CLIENTPLAYER) ? "player" : "RC", accountName.text() );
 		//remove me from level
 		leaveLevel();
 
