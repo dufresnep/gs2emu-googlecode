@@ -13,6 +13,11 @@ Additions:
 - Added the new serveroptions.txt option "detailedconsole".  It is a
   boolean value that defaults to false.  If true, it will display the
   old detailed console messages.
+- Added the new serveroptions.txt option "underconstruction".  It is a
+  boolean value that defaults to false.  If true, the server will be
+  flagged as Under Construction, which means it will not show up in the
+  player list.  To access the server, you have to type in the name
+  of the server in the edit box below the server list and press Enter.
 - The GServer now prints less console messages and in a less detailed
   format.
 - Folder Configuration is now implemented.  See the foldersconfig.txt

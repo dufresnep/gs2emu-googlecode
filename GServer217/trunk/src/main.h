@@ -16,7 +16,7 @@
 //#define STORE_SQL
 
 extern bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, lsConnected, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, showQuery, staffOnly, vasesDrop, warptoforall, defaultweapons;
-extern bool clientsidePushPull, detailedconsole;
+extern bool clientsidePushPull, detailedconsole, underconstruction;
 extern char fSep[], dataDir[];
 extern CLevel *NOLEVEL;
 extern CList newPlayers, playerList, playerIds, settingList, weaponList, npcList, npcIds, levelList;

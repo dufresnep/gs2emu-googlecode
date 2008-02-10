@@ -30,7 +30,7 @@
 #endif
 
 bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, hasShutdown = false, lsConnected = false, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, staffOnly, vasesDrop, warptoforall, defaultweapons;
-bool clientsidePushPull, detailedconsole;
+bool clientsidePushPull, detailedconsole, underconstruction;
 const char* __admin[]   = {"description", "listport", "listip", "language", "maxplayers", "myip", "name", "serverport", "sharefolder", "showconsolepackets", "url", "worldname"};
 const char* __colours[] = {"white", "yellow", "orange", "pink", "red", "darkred", "lightgreen", "green", "darkgreen", "lightblue", "blue", "darkblue", "brown", "cynober", "purple", "darkpurple", "lightgray", "gray", "black", "transparent"};
 const char* __cloths[]  = {"setskin", "setcoat", "setsleeve", "setshoe", "setbelt", "setsleeves", "setshoes"};
@@ -351,6 +351,7 @@ bool loadSettings(char* pFile)
 	setshieldallowed = CHECK_BOOL(findKey("setshieldallowed", "true"));
 	showConsolePackets = CHECK_BOOL(findKey("showconsolepackets", "false"));
 	staffOnly = CHECK_BOOL(findKey("staffonly", "false"));
+	underconstruction = CHECK_BOOL(findKey("underconstruction", "false"));
 	vasesDrop = CHECK_BOOL(findKey("vasesdrop", "true"));
 	warptoforall  = CHECK_BOOL(findKey("warptoforall", "false"));
 
@@ -386,6 +387,11 @@ bool loadSettings(char* pFile)
 	shareFolder = findKey("sharefolder");
 	staffHead = findKey("staffhead", "head25.png");
 	worldName = findKey("worldname", "main");
+
+	// If the server is flagged as under construction, prepend the
+	// Under Construction value to the name.
+	if ( underconstruction && !listServerFields[0].match( "U *" ) )
+		listServerFields[0] = CBuffer() << "U " << listServerFields[0];
 
 	return true;
 }
@@ -654,10 +660,11 @@ bool isValidFile(CBuffer& file, int type)
 {
 	for ( int i = 0; i < folderConfig.count(); ++i )
 	{
+		folderConfig[i].setRead(0);
 		CString ftype( folderConfig[i].readString( " " ) );
-		CString fmask( folderConfig[i].readString( "" ) );
-		ftype.trim();
-		fmask.trim();
+		CString fmask = CBuffer() << dataDir <<
+			CBuffer(folderConfig[i].readString( "" )).trim().text();
+		folderConfig[i].setRead(0);
 
 		switch ( type )
 		{

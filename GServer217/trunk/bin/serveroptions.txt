@@ -53,3 +53,4 @@ name = My Server
 serverport = 14802
 sharefolder = 
 showconsolepackets = false
+underconstruction = false

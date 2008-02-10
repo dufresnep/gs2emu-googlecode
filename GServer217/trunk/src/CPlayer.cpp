@@ -491,12 +491,25 @@ void CPlayer::sendAccount()
 
 	if (type == CLIENTPLAYER)
 	{
-		CString level2 = levelName;
-		float x2 = x, y2 = y;
-		levelName = unstickmeLevel;
-		x = unstickmeX;
-		y = unstickmeY;
-		warp( level2, x2, y2, 0 );
+		sendPacket(CPacket() << (char)PLAYERWARPED << getProp(PLAYERX) << getProp(PLAYERY) << levelName);
+		sendPacket(CPacket() << (char)LEVELNAME << levelName);
+
+		if (!sendLevel(levelName, x, y, 0))
+		{
+			sendPacket(CPacket() << (char)LEVELFAILED);
+
+			// Construct and send special warp packet.
+			CPacket warpPacket;
+			warpPacket << (char)PLAYERWARPED;
+			warpPacket.writeByte1( (char)(unstickmeX * 2) );
+			warpPacket.writeByte1( (char)(unstickmeY * 2) );
+			warpPacket << unstickmeLevel;
+			sendPacket(warpPacket);
+
+			sendPacket(CPacket() << (char)LEVELNAME << unstickmeLevel);
+			if (!sendLevel(unstickmeLevel, unstickmeX, unstickmeY, 0))
+				deleteMe = true;
+		}
 
 		sendPacket(CPacket() << (char)STARTMESSAGE << serverMessage);
 	}
@@ -739,6 +752,9 @@ void CPlayer::warp(CString& pLevel, float pX, float pY, time_t pModTime)
 		}
 	}
 
+	x = pX;
+	y = pY;
+
 	if (pLevel != levelName)
 	{
 		if (pModTime == 0) sendPacket(CPacket() << (char)PLAYERWARPED << getProp(PLAYERX) << getProp(PLAYERY) << pLevel);
@@ -758,13 +774,10 @@ void CPlayer::warp(CString& pLevel, float pX, float pY, time_t pModTime)
 			}
 		}
 	}
-	if ( deleteMe == false )
+	else
 	{
-		x = pX;
-		y = pY;
 		updateProp(PLAYERX);
 		updateProp(PLAYERY);
-		compressAndSend();
 	}
 }
 
@@ -1471,8 +1484,11 @@ void CPlayer::sendFiles()
 			bool foundMatch = false;
 			for ( int j = 0; j < folderConfig.count(); ++j )
 			{
-				CString ftype( folderConfig[i].readString( " " ) );
-				CString fmask( folderConfig[i].readString( "" ) );
+				folderConfig[j].setRead(0);
+				CString ftype( folderConfig[j].readString( " " ) );
+				CString fmask = CBuffer() << dataDir <<
+					CBuffer(folderConfig[j].readString( "" )).trim().text();
+				folderConfig[j].setRead(0);
 				ftype.trim();
 				fmask.trim();
 				if ( longName.match( fmask.text() ) ) foundMatch = true;
