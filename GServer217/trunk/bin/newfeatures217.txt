@@ -28,6 +28,8 @@ Additions:
 
 Fixes:
 - More NPC props fixes.
+- Fixed Private Messages.
+- Made NPC's default to looking down.
 
 
 --------------------------------------------

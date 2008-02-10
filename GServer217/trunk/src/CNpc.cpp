@@ -25,7 +25,8 @@ CNpc::CNpc(CString& pImage, CString& pCode, float pX, float pY, CLevel* pLevel)
 	memset(colors, 0, sizeof(colors));
 	memset(modTime, 0, sizeof(modTime));
 	gAni = "idle";
-	rupees = darts = bombs = glovePower = blockFlags = sprite = bombPower = power = 0;
+	rupees = darts = bombs = glovePower = blockFlags = bombPower = power = 0;
+	sprite = 2;
 	shieldPower = swordPower = 0;
 	shieldImage = "";
 	swordImage = "";

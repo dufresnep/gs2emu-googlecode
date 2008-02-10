@@ -177,7 +177,8 @@ CPlayer::CPlayer(CSocket* pSocket)
 	loadOnly = deleteMe = allowBomb = false;
 	firstPacket = firstLevel = true;
 	key = adminRights =  0;
-	lastData = lastMovement = lastMessage = lastChat = lastSave = loginTime = time(NULL);
+	lastData = lastMovement = lastChat = lastSave = loginTime = time(NULL);
+	lastMessage = getTime();
 	lastNick = 0;
 
 	iterator = 0x04A80B38;
