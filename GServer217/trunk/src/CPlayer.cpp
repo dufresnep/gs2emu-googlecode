@@ -661,7 +661,7 @@ void CPlayer::parsePacket(CPacket& pPacket)
 		if ( msgFuncs[messageId] != 0 )
 			(*this.*msgFuncs[messageId])(packet);
 	}
-	else if ( messageId < 0 )
+	else
 	{
 		deleteMe = true;
 		errorOut( "rclog.txt", CString() << accountName << " sent an incorrect message id [" << toString(messageId) << "]\nPacket: " << pPacket.text() + 1 << "\n", true );
