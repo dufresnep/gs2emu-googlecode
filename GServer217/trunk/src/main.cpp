@@ -698,6 +698,11 @@ bool isValidFile(CBuffer& file, int type)
 						return true;
 			break;
 
+			case -1:	// Any
+				if ( file.match( fmask.text() ) )
+					return true;
+			break;
+
 			default:
 			case 0:		// file
 				if ( ftype == "file" )

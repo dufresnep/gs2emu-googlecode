@@ -19,7 +19,7 @@ Additions:
   player list.  To access the server, you have to type in the name
   of the server in the edit box below the server list and press Enter.
 - The GServer now prints less console messages and in a less detailed
-  format.
+  format.  It also prints the IP address of all incoming connections.
 - Folder Configuration is now implemented.  See the foldersconfig.txt
   file for a list of default options.  The folder configuration is
   mainly used to restrict files to certain directories, like restricting
@@ -30,6 +30,7 @@ Fixes:
 - More NPC props fixes.
 - Fixed Private Messages.
 - Made NPC's default to looking down.
+- Server should now correctly disconnect players who send bad packets.
 
 
 --------------------------------------------

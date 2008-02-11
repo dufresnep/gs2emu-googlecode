@@ -1482,22 +1482,7 @@ void CPlayer::sendFiles()
 
 		if(longName.length())
 		{
-			// Check if the file matches any of the folder config masks.
-			bool foundMatch = false;
-			for ( int j = 0; j < folderConfig.count(); ++j )
-			{
-				folderConfig[j].setRead(0);
-				CString ftype( folderConfig[j].readString( " " ) );
-				CString fmask = CBuffer() << dataDir <<
-					CBuffer(folderConfig[j].readString( "" )).trim().text();
-				folderConfig[j].setRead(0);
-				ftype.trim();
-				fmask.trim();
-				if ( longName.match( fmask.text() ) ) foundMatch = true;
-			}
-
-			// Match found, send file.
-			if ( foundMatch )
+			if ( isValidFile( longName, -1 ) )
 			{
 				modTime = getFileModTime(longName.text());
 				if (modTime != file->modTime)
@@ -1794,6 +1779,7 @@ CPacket CPlayer::getProp(int pProp)
 	case PSTATUSMSG:
 		retVal.writeByte1(statusMsg);
 		break;
+
 	case UDPPORT:
 		retVal.writeByte3(udpPort);
 		break;
@@ -1856,6 +1842,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 		if(index < 0 || index >= propscount-1)
 		{
 			errorOut("rclog.txt", CString() << "setProps(" << toString(index) << ") index out of bounds by " << accountName);
+			deleteMe = true;
 			break;
 		}
 
@@ -1907,7 +1894,11 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 		case PLAYERANI:
 			len = pProps.readByte1();
 			if (len >= 0)
-				gAni = pProps.readChars(len);
+			{
+				CString temp( pProps.readChars(len) );
+				if ( isValidFile( temp, -1 ) )
+					gAni = temp;
+			}
 			break;
 
 		case SWORDPOWER:
@@ -1918,7 +1909,11 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 				sp -= 30;
 				len = pProps.readByte1();
 				if(len >= 0)
-					swordImage = pProps.readChars(len);
+				{
+					CString temp( pProps.readChars(len) );
+					if ( isValidFile( temp, SWORDPOWER ) )
+						swordImage = temp;
+				}
 			} else if(sp <= 4)
 				swordImage = CString() << "sword" << toString(sp) << ".png";
 			swordPower = CLIP(sp, 0, swordLimit);
@@ -1933,7 +1928,11 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 				sp -= 10;
 				len = pProps.readByte1();
 				if(len >= 0)
-					shieldImage = pProps.readChars(len);
+				{
+					CString temp( pProps.readChars(len) );
+					if ( isValidFile( temp, SHIELDPOWER ) )
+						shieldImage = temp;
+				}
 			} else if(sp <= 3)
 				shieldImage = CString() << "shield" << toString(sp) << ".png";
 			shieldPower = CLIP(sp, 0, shieldLimit);
@@ -1949,7 +1948,11 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			} else
 			{
 				if (len > 100)
-					headImage = pProps.readChars(len-100);
+				{
+					CString temp( pProps.readChars(len-100) );
+					if ( isValidFile( temp, HEADGIF ) )
+						headImage = temp;
+				}
 			}
 		break;
 
@@ -2039,7 +2042,11 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 		case HORSEGIF:
 			len = pProps.readByte1();
 			if(len >= 0)
-				horseImage = pProps.readChars(len);
+			{
+				CString temp( pProps.readChars(len) );
+				if ( isValidFile( temp, -1 ) )
+					horseImage = temp;
+			}
 			//TO DO: add hack check
 			break;
 
@@ -2137,15 +2144,19 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 		case BODYIMG:
 			len = pProps.readByte1();
 			if (len >= 0)
-				bodyImage = pProps.readChars(len);
+			{
+				CString temp( pProps.readChars(len) );
+				if ( isValidFile( temp, BODYIMG ) )
+					bodyImage = temp;
+			}
 			//TO DO: add hack check
 			break;
 
 		case PSTATUSMSG:
 			statusMsg = pProps.readByte1();
 
-		// Allows proper RC login.
-		if ( id == -1 ) break;
+			// Allows proper RC login.
+			if ( id == -1 ) break;
 
 			for(int i = 0; i < playerList.count(); i++)
 			{
@@ -2161,7 +2172,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			len = pProps.readByte1();
 			if(len >= 0)
 				language = pProps.readChars(len);
-		break;
+			break;
 
 		case GATTRIB1:  myAttr[0]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
 		case GATTRIB2:  myAttr[1]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
@@ -2197,8 +2208,12 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 		case RATING:
 			rating = pProps.readByte2();
 			break;
+
 		default:
 			errorOut("rclog.txt", CString() << "Setprops error: " << toString(index) << " By " << accountName);
+
+			// If they send bad props, kick them.
+			deleteMe = true;
 			return;
 		}
 
