@@ -685,8 +685,9 @@ void CLevel::updateLevel(CString& pFileName)
 			CEnteredLevel* entered = (CEnteredLevel*)player->enteredLevels[ii];
 			if(entered->level == level)
 			{
-				delete entered;
-				player->enteredLevels.remove(ii);
+				entered->time = -1;
+//				delete entered;
+//				player->enteredLevels.remove(ii);
 				break;
 			}
 		}
@@ -756,18 +757,27 @@ void CLevel::reset()
 
 void CLevel::animate()
 {
-	for(int i = 0; i < boardChanges.count(); i++)
+	for(int i = boardChanges.count() - 1; i >= 0; --i)
 	{
-		CBoardChange*change = (CBoardChange*)boardChanges[i];
-		if(change->counter > 0)
+		CBoardChange* change = (CBoardChange*)boardChanges[i];
+		change->counter--;
+		if ( change->counter <= 0 )
 		{
-			change->counter--;
-			if(change->counter == 0)
+			applyChange(change->prevData, change->x, change->y, change->width, change->height);
+			delete change;
+			boardChanges.remove(i);
+
+			// For players who used to be in the level, set the mod time to -1
+			// so they will re-load the tile data on next visit.
+			for ( int j = 0; j < playerList.count(); ++j )
 			{
-				applyChange(change->prevData, change->x, change->y, change->width, change->height);
-				change->tileData = change->prevData;
-				change->modifyTime = getTime();
-				change->counter = -1;
+				CPlayer* player = (CPlayer*)playerList[j];
+				for ( int k = 0; k < player->enteredLevels.count(); ++k )
+				{
+					CEnteredLevel* lvl = (CEnteredLevel*)player->enteredLevels[k];
+					if ( lvl->level == this->fileName && player->level != this )
+						lvl->time = -1;
+				}
 			}
 		}
 	}
@@ -837,6 +847,7 @@ void CLevel::animate()
 		saveCounter = 300;
 	}
 }
+
 const char* CLink::getLinkString()
 {
 	static char retVal[500];
@@ -849,6 +860,7 @@ CLevel::~CLevel()
 {
 	reset();
 }
+
 CBoardChange::CBoardChange(CPacket& pTiles, int pX, int pY, int pWidth, int pHeight)
 {
 	x = pX;
@@ -868,16 +880,15 @@ CPacket CBoardChange::getSendData()
 }
 
 short tileObjects[] = {
-  0x1ff,0x3ff,0x2ac,2,0x200,0x22,
-  0x3de,0x1a4,0x14a,0x674
-  };
-
+	0x1ff,0x3ff,0x2ac,2,0x200,0x22,
+	0x3de,0x1a4,0x14a,0x674
+};
 
 bool CLevel::changeBoard(CPacket& pTileData, int pX, int pY, int pWidth, int pHeight, CPlayer* player)
 {
-	if(pX < 0 || pY < 0 || pX > 63 || pY > 63 ||
+	if( pX < 0 || pY < 0 || pX > 63 || pY > 63 ||
 		pWidth < 1 || pHeight < 1 ||
-		pX + pWidth > 64 || pY + pHeight > 64)
+		pX + pWidth > 64 || pY + pHeight > 64 )
 		return false;
 
 	// Do the check for the push-pull block.
@@ -936,7 +947,7 @@ bool CLevel::changeBoard(CPacket& pTileData, int pX, int pY, int pWidth, int pHe
 	}
 
 	//Delete any existing changes within the same region
-	for(int i = 0; i < boardChanges.count(); i++)
+	for ( int i = 0; i < boardChanges.count(); i++ )
 	{
 		CBoardChange* change = (CBoardChange*)boardChanges[i];
 		if(change->x >= pX && change->y >= pY && change->x + change->width <= pX + pWidth &&
@@ -950,7 +961,7 @@ bool CLevel::changeBoard(CPacket& pTileData, int pX, int pY, int pWidth, int pHe
 
 	CBoardChange* change = new CBoardChange(pTileData, pX, pY, pWidth, pHeight);
 	change->prevData << applyChange(pTileData, pX, pY, pWidth, pHeight);
-	if(change->prevData.length() > 0)
+	if ( change->prevData.length() > 0 )
 		boardChanges.add(change);
 	else delete change;
 	return true;
@@ -978,14 +989,13 @@ CPacket CLevel::applyChange(CPacket& pTileData, int pX, int pY, int pWidth, int 
 		}
 	}
 
-	for(int i = 0; i < players.count(); i++)
+	for (int i = 0; i < players.count(); i++)
 	{
 		CPlayer* other = (CPlayer*)players[i];
 		other->sendPacket(sendBuff);
 	}
 
 	return retVal;
-
 }
 
 void CLevel::addHorse(CHorse* pHorse)
