@@ -22,20 +22,21 @@ Additions:
   format.  It also prints the IP address of all incoming connections.
 - Folder Configuration is now implemented.  See the foldersconfig.txt
   file for a list of default options.  The folder configuration is
-  mainly used to restrict files to certain directories, like restricting
-  head images to world/heads/*.  This will prevent players from being
-  able to do odd things like 'sethead pics1.png'.
+  mainly used to restrict files to certain directories, like
+  restricting head images to world/heads/*.  This will prevent players
+  from being able to do odd things like 'sethead pics1.png'.
 
 Fixes:
 - More NPC props fixes.
 - Fixed Private Messages.
 - Made NPC's default to looking down.
 - Server should now correctly disconnect players who send bad packets.
-- Players who don't have the Change Staff Accounts right but do have the
-  ability to alter attributes can now correctly set player attributes.
-- If a player fails to warp to a new level and fails to warp back to his
-  previous level, the gserver will now attempt to warp the player to the
-  unstick me level before disconnecting the player.
+- Players who don't have the Change Staff Accounts right but do have
+  the ability to alter attributes can now correctly set player
+  attributes.
+- If a player fails to warp to a new level and fails to warp back to
+  his previous level, the gserver will now attempt to warp the player
+  to the unstick me level before disconnecting the player.
 - Fixed a bug that would crash the gserver when opening the FileBrowser
   after setting a player's rights.
 
