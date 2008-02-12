@@ -31,6 +31,11 @@ Fixes:
 - Fixed Private Messages.
 - Made NPC's default to looking down.
 - Server should now correctly disconnect players who send bad packets.
+- Players who don't have the Change Staff Accounts right but do have the
+  ability to alter attributes can now correctly set player attributes.
+- If a player fails to warp to a new level and fails to warp back to his
+  previous level, the gserver will now attempt to warp the player to the
+  unstick me level before disconnecting the player.
 
 
 --------------------------------------------

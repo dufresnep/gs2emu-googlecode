@@ -770,9 +770,16 @@ void CPlayer::warp(CString& pLevel, float pX, float pY, time_t pModTime)
 
 			if (!sendLevel(levelName, x, y, 0))
 			{
-				sendPacket(CPacket() << (char)DISMESSAGE << "No level available");
-				errorOut("rclog.txt", CString() << "Cannot find a level for " << accountName);
-				deleteMe = true;
+				sendPacket(CPacket() << (char)LEVELFAILED);
+				sendPacket(CPacket() << (char)PLAYERWARPED << toString((int)(unstickmeX*2)+32) << toString((int)(unstickmeX*2)+32) << unstickmeLevel);
+				sendPacket(CPacket() << (char)LEVELNAME << unstickmeLevel);
+
+				if (!sendLevel(unstickmeLevel, unstickmeX, unstickmeY, 0))
+				{
+					sendPacket(CPacket() << (char)DISMESSAGE << "No level available");
+					errorOut("rclog.txt", CString() << "Cannot find a level for " << accountName);
+					deleteMe = true;
+				}
 			}
 		}
 	}
@@ -3551,7 +3558,7 @@ void CPlayer::msgDSETACCPLPROPS(CPacket& pPacket)
 	}
 
 	// Only people with CANCHANGESTAFFACC can alter the default account.
-	if ( !hasRight(CANCHANGESTAFFACC) )
+	if ( !hasRight(CANCHANGESTAFFACC) && accname == "defaultaccount" )
 	{
 		sendRCPacket( CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to alter the default account." );
 		return;
