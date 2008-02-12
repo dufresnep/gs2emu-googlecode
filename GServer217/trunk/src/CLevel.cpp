@@ -775,7 +775,7 @@ void CLevel::animate()
 				for ( int k = 0; k < player->enteredLevels.count(); ++k )
 				{
 					CEnteredLevel* lvl = (CEnteredLevel*)player->enteredLevels[k];
-					if ( lvl->level == this->fileName && player->level != this )
+					if ( lvl->level == this && player->level != this )
 						lvl->time = -1;
 				}
 			}
