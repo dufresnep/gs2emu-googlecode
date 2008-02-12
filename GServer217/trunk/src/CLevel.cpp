@@ -685,9 +685,8 @@ void CLevel::updateLevel(CString& pFileName)
 			CEnteredLevel* entered = (CEnteredLevel*)player->enteredLevels[ii];
 			if(entered->level == level)
 			{
-				entered->time = -1;
-//				delete entered;
-//				player->enteredLevels.remove(ii);
+				delete entered;
+				player->enteredLevels.remove(ii);
 				break;
 			}
 		}
@@ -776,7 +775,7 @@ void CLevel::animate()
 				{
 					CEnteredLevel* lvl = (CEnteredLevel*)player->enteredLevels[k];
 					if ( lvl->level == this && player->level != this )
-						lvl->time = -1;
+						lvl->time = 0;
 				}
 			}
 		}
