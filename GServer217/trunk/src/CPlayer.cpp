@@ -3889,7 +3889,7 @@ void CPlayer::msgDSETRIGHTS(CPacket& pPacket)
 	// Untokenize and load the directories.
 	CString temp(pPacket.readChars(pPacket.readByte2()));
 	temp.untokenize();
-	myFolders.clear();
+	//myFolders.clear();
 	player->myFolders.load(temp.text(), "\n");
 
 	// Remove any invalid directories.
@@ -4057,7 +4057,7 @@ void CPlayer::msgDWANTFTP(CPacket& pPacket)
 				CBuffer mrights = myFolders[i].readString(" ");
 				CBuffer mfolder = myFolders[i].readString("");
 				mfolder.remove(mfolder.length() - 1, 1);
-				myFolders[i].setRead(0);
+				//myFolders[i].setRead(0);
 
 				// Check if lastFolder is equal to our folder.
 				if ( lastFolder == mfolder )
@@ -4074,7 +4074,7 @@ void CPlayer::msgDWANTFTP(CPacket& pPacket)
 
 		ftpOn = true;
 	}
-	myFolders[0].setRead(0);
+	//myFolders[0].setRead(0);
 }
 
 void CPlayer::msgDCHANGEFTP(CPacket& pPacket)
