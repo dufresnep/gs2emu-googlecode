@@ -8,6 +8,8 @@ Maintenance:
 - The log files now display everything on one line.
 - Re-worked the RC messages again to send to all RC's and to display
   the account name of the player who sent the packet.
+- Added the images folder to world/ to fit with the current
+  foldersconfig.txt file.
 
 Additions:
 - Added the new serveroptions.txt option "detailedconsole".  It is a
@@ -25,6 +27,9 @@ Additions:
   mainly used to restrict files to certain directories, like
   restricting head images to world/heads/*.  This will prevent players
   from being able to do odd things like 'sethead pics1.png'.
+  PLEASE MAKE SURE YOUR FOLDERSCONFIG.TXT FILE IS CORRECT BEFORE YOU
+  SEEK HELP!  IF YOUR FOLDERSCONFIG.TXT FILE IS INCORRECT, IT WILL
+  CAUSE MANY THINGS TO TO BREAK.
 
 Fixes:
 - More NPC props fixes.
@@ -38,7 +43,7 @@ Fixes:
   his previous level, the gserver will now attempt to warp the player
   to the unstick me level before disconnecting the player.
 - Fixed a bug that would crash the gserver when opening the FileBrowser
-  after setting a player's rights.
+  after certain actions.
 
 
 --------------------------------------------
