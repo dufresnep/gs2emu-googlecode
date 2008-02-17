@@ -276,6 +276,10 @@ void ListServer_Main()
 				printf("[%s] %s\n", getTimeStr(1).text(), line.readString(""));
 			break;
 
+			case GSVPING:
+				// Sent every 60 seconds, do nothing.
+			break;
+
 			default:
 				printf("[%s] Invalid List Server Message: %i\n", getTimeStr(1).text(), messageId);
 			break;

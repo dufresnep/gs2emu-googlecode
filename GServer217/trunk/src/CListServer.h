@@ -43,7 +43,8 @@ enum
 	GSVOLD,
 	GSVCURRENT,
 	GSVPROFILE,
-	GSVMSG
+	GSVMSG,
+	GSVPING = 99,
 };
 
 #endif
