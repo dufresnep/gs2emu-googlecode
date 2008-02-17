@@ -1294,7 +1294,7 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	for (int i = 0; i < level->boardChanges.count(); i++)
 	{
 		CBoardChange* change = (CBoardChange*)level->boardChanges[i];
-		if(change->modifyTime >= time)
+		if ( change->modifyTime >= getTime() )
 			packet << change->getSendData();
 	}
 	sendPacket(packet);
