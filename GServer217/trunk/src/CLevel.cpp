@@ -756,7 +756,7 @@ void CLevel::reset()
 
 void CLevel::animate()
 {
-	for(int i = boardChanges.count() - 1; i >= 0; --i)
+	for ( int i = 0; i < boardChanges.count(); i++ )
 	{
 		CBoardChange* change = (CBoardChange*)boardChanges[i];
 		if ( change->counter > 0 )

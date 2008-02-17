@@ -1416,7 +1416,7 @@ void CPlayer::leaveLevel()
 	enteredLevels.add(new CEnteredLevel(level, getSysTime()));
 
 	// Sad hack to try to fix npcs.
-	if ( level->players.count() == 0 ) CLevel::updateLevel(level->fileName);
+	//if ( level->players.count() == 0 ) CLevel::updateLevel(level->fileName);
 
 	level = NOLEVEL;
 }
