@@ -1265,7 +1265,7 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	time_t time = getLeavingTime(level);
 	if ( time <= 0 )
 	{
-		if ( pModTime != level->modTime || time == 0 )
+		if ( pModTime != level->modTime )
 		{
 			sendPacket(CPacket() << (char)100 << (int)(1+(64*64*2)+1));
 			packet.clear();

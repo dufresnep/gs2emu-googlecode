@@ -759,29 +759,23 @@ void CLevel::animate()
 	for(int i = boardChanges.count() - 1; i >= 0; --i)
 	{
 		CBoardChange* change = (CBoardChange*)boardChanges[i];
-		change->counter--;
-		if ( change->counter <= 0 )
+		if ( change->counter > 0 )
 		{
-			applyChange(change->prevData, change->x, change->y, change->width, change->height);
-			delete change;
-			boardChanges.remove(i);
-
-			// For players who used to be in the level, set the mod time to -1
-			// so they will re-load the tile data on next visit.
-			for ( int j = 0; j < playerList.count(); ++j )
+			change->counter--;
+			if ( change->counter <= 0 )
 			{
-				CPlayer* player = (CPlayer*)playerList[j];
-				for ( int k = 0; k < player->enteredLevels.count(); ++k )
-				{
-					CEnteredLevel* lvl = (CEnteredLevel*)player->enteredLevels[k];
-					if ( lvl->level == this && player->level != this )
-						lvl->time = 0;
-				}
+				// Put the old data back in.  DON'T DELETE THE CHANGE.
+				// The client remembers board changes and if we delete the
+				// change, the client won't get the new data.
+				applyChange(change->prevData, change->x, change->y, change->width, change->height);
+				change->tileData = change->prevData;
+				change->modifyTime = getTime();
+				change->counter = -1;
 			}
 		}
 	}
 
-	for(int i = 0; i < items.count(); i++)
+	for ( int i = 0; i < items.count(); i++ )
 	{
 		CItem* item = (CItem*)items[i];
 		item->counter--;
@@ -793,7 +787,7 @@ void CLevel::animate()
 		}
 	}
 
-	for(int i = 0; i < baddies.count(); i++)
+	for ( int i = 0; i < baddies.count(); i++ )
 	{
 		CBaddy* baddy = (CBaddy*)baddies[i];
 		if(baddy->mode == DIE || !players.count())
