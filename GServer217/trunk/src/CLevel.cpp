@@ -696,7 +696,6 @@ void CLevel::updateLevel(CString& pFileName)
 	}
 }
 
-
 void CLevel::reset()
 {
 	for(int i = 0; i < npcs.count(); i++)
@@ -711,6 +710,7 @@ void CLevel::reset()
 				(char)ACTIONSCRIPT << (short)0 << (char)VISFLAGS << (char)0 <<
 				(char)BLOCKFLAGS << (char)0 << (char)NPCMESSAGE << (char)0 );
 			player->sendPacket(CPacket() << (char)SDELNPC << (int)npc->id);
+			player->compressAndSend();
 		}
 		delete npc;
 	}

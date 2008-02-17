@@ -1394,7 +1394,6 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 
 void CPlayer::leaveLevel()
 {
-	CPacket otherProps;
 	if (level == NOLEVEL)
 		return;
 
@@ -1404,10 +1403,11 @@ void CPlayer::leaveLevel()
 		((CPlayer*)level->players[0])->sendPacket(CPacket() << (char)ISLEADER);
 
 	// Tell everyone I left.
+	CPacket otherProps;
 	otherProps << (char)OTHERPLPROPS << (short)id << (char)50 << (char)0;
 	for (int i = 0; i < level->players.count(); i++)
 	{
-		CPlayer*other = (CPlayer*)level->players[i];
+		CPlayer* other = (CPlayer*)level->players[i];
 		other->sendPacket(otherProps);
 		sendPacket(CPacket() << (char)OTHERPLPROPS << (short)other->id << (char)50 << (char)0);
 	}
@@ -1901,8 +1901,15 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			if (len >= 0)
 			{
 				CString temp( pProps.readChars(len) );
-				if ( isValidFile( temp, -1 ) )
+				if ( defaultGaniNames.find( temp ) != -1 )
 					gAni = temp;
+				else
+				{
+					CString temp2( getDataFile( temp.text() ) );
+					if ( temp2.length() > 0 )
+						if ( isValidFile( temp2, -1 ) )
+							gAni = temp;		// Not temp2
+				}
 			}
 			break;
 
@@ -1916,8 +1923,15 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 				if(len >= 0)
 				{
 					CString temp( pProps.readChars(len) );
-					if ( isValidFile( temp, SWORDPOWER ) )
+					if ( defaultSwordNames.find( temp ) != -1 )
 						swordImage = temp;
+					else
+					{
+						CString temp2( getDataFile( temp.text() ) );
+						if ( temp2.length() > 0 )
+							if ( isValidFile( temp2, SWORDPOWER ) )
+								swordImage = temp;		// Not temp2
+					}
 				}
 			} else if(sp <= 4)
 				swordImage = CString() << "sword" << toString(sp) << ".png";
@@ -1935,8 +1949,15 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 				if(len >= 0)
 				{
 					CString temp( pProps.readChars(len) );
-					if ( isValidFile( temp, SHIELDPOWER ) )
+					if ( defaultShieldNames.find( temp ) != -1 )
 						shieldImage = temp;
+					else
+					{
+						CString temp2( getDataFile( temp.text() ) );
+						if ( temp2.length() > 0 )
+							if ( isValidFile( temp2, SHIELDPOWER ) )
+								shieldImage = temp;		// Not temp2
+					}
 				}
 			} else if(sp <= 3)
 				shieldImage = CString() << "shield" << toString(sp) << ".png";
