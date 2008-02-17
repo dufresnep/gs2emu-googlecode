@@ -357,7 +357,8 @@ class CPlayer : public CAccount
 		CSocket *playerSock;
 		CStringList weaponSend;
 		int additionalFlags, carrySprite, failAttempts, key, iterator, id, packCount, rating, statusMsg, udpPort;
-		time_t lastCheck, lastData, lastMessage, lastMovement, lastNick, lastSave, loginTime, lastChat;
+		time_t lastCheck, lastData, lastNick, lastSave, loginTime, lastChat;
+		int lastMessage, lastMovement;
 		#ifdef GSERV22
 			codec mcodec;
 		#endif

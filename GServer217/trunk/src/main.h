@@ -42,7 +42,7 @@ CString getTimeStr(int pType = 0);
 int createPlayerId(CPlayer* pPlayer);
 int createNpcId(CNpc* pNpc);
 int getFileSize(char* pFile);
-long long getFileModTime(char* pFile);
+time_t getFileModTime(char* pFile);
 void CalculateMD5(char *buffer, int length, char *checksum);
 void errorOut(char *pFile, CBuffer pError, bool pWrite = false);
 void getSubDirs(char* dir);
@@ -61,6 +61,11 @@ inline char* removeGifExtension(char* pFileName)
 inline int getTime()
 {
 	return gameTime;
+}
+
+inline time_t getSysTime()
+{
+	return time(0);
 }
 
 inline int getNWTime()

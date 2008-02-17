@@ -44,6 +44,7 @@ Fixes:
   to the unstick me level before disconnecting the player.
 - Fixed a bug that would crash the gserver when opening the FileBrowser
   after certain actions.
+- Overhauled the time modification system.  Might fix some problems.
 
 
 --------------------------------------------

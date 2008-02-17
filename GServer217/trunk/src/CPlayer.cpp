@@ -177,8 +177,8 @@ CPlayer::CPlayer(CSocket* pSocket)
 	loadOnly = deleteMe = allowBomb = false;
 	firstPacket = firstLevel = true;
 	key = adminRights =  0;
-	lastData = lastMovement = lastChat = lastSave = loginTime = time(NULL);
-	lastMessage = getTime();
+	lastData = lastChat = lastSave = loginTime = getSysTime();
+	lastMessage = lastMovement = getTime();
 	lastNick = 0;
 
 	iterator = 0x04A80B38;
@@ -1262,8 +1262,8 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	y = pY;
 	levelName = nextLevel->fileName;
 	firstLevel = false;
-	time_t time = getLeavingTime(level);
-	if ( time <= 0 )
+	time_t l_time = getLeavingTime(level);
+	if ( l_time <= 0 )
 	{
 		if ( pModTime != level->modTime )
 		{
@@ -1294,7 +1294,7 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	for (int i = 0; i < level->boardChanges.count(); i++)
 	{
 		CBoardChange* change = (CBoardChange*)level->boardChanges[i];
-		if ( change->modifyTime >= getTime() )
+		if ( change->modifyTime >= l_time )
 			packet << change->getSendData();
 	}
 	sendPacket(packet);
@@ -1307,38 +1307,36 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 		chestString << toString(chest->x) << ":" << toString(chest->y) <<
 			":" << levelName;
 		if (myChests.findI(chestString) >= 0)
-		{
 			sendPacket(CPacket() << (char)LEVELCHEST << (char)1 << (char)chest->x << (char)chest->y);
-		}
 		else
-		sendPacket(CPacket() << (char)LEVELCHEST << (char)0 << (char)chest->x << (char)chest->y << (char)chest->item << (char)chest->signIndex);
+			sendPacket(CPacket() << (char)LEVELCHEST << (char)0 << (char)chest->x << (char)chest->y << (char)chest->item << (char)chest->signIndex);
 	}
 
 	//send horses
-	for(int i = 0; i < level->horses.count(); i++)
+	for ( int i = 0; i < level->horses.count(); i++ )
 	{
 		CHorse* horse = (CHorse*)level->horses[i];
 		sendPacket(CPacket() << (char)SADDHORSE << (char)horse->x << (char)horse->y << horse->imageName);
 	}
 	//send baddies
-	for (int i = 0; i < level->baddies.count(); i++)
+	for ( int i = 0; i < level->baddies.count(); i++ )
 	{
 		CBaddy* baddy = (CBaddy*)level->baddies[i];
 		sendPacket(CPacket() << (char)SBADDYPROPS << (char)baddy->id << baddy->getPropList());
 	}
 
 	//send npcs
-	for (int i = 0; i < level->npcs.count(); i++)
+	for ( int i = 0; i < level->npcs.count(); i++ )
 	{
 		CPacket npcProps;
 		CNpc* npc = (CNpc*)level->npcs[i];
-		npcProps << (char)SNPCPROPS << (int)npc->id << npc->getPropertyList(time);
+		npcProps << (char)SNPCPROPS << (int)npc->id << npc->getPropertyList(l_time);
 		if (npcProps.length() > 3)
 			sendPacket(npcProps);
 	}
 
 	// Remove the player from the enteredLevels thingy.
-	for (int i = enteredLevels.count() - 1; i >= 0; i--)
+	for ( int i = enteredLevels.count() - 1; i >= 0; i-- )
 	{
 		CEnteredLevel* lvl = (CEnteredLevel*)enteredLevels[i];
 		if ( lvl->level == level )
@@ -1349,7 +1347,7 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	}
 
 	// If you are the only person in the level, send the ISLEADER packet.
-	if (level->players.count() == 1)
+	if ( level->players.count() == 1 )
 		sendPacket(CPacket() << (char)ISLEADER);
 
 	//tell others i changed maps
@@ -1415,7 +1413,7 @@ void CPlayer::leaveLevel()
 	}
 
 	// Remember when the player last visited the level.
-	enteredLevels.add(new CEnteredLevel(level, getTime()));
+	enteredLevels.add(new CEnteredLevel(level, getSysTime()));
 
 	// Sad hack to try to fix npcs.
 	if ( level->players.count() == 0 ) CLevel::updateLevel(level->fileName);
@@ -1986,21 +1984,21 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 		case PLAYERX:
 			x = (float)pProps.readByte1() / 2;
 			status &= (-1-1);
-			lastMovement = time(NULL);
+			lastMovement = getTime();
 			//TO DO: add hack check;
 			break;
 
 		case PLAYERY:
 			y = (float)pProps.readByte1() / 2;
 			status &= (-1-1);
-			lastMovement = time(NULL);
+			lastMovement = getTime();
 			//TO DO: add hack check;
 			break;
 
 		case PLAYERZ:
 			z = (float)pProps.readByte1() / 2;
 			status &= (-1-1);
-			lastMovement = time(NULL);
+			lastMovement = getTime();
 			//TO DO: add hack check;
 			break;
 
@@ -2931,7 +2929,7 @@ void CPlayer::msgEXPLOSION(CPacket& pPacket)
 void CPlayer::msgPRIVMESSAGE(CPacket& pPacket)
 {
 	if ( id == -1 ) return;
-	if(getTime() - lastMessage <= 4)
+	if (getTime() - lastMessage <= 4)
 	{
 		sendPacket(CPacket() << (char)SADMINMSG <<
 				   "Server message:\xa7You can only send messages once every four seconds.");

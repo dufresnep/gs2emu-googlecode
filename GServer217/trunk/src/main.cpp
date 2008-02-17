@@ -582,13 +582,13 @@ char* getDataFile(char* pFile)
 	return path;
 }
 
-long long getFileModTime(char* pFile)
+time_t getFileModTime(char* pFile)
 {
 	struct stat fileStat;
 	if(strlen(pFile) <=0)
 		return 0;
 	if(stat(pFile, &fileStat) != -1)
-		return fileStat.st_mtime;
+		return (time_t)fileStat.st_mtime;
 	return 0;
 }
 

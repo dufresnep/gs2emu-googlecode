@@ -769,7 +769,7 @@ void CLevel::animate()
 				// change, the client won't get the new data.
 				applyChange(change->prevData, change->x, change->y, change->width, change->height);
 				change->tileData = change->prevData;
-				change->modifyTime = getTime();
+				change->modifyTime = getSysTime();
 				change->counter = -1;
 			}
 		}
@@ -862,7 +862,7 @@ CBoardChange::CBoardChange(CPacket& pTiles, int pX, int pY, int pWidth, int pHei
 	height = pHeight;
 	counter = tileRespawn;
 	tileData << pTiles;
-	modifyTime = getTime();
+	modifyTime = getSysTime();
 }
 
 CPacket CBoardChange::getSendData()

@@ -24,7 +24,7 @@ class CLevel
 	CStringList signs;
 	CMap* map;
 	int levelIndex;
-	long long modTime;
+	time_t modTime;
 	short saveCounter;
 	bool opened, sparZone;
 	short tiles[64*64];
@@ -115,7 +115,7 @@ class CBoardChange
 public:
 	CPacket tileData, prevData;
 	short counter, x, y, width, height;
-	int modifyTime;
+	time_t modifyTime;
 	CLevel* level;
 	CBoardChange(CPacket& pTiles, int pX, int pY, int pWidth, int pHeight);
 	CPacket getSendData();

@@ -34,12 +34,12 @@ CNpc::CNpc(CString& pImage, CString& pCode, float pX, float pY, CLevel* pLevel)
 	for (int i = 0; i < 6; i++)
 		imagePart.writeByte(32);
 
-	modTime[NPCGIF] = getTime();
-	modTime[ACTIONSCRIPT] = getTime();
-	modTime[NPCX] = getTime();
-	modTime[NPCY] = getTime();
-	modTime[VISFLAGS] = getTime();
-	modTime[NPCSPRITE] = getTime();
+	modTime[NPCGIF] = getSysTime();
+	modTime[ACTIONSCRIPT] = getSysTime();
+	modTime[NPCX] = getSysTime();
+	modTime[NPCY] = getSysTime();
+	modTime[VISFLAGS] = getSysTime();
+	modTime[NPCSPRITE] = getSysTime();
 }
 
 CNpc::~CNpc()
@@ -591,7 +591,7 @@ void CNpc::setProps(CPacket& pProps)
 		if(index >= 0 && index < npcpropcount)
 		{
 			if ( oldProp != getProperty(index) )
-				modTime[index] = getTime();
+				modTime[index] = getSysTime();
 		}
 	}
 	con_print( "\n" );
