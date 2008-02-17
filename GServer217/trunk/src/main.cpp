@@ -34,7 +34,7 @@ bool clientsidePushPull, detailedconsole, underconstruction;
 const char* __admin[]   = {"description", "detailedconsole", "language", "listport", "listip", "maxplayers", "myip", "name", "serverport", "sharefolder", "showconsolepackets", "underconstruction", "url", "worldname"};
 const char* __colours[] = {"white", "yellow", "orange", "pink", "red", "darkred", "lightgreen", "green", "darkgreen", "lightblue", "blue", "darkblue", "brown", "cynober", "purple", "darkpurple", "lightgray", "gray", "black", "transparent"};
 const char* __cloths[]  = {"setskin", "setcoat", "setsleeve", "setshoe", "setbelt", "setsleeves", "setshoes"};
-const char* __defaultgani[] = {"carry.gani", "dead.gani", "def.gani", "grab.gani", "gralats.gani", "hatoff.gani", "haton.gani", "hidden.gani", "hiddenstill.gani", "hurt.gani", "idle.gani", "lava.gani", "lift.gani", "maps1.gani", "maps2.gani", "maps3.gani", "pull.gani", "push.gani", "ride.gani", "rideeat.gani", "ridefire.gani", "ridehurt.gani", "ridejump.gani", "ridestill.gani", "ridesword.gani", "shoot.gani", "sit.gani", "sleep.gani", "spin.gani", "swim.gani", "sword.gani", "walk.gani" };
+const char* __defaultgani[] = {"carry", "dead", "def", "grab", "gralats", "hatoff", "haton", "hidden", "hiddenstill", "hurt", "idle", "lava", "lift", "maps1", "maps2", "maps3", "pull", "push", "ride", "rideeat", "ridefire", "ridehurt", "ridejump", "ridestill", "ridesword", "shoot", "sit", "sleep", "spin", "swim", "sword", "walk" };
 const char* __defaultsword[] = {"sword1.png", "sword2.png", "sword3.png", "sword4.png"};
 const char* __defaultshield[] = {"shield1.png", "shield2.png", "shield3.png"};
 CLevel* NOLEVEL = new CLevel();
