@@ -13,7 +13,7 @@
 extern char baddyStartMode[];
 extern bool baddyPropsReinit[];
 
-#define baddypropcount 10
+#define baddypropcount 11
 // Baddy properties types
 enum {
 	BADDYID,	  //  0

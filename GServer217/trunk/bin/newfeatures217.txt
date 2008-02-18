@@ -48,6 +48,7 @@ Fixes:
 - Fixed a bug that would crash the gserver when opening the FileBrowser
   after certain actions.
 - Overhauled the time modification system.  Might fix some problems.
+- Fixed the baddy verse that activates when a baddy hurts a player.
 
 
 --------------------------------------------
