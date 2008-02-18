@@ -848,32 +848,29 @@ void CLevel::animate()
 
 void CLevel::dropItem( char iX, char iY )
 {
-	for (int i = 0; i < 10; i ++)
+	int itemId = rand()%20;
+	bool valid = false;
+
+	switch (itemId)
 	{
-		int itemId = rand()%20;
-		bool valid = false;
+		case GREENRUPEE:
+		case BLUERUPEE:
+		case REDRUPEE:
+		case BOMBS:
+		case DARTS:
+		case HEART:
+			valid = true;
+		break;
 
-		switch (itemId)
-		{
-			case GREENRUPEE:
-			case BLUERUPEE:
-			case REDRUPEE:
-			case BOMBS:
-			case DARTS:
-			case HEART:
-				valid = true;
+		default:
 			break;
+	}
 
-			default:
-				continue;
-		}
-
-		if (valid)
-		{
-			items.add(new CItem(iX, iY, itemId));
-			for (int ii = 0; ii < players.count(); ii++)
-				((CPlayer*)players[ii])->sendPacket(CPacket() << (char)SADDEXTRA << (char)(iX*2) << (char)(iY*2) << (char)itemId);
-		}
+	if (valid)
+	{
+		items.add(new CItem(iX, iY, itemId));
+		for (int ii = 0; ii < players.count(); ii++)
+			((CPlayer*)players[ii])->sendPacket(CPacket() << (char)SADDEXTRA << (char)(iX*2) << (char)(iY*2) << (char)itemId);
 	}
 }
 
