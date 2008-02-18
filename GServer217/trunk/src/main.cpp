@@ -155,8 +155,8 @@ int main()
 		gameTime ++;
 		NOLEVEL->reset();
 
-		// Every 60 seconds
-		if (gameTime % 60 == 0)
+		// Every 30 seconds
+		if (gameTime % 30 == 0)
 		{
 			ListServer_Send(CPacket() << (char)SLSPING);
 		}
