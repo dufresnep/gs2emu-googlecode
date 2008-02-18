@@ -3705,6 +3705,7 @@ Platform: win
 /find filepattern: searches for a game files in levels/
 /finddef filepattern: searches for default (classic) game files
 /updatelevel level[,level]: reloads levels form hard disk
+/updatelevelall: updates all loaded levels
 /refreshfilelist: scans the folders again (only use when /find is not working correctly)
 /shutdown: closes the server
 */
@@ -3833,6 +3834,14 @@ void CPlayer::msgDRCCHAT(CPacket& pPacket)
 		CStringList levels;
 		for (int i = 1; i < words.count(); i++)
 			CLevel::updateLevel(words[i]);
+	}
+	else if (words[0] == "/updatelevelall" && hasRight(CANUPDATELEVEL))
+	{
+		for ( int i = 0; i < levelList.count(); ++i )
+		{
+			CLevel* level = (CLevel*)levelList[i];
+			CLevel::updateLevel( level->fileName );
+		}
 	}
 }
 

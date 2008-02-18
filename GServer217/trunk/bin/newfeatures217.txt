@@ -33,6 +33,8 @@ Additions:
   PLEASE MAKE SURE YOUR FOLDERSCONFIG.TXT FILE IS CORRECT BEFORE YOU
   SEEK HELP!  IF YOUR FOLDERSCONFIG.TXT FILE IS INCORRECT, IT WILL
   CAUSE MANY THINGS TO TO BREAK.
+- Added RC command /updatelevelall.  It updates all loaded levels on
+  the gserver.
 
 Fixes:
 - More NPC props fixes.
