@@ -678,12 +678,13 @@ void CLevel::updateLevel(CString& pFileName)
 		playerTemp.add(player);
 	}
 
-	for(int i = 0; i < playerTemp.count(); i++)
+	for ( int i = 0; i < playerTemp.count(); i++ )
 	{
 		CPlayer* player = (CPlayer*)playerTemp[i];
-		for(int ii = player->enteredLevels.count() - 1; ii >= 0; ii--)
+		for ( int ii = player->enteredLevels.count() - 1; ii >= 0; ii-- )
 		{
 			CEnteredLevel* entered = (CEnteredLevel*)player->enteredLevels[ii];
+			if ( entered == 0 ) continue;
 			if(entered->level == level)
 			{
 				delete entered;
