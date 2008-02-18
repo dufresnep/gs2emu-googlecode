@@ -1318,11 +1318,13 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 		CHorse* horse = (CHorse*)level->horses[i];
 		sendPacket(CPacket() << (char)SADDHORSE << (char)horse->x << (char)horse->y << horse->imageName);
 	}
+
 	//send baddies
 	for ( int i = 0; i < level->baddies.count(); i++ )
 	{
 		CBaddy* baddy = (CBaddy*)level->baddies[i];
-		sendPacket(CPacket() << (char)SBADDYPROPS << (char)baddy->id << baddy->getPropList());
+		if ( baddy->mode != DIE )
+			sendPacket(CPacket() << (char)SBADDYPROPS << (char)baddy->id << baddy->getPropList());
 	}
 
 	//send npcs
