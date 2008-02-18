@@ -1339,6 +1339,7 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	for ( int i = enteredLevels.count() - 1; i >= 0; i-- )
 	{
 		CEnteredLevel* lvl = (CEnteredLevel*)enteredLevels[i];
+		if ( lvl == 0 ) continue;
 		if ( lvl->level == level )
 		{
 			delete lvl;
@@ -2273,7 +2274,8 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 		for ( int i = 0; i < playerList.count(); ++i )
 		{
 			CPlayer* other = (CPlayer*)playerList[i];
-			if ( other != this && other->level != this->level )
+			if ( other == this ) continue;
+			if ( other->level != this->level && other->type == CLIENTPLAYER )
 			{
 				other->sendPacket( forwardBuff2 );
 				other->compressAndSend();
