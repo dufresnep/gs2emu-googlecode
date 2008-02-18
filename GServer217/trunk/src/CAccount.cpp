@@ -131,7 +131,7 @@ bool CAccount::loadWorldPropsIni()
 
 void CAccount::saveAccount(bool pAttributes)
 {
-	if (loadOnly || accountName.length() < 1 || type == CLIENTRC)
+	if (loadOnly || accountName.length() < 1)
 		return;
 
 	CAccount oldAccount;

@@ -461,10 +461,10 @@ void CPlayer::sendAccount()
 
 	errorOut("rclog.txt", CString() << "New player: " << accountName);
 	id = createPlayerId(this);
-	saveAccount();
 
 	if(type == CLIENTPLAYER)
 	{
+		saveAccount();
 		sendPacket(CPacket() << (char)UNLIMITEDSIG << (char)73);
 
 		CPacket staff;
@@ -1834,7 +1834,9 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 {
 	int len;
 	CPacket forwardBuff;
+	CPacket forwardBuff2;
 	forwardBuff << (char)OTHERPLPROPS << (short)id;
+	forwardBuff2 << (char)OTHERPLPROPS << (short)id;
 
 	// This allows for correct RC login.
 	if (id == -1 && pForward)
@@ -1844,7 +1846,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 	{
 //		int startpos = pProps.getRead();
 		int index = pProps.readByte1();
-		if(index < 0 || index >= propscount-1)
+		if ( index < 0 || index >= propscount )
 		{
 			errorOut("rclog.txt", CString() << "setProps(" << toString(index) << ") index out of bounds by " << accountName);
 			deleteMe = true;
@@ -1860,6 +1862,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 				break;
 
 			setNick(CString() << pProps.readChars(len), true);
+			forwardBuff2 << (char)index << getProp( index );
 		}
 		break;
 
@@ -1970,14 +1973,20 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			if (len < 100)
 			{
 				if (len >= 0)
+				{
 					headImage = CString() << "head" << toString(len) << ".png";
+					forwardBuff2 << (char)index << getProp( index );
+				}
 			} else
 			{
 				if (len > 100)
 				{
 					CString temp( pProps.readChars(len-100) );
 					if ( isValidFile( temp, HEADGIF ) )
+					{
 						headImage = temp;
+						forwardBuff2 << (char)index << getProp( index );
+					}
 				}
 			}
 		break;
@@ -2254,6 +2263,18 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			}
 			*/
 			forwardBuff << (char)index << getProp(index);
+		}
+	}
+
+	// Send head and nick changes to players not in the level.
+	// This makes the mini-map work.
+	if ( forwardBuff2.length() > 3 )
+	{
+		for ( int i = 0; i < playerList.count(); ++i )
+		{
+			CPlayer* other = (CPlayer*)playerList[i];
+			if ( other != this && other->level != this->level )
+				other->sendPacket( forwardBuff2 );
 		}
 	}
 

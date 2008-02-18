@@ -49,6 +49,9 @@ Fixes:
   after certain actions.
 - Overhauled the time modification system.  Might fix some problems.
 - Fixed the baddy verse that activates when a baddy hurts a player.
+- When a player changes his nickname or head, it is now sent properly
+  to everybody on the server.  This fixes the problem where player's
+  heads weren't updating on the mini-map.
 
 
 --------------------------------------------

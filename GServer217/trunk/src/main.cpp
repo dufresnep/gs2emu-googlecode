@@ -608,6 +608,7 @@ int getFileSize(char* pFile)
 		return fileStat.st_size;
 	return 0;
 }
+
 int createPlayerId(CPlayer* pPlayer)
 {
 	for(int i = 1; i < playerIds.count(); i++)
