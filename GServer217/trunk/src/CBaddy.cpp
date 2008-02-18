@@ -6,7 +6,7 @@
 
 char baddyStartMode[] = {WALK,WALK,WALK,WALK,SWAMPSHOT,HAREJUMP,WALK,WALK,WALK,WALK};
 bool baddyPropsReinit[] = {false, true, true, true, true, true, true, true, false, false, false};
-int baddyPower[] = {2,3,4,3,2, 1,1,6,12,8};
+int baddyPower[] = {2,3,4,3,2,1,1,6,12,8};
 
 char* baddyImages[] = {
 	"baddygray.png", "baddyblue.png", "baddyred.png", "baddyblue.png",
@@ -99,7 +99,7 @@ void CBaddy::setProps(CPacket& pPacket)
 			break;
 			case BADDYMODE:
 				mode = pPacket.readByte1();
-				if(mode == DIE)
+				if ( mode == DIE )
 				{
 					if(respawn)
 						respawnCount = baddyRespawn;

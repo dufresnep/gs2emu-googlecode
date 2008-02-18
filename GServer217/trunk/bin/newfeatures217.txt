@@ -20,6 +20,9 @@ Additions:
   flagged as Under Construction, which means it will not show up in the
   player list.  To access the server, you have to type in the name
   of the server in the edit box below the server list and press Enter.
+- Added the new serveroptions.txt option "baddydropitems".  It is a
+  boolean value that defaults to false.  If true, baddies will drop
+  items when killed.
 - The GServer now prints less console messages and in a less detailed
   format.  It also prints the IP address of all incoming connections.
 - Folder Configuration is now implemented.  See the foldersconfig.txt

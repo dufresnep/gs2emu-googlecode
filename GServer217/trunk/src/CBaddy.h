@@ -9,8 +9,10 @@
 #include "CStringList.h"
 #include "CPacket.h"
 #include "COther.h"
+
 extern char baddyStartMode[];
 extern bool baddyPropsReinit[];
+
 #define baddypropcount 10
 // Baddy properties types
 enum {
@@ -56,7 +58,6 @@ class CBaddy
 	CPacket getProperty(int pId);
 	void setProps(CPacket &pProps);
 	void reset();
-
 };
 
 inline CBaddy::CBaddy(int pX, int pY, char pType)

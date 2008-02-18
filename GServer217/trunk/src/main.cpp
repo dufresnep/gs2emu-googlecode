@@ -30,7 +30,7 @@
 #endif
 
 bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, hasShutdown = false, lsConnected = false, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, staffOnly, vasesDrop, warptoforall, defaultweapons;
-bool clientsidePushPull, detailedconsole, underconstruction;
+bool clientsidePushPull, detailedconsole, underconstruction, baddyDropItems;
 const char* __admin[]   = {"description", "detailedconsole", "language", "listport", "listip", "maxplayers", "myip", "name", "serverport", "sharefolder", "showconsolepackets", "underconstruction", "url", "worldname"};
 const char* __colours[] = {"white", "yellow", "orange", "pink", "red", "darkred", "lightgreen", "green", "darkgreen", "lightblue", "blue", "darkblue", "brown", "cynober", "purple", "darkpurple", "lightgray", "gray", "black", "transparent"};
 const char* __cloths[]  = {"setskin", "setcoat", "setsleeve", "setshoe", "setbelt", "setsleeves", "setshoes"};
@@ -340,6 +340,7 @@ bool loadSettings(char* pFile)
 
 	/* BOOL Server-Options */
 	apSystem = CHECK_BOOL(findKey("apsystem", "true"));
+	baddyDropItems = CHECK_BOOL(findKey("baddydropitems", "false"));
 	bushesDrop = CHECK_BOOL(findKey("bushitems", "true"));
 	cheatwindowsban = CHECK_BOOL(findKey("cheatwindowsban", "false"));
 	clientsidePushPull = CHECK_BOOL(findKey("clientsidepushpull", "true"));

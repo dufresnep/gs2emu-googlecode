@@ -7,6 +7,7 @@ aptime2 = 300
 aptime3 = 600
 aptime4 = 1200
 apsystem = true
+baddydropitems = false
 baddyrespawntime = 60
 bushitems = true
 clientsidepushpull = true

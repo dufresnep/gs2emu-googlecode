@@ -60,7 +60,7 @@ class CLevel
 	bool changeBoard(CPacket& pTileData, int pX, int pY, int pWidth, int pHeight, CPlayer* player);
 	CPacket applyChange(CPacket& pTileData, int pX, int pY, int pWidth, int pHeight);
 	int createBaddyId(CBaddy*pBaddy);
-
+	void dropItem( char iX, char iY );
 };
 
 //Level objects
