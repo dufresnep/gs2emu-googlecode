@@ -2274,7 +2274,10 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 		{
 			CPlayer* other = (CPlayer*)playerList[i];
 			if ( other != this && other->level != this->level )
+			{
 				other->sendPacket( forwardBuff2 );
+				other->compressAndSend();
+			}
 		}
 	}
 
