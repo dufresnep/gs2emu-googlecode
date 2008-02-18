@@ -797,7 +797,7 @@ void CLevel::animate()
 			{
 				// Drop items.
 				if ( baddy->respawnCount == baddyRespawn && baddyDropItems == true )
-					dropItem( baddy->x, baddy->y );
+					dropBaddyItem( baddy->x, baddy->y );
 
 				baddy->respawnCount--;
 				if(!baddy->respawnCount)
@@ -846,10 +846,13 @@ void CLevel::animate()
 	}
 }
 
-void CLevel::dropItem( char iX, char iY )
+void CLevel::dropBaddyItem( char iX, char iY )
 {
-	int itemId = rand()%20;
-	bool valid = false;
+	// 41.66...% chance of a green gralat.
+	// 41.66...% chance of something else.
+	// 16.66...% chance of nothing.
+	int itemId = rand()%12;
+	bool valid = true;
 
 	switch (itemId)
 	{
@@ -859,18 +862,20 @@ void CLevel::dropItem( char iX, char iY )
 		case BOMBS:
 		case DARTS:
 		case HEART:
-			valid = true;
+			break;
 		break;
 
 		default:
+			if ( itemId > 5 && itemId < 10 ) itemId = GREENRUPEE;
+			else valid = false;
 			break;
 	}
 
-	if (valid)
+	if ( valid )
 	{
 		items.add(new CItem(iX, iY, itemId));
-		for (int ii = 0; ii < players.count(); ii++)
-			((CPlayer*)players[ii])->sendPacket(CPacket() << (char)SADDEXTRA << (char)(iX*2) << (char)(iY*2) << (char)itemId);
+		for (int i = 0; i < players.count(); i++)
+			((CPlayer*)players[i])->sendPacket(CPacket() << (char)SADDEXTRA << (char)(iX*2) << (char)(iY*2) << (char)itemId);
 	}
 }
 
