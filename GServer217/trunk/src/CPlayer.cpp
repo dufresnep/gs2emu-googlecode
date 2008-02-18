@@ -798,7 +798,7 @@ void CPlayer::processChat(CString& pMessage)
 	CStringList words;
 	if ((pMessage == "unstuck me" || pMessage == "unstick me") && jailLevels.find(levelName) < 0)
 	{
-		if (time(NULL) - lastMovement >= 30)
+		if (getTime() - lastMovement >= 30)
 		{
 			warp(unstickmeLevel, unstickmeX, unstickmeY);
 			chatMsg = CString() << "Warped!";
@@ -810,14 +810,14 @@ void CPlayer::processChat(CString& pMessage)
 	}
 	else if (pMessage.find("setnick") == 0)
 	{
-		if (time(NULL) - lastNick <= 10)
+		if (getTime() - lastNick <= 10)
 		{
 			chatMsg = "Wait 10 seconds before changing your nick again!";
 			updateProp(CURCHAT);
 			return;
 		}
 
-		lastNick = time(NULL);
+		lastNick = getTime();
 		CString temp = pMessage.text() + 7;
 		setNick(temp, true);
 	}
