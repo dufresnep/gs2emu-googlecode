@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="pspGserver" />
+		<Option makefile="../src/Makefile.psp" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="pspcompiler" />
+		<MakeCommands>
+			<Build command="$make -f $makefile" />
+			<CompileFile command="$make -f $makefile $file" />
+			<Clean command="$make -f $makefile clean" />
+			<DistClean command="$make -f $makefile distclean" />
+		</MakeCommands>
+		<Build>
+			<Target title="PSP">
+				<Option output="..\bin\PSPTest" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug\" />
+				<Option type="1" />
+				<Option compiler="pspcompiler" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<MakeCommands>
+					<Build command="$make -f $makefile" />
+					<CompileFile command="$make -f $makefile $file" />
+					<Clean command="$make -f $makefile clean" />
+					<DistClean command="$make -f $makefile distclean" />
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="..\src\CAccount.cpp" />
+		<Unit filename="..\src\CAccount.h" />
+		<Unit filename="..\src\CBaddy.cpp" />
+		<Unit filename="..\src\CBaddy.h" />
+		<Unit filename="..\src\CBuffer.cpp" />
+		<Unit filename="..\src\CBuffer.h" />
+		<Unit filename="..\src\CDatabase.cpp" />
+		<Unit filename="..\src\CDatabase.h" />
+		<Unit filename="..\src\CIni.cpp" />
+		<Unit filename="..\src\CIni.h" />
+		<Unit filename="..\src\CLevel.cpp" />
+		<Unit filename="..\src\CLevel.h" />
+		<Unit filename="..\src\CLinkedList.cpp" />
+		<Unit filename="..\src\CLinkedList.h" />
+		<Unit filename="..\src\CList.cpp" />
+		<Unit filename="..\src\CList.h" />
+		<Unit filename="..\src\CListServer.cpp" />
+		<Unit filename="..\src\CListServer.h" />
+		<Unit filename="..\src\CMap.cpp" />
+		<Unit filename="..\src\CMap.h" />
+		<Unit filename="..\src\CNpc.cpp" />
+		<Unit filename="..\src\CNpc.h" />
+		<Unit filename="..\src\COther.h" />
+		<Unit filename="..\src\CPacket.cpp" />
+		<Unit filename="..\src\CPacket.h" />
+		<Unit filename="..\src\CPlayer.cpp" />
+		<Unit filename="..\src\CPlayer.h" />
+		<Unit filename="..\src\CSocket.cpp" />
+		<Unit filename="..\src\CSocket.h" />
+		<Unit filename="..\src\CString.h" />
+		<Unit filename="..\src\CStringList.cpp" />
+		<Unit filename="..\src\CStringList.h" />
+		<Unit filename="..\src\CWeapon.cpp" />
+		<Unit filename="..\src\CWeapon.h" />
+		<Unit filename="..\src\CWordFilter.cpp" />
+		<Unit filename="..\src\CWordFilter.h" />
+		<Unit filename="..\src\main.cpp" />
+		<Unit filename="..\src\main.h" />
+		<Unit filename="..\src\Makefile.psp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

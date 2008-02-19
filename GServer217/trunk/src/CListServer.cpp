@@ -5,7 +5,7 @@ CSocket listServer;
 
 void ListServer_Connect()
 {
-	if ((lsConnected = listServer.connect(findKey("listip"), atoi(findKey("listport")))) == false)
+	if ((lsConnected = listServer.connectSock(findKey("listip"), atoi(findKey("listport")))) == false)
 	{
 		errorOut("rclog.txt", "Unable to connect to list server", true);
 		return;

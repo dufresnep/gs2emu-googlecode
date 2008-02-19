@@ -13,7 +13,10 @@
 #include <time.h>
 
 #define GSERVER_BUILD 56
-//#define STORE_SQL
+
+#ifdef PSPSDK
+	#define printf pspDebugScreenPrintf
+#endif
 
 extern bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, lsConnected, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, showQuery, staffOnly, vasesDrop, warptoforall, defaultweapons;
 extern bool clientsidePushPull, detailedconsole, underconstruction, baddyDropItems;

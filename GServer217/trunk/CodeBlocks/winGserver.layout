@@ -43,11 +43,11 @@
 	<File name="..\src\CList.h" open="0" top="0" tabpos="0">
 		<Cursor position="829" topLine="10" />
 	</File>
-	<File name="..\src\CListServer.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="278" topLine="0" />
+	<File name="..\src\CListServer.cpp" open="0" top="0" tabpos="7">
+		<Cursor position="1534" topLine="28" />
 	</File>
 	<File name="..\src\CListServer.h" open="0" top="0" tabpos="0">
-		<Cursor position="618" topLine="0" />
+		<Cursor position="237" topLine="0" />
 	</File>
 	<File name="..\src\CMap.cpp" open="0" top="0" tabpos="22">
 		<Cursor position="1306" topLine="84" />
@@ -61,8 +61,8 @@
 	<File name="..\src\CNpc.h" open="0" top="0" tabpos="15">
 		<Cursor position="1102" topLine="33" />
 	</File>
-	<File name="..\src\COther.h" open="0" top="0" tabpos="8">
-		<Cursor position="181" topLine="5" />
+	<File name="..\src\COther.h" open="0" top="0" tabpos="6">
+		<Cursor position="788" topLine="23" />
 	</File>
 	<File name="..\src\CPacket.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="14" topLine="0" />
@@ -70,17 +70,17 @@
 	<File name="..\src\CPacket.h" open="0" top="0" tabpos="11">
 		<Cursor position="112" topLine="0" />
 	</File>
-	<File name="..\src\CPlayer.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="15262" topLine="365" />
+	<File name="..\src\CPlayer.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="20916" topLine="633" />
 	</File>
 	<File name="..\src\CPlayer.h" open="0" top="0" tabpos="1">
 		<Cursor position="10603" topLine="356" />
 	</File>
 	<File name="..\src\CSocket.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="5531" topLine="222" />
+		<Cursor position="11" topLine="0" />
 	</File>
 	<File name="..\src\CSocket.h" open="0" top="0" tabpos="10">
-		<Cursor position="1588" topLine="49" />
+		<Cursor position="508" topLine="18" />
 	</File>
 	<File name="..\src\CStringList.cpp" open="0" top="0" tabpos="20">
 		<Cursor position="1192" topLine="34" />

@@ -5,14 +5,12 @@
 #define COTHERH
 
 
-#ifdef WIN32
-
+#if defined(WIN32)
 	#include <windows.h>
-
+#elif defined(PSPSDK)
+	#include <pspthreadman.h>
 #else
-
 	#include <unistd.h>
-
 #endif
 
 inline bool CHECK_BOOL(char *a)
@@ -50,10 +48,12 @@ inline float CLIP(float value, float min, float max)
 
 inline void wait(int pMilliseconds)
 {
-	#ifdef WIN32
-	Sleep(pMilliseconds);
+	#if defined(WIN32)
+		Sleep(pMilliseconds);
+	#elif defined(PSPSDK)
+		sceKernelDelayThread(pMilliseconds*1000);
 	#else
-	usleep(pMilliseconds*1000);
+		usleep(pMilliseconds*1000);
 	#endif
 }
 

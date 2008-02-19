@@ -13,16 +13,18 @@
 #include <stdlib.h>
 
 #ifdef WIN32
-//	#ifdef _MSC_VER
-		#define WIN32_LEAN_AND_MEAN
-		#include <windows.h>
-//	#else
-//		#include <dir.h>
-//	#endif
-
+	#define WIN32_LEAN_AND_MEAN
+	#include <windows.h>
 	char fSep[] = "\\";
 	char dataDir[] = "world\\";
-#else
+#elif defined(PSPSDK)
+	#include <pspkernel.h>
+	#include <pspdebug.h>
+	#include <pspsdk.h>
+	PSP_MODULE_INFO("GServer217", 0, 1, 1);
+#endif
+
+#ifndef WIN32
 	#include <unistd.h>
 	#include <dirent.h>
 	char fSep[] = "/";
@@ -52,8 +54,42 @@ void doTimer();
 void sendRCPacket(CPacket& pPacket);
 void shutdownServer();
 
-int main()
+#ifdef PSPSDK
+	/* Exit callback */
+	int exit_callback(int arg1, int arg2, void *common)
+	{
+		shutdownServer();
+		return 0;
+	}
+
+	/* Callback thread */
+	int CallbackThread(SceSize args, void *argp)
+	{
+		int cbid = sceKernelCreateCallback("Exit Callback", exit_callback, NULL);
+		sceKernelRegisterExitCallback(cbid);
+		sceKernelSleepThreadCB();
+		return 0;
+	}
+
+	/* Sets up the callback thread and returns its thread id */
+	int SetupCallbacks()
+	{
+		int thid = sceKernelCreateThread("update_thread", CallbackThread, 0x11, 0xFA0, 0, 0);
+		if (thid >= 0)
+			sceKernelStartThread(thid, 0, 0);
+		return thid;
+	}
+#endif
+
+int main(int argc, char *argv[])
 {
+	#ifdef PSPSDK
+		pspDebugScreenInit();
+		SetupCallbacks();
+	#else
+		atexit(shutdownServer);
+	#endif
+
 	/* Main Initiating */
 	adminNames.load( __admin, sizeof(__admin) / sizeof(const char*) );
 	colourNames.load( __colours, sizeof(__colours) / sizeof(const char*) );
@@ -81,7 +117,7 @@ int main()
 
 	/* Initialize Sockets */
 	CSocket::sockStart();
-	if(!serverSock.listen(serverPort, 20))
+	if(!serverSock.listenSock(serverPort, 20))
 	{
 		errorOut("rclog.txt", CString() << "SOCK ERROR: Unable to listen on port: " << toString(serverPort));
 		return 1;
@@ -109,7 +145,6 @@ int main()
 
 	/* Server Finished Loading */
 	printf("GServer 2 by 39ster\nSpecial thanks to Marlon, Agret, Pac300, 39ster and others for porting the \noriginal 1.39 gserver to 2.1\nServer listening on port: %i\nServer version: Build %s\n\n", serverPort, listServerFields[3].text());
-	atexit(shutdownServer);
 	errorOut("rclog.txt", "Server started");
 	serverRunning = true;
 
@@ -151,6 +186,7 @@ int main()
 			ListServer_Main();
 			wait(100);
 		}
+
 		doTimer();
 		gameTime ++;
 		NOLEVEL->reset();
@@ -776,6 +812,10 @@ void shutdownServer()
 
 	for(int i = 0; i < weaponList.count(); i++)
 		delete ((CWeapon*)weaponList[i]);
+
+	#ifdef PSPSDK
+		sceKernelExitGame();
+	#endif
 }
 
 void errorOut(char *pFile, CBuffer pError, bool pWrite)

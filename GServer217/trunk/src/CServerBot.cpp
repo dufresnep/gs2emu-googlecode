@@ -10,7 +10,7 @@ bool CServerBot::connect(char* pServer, int pPort)
 	CString pass = "SERVBOT";
 
 	botSock = new CSocket();
-	if(!botSock->connect(pServer, pPort))
+	if(!botSock->connectSock(pServer, pPort))
 		return false;
 	botSock->setSync(false);
 	CPacket packet;
