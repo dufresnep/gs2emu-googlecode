@@ -1487,18 +1487,15 @@ void CPlayer::sendFiles()
 
 		if(longName.length())
 		{
-			if ( isValidFile( longName, -1 ) )
+			modTime = getFileModTime(longName.text());
+			if (modTime != file->modTime)
 			{
-				modTime = getFileModTime(longName.text());
-				if (modTime != file->modTime)
+				if (fileData.load(longName.text()) && fileData.length() <= 64500)
 				{
-					if (fileData.load(longName.text()) && fileData.length() <= 64500)
-					{
-						failed = false;
-						int len = 1 + 5 + 1 + shortName.length() + fileData.length() + 1;
-						sendPacket(CPacket() << (char)100 << (int)len);
-						sendPacket(CPacket() << (char)102 << (long long)modTime << (char)shortName.length() << shortName << fileData << "\n");
-					}
+					failed = false;
+					int len = 1 + 5 + 1 + shortName.length() + fileData.length() + 1;
+					sendPacket(CPacket() << (char)100 << (int)len);
+					sendPacket(CPacket() << (char)102 << (long long)modTime << (char)shortName.length() << shortName << fileData << "\n");
 				}
 			}
 		}
