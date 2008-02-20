@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 
 	/* Setup Data-Directory */
 	dataDir = CBuffer(argv[0]).replaceAll("\\", "/");
-	dataDir = dataDir.copy(0, dataDir.findl('/')) << "/world/";
+	dataDir = dataDir.copy(0, dataDir.findl('/') + 1) << "world/";
 
 	/* Main Initiating */
 	adminNames.load( __admin, sizeof(__admin) / sizeof(const char*) );

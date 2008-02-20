@@ -236,6 +236,11 @@ CPlayer::~CPlayer()
 				other->sendPacket(CPacket() << (char)SDELPLAYER << (short)id);
 		}
 
+		// Save any pending weapons.
+		for ( int i = 0; i < weaponSend.count(); ++i )
+			if ( myWeapons.find( weaponSend[i] ) == -1 )
+				myWeapons.add( weaponSend[i] );
+
 		if (type == CLIENTPLAYER)
 		{
 			saveAccount();
