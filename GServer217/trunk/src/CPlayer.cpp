@@ -508,7 +508,10 @@ void CPlayer::sendAccount()
 
 			sendPacket(CPacket() << (char)LEVELNAME << unstickmeLevel);
 			if (!sendLevel(unstickmeLevel, unstickmeX, unstickmeY, 0))
+			{
+				errorOut("rclog.txt", CString() << "Could not find a level for " << accountName);
 				deleteMe = true;
+			}
 		}
 
 		sendPacket(CPacket() << (char)STARTMESSAGE << serverMessage);
