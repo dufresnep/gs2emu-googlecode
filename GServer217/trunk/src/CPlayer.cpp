@@ -3249,7 +3249,7 @@ void CPlayer::msgSSETOPTIONS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANEDITSERVEROPTION))
 	{
-		if ( type != CLIENTIRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to set the server options." );
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to set the server options." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to change the server options.");
 		return;
 	}
