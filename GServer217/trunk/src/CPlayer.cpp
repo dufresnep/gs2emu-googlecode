@@ -1339,8 +1339,7 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	for ( int i = enteredLevels.count() - 1; i >= 0; i-- )
 	{
 		CEnteredLevel* lvl = (CEnteredLevel*)enteredLevels[i];
-		if ( lvl == 0 ) continue;
-		if ( lvl->level == level )
+		if ( lvl == 0 || lvl->level == level )
 		{
 			delete lvl;
 			enteredLevels.remove(i);
@@ -1515,7 +1514,7 @@ time_t CPlayer::getLeavingTime(CLevel* pLevel)
 	for (int i = 0; i < enteredLevels.count(); i++)
 	{
 		CEnteredLevel* entered = (CEnteredLevel*)enteredLevels[i];
-		if (entered->level == pLevel)
+		if ( entered != 0 && entered->level == pLevel )
 			return entered->time;
 	}
 	return 0;

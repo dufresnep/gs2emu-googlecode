@@ -684,8 +684,7 @@ void CLevel::updateLevel(CString& pFileName)
 		for ( int j = player->enteredLevels.count() - 1; j >= 0; ++j )
 		{
 			CEnteredLevel* entered = (CEnteredLevel*)player->enteredLevels[j];
-			if ( entered == 0 ) continue;
-			if ( entered->level == level )
+			if ( entered == 0 || entered->level == level )
 			{
 				delete entered;
 				player->enteredLevels.remove( j );
