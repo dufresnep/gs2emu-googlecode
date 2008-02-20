@@ -2288,7 +2288,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 		}
 	}
 
-	if (pForward && forwardBuff.length() > 0)
+	if (pForward && forwardBuff.length() > 3)
 	{
 		sendLocally(forwardBuff);
 		compressAndSend();
@@ -3219,7 +3219,10 @@ inline bool CPlayer::hasStaff()
 void CPlayer::msgSWANTSOPTIONS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
+	{
+		errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to view the server options." );
 		return;
+	}
 
 	CStringList serverOptions;
 	serverOptions.load("serveroptions.txt");
@@ -3246,6 +3249,7 @@ void CPlayer::msgSSETOPTIONS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANEDITSERVEROPTION))
 	{
+		if ( type != CLIENTIRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to set the server options." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to change the server options.");
 		return;
 	}
@@ -3291,6 +3295,7 @@ void CPlayer::msgWANTRCFOLDERS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to view the folder configuration." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to view the folder configuration.");
 		return;
 	}
@@ -3304,6 +3309,7 @@ void CPlayer::msgSETRCFOLDERS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANEDITFOLDEROPTION))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to change the folder configuration." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to change the folder configuration.");
 		return;
 	}
@@ -3353,6 +3359,7 @@ void CPlayer::msgSETPLPROPS(CPacket& pPacket)
 
 	if (type != CLIENTRC || (player->accountName != accountName && !hasRight(CANSETATTRIBS)) || (player->accountName == accountName && !hasRight(CANSETOWNATTRIBS)))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to set a player's attributes." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to set attributes.");
 		return;
 	}
@@ -3366,6 +3373,7 @@ void CPlayer::msgDISPLAYER(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANDISCONNECT))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to disconnect a player." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to disconnect players.");
 		return;
 	}
@@ -3381,6 +3389,7 @@ void CPlayer::msgUPDLEVELS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANUPDATELEVEL))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to update a level." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to update levels.");
 		return;
 	}
@@ -3400,6 +3409,7 @@ void CPlayer::msgADMINMSG(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANADMINMSG))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to send an admin message." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to send admin messages.");
 		return;
 	}
@@ -3417,6 +3427,7 @@ void CPlayer::msgPRIVADMINMSG(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANADMINMSG))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to send an admin message." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to send admin messages.");
 		return;
 	}
@@ -3448,6 +3459,7 @@ void CPlayer::msgLISTSFLAGS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to view the server flags." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to view the server flags.");
 		return;
 	}
@@ -3462,6 +3474,7 @@ void CPlayer::msgSETSFLAGS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANSETSERVERFLAG))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to set the server flags." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to change the server flags.");
 		return;
 	}
@@ -3486,6 +3499,7 @@ void CPlayer::msgDADDACCOUNT(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANCHANGESTAFFACC))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to add a new account." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to add new accounts.");
 		return;
 	}
@@ -3508,6 +3522,7 @@ void CPlayer::msgDDELACCOUNT(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANCHANGESTAFFACC))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to delete an account." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to delete accounts.");
 		return;
 	}
@@ -3523,6 +3538,7 @@ void CPlayer::msgDWANTACCLIST(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to view the accounts list." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized for viewing the accounts list.");
 		return;
 	}
@@ -3543,6 +3559,7 @@ void CPlayer::msgDWANTACCPLPROPS(CPacket& pPacket)
 {
 	if ( type != CLIENTRC || !hasStaff() )
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to view a player's attributes." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to load player attributes.");
 		return;
 	}
@@ -3569,6 +3586,7 @@ void CPlayer::msgDRESETPLPROPS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANRESETATTRIBS))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to reset an account." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to reset accounts.");
 		return;
 	}
@@ -3603,6 +3621,7 @@ void CPlayer::msgDSETACCPLPROPS(CPacket& pPacket)
 	CString accname = pPacket.readChars(pPacket.readByte1());
 	if (type != CLIENTRC || (accname != accountName && !hasRight(CANSETATTRIBS)) || (accname == accountName && !hasRight(CANSETOWNATTRIBS)))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to change a player's attributes." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to change player attributes.");
 		return;
 	}
@@ -3636,6 +3655,7 @@ void CPlayer::msgDWANTACCOUNT(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to view a player's account." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to view the player's account.");
 		return;
 	}
@@ -3661,6 +3681,7 @@ void CPlayer::msgDSETACCOUNT(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANCHANGESTAFFACC))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to set a player's account." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to set the player's account.");
 		return;
 	}
@@ -3719,6 +3740,7 @@ void CPlayer::msgDRCCHAT(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to send an RC chat message." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to send RC chat.");
 		return;
 	}
@@ -3865,6 +3887,7 @@ void CPlayer::msgWARPPLAYER(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANWARPPLAYER))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to warp a player." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to warp players.");
 		return;
 	}
@@ -3883,6 +3906,7 @@ void CPlayer::msgDWANTRIGHTS(CPacket& pPacket)
 	CString accname = pPacket.readString("");
 	if (type != CLIENTRC || (accname != accountName && !hasRight(CANCHANGERIGHTS)))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to view a player's admin rights." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to view admin rights.");
 		return;
 	}
@@ -3913,6 +3937,7 @@ void CPlayer::msgDSETRIGHTS(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANCHANGERIGHTS))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to set a player's admin rights." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to change admin rights.");
 		return;
 	}
@@ -3971,6 +3996,7 @@ void CPlayer::msgDWANTCOM(CPacket&pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANCHANGECOMMENTS))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to view a player's comments." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to view comments.");
 		return;
 	}
@@ -3997,6 +4023,7 @@ void CPlayer::msgDSETCOM(CPacket&pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANCHANGECOMMENTS))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to set a player's comments." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to change admin comments.");
 		return;
 	}
@@ -4028,6 +4055,7 @@ void CPlayer::msgDEDITBAN(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to view a player's ban." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to view a player's ban.");
 		return;
 	}
@@ -4054,6 +4082,7 @@ void CPlayer::msgDSETBAN(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasRight(CANBAN))
 	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to ban a player." );
 		sendRCPacket(CPacket() << (char)DRCLOG << "Server: " << accountName << " is not authorized to ban players.");
 		return;
 	}
@@ -4087,7 +4116,10 @@ void CPlayer::msgDSETBAN(CPacket& pPacket)
 void CPlayer::msgDWANTFTP(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
+	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to open a FileBrowser session." );
 		return;
+	}
 
 	sendPacket(CPacket() << (char)SFOLDERFTP << myFolders.join("\n").tokenize());
 	sendPacket(CPacket() << (char)STEXTFTP << "Welcome to the FileBrowser");
@@ -4167,7 +4199,10 @@ void CPlayer::msgDENDFTP(CPacket& pPacket)
 void CPlayer::msgDFILEFTPDOWN(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
+	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to download a file through a FileBrowser session." );
 		return;
+	}
 
 	CString shortName = pPacket.text() + 1;
 	fileList.add(new COutFile(CString() << lastFolder << shortName));
@@ -4177,7 +4212,10 @@ void CPlayer::msgDFILEFTPDOWN(CPacket& pPacket)
 void CPlayer::msgDFILEFTPUP(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
+	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to upload a file through a FileBrowser session." );
 		return;
+	}
 
 	CBuffer shortName, fileData, fileName;
 	shortName = pPacket.readChars((unsigned char)pPacket.readByte1());
@@ -4192,7 +4230,10 @@ void CPlayer::msgDFILEFTPMOV(CPacket& pPacket)
 {
 	// learn 2 fucking order...
 	if (type != CLIENTRC || !hasStaff())
+	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to move a file through a FileBrowser session." );
 		return;
+	}
 
 	CBuffer f1, f2, f3, f4;
 	f1 = pPacket.readChars((unsigned char)pPacket.readByte1());
@@ -4209,7 +4250,11 @@ void CPlayer::msgDFILEFTPMOV(CPacket& pPacket)
 void CPlayer::msgDFILEFTPDEL(CPacket& pPacket)
 {
 	if (type != CLIENTRC || !hasStaff())
+	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to delete a file through a FileBrowser session." );
 		return;
+	}
+
 	// no security.. oh well
 	CString fileName = CString() << lastFolder << pPacket.text() + 1;
 	remove(fileName.text());
@@ -4218,8 +4263,12 @@ void CPlayer::msgDFILEFTPDEL(CPacket& pPacket)
 
 void CPlayer::msgDFILEFTPREN(CPacket& pPacket)
 {
-	if(type != CLIENTRC)
+	if (type != CLIENTRC)
+	{
+		if ( type != CLIENTRC ) errorOut("rclog.txt", CString() << "[Hack] " << accountName << " attempted to rename a file through a FileBrowser session." );
 		return;
+	}
+
 	// no security.. oh well
 	CString f1 = CString() << lastFolder << pPacket.readChars((unsigned char)pPacket.readByte1());
 	CString f2 = CString() << lastFolder << pPacket.readChars((unsigned char)pPacket.readByte1());

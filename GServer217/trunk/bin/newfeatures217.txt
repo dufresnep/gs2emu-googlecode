@@ -9,6 +9,9 @@ Maintenance:
 - The log files now display everything on one line.
 - Re-worked the RC messages again to send to all RC's and to display
   the account name of the player who sent the packet.
+- Attempts by player's to issue RC commands through packet forgery are
+  now logged in rclog.txt.  Do a search for [Hack] to view all
+  access attempts.
 - Added the images folder to world/ to fit with the current
   foldersconfig.txt file.
 - Removed CBuffer::findIn().  Wasn't needed after all.  :x
