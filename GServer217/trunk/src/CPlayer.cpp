@@ -465,8 +465,6 @@ void CPlayer::sendAccount()
 	if(type == CLIENTPLAYER)
 	{
 		saveAccount();
-		sendPacket(CPacket() << (char)UNLIMITEDSIG << (char)73);
-
 		CPacket staff;
 		staff << (char)SSTAFFGUILDS;
 		for(int i = 0; i < staffGuilds.count(); i++)
@@ -3306,9 +3304,9 @@ void CPlayer::msgSETRCFOLDERS(CPacket& pPacket)
 	}
 
 	CString data = pPacket.text() + 1;
-	data.untokenize();//.replaceAll("\n", "\n");
+	data.untokenize();
 	data.save("foldersconfig.txt");
-	folderConfig.load( "foldersconfig.txt" );
+	folderConfig.load("foldersconfig.txt");
 	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " has updated the folder configuration.");
 }
 
@@ -3814,12 +3812,6 @@ void CPlayer::msgDRCCHAT(CPacket& pPacket)
 	{
 		words.remove(0);
 		msgDRESETPLPROPS(CPacket() << words.join(" "));
-	}
-	else if (words[0] == "/refreshfilelist" && hasRight(CANEDITSERVEROPTION))
-	{
-		subDirs.clear();
-		getSubDirs(dataDir);
-		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " refreshed the file list.");
 	}
 	else if (words[0] == "/refreshservermessage" && hasRight(CANEDITSERVEROPTION))
 	{

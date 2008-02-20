@@ -15,8 +15,8 @@
 #ifdef WIN32
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
-	char fSep[] = "\\";
-	char dataDir[] = "world\\";
+	char fSep[] = "/";
+	char dataDir[] = "world/";
 #elif defined(PSPSDK)
 	#include <pspkernel.h>
 	#include <pspdebug.h>
@@ -28,7 +28,7 @@
 	#include <unistd.h>
 	#include <dirent.h>
 	char fSep[] = "/";
-	char dataDir[] = "world/";
+	char dataDir[] = "ms0:/PSP/GAME/NET/world/";
 #endif
 
 bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, hasShutdown = false, lsConnected = false, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, staffOnly, vasesDrop, warptoforall, defaultweapons;
@@ -116,7 +116,9 @@ int main(int argc, char *argv[])
 	}
 
 	/* Initialize Sockets */
-	CSocket::sockStart();
+	if (CSocket::sockStart() != 0)
+		return 1;
+
 	if(!serverSock.listenSock(serverPort, 20))
 	{
 		errorOut("rclog.txt", CString() << "SOCK ERROR: Unable to listen on port: " << toString(serverPort));
@@ -124,12 +126,6 @@ int main(int argc, char *argv[])
 	}
 
 	serverSock.setSync(false);
-
-	/* Sub-Directory Caching */
-	printf("[%s] Caching sub dirs\n",getTimeStr(1).text());
-	getSubDirs(dataDir);
-	if(shareFolder.length()>1)
-		getSubDirs(shareFolder.text());
 
 	/* Load Maps */
 	for(int i = 0; i < mapNames.count(); i++)
@@ -334,7 +330,10 @@ bool updateFile(char *pFile)
 	else if (strcmp(pFile, "rules.txt") == 0)
 		WordFilter.load("rules.txt");
 	else if ( strcmp(pFile, "foldersconfig.txt") == 0 )
+	{
 		folderConfig.load( "foldersconfig.txt" );
+		getSubDirs();
+	}
 	else
 		return false;
 
@@ -439,102 +438,105 @@ bool loadSettings(char* pFile)
 	return true;
 }
 
-#ifdef WIN32
-void getSubDirs(char *pDir)
+void getSubDirs()
 {
-	CString searchdir = CString() << pDir << "*";
-	WIN32_FIND_DATA filedata;
-	HANDLE hFind = FindFirstFile(searchdir.text(), &filedata);
-	subDirs.add(pDir);
-
-	if(hFind!=NULL)
+	subDirs.clear();
+	subDirs.add(dataDir);
+	for (int i = 0; i < folderConfig.count(); i++)
 	{
-		do
+		if (folderConfig[i][0] == '#')
+			continue;
+
+		CBuffer fmask, fname;
+		folderConfig[i].setRead(folderConfig[i].find(' '));
+		fmask = CBuffer() << dataDir << CBuffer(folderConfig[i].readString("")).trim();
+		fname = CBuffer() << fmask.readChars(fmask.findl(fSep[0])) << fSep;
+		if (subDirs.find(fname) == -1)
+			subDirs.add(fname);
+	}
+}
+
+#if defined(WIN32)
+	void getSubFiles(char* pDir, CStringList& pOut, CString* search)
+	{
+		// Assemble the search wildcards.
+		CString searchdir( pDir );
+		if ( search == 0 ) searchdir << "*";
+		else
 		{
-			if(filedata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			searchdir << search->replaceAll( "%", "*" );
+			searchdir << ".txt";
+		}
+
+		WIN32_FIND_DATA filedata;
+		HANDLE hFind = FindFirstFile(searchdir.text(), &filedata);
+		if(hFind!=NULL)
+		{
+			do
 			{
-				if(filedata.cFileName[0] != '.')
+				if(!(filedata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+					pOut.add(filedata.cFileName);
+			} while (FindNextFile(hFind, &filedata));
+		}
+		FindClose(hFind);
+	}
+#elif defined(PSPSDK)
+	void getSubFiles(char* pDir, CStringList& pOut, CString* search)
+	{
+		SceUID dir;
+		if ((dir = sceIoDopen(pDir)) <= 0)
+			return;
+
+		SceIoDirent ent;
+		SceIoStat statx;
+
+		while (sceIoDread(dir, &ent) > 0)
+		{
+			CString fullName = CString() << pDir << ent.d_name;
+			sceIoGetstat(fullName.text(), &statx);
+			if (!(statx.st_mode & S_IFDIR))
+			{
+				if (search != 0)
 				{
-					CString directory = CString() << pDir << filedata.cFileName << fSep;
-					getSubDirs(directory.text());
+					CString s( *search );
+					CString m( ent.d_name );
+					s.replaceAll( "%", "*" );
+					s << ".txt";
+					if (m.match( s.text()) == false) continue;
 				}
+				pOut.add( ent.d_name );
 			}
-		} while (FindNextFile(hFind, &filedata));
-	}
-	FindClose(hFind);
-}
+		}
 
-void getSubFiles(char* pDir, CStringList& pOut, CString* search)
-{
-	// Assemble the search wildcards.
-	CString searchdir( pDir );
-	if ( search == 0 ) searchdir << "*";
-	else
-	{
-		searchdir << search->replaceAll( "%", "*" );
-		searchdir << ".txt";
+		sceIoDclose(dir);
 	}
-
-	WIN32_FIND_DATA filedata;
-	HANDLE hFind = FindFirstFile(searchdir.text(), &filedata);
-	if(hFind!=NULL)
-	{
-		do
-		{
-			if(!(filedata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-				pOut.add(filedata.cFileName);
-		} while (FindNextFile(hFind, &filedata));
-	}
-	FindClose(hFind);
-}
 #else
-void getSubDirs(char *pDir)
-{
-	DIR *dir;
-	struct stat statx;
-	struct dirent *ent;
-	if ((dir = opendir(pDir)) == NULL)
-		return;
-	subDirs.add(pDir);
-	while ((ent = readdir(dir)) != NULL)
+	void getSubFiles(char* pDir, CStringList& pOut, CString* search)
 	{
-		if (ent->d_name[0] != '.')
+		DIR *dir;
+		struct stat statx;
+		struct dirent *ent;
+		if ((dir = opendir(pDir)) == NULL)
+			return;
+		while ((ent = readdir(dir)) != NULL)
 		{
-			CString directory = CString() << pDir << ent->d_name << fSep;
-			stat(directory.text(), &statx);
-			if (statx.st_mode & S_IFDIR)
-				getSubDirs(directory.text());
-		}
-	}
-	closedir(dir);
-}
-
-void getSubFiles(char* pDir, CStringList& pOut, CString* search)
-{
-	DIR *dir;
-	struct stat statx;
-	struct dirent *ent;
-	if ((dir = opendir(pDir)) == NULL)
-		return;
-	while ((ent = readdir(dir)) != NULL)
-	{
-		CString fullName = CString() << pDir << ent->d_name;
-		stat(fullName.text(), &statx);
-		if (!(statx.st_mode & S_IFDIR))
-		{
-			if ( search != 0 )
+			CString fullName = CString() << pDir << ent->d_name;
+			stat(fullName.text(), &statx);
+			if (!(statx.st_mode & S_IFDIR))
 			{
-				CString s( *search );
-				CString m( ent->d_name );
-				s.replaceAll( "%", "*" );
-				s << ".txt";
-				if ( m.match( s.text() ) == false ) continue;
+				if ( search != 0 )
+				{
+					CString s( *search );
+					CString m( ent->d_name );
+					s.replaceAll( "%", "*" );
+					s << ".txt";
+					if ( m.match( s.text() ) == false ) continue;
+				}
+				pOut.add( ent->d_name );
 			}
-			pOut.add( ent->d_name );
 		}
+		closedir(dir);
 	}
-	closedir(dir);
-}
 #endif
 
 bool loadWeapons(char* pFile)

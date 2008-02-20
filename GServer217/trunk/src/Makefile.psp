@@ -219,7 +219,7 @@ clean:
 	-rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO) $(PSP_EBOOT) $(EXTRA_TARGETS)
 
 clean_o:
-	-rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO)
+	#-rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO)
 	-mv -f $(PSP_EBOOT) ../bin/$(PSP_EBOOT)
 
 rebuild: clean all

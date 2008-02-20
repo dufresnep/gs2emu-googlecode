@@ -196,13 +196,8 @@ int CSocket::receiveBytes(CBuffer& pDestination, int pCount, int pMode)
 			return size;
 
 		int a = recv(sockId, buff, len, 0);
-		#ifdef PSPSDK
-			if (a == 0)
-				return -1;
-		#else
-			if (a == 0 || a == -1)
-				return -1;
-		#endif
+		if (a == 0)
+			return -1;
 
 		if(a < 0)
 		{
