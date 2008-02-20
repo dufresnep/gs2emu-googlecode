@@ -51,10 +51,10 @@
 
 class CSocket
 {
-    int sockId;
-    bool blocking, udp;
+	int sockId;
+	bool blocking, udp;
 
-    public:
+	public:
 		CSocket(char* pAddress, int pPort);
 		CSocket(int pSockId);
 		CSocket(){sockId = 0;}

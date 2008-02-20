@@ -45,6 +45,7 @@ CStringList folderConfig, defaultGaniNames, defaultSwordNames, defaultShieldName
 CWordFilter WordFilter;
 float unstickmeX, unstickmeY;
 int aptime[5], baddyRespawn, cheatwindowstime, gameTime = 1, heartLimit, horseLife, idleDisconnect, listServerPort, maxNoMovement, maxPlayers, nwTime, serverPort, serverTime = 0, shieldLimit, swordLimit, tileRespawn;
+
 void acceptNewPlayers(CSocket &pSocket);
 void doTimer();
 void sendRCPacket(CPacket& pPacket);

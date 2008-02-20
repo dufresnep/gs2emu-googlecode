@@ -3836,6 +3836,7 @@ void CPlayer::msgDRCCHAT(CPacket& pPacket)
 			CLevel* level = (CLevel*)levelList[i];
 			CLevel::updateLevel( level->fileName );
 		}
+		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " updated all the levels.");
 	}
 }
 
