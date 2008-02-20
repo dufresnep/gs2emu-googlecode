@@ -1736,6 +1736,7 @@ CPacket CPlayer::getProp(int pProp)
 	case HORSEGIF:
 		retVal << (char)horseImage.length() << horseImage;
 		break;
+
 	case HORSEBUSHES:
 		retVal.writeByte1(horseBushes);
 		break;
@@ -1788,6 +1789,10 @@ CPacket CPlayer::getProp(int pProp)
 
 	case UDPPORT:
 		retVal.writeByte3(udpPort);
+		break;
+
+	case PLANGUAGE:
+		retVal << (char)language.length() << language;
 		break;
 
 	case GATTRIB1: retVal << (char)myAttr[0].length() << myAttr[0]; break;
