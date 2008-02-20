@@ -729,14 +729,26 @@ bool isValidFile(CBuffer& file, int type)
 
 			case 8:		// SWORDPOWER
 				if ( ftype == "sword" )
+				{
+					int j = 0;
+					while ( j < defaultSwordNames.count() &&
+						file.find( defaultSwordNames[j].text() ) == -1 ) ++j;
+					if ( j != defaultSwordNames.count() ) return false;
 					if ( file.match( fmask.text() ) )
 						return true;
+				}
 			break;
 
 			case 9:		// SHIELDPOWER
 				if ( ftype == "shield" )
+				{
+					int j = 0;
+					while ( j < defaultShieldNames.count() &&
+						file.find( defaultShieldNames[j].text() ) == -1 ) ++j;
+					if ( j != defaultShieldNames.count() ) return false;
 					if ( file.match( fmask.text() ) )
 						return true;
+				}
 			break;
 
 			case 1:		// level
@@ -746,12 +758,26 @@ bool isValidFile(CBuffer& file, int type)
 			break;
 
 			case -1:	// Any
+				if ( file.find( ".gani" ) != -1 )
+				{
+					int j = 0;
+					while ( j < defaultGaniNames.count() &&
+						file.find( defaultGaniNames[j].text() ) == -1 ) ++j;
+					if ( j != defaultGaniNames.count() ) return false;
+				}
 				if ( file.match( fmask.text() ) )
 					return true;
 			break;
 
 			default:
 			case 0:		// file
+				if ( file.find( ".gani" ) != -1 )
+				{
+					int j = 0;
+					while ( j < defaultGaniNames.count() &&
+						file.find( defaultGaniNames[j].text() ) == -1 ) ++j;
+					if ( j != defaultGaniNames.count() ) return false;
+				}
 				if ( ftype == "file" )
 					if ( file.match( fmask.text() ) )
 						return true;

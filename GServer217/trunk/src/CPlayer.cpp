@@ -1825,7 +1825,7 @@ CPacket CPlayer::getProp(int pProp)
 		retVal.writeByte2(rating);
 	break;
 	default:
-		errorOut("rclog.txt", CString() << "Unknown getProp() by " << accountName);
+		errorOut("rclog.txt", CString() << "Unknown getProp( " << toString(pProp) << " ) by " << accountName);
 		break;
 	}
 	return retVal;

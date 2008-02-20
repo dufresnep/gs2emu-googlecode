@@ -11,6 +11,7 @@ Maintenance:
   the account name of the player who sent the packet.
 - Added the images folder to world/ to fit with the current
   foldersconfig.txt file.
+- Removed CBuffer::findIn().  Wasn't needed after all.  :x
 
 Additions:
 - Added the new serveroptions.txt option "detailedconsole".  It is a
@@ -34,6 +35,10 @@ Additions:
   PLEASE MAKE SURE YOUR FOLDERSCONFIG.TXT FILE IS CORRECT BEFORE YOU
   SEEK HELP!  IF YOUR FOLDERSCONFIG.TXT FILE IS INCORRECT, IT WILL
   CAUSE MANY THINGS TO TO BREAK.
+- The gserver will no longer send any of the default sword, shield, or
+  gani files to the client if the files on the gserver differ.  This
+  will prevent problems like the gserver sending the broken sword.gani
+  file with the wrong hat position to clients who connect.j
 - Added RC command /updatelevelall.  It updates all loaded levels on
   the gserver.
 
