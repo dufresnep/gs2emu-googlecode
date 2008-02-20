@@ -43,15 +43,15 @@ vasesdrop = true
 warptoforall = false
  
 # Private-Server Options (changestaffacct required)
-description = My Server
-detailedconsole = false
+description = My Serv
+detailedconsole = true
 language = English
 listport = 14900
 listip = listserver.graal.in
 maxplayers = 128
 myip = AUTO
 name = My Server
-serverport = 14802
+serverport = 14920
 sharefolder = 
 showconsolepackets = false
 underconstruction = false

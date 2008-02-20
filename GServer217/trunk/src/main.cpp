@@ -15,8 +15,6 @@
 #ifdef WIN32
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
-	char fSep[] = "/";
-	char dataDir[] = "world/";
 #elif defined(PSPSDK)
 	#include <pspkernel.h>
 	#include <pspdebug.h>
@@ -27,12 +25,11 @@
 #ifndef WIN32
 	#include <unistd.h>
 	#include <dirent.h>
-	char fSep[] = "/";
-	char dataDir[] = "ms0:/PSP/GAME/NET/world/";
 #endif
 
 bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, hasShutdown = false, lsConnected = false, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, staffOnly, vasesDrop, warptoforall, defaultweapons;
 bool clientsidePushPull, detailedconsole, underconstruction, baddyDropItems;
+char fSep[] = "/";
 const char* __admin[]   = {"description", "detailedconsole", "language", "listport", "listip", "maxplayers", "myip", "name", "serverport", "sharefolder", "showconsolepackets", "underconstruction", "url", "worldname"};
 const char* __colours[] = {"white", "yellow", "orange", "pink", "red", "darkred", "lightgreen", "green", "darkgreen", "lightblue", "blue", "darkblue", "brown", "cynober", "purple", "darkpurple", "lightgray", "gray", "black", "transparent"};
 const char* __cloths[]  = {"setskin", "setcoat", "setsleeve", "setshoe", "setbelt", "setsleeves", "setshoes"};
@@ -42,13 +39,12 @@ const char* __defaultshield[] = {"shield1.png", "shield2.png", "shield3.png"};
 CLevel* NOLEVEL = new CLevel();
 CList newPlayers, playerList, playerIds, settingList, weaponList, npcList, npcIds, levelList;
 CSocket responseSock, serverSock;
-CString listServerFields[6], listServerIp, serverMessage, shareFolder, staffHead, worldName, unstickmeLevel;
+CString dataDir, listServerFields[6], listServerIp, serverMessage, shareFolder, staffHead, worldName, unstickmeLevel;
 CStringList adminNames, cheatwindows, clothCommands, colourNames, globalGuildList, jailLevels, mapNames, profileList, RCBans, RCMessage, RCHelpMessage, serverFlags, staffGuilds, staffList, statusList, subDirs;
 CStringList folderConfig, defaultGaniNames, defaultSwordNames, defaultShieldNames;
 CWordFilter WordFilter;
 float unstickmeX, unstickmeY;
 int aptime[5], baddyRespawn, cheatwindowstime, gameTime = 1, heartLimit, horseLife, idleDisconnect, listServerPort, maxNoMovement, maxPlayers, nwTime, serverPort, serverTime = 0, shieldLimit, swordLimit, tileRespawn;
-
 void acceptNewPlayers(CSocket &pSocket);
 void doTimer();
 void sendRCPacket(CPacket& pPacket);
@@ -89,6 +85,10 @@ int main(int argc, char *argv[])
 	#else
 		atexit(shutdownServer);
 	#endif
+
+	/* Setup Data-Directory */
+	dataDir = CBuffer(argv[0]).replaceAll("\\", "/");
+	dataDir = dataDir.copy(0, dataDir.findl('/')) << "/world/";
 
 	/* Main Initiating */
 	adminNames.load( __admin, sizeof(__admin) / sizeof(const char*) );

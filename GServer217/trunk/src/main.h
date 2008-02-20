@@ -20,10 +20,10 @@
 
 extern bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, lsConnected, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, showQuery, staffOnly, vasesDrop, warptoforall, defaultweapons;
 extern bool clientsidePushPull, detailedconsole, underconstruction, baddyDropItems;
-extern char fSep[], dataDir[];
+extern char fSep[];
 extern CLevel *NOLEVEL;
 extern CList newPlayers, playerList, playerIds, settingList, weaponList, npcList, npcIds, levelList;
-extern CString listServerFields[6], serverMessage, staffHead, unstickmeLevel, worldName, rev;
+extern CString dataDir, listServerFields[6], serverMessage, staffHead, unstickmeLevel, worldName, rev;
 extern CStringList adminNames, cheatwindows, clothCommands, colourNames, globalGuildList, jailLevels, mapNames, profileList, RCBans, RCMessage, RCHelpMessage, serverFlags, staffGuilds, staffList, statusList, subDirs;
 extern CStringList folderConfig, defaultGaniNames, defaultSwordNames, defaultShieldNames;
 extern float unstickmeX, unstickmeY;
