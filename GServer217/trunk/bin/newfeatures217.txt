@@ -41,7 +41,7 @@ Additions:
 - The gserver will no longer send any of the default sword, shield, or
   gani files to the client if the files on the gserver differ.  This
   will prevent problems like the gserver sending the broken sword.gani
-  file with the wrong hat position to clients who connect.j
+  file with the wrong hat position to clients who connect.
 - Added RC command /updatelevelall.  It updates all loaded levels on
   the gserver.
 
@@ -64,8 +64,8 @@ Fixes:
   to everybody on the server.  This fixes the problem where player's
   heads weren't updating on the mini-map.
 - The GServer won't send dead baddies to the client anymore.  This
-  the problem where a player would enter a level full of dead baddies,
-  load them, then immediately watch them all die.
+  fixes the problem where a player would enter a level full of dead
+  baddies, load them, then immediately watch them all die.
 - The PLANGUAGE player property is now sent when requested.
 
 
