@@ -275,7 +275,8 @@ void CPlayer::main()
 	int size=0;
 	if ((size = playerSock->receiveBytes(receiveBuff, 65536)) < 0)
 	{
-		errorOut("rclog.txt", CString() << "Client " << accountName << " disconnected with sock error: " << toString(size));
+		if ( size != -1 )
+			errorOut("rclog.txt", CString() << "Client " << accountName << " disconnected with sock error: " << toString(size));
 		deleteMe = true;
 		compressAndSend();
 		return;
