@@ -1,4 +1,4 @@
-# Not needed as of yet.
+# Folder Configuration
 body    bodies/*.png
 head    heads/*
 sword   swords/*
