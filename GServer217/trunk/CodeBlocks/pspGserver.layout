@@ -1,4 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug" />
+	<ActiveTarget name="PSP" />
+	<File name="..\src\CBuffer.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="11357" topLine="571" />
+	</File>
+	<File name="..\src\CBuffer.h" open="1" top="0" tabpos="0">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="..\src\CDatabase.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="2915" topLine="0" />
+	</File>
+	<File name="..\src\CIni.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="5993" topLine="246" />
+	</File>
+	<File name="..\src\CLevel.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="4156" topLine="141" />
+	</File>
+	<File name="..\src\CListServer.cpp" open="1" top="0" tabpos="0">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="..\src\COther.h" open="0" top="0" tabpos="0">
+		<Cursor position="916" topLine="24" />
+	</File>
+	<File name="..\src\CPlayer.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="10301" topLine="283" />
+	</File>
+	<File name="..\src\CPlayer.h" open="0" top="0" tabpos="0">
+		<Cursor position="6810" topLine="258" />
+	</File>
+	<File name="..\src\CSocket.cpp" open="1" top="1" tabpos="3">
+		<Cursor position="2010" topLine="70" />
+	</File>
+	<File name="..\src\Makefile.psp" open="1" top="0" tabpos="2">
+		<Cursor position="1723" topLine="26" />
+	</File>
+	<File name="..\src\main.cpp" open="1" top="0" tabpos="0">
+		<Cursor position="15192" topLine="426" />
+	</File>
+	<File name="..\src\main.h" open="1" top="0" tabpos="1">
+		<Cursor position="2353" topLine="23" />
+	</File>
 </CodeBlocks_layout_file>

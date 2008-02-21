@@ -43,6 +43,11 @@ MKSFO    = mksfo
 PACK_PBP = pack-pbp
 FIXUP    = psp-fixup-imports
 
+
+# PSP Images
+PSP_EBOOT_ICON = bin/ICON0.PNG
+PSP_EBOOT_PIC1 = bin/PIC1.PNG
+
 # Add in PSPSDK includes and libraries.
 INCDIR   := $(INCDIR) . $(PSPSDK)/include
 LIBDIR   := $(LIBDIR) . $(PSPSDK)/lib
@@ -219,7 +224,7 @@ clean:
 	-rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO) $(PSP_EBOOT) $(EXTRA_TARGETS)
 
 clean_o:
-	#-rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO)
+	-rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO)
 	-mv -f $(PSP_EBOOT) ../bin/$(PSP_EBOOT)
 
 rebuild: clean all
