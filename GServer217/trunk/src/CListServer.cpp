@@ -7,11 +7,11 @@ void ListServer_Connect()
 {
 	if ((lsConnected = listServer.connectSock(findKey("listip"), atoi(findKey("listport")))) == false)
 	{
-		errorOut("errorlog.txt", "Unable to connect to list server", true);
+		errorOut("errorlog.txt", "Unable to connect to list server.", true);
 		return;
 	}
 
-	errorOut("serverlog.txt", "Connected to the list server successfully\n", true);
+	errorOut("serverlog.txt", "Connected to the list server successfully.", true);
 	listServer.setSync(false);
 
 	// send gserver info to listserver
