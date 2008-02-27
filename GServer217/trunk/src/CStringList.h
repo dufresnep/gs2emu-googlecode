@@ -9,10 +9,6 @@
 #include "CList.h"
 #include "CBuffer.h"
 
-#ifndef stricmp
-	#define stricmp(a, b) strcasecmp(a, b)
-#endif
-
 class CStringList:
 	public CList
 {

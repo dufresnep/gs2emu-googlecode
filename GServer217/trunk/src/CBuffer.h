@@ -7,6 +7,10 @@
 #define __MIN(a, b) (a < b ? a : b)
 #define __MAX(a, b) (a > b ? a : b)
 
+#if !(defined(WIN32) || defined(WIN64))
+	#define stricmp		strcasecmp
+#endif
+
 class CBuffer
 {
 	char* data;

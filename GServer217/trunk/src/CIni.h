@@ -13,10 +13,7 @@
 #include <cstring>
 #include <cstdlib>
 #include "CList.h"
-
-#ifndef stricmp
-	#define stricmp(a, b) strcasecmp(a, b)
-#endif
+#include "CBuffer.h"
 
 typedef struct
 {

@@ -1,4 +1,20 @@
 --------------------------------------------
+New features/bug fixes in v2.171 build 57
+--------------------------------------------
+
+Maintenance:
+- Re-worked the logging system to log into three files now: rclog.txt,
+  errorlog.txt, and serverlog.txt.
+- Added logging of more RC actions.
+
+Additions:
+
+
+Fixes:
+- Server now properly shuts down.
+
+
+--------------------------------------------
 New features/bug fixes in v2.171 build 56
 --------------------------------------------
 

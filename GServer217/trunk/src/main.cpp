@@ -8,9 +8,11 @@
 #include "CWeapon.h"
 #include "CDatabase.h"
 #include "CLevel.h"
+#include "CBuffer.h"
 #include <time.h>
 #include <sys/stat.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #ifdef WIN32
 	#define WIN32_LEAN_AND_MEAN
@@ -26,6 +28,9 @@
 	#include <unistd.h>
 	#include <dirent.h>
 #endif
+
+// Function pointer for signal handling.
+typedef void (*sighandler_t)(int);
 
 bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, hasShutdown = false, lsConnected = false, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, staffOnly, vasesDrop, warptoforall, defaultweapons;
 bool clientsidePushPull, detailedconsole, underconstruction, baddyDropItems;
@@ -49,13 +54,13 @@ int aptime[5], baddyRespawn, cheatwindowstime, gameTime = 1, heartLimit, horseLi
 void acceptNewPlayers(CSocket &pSocket);
 void doTimer();
 void sendRCPacket(CPacket& pPacket);
-void shutdownServer();
+void shutdownServer( int signal );
 
 #ifdef PSPSDK
 	/* Exit callback */
 	int exit_callback(int arg1, int arg2, void *common)
 	{
-		shutdownServer();
+		shutdownServer(0);
 		return 0;
 	}
 
@@ -84,7 +89,9 @@ int main(int argc, char *argv[])
 		pspDebugScreenInit();
 		SetupCallbacks();
 	#else
-		atexit(shutdownServer);
+		// Shut down the server if we get a kill signal.
+		signal( SIGINT, (sighandler_t) shutdownServer );
+		signal( SIGTERM, (sighandler_t) shutdownServer );
 	#endif
 
 	/* Setup Data-Directory */
@@ -105,14 +112,14 @@ int main(int argc, char *argv[])
 	/* Load Settings */
 	if (!loadSettings("serveroptions.txt"))
 	{
-		errorOut("rclog.txt", "Unable to load server settings..");
+		errorOut("errorlog.txt", "Unable to load server settings..");
 		return 1;
 	}
 
 	/* Load Weapons */
 	if (!loadWeapons("weapons.txt"))
 	{
-		errorOut("rclog.txt", "Unable to load weapons from weapons.txt..");
+		errorOut("errorlog.txt", "Unable to load weapons from weapons.txt..");
 		return 1;
 	}
 
@@ -122,7 +129,7 @@ int main(int argc, char *argv[])
 
 	if(!serverSock.listenSock(serverPort, 20))
 	{
-		errorOut("rclog.txt", CString() << "SOCK ERROR: Unable to listen on port: " << toString(serverPort));
+		errorOut("errorlog.txt", CString() << "SOCK ERROR: Unable to listen on port: " << toString(serverPort));
 		return 1;
 	}
 
@@ -142,7 +149,7 @@ int main(int argc, char *argv[])
 
 	/* Server Finished Loading */
 	printf("GServer 2 by 39ster\nSpecial thanks to Marlon, Agret, Pac300, 39ster and others for porting the \noriginal 1.39 gserver to 2.1\nServer listening on port: %i\nServer version: Build %s\n\n", serverPort, listServerFields[3].text());
-	errorOut("rclog.txt", "Server started");
+	errorOut("serverlog.txt", "Server started");
 	serverRunning = true;
 
 	if (!lsConnected)
@@ -253,7 +260,7 @@ void doTimer()
 				if ((time(NULL) - player->lastMovement > maxNoMovement) &&
 					(time(NULL) - player->lastChat > maxNoMovement) )
 				{
-					errorOut("rclog.txt", CString() << "Client " << player->accountName << " had no activity for over " << toString(maxNoMovement) << " seconds.");
+					errorOut("errorlog.txt", CString() << "Client " << player->accountName << " had no activity for over " << toString(maxNoMovement) << " seconds.");
 					player->sendPacket(CPacket() << (char)DISMESSAGE << "You have been disconnected because of inactivity.");
 					player->deleteMe = true;
 					continue;
@@ -262,7 +269,7 @@ void doTimer()
 
 			if (time(NULL) - player->lastData > 300)
 			{
-				errorOut("rclog.txt", CString() << "No data from " << player->accountName << " for 300 secs");
+				errorOut("errorlog.txt", CString() << "No data from " << player->accountName << " for 300 secs");
 				player->deleteMe = true;
 				continue;
 			}
@@ -814,7 +821,7 @@ char* removeGifExtension(CString& pFileName)
 	return CBuffer::retBuffer.text();
 }
 
-void shutdownServer()
+void shutdownServer( int signal )
 {
 	if(hasShutdown)
 		return;
@@ -822,7 +829,7 @@ void shutdownServer()
 	serverRunning = false;
 	if(lsConnected)
 		ListServer_End();
-	errorOut("rclog.txt", "Server shutdown..");
+	errorOut("serverlog.txt", "Server shutdown.");
 	serverSock.closeSock();
 	saveWeapons("weapons.txt");
 	serverFlags.save("serverflags.txt");

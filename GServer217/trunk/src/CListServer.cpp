@@ -7,11 +7,11 @@ void ListServer_Connect()
 {
 	if ((lsConnected = listServer.connectSock(findKey("listip"), atoi(findKey("listport")))) == false)
 	{
-		errorOut("rclog.txt", "Unable to connect to list server", true);
+		errorOut("errorlog.txt", "Unable to connect to list server", true);
 		return;
 	}
 
-	errorOut("rclog.txt", "Connected to the list server successfully\n", true);
+	errorOut("serverlog.txt", "Connected to the list server successfully\n", true);
 	listServer.setSync(false);
 
 	// send gserver info to listserver
@@ -44,7 +44,7 @@ void ListServer_Main()
 	CBuffer receiveBuff;
 	if (listServer.receiveBytes(receiveBuff, 65536) < 0)
 	{
-		errorOut("rclog.txt", "Disconnected from list server");
+		errorOut("serverlog.txt", "Disconnected from list server.");
 		lsConnected = false;
 		return;
 	}

@@ -53,7 +53,7 @@ void getSubFiles(char* pDir, CStringList& pOut, CString* search = 0);
 void loadServerMessage();
 void saveWeapons(char* pFile);
 void sendRCPacket(CPacket& pPacket);
-void shutdownServer();
+void shutdownServer( int signal );
 
 inline char* removeGifExtension(char* pFileName)
 {

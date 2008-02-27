@@ -2,6 +2,7 @@
 // (C) GraalReborn 2007
 
 #include "CIni.h"
+#include "CBuffer.h"
 
 bool CIni::load(char* pFileName)
 {

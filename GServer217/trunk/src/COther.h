@@ -13,6 +13,8 @@
 	#include <unistd.h>
 #endif
 
+#include "CBuffer.h"
+
 inline bool CHECK_BOOL(char *a)
 {
 	return (stricmp(a, "true") == 0 || stricmp(a, "1") == 0);

@@ -215,7 +215,8 @@ CPlayer::~CPlayer()
 {
 	if (id >= 0)
 	{
-		printf( "[%s] Leaving %s: %s\n", getTimeStr(1).text(), (type == CLIENTPLAYER) ? "player" : "RC", accountName.text() );
+		errorOut( "serverlog.txt", CString() << "Leaving " << ((type == CLIENTPLAYER) ? "player" : "RC") << ": " << accountName.text(), true );
+
 		//remove me from level
 		leaveLevel();
 
@@ -276,7 +277,7 @@ void CPlayer::main()
 	if ((size = playerSock->receiveBytes(receiveBuff, 65536)) < 0)
 	{
 		if ( size != -1 )
-			errorOut("rclog.txt", CString() << "Client " << accountName << " disconnected with sock error: " << toString(size));
+			errorOut("errorlog.txt", CString() << "Client " << accountName << " disconnected with sock error: " << toString(size));
 		deleteMe = true;
 		compressAndSend();
 		return;
@@ -284,7 +285,7 @@ void CPlayer::main()
 
 	if (receiveBuff.length() >= 128*1024)
 	{
-		errorOut("rclog.txt", CString() << "Client " << accountName << "has sent to much data (input buffer >=128k)");
+		errorOut("errorlog.txt", CString() << "Client " << accountName << "has sent to much data (input buffer >=128k)");
 		sendPacket(CPacket() << (char)DISMESSAGE << "Your Graal.exe has sent to much data (>=128k in the input buffer)");
 		deleteMe = true;
 		return;
@@ -298,11 +299,14 @@ void CPlayer::main()
 
 		// Packet might not be fully in yet.
 		if ( len > (unsigned int)receiveBuff.length() - 2 )
+		{
+			errorOut( "debuglog.txt", CString() << accountName << ": Packet not fully in yet?", true );
 			break;
+		}
 /*
 		if(len > receiveBuff.length() - 2 || len < 0)
 		{
-			errorOut("rclog.txt", CString() << "Client " << accountName << " sent a wrong data package length: " << toString(len) << "->" << toString(receiveBuff.length()));
+			errorOut("errorlog.txt", CString() << "Client " << accountName << " sent a wrong data package length: " << toString(len) << "->" << toString(receiveBuff.length()));
 			sendPacket(CPacket() << (char)DISMESSAGE << "Your Graal.exe has sent a wrong data package length.");
 			deleteMe = true;
 			return;
@@ -314,7 +318,7 @@ void CPlayer::main()
 			CPacket lines;
 			if(cLen <= 0)
 			{
-				errorOut("rclog.txt", CString() << "Client " << accountName << " sent an empty package.");
+				errorOut("errorlog.txt", CString() << "Client " << accountName << " sent an empty package.");
 				sendPacket(CPacket() << (char)DISMESSAGE << "Your Graal.exe has sent an empty data package.");
 				deleteMe = true;
 				return;
@@ -353,7 +357,7 @@ void CPlayer::main()
 		}
 		else
 		{
-			errorOut("rclog.txt", CString() << "Decompression error for player " << accountName);
+			errorOut("errorlog.txt", CString() << "Decompression error for player " << accountName);
 			deleteMe = true;
 			sendPacket(CPacket() << (char)DISMESSAGE << "Decompression error\n");
 			return;
@@ -388,19 +392,20 @@ void CPlayer::processLogin(CPacket& pPacket)
 
 	if ( detailedconsole )
 	{
-		printf("[%s] Account login details:\n"
-			"Key: %i\n"
-			"Version: %s\n"
-			"Type: %i\n"
-			"Account: %s\n"
-			"Password: ***\n", getTimeStr(1).text(), key, version.text(), type, accountName.text());
+		errorOut( "serverlog.txt", CString() <<
+			"Account login details:\n" <<
+			"Key: " << toString(key) << "\n" <<
+			"Version: " << version << "\n" <<
+			"Type: " << ((type == CLIENTRC) ? "RC" : "Player") << "\n" <<
+			"Account: " << accountName,
+			true );
 	}
 	else
-		printf( "[%s] New %s: %s\n", getTimeStr(1).text(), (type == CLIENTPLAYER) ? "player" : "RC", accountName.text() );
+		errorOut( "serverlog.txt", CString() << "New " << ((type == CLIENTRC) ? "RC" : "player") << ": " << accountName, true );
 
 	if (playerList.count() >= maxPlayers)
 	{
-		errorOut("rclog.txt", "Player limit reached");
+		errorOut("serverlog.txt", "Player limit reached");
 		sendPacket(CPacket() << (char)DISMESSAGE << "This server has reached its player limit.");
 		deleteMe = true;
 		return;
@@ -409,7 +414,7 @@ void CPlayer::processLogin(CPacket& pPacket)
 	CString ip = playerSock->tcpIp();
 	if (isIpBanned(ip))
 	{
-		errorOut("rclog.txt", CString() << accountName << " is ip banned");
+		errorOut("serverlog.txt", CString() << accountName << " is ip banned");
 		sendPacket(CPacket() << (char)DISMESSAGE << "Your ip has been banned from this server.");
 		deleteMe = true;
 		return;
@@ -420,7 +425,7 @@ void CPlayer::processLogin(CPacket& pPacket)
 		ListServer_Send(CPacket() << (char)SLSACCOUNT << (char)accountName.length() << accountName << (char)password.length() << password << "\n");
 	else
 	{
-		errorOut("rclog.txt", "List server is unavailable");
+		errorOut("errorlog.txt", "List server is unavailable");
 		sendPacket(CPacket() << (char)DISMESSAGE << "Unable to contact account server.");
 		deleteMe = true;
 	}
@@ -431,7 +436,7 @@ void CPlayer::sendAccount()
 	//CPacket packet;
 	if (!loadAccount())  //Do login check
 	{
-		errorOut("rclog.txt", CString() << accountName << " is not allowed on server");
+		errorOut("serverlog.txt", CString() << accountName << " is not allowed on server");
 		deleteMe = true;
 		lastIp = inet_addr(playerSock->tcpIp());
 		return;
@@ -450,13 +455,13 @@ void CPlayer::sendAccount()
 			{
 				if (time(NULL) - player->lastData > 30)
 				{
-					errorOut("rclog.txt", CString() << "No data for 30 secs from " << player->accountName);
+					errorOut("serverlog.txt", CString() << "No data for 30 secs from " << player->accountName);
 					player->sendPacket(CPacket() << (char)DISMESSAGE << "Someone else has logged into your account.");
 					player->deleteMe = true;
 				}
 				else
 				{
-					errorOut("rclog.txt", accountName << " account is already in use.");
+					errorOut("serverlog.txt", accountName << " account is already in use.");
 					sendPacket(CPacket() << (char) DISMESSAGE << "This account is already in use.");
 					deleteMe = true;
 					return;
@@ -465,7 +470,7 @@ void CPlayer::sendAccount()
 		}
 	}
 
-	errorOut("rclog.txt", CString() << "New player: " << accountName);
+	errorOut("serverlog.txt", CString() << "New player: " << accountName);
 	id = createPlayerId(this);
 
 	if(type == CLIENTPLAYER)
@@ -515,7 +520,7 @@ void CPlayer::sendAccount()
 			sendPacket(CPacket() << (char)LEVELNAME << unstickmeLevel);
 			if (!sendLevel(unstickmeLevel, unstickmeX, unstickmeY, 0))
 			{
-				errorOut("rclog.txt", CString() << "Could not find a level for " << accountName);
+				errorOut("serverlog.txt", CString() << "Could not find a level for " << accountName);
 				deleteMe = true;
 			}
 		}
@@ -630,8 +635,11 @@ void CPlayer::sendAccount()
 
 void CPlayer::parsePacket(CPacket& pPacket)
 {
-	if(pPacket.length() <= 0)
+	if ( pPacket.length() <= 0 )
+	{
+		errorOut( "debuglog.txt", CString() << accountName << ": [CPlayer::parsePacket()] pPacket.length() <= 0", true );
 		return;
+	}
 	CPacket packet;
 
 #ifdef GSERV22
@@ -671,7 +679,7 @@ void CPlayer::parsePacket(CPacket& pPacket)
 	else
 	{
 		deleteMe = true;
-		errorOut( "rclog.txt", CString() << accountName << " sent an incorrect message id [" << toString(messageId) << "]\nPacket: " << pPacket.text() + 1 << "\n", true );
+		errorOut( "errorlog.txt", CString() << accountName << " sent an incorrect message id [" << toString(messageId) << "]\nPacket: " << pPacket.text() << "\n", true );
 		sendPacket( CPacket() << (char)DISMESSAGE << "You sent an incorrect packet" );
 		return;
 	}
@@ -706,7 +714,7 @@ void CPlayer::compressAndSend()
 
 	if (error != Z_OK)
 	{
-		errorOut("rclog.txt", CString() << "Compression error for " << accountName);
+		errorOut("errorlog.txt", CString() << "Compression error for " << accountName);
 		return;
 	}
 
@@ -724,7 +732,7 @@ void CPlayer::sendOutGoing()
 	if(sendBuff.length() > 2048000)
 	{
 		sendBuff.clear();
-		errorOut("rclog.txt", CString() << "Sending is blocked for " << accountName);
+		errorOut("errorlog.txt", CString() << "Sending is blocked for " << accountName);
 		sendPacket(CPacket() << (char)DISMESSAGE << "Sending is blocked");
 		deleteMe = true;
 		return;
@@ -738,7 +746,7 @@ void CPlayer::sendOutGoing()
 			sendBuff.remove(0, len);
 		else if(len < 0)
 		{
-			errorOut("rclog.txt", CString() << "Send error to " << accountName);
+			errorOut("errorlog.txt", CString() << "Send error to " << accountName);
 			deleteMe = true;
 			return;
 		}
@@ -756,7 +764,7 @@ void CPlayer::warp(CString& pLevel, float pX, float pY, time_t pModTime)
 		else
 		{
 			sendPacket(CPacket() << (char)DISMESSAGE << "No level available");
-			errorOut("rclog.txt", CString() << "Cannot find a level for " << accountName);
+			errorOut("serverlog.txt", CString() << "Cannot find a level for " << accountName);
 			deleteMe = true;
 		}
 	}
@@ -784,7 +792,7 @@ void CPlayer::warp(CString& pLevel, float pX, float pY, time_t pModTime)
 				if (!sendLevel(unstickmeLevel, unstickmeX, unstickmeY, 0))
 				{
 					sendPacket(CPacket() << (char)DISMESSAGE << "No level available");
-					errorOut("rclog.txt", CString() << "Cannot find a level for " << accountName);
+					errorOut("serverlog.txt", CString() << "Cannot find a level for " << accountName);
 					deleteMe = true;
 				}
 			}
@@ -1835,7 +1843,7 @@ CPacket CPlayer::getProp(int pProp)
 		retVal.writeByte2(rating);
 	break;
 	default:
-		errorOut("rclog.txt", CString() << "Unknown getProp( " << toString(pProp) << " ) by " << accountName);
+		errorOut("errorlog.txt", CString() << "Unknown getProp( " << toString(pProp) << " ) by " << accountName);
 		break;
 	}
 	return retVal;
@@ -1859,7 +1867,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 		int index = pProps.readByte1();
 		if ( index < 0 || index >= propscount )
 		{
-			errorOut("rclog.txt", CString() << "setProps(" << toString(index) << ") index out of bounds by " << accountName);
+			errorOut("errorlog.txt", CString() << "setProps(" << toString(index) << ") index out of bounds by " << accountName);
 			deleteMe = true;
 			break;
 		}
@@ -2256,7 +2264,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			break;
 
 		default:
-			errorOut("rclog.txt", CString() << "Setprops error: " << toString(index) << " By " << accountName);
+			errorOut("errorlog.txt", CString() << "Setprops error: " << toString(index) << " By " << accountName);
 
 			// If they send bad props, kick them.
 			deleteMe = true;
@@ -3047,7 +3055,7 @@ void CPlayer::msgPACKCOUNT(CPacket& pPacket)
 	int pCount = pPacket.readByte2();
 	if (pCount != packCount || packCount > 10000)
 	{
-		errorOut("rclog.txt", CString() << accountName << " has sent an incorrect number of packets");
+		errorOut("errorlog.txt", CString() << accountName << " has sent an incorrect number of packets");
 		if (packCount != pCount)
 		{
 			sendPacket(CPacket() << (char)DISMESSAGE << "The server received uncertified packets from your connection");
@@ -3293,6 +3301,7 @@ void CPlayer::msgSSETOPTIONS(CPacket& pPacket)
 	data = newOps.join("\n");
 	data.save("serveroptions.txt");
 	loadSettings("serveroptions.txt");
+	errorOut( "rclog.txt", CString() << accountName << " has updated the server options." );
 	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " has updated the server options.");
 }
 
@@ -3323,6 +3332,7 @@ void CPlayer::msgSETRCFOLDERS(CPacket& pPacket)
 	data.untokenize();
 	data.save("foldersconfig.txt");
 	folderConfig.load("foldersconfig.txt");
+	errorOut( "rclog.txt", CString() << accountName << " has updated the folder configuration." );
 	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " has updated the folder configuration.");
 }
 
@@ -3371,6 +3381,7 @@ void CPlayer::msgSETPLPROPS(CPacket& pPacket)
 
 	player->setAccPropsRc(pPacket);
 	player->saveAccount();
+	errorOut( "rclog.txt", CString() << accountName << " set the attributes of player " << player->accountName );
 	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " set the attributes of player " << player->accountName);
 }
 
@@ -3387,7 +3398,8 @@ void CPlayer::msgDISPLAYER(CPacket& pPacket)
 		return;
 	other->sendPacket(CPacket() << (char)DISMESSAGE << "The server administrator has disconnected you.");
 	other->deleteMe = true;
-	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " disconnected " << other->accountName << ".");
+	errorOut( "rclog.txt", CString() << accountName << " disconnected " << other->accountName );
+	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " disconnected " << other->accountName );
 }
 
 void CPlayer::msgUPDLEVELS(CPacket& pPacket)
@@ -3497,6 +3509,7 @@ void CPlayer::msgSETSFLAGS(CPacket& pPacket)
 			other->sendPacket(CPacket() << (char)SSETFLAG << flag);
 		}
 	}
+	errorOut( "rclog.txt", CString() << accountName << " has updated the server flags." );
 	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " has updated the server flags.");
 }
 
@@ -3520,6 +3533,7 @@ void CPlayer::msgDADDACCOUNT(CPacket& pPacket)
 	newAccount.banned = banned;
 	newAccount.loadOnly = onlyLoad;
 	newAccount.saveAccount(true);
+	errorOut( "rclog.txt", CString() << accountName << " has created a new account: " << newAccount.accountName );
 	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " has created the new account: " << newAccount.accountName);
 }
 
@@ -3534,7 +3548,10 @@ void CPlayer::msgDDELACCOUNT(CPacket& pPacket)
 
 	CString accname = pPacket.readString("");
 	if (remove(CString(CString() << "accounts" << fSep << accname << ".txt").text()) == 0)
+	{
+		errorOut( "rclog.txt", CString() << accountName << " has deleted the account:" << accname );
 		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " has deleted the account: " << accname);
+	}
 	else
 		sendPacket(CPacket() << (char)DRCLOG << "Server: Invalid account.");
 }
@@ -3614,6 +3631,7 @@ void CPlayer::msgDRESETPLPROPS(CPacket& pPacket)
 	{
 		player->sendPacket(CPacket() << (char)DISMESSAGE << "Your account was reset");
 		player->deleteMe = true;
+		errorOut( "rclog.txt", CString() << accountName << " has reset the attributes of player " << accname );
 		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " has reset the attributes of player " << accname);
 	}
 
@@ -3649,6 +3667,7 @@ void CPlayer::msgDSETACCPLPROPS(CPacket& pPacket)
 		}
 	}
 
+	errorOut( "rclog.txt", CString() << accountName << " set the attributes of player " << player->accountName );
 	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " set the attributes of player " << player->accountName);
 	player->setAccPropsRc(pPacket);
 	player->saveAccount();
@@ -3711,6 +3730,8 @@ void CPlayer::msgDSETACCOUNT(CPacket& pPacket)
 	pPacket.readChars(pPacket.readByte1());	//skip playerworld
 	pPacket.readChars(pPacket.readByte1()); // skip ban reason
 	player->saveAccount(true);
+
+	errorOut( "rclog.txt", CString() << accountName << " has modified the account of player " << player->accountName );
 	if (player->id == -1)
 		delete player;
 }
@@ -3848,12 +3869,14 @@ void CPlayer::msgDRCCHAT(CPacket& pPacket)
 	else if (words[0] == "/refreshservermessage" && hasRight(CANEDITSERVEROPTION))
 	{
 		loadServerMessage();
+		errorOut( "rclog.txt", CString() << accountName << " reloaded the server message." );
 		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " reloaded the server message.");
 	}
 	else if(words[0] == "/shutdown" && hasRight(CANCHANGESTAFFACC))
 	{
+		errorOut( "rclog.txt", CString() << accountName << " shutdown the server." );
 		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " shutdown the server.");
-		shutdownServer();
+		shutdownServer(0);
 	}
 	else if (words[0] == "/updatelevel" && hasRight(CANUPDATELEVEL))
 	{
@@ -3868,6 +3891,7 @@ void CPlayer::msgDRCCHAT(CPacket& pPacket)
 			CLevel* level = (CLevel*)levelList[i];
 			CLevel::updateLevel( level->fileName );
 		}
+		errorOut( "rclog.txt", CString() << accountName << " updated all the levels." );
 		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " updated all the levels.");
 	}
 }
@@ -3905,6 +3929,7 @@ void CPlayer::msgWARPPLAYER(CPacket& pPacket)
 	float nY = (float)(pPacket.readByte1())/2;
 	CString name = pPacket.readString("");
 	player->warp(name, nX, nY);
+	errorOut( "rclog.txt", CString() << accountName << " has warped " << player->accountName << " to " << name << " (" << toString(nX) << ", " << toString(nY) < ")." );
 }
 void CPlayer::msgDWANTRIGHTS(CPacket& pPacket)
 {
@@ -3994,6 +4019,7 @@ void CPlayer::msgDSETRIGHTS(CPacket& pPacket)
 		if (pl != NULL) pl->loadDBAccount(accname);
 		delete player;
 	}
+	errorOut( "rclog.txt", CString() << accountName << " has set the rights of " << accname );
 	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " has set the rights of " << accname);
 }
 
@@ -4051,6 +4077,7 @@ void CPlayer::msgDSETCOM(CPacket&pPacket)
 
 		player->comments = comment;
 		player->saveAccount(true);
+		errorOut( "rclog.txt", CString() << accountName << " has set the comments of " << player->accountName );
 		if (player->id == -1)
 			delete player;
 	}
@@ -4112,6 +4139,7 @@ void CPlayer::msgDSETBAN(CPacket& pPacket)
 		player->banned = ban;
 		player->banReason = reason;
 		player->saveAccount();
+		errorOut( "rclog.txt", CString() << accountName << " has set the ban of " << accname );
 		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " has set the ban of " << accname);
 		if (player->id == -1)
 			delete player;
@@ -4211,6 +4239,7 @@ void CPlayer::msgDFILEFTPDOWN(CPacket& pPacket)
 
 	CString shortName = pPacket.text() + 1;
 	fileList.add(new COutFile(CString() << lastFolder << shortName));
+	errorOut( "rclog.txt", CString() << accountName << " downloaded file " << shortName );
 	sendPacket(CPacket() << (char)STEXTFTP << "Downloaded file " << shortName);
 }
 
@@ -4227,6 +4256,7 @@ void CPlayer::msgDFILEFTPUP(CPacket& pPacket)
 	fileName = CString() << lastFolder << shortName;
 	fileData = pPacket.copy(pPacket.getRead());
 	fileData.save(fileName.text());
+	errorOut( "rclog.txt", CString() << accountName << " uploaded file " << fileName );
 	sendPacket(CPacket() << (char)STEXTFTP << "Uploaded file " << fileName);
 	updateFile(shortName.text());
 }
@@ -4247,6 +4277,8 @@ void CPlayer::msgDFILEFTPMOV(CPacket& pPacket)
 	f1 << f2;
 	f4 << lastFolder << f2;
 
+	errorOut( "rclog.txt", CString() << accountName << " moved file " << f4 << " to " << f1 );
+
 	f3.load(f4.text());
 	f3.save(f1.text());
 	remove(f4.text());
@@ -4263,6 +4295,7 @@ void CPlayer::msgDFILEFTPDEL(CPacket& pPacket)
 	// no security.. oh well
 	CString fileName = CString() << lastFolder << pPacket.text() + 1;
 	remove(fileName.text());
+	errorOut( "rclog.txt", CString() << accountName << " deleted file " << fileName );
 	sendPacket(CPacket() << (char)STEXTFTP << "Deleted file " << fileName);
 }
 
@@ -4278,5 +4311,6 @@ void CPlayer::msgDFILEFTPREN(CPacket& pPacket)
 	CString f1 = CString() << lastFolder << pPacket.readChars((unsigned char)pPacket.readByte1());
 	CString f2 = CString() << lastFolder << pPacket.readChars((unsigned char)pPacket.readByte1());
 	rename(f1.text(), f2.text());
+	errorOut( "rclog.txt", CString() << accountName << " renamed file " << f1 << " to " << f2 );
 	sendPacket(CPacket() << (char)STEXTFTP << "Renamed file " << f1 << " to " << f2);
 }
