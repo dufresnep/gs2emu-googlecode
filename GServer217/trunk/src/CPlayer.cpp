@@ -470,7 +470,7 @@ void CPlayer::sendAccount()
 		}
 	}
 
-	errorOut("serverlog.txt", CString() << "New player: " << accountName);
+	// Give the player an id.
 	id = createPlayerId(this);
 
 	if(type == CLIENTPLAYER)
