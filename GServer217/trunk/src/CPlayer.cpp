@@ -982,7 +982,7 @@ void CPlayer::processChat(CString& pMessage)
 		{
 			// File not found.  Try appending extensions.
 			int i = 0;
-			char* ext = {".png", ".mng", ".gif"};
+			char* ext[] = {".png", ".mng", ".gif"};
 			while ( i < 3 && file == 0 )
 				file = getDataFile( (CString() << words[1] << ext[i++]).text() );
 		}
