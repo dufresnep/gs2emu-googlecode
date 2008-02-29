@@ -976,9 +976,21 @@ void CPlayer::processChat(CString& pMessage)
 		if (words.count() <= 1 || !setheadallowed)
 			return;
 
-		if(strlen(getDataFile(words[1].text())))
+		// Check if we can find the file.
+		char* file = getDataFile(words[1].text());
+		if ( file == 0 )
 		{
-			if ( isValidFile( CBuffer() << getDataFile(words[1].text()), HEADGIF ) )
+			// File not found.  Try appending extensions.
+			int i = 0;
+			char* ext = {".png", ".mng", ".gif"};
+			while ( i < 3 && file == 0 )
+				file = getDataFile( (CString() << words[1] << ext[i++]).text() );
+		}
+
+		// Try and load now.
+		if( file )
+		{
+			if ( isValidFile( CBuffer() << file, HEADGIF ) )
 			{
 				headImage = words[1];
 				updateProp(HEADGIF);

@@ -6,9 +6,12 @@ Maintenance:
 - Re-worked the logging system to log into three files now: rclog.txt,
   errorlog.txt, and serverlog.txt.
 - Added logging of more RC actions.
+- Updated the list of default ganis.
 
 Additions:
-
+- If a player says 'sethead head30', the server will check png, mng,
+  and gif files in that order for a match and return the first one
+  found, if any.
 
 Fixes:
 - Server now properly shuts down.
