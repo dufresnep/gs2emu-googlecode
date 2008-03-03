@@ -2,7 +2,15 @@
 // (C) GraalReborn 2007
 
 #include "CServerBot.h"
-#include "zlib.h"
+
+#ifdef WIN32
+    #include "zlib.h"
+#endif
+
+#ifndef WIN32
+    #include <zlib.h>
+#endif
+
 
 bool CServerBot::connect(char* pServer, int pPort)
 {

@@ -7,7 +7,15 @@
 #include "CListServer.h"
 #include "CPlayer.h"
 #include "CWeapon.h"
-#include "zlib.h"
+
+#ifdef WIN32
+    #include "zlib.h"
+#endif
+
+#ifndef WIN32
+    #include <zlib.h>
+#endif
+
 #include "main.h"
 #include <sys/stat.h>
 
