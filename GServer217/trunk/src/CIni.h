@@ -1,5 +1,6 @@
-// GraalReborn Server - Revision 38
-// (C) GraalReborn 2007
+/* GraalReborn Server
+    $Id$
+ (C) GraalReborn 2007 */
 
 /*
 	This INI manager class was coded by 39ster (39ster@gmail.com)

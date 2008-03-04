@@ -1,3 +1,7 @@
+/* GraalReborn Server
+    $Id$
+ (C) GraalReborn 2007 */
+
 #include "CPacket.h"
 
 int CPacket::writeByte1(char pByte)

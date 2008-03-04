@@ -1,3 +1,7 @@
+/* GraalReborn Server
+    $Id$
+ (C) GraalReborn 2007 */
+
 #ifndef HCBUFFER
 #define HCBUFFER
 

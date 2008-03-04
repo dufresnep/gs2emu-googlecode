@@ -1,5 +1,6 @@
-// GraalReborn Server - Revision 38
-// (C) GraalReborn 2007
+/* GraalReborn Server
+    $Id$
+ (C) GraalReborn 2007 */
 
 #include "CBaddy.h"
 #include "main.h"

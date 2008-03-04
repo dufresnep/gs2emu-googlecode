@@ -1,3 +1,7 @@
+/* GraalReborn Server
+    $Id$
+ (C) GraalReborn 2007 */
+
 #include "CListServer.h"
 #include "main.h"
 
