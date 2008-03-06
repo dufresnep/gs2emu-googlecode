@@ -3636,14 +3636,11 @@ void CPlayer::msgDRESETPLPROPS(CPacket& pPacket)
 
 	CString accname = pPacket.readString("");
 	CPlayer *player = findPlayerId(accname, true);
-	if (player == NULL)
+	if ( player == 0 )
 	{
-		player = new CPlayer(NULL);
-		if (!player->loadDBAccount(accname))
-		{
-			delete player;
-			return;
-		}
+		// Player isn't playing, so we will temporarily create the player.
+		player = new CPlayer(0);
+		player->accountName = accname;
 	}
 
 	player->loadWorldPropsIni();

@@ -15,6 +15,7 @@ Additions:
 
 Fixes:
 - Server now properly shuts down.
+- RC can now correctly reset broken accounts.
 
 
 --------------------------------------------
