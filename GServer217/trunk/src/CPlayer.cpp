@@ -3649,9 +3649,9 @@ void CPlayer::msgDRESETPLPROPS(CPacket& pPacket)
 	{
 		player->sendPacket(CPacket() << (char)DISMESSAGE << "Your account was reset");
 		player->deleteMe = true;
-		errorOut( "rclog.txt", CString() << accountName << " has reset the attributes of player " << accname );
-		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " has reset the attributes of player " << accname);
 	}
+	errorOut( "rclog.txt", CString() << accountName << " has reset the attributes of player " << accname );
+	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " has reset the attributes of player " << accname);
 
 	if (player->id == -1)
 		delete player;
