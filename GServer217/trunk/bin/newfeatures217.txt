@@ -12,6 +12,14 @@ Additions:
 - If a player says 'sethead head30', the server will check png, mng,
   and gif files in that order for a match and return the first one
   found, if any.
+- It is now possible to build the server in 'localhost mode' by defining
+  DEBUG_LOCALHOSTMODE when you compile it. This mode disables the listserver
+  connection and authentication, allowing for development in locations
+  where an internet connection is unavailable. Since normal users won't ever
+  require the use of this mode i've implemented it as a DEFINE. The only
+  situations I can think of a regular user requiring such a mode would be
+  in a LAN environment or like me, when you're developing a playerworld based
+  on player interactions and you need to test with multiple clients.
 
 Fixes:
 - Server now properly shuts down.
