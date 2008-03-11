@@ -9,9 +9,6 @@ CSocket listServer;
 
 void ListServer_Connect()
 {
-    #ifdef DEBUG_LOCALHOSTMODE
-        errorOut("serverlog.txt", "[DEBUG_LOCALHOSTMODE] List server connection bypassed.", true);
-    #else
         if ((lsConnected = listServer.connectSock(findKey("listip"), atoi(findKey("listport")))) == false)
         {
             errorOut("errorlog.txt", "Unable to connect to list server.", true);
@@ -33,7 +30,6 @@ void ListServer_Connect()
         }
 
         ListServer_Send(CPacket() << (char)SLSCOUNT << (char)playerList.count() << pPacket << "\n");
-	#endif
 }
 
 void ListServer_End()
@@ -43,12 +39,17 @@ void ListServer_End()
             return;
 
         listServer.closeSock();
+	#else
+		return;
 	#endif
 }
 
 void ListServer_Main()
 {
-#ifndef DEBUG_LOCALHOSTMODE
+#ifdef DEBUG_LOCALHOSTMODE
+	return;
+#endif
+
     if (!lsConnected)
         return;
 
@@ -296,7 +297,6 @@ void ListServer_Main()
 			break;
 		}
 	}
-#endif
 }
 
 void ListServer_Send(CPacket &pPacket)
@@ -310,5 +310,7 @@ void ListServer_Send(CPacket &pPacket)
         }
 
         listServer.sendBuffer(pPacket);
+	#else
+		return;
 	#endif
 }

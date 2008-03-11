@@ -151,12 +151,17 @@ int main(int argc, char *argv[])
 	/* Server Finished Loading */
 	printf("GServer 2 by 39ster\nSpecial thanks to Marlon, Agret, Pac300, 39ster and others for porting the \noriginal 1.39 gserver to 2.1\nServer listening on port: %i\nServer version: Build %s\n\n", serverPort, listServerFields[3].text());
 	errorOut("serverlog.txt", "Server started");
+	#ifdef DEBUG_LOCALHOSTMODE
+        errorOut("serverlog.txt", "[DEBUG_LOCALHOSTMODE] Localhost mode is activated.\nListserver communication & account authentication are disabled.", true);
+    #endif
 	serverRunning = true;
 
+	#ifndef DEBUG_LOCALHOSTMODE
 	if (!lsConnected)
 	{
 		ListServer_Connect();
 	}
+	#endif
 
 	while (serverRunning)
 	{
