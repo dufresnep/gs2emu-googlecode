@@ -237,10 +237,12 @@ int main(int argc, char *argv[])
 void doTimer()
 {
 	/* Reconnect Listserver if Disconnected */
-	if (!lsConnected)
-	{
-		ListServer_Connect();
-	}
+	#ifndef DEBUG_LOCALHOSTMODE
+    if (!lsConnected)
+    {
+        ListServer_Connect();
+    }
+	#endif
 
 	/* Level-Animations */
 	for(int i = 0; i < levelList.count(); i++)
