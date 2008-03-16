@@ -8,17 +8,9 @@
 #include "CListServer.h"
 #include "CPlayer.h"
 #include "CWeapon.h"
-
-#ifdef WIN32
-    #include "zlib.h"
-#endif
-
-#ifndef WIN32
-    #include <zlib.h>
-#endif
-
 #include "main.h"
 #include <sys/stat.h>
+#include <zlib.h>
 
 pt2func CPlayer::msgFuncs[] = {
 			&CPlayer::msgLEVELWARP, &CPlayer::msgBOARDMODIFY,
