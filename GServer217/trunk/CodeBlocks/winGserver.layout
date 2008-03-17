@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release" />
+	<ActiveTarget name="Win32" />
 	<File name="..\src\CAccount.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="7380" topLine="141" />
 	</File>
