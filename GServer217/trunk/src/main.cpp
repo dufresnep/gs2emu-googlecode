@@ -39,7 +39,6 @@ char fSep[] = "/";
 const char* __admin[]   = {"description", "detailedconsole", "language", "listport", "listip", "maxplayers", "myip", "name", "serverport", "sharefolder", "showconsolepackets", "underconstruction", "url", "worldname"};
 const char* __colours[] = {"white", "yellow", "orange", "pink", "red", "darkred", "lightgreen", "green", "darkgreen", "lightblue", "blue", "darkblue", "brown", "cynober", "purple", "darkpurple", "lightgray", "gray", "black", "transparent"};
 const char* __cloths[]  = {"setskin", "setcoat", "setsleeve", "setshoe", "setbelt", "setsleeves", "setshoes"};
-const char* __defaultgani[] = {"carried","carry","carrystill","carrypeople","dead","def","editorcursor","editorcursor2","ghostani","grab","gralats","hatoff","haton","hidden","hiddenstill","hurt","idle","kick","lava","lift","maps1","maps2","maps3","pull","push","ride","rideeat","ridefire","ridehurt","ridejump","ridestill","ridesword","shoot","sit","skip","sleep","spin","swim","sword","walk","walkslow"};
 const char* __defaultsword[] = {"sword1.png", "sword2.png", "sword3.png", "sword4.png"};
 const char* __defaultshield[] = {"shield1.png", "shield2.png", "shield3.png"};
 CLevel* NOLEVEL = new CLevel();
@@ -47,7 +46,7 @@ CList newPlayers, playerList, playerIds, settingList, weaponList, npcList, npcId
 CSocket responseSock, serverSock;
 CString dataDir, listServerFields[6], listServerIp, serverMessage, shareFolder, staffHead, worldName, unstickmeLevel;
 CStringList adminNames, cheatwindows, clothCommands, colourNames, globalGuildList, jailLevels, mapNames, profileList, RCBans, RCMessage, RCHelpMessage, serverFlags, staffGuilds, staffList, statusList, subDirs;
-CStringList folderConfig, defaultGaniNames, defaultSwordNames, defaultShieldNames;
+CStringList folderConfig, defaultSwordNames, defaultShieldNames;
 CWordFilter WordFilter;
 float unstickmeX, unstickmeY;
 int aptime[5], baddyRespawn, cheatwindowstime, gameTime = 1, heartLimit, horseLife, idleDisconnect, listServerPort, maxNoMovement, maxPlayers, nwTime, serverPort, serverTime = 0, shieldLimit, swordLimit, tileRespawn;
@@ -103,7 +102,6 @@ int main(int argc, char *argv[])
 	adminNames.load( __admin, sizeof(__admin) / sizeof(const char*) );
 	colourNames.load( __colours, sizeof(__colours) / sizeof(const char*) );
 	clothCommands.load( __cloths, sizeof(__cloths) / sizeof(const char*) );
-	defaultGaniNames.load( __defaultgani, sizeof(__defaultgani) / sizeof(const char*) );
 	defaultSwordNames.load( __defaultsword, sizeof(__defaultsword) / sizeof(const char*) );
 	defaultShieldNames.load( __defaultshield, sizeof(__defaultshield) / sizeof(const char*) );
 	playerIds.add(0);
@@ -265,7 +263,7 @@ void doTimer()
 		{
 			if (idleDisconnect)
 			{
-				if ((time(NULL) - player->lastMovement > maxNoMovement) &&
+				if ((getTime() - player->lastMovement > maxNoMovement) &&
 					(time(NULL) - player->lastChat > maxNoMovement) )
 				{
 					errorOut("errorlog.txt", CString() << "Client " << player->accountName << " had no activity for over " << toString(maxNoMovement) << " seconds.");
@@ -773,26 +771,12 @@ bool isValidFile(CBuffer& file, int type)
 			break;
 
 			case -1:	// Any
-				if ( file.find( ".gani" ) != -1 )
-				{
-					int j = 0;
-					while ( j < defaultGaniNames.count() &&
-						file.find( defaultGaniNames[j].text() ) == -1 ) ++j;
-					if ( j != defaultGaniNames.count() ) return false;
-				}
 				if ( file.match( fmask.text() ) )
 					return true;
 			break;
 
 			default:
 			case 0:		// file
-				if ( file.find( ".gani" ) != -1 )
-				{
-					int j = 0;
-					while ( j < defaultGaniNames.count() &&
-						file.find( defaultGaniNames[j].text() ) == -1 ) ++j;
-					if ( j != defaultGaniNames.count() ) return false;
-				}
 				if ( ftype == "file" )
 					if ( file.match( fmask.text() ) )
 						return true;

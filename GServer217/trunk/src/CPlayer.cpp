@@ -760,7 +760,7 @@ void CPlayer::sendOutGoing()
 			sendBuff.remove(0, len);
 		else if(len < 0)
 		{
-			errorOut("errorlog.txt", CString() << "Send error to " << accountName);
+			errorOut("errorlog.txt", CString() << "Send error to " << accountName << " [id: " << toString(len) << "]" );
 			deleteMe = true;
 			return;
 		}
@@ -1949,15 +1949,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			if (len >= 0)
 			{
 				CString temp( pProps.readChars(len) );
-				if ( defaultGaniNames.find( temp ) != -1 )
-					gAni = temp;
-				else
-				{
-					CString temp2( getDataFile( (CString() << temp << ".gani").text() ) );
-					if ( temp2.length() > 0 )
-						if ( isValidFile( temp2, -1 ) )
-							gAni = temp;		// Not temp2
-				}
+				gAni = temp;
 			}
 			break;
 
