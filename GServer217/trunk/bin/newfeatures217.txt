@@ -21,6 +21,10 @@ Additions:
   Clients can set their gani to gani's not allowed via
   foldersconfig.txt; however, if the gani location isn't in
   foldersconfig.txt, the gani won't be sent to the player.
+- Added new boolean server option, nofoldersconfig.  If set to true, it
+  will disable the foldersconfig.txt file.  Keep in mind that if you
+  disable it, people will be able to do stuff like:
+  sethead myminimap.png
 
 Fixes:
 - Server now properly shuts down.

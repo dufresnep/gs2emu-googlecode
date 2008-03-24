@@ -771,15 +771,18 @@ void CPlayer::sendOutGoing()
 void CPlayer::warp(CString& pLevel, float pX, float pY, time_t pModTime)
 {
 	// Don't let them warp to a level not in the folder configuration path.
-	if ( isValidFile( CBuffer() << getDataFile(pLevel.text()), 1 ) == false )
+	if ( noFoldersConfig == false )
 	{
-		if ( levelName.length() > 0 )
-			return;
-		else
+		if ( isValidFile( CBuffer() << getDataFile(pLevel.text()), 1 ) == false )
 		{
-			sendPacket(CPacket() << (char)DISMESSAGE << "No level available");
-			errorOut("serverlog.txt", CString() << "Cannot find a level for " << accountName);
-			deleteMe = true;
+			if ( levelName.length() > 0 )
+				return;
+			else
+			{
+				sendPacket(CPacket() << (char)DISMESSAGE << "No level available");
+				errorOut("serverlog.txt", CString() << "Cannot find a level for " << accountName);
+				deleteMe = true;
+			}
 		}
 	}
 
@@ -1004,7 +1007,7 @@ void CPlayer::processChat(CString& pMessage)
 		// Try and load now.
 		if( file )
 		{
-			if ( isValidFile( CBuffer() << file, HEADGIF ) )
+			if ( noFoldersConfig || isValidFile( CBuffer() << file, HEADGIF ) )
 			{
 				headImage = words[1];
 				updateProp(HEADGIF);
@@ -1022,7 +1025,7 @@ void CPlayer::processChat(CString& pMessage)
 
 		if(strlen(getDataFile(words[1].text())))
 		{
-			if ( isValidFile( CBuffer() << getDataFile(words[1].text()), BODYIMG ) )
+			if ( noFoldersConfig || isValidFile( CBuffer() << getDataFile(words[1].text()), BODYIMG ) )
 			{
 				bodyImage = words[1];
 				updateProp(BODYIMG);
@@ -1039,7 +1042,7 @@ void CPlayer::processChat(CString& pMessage)
 
 		if(strlen(getDataFile(words[1].text())))
 		{
-			if ( isValidFile( CBuffer() << getDataFile(words[1].text()), SWORDPOWER ) )
+			if ( noFoldersConfig || isValidFile( CBuffer() << getDataFile(words[1].text()), SWORDPOWER ) )
 			{
 				swordImage = words[1];
 				updateProp(SWORDPOWER);
@@ -1056,7 +1059,7 @@ void CPlayer::processChat(CString& pMessage)
 
 		if (strlen(getDataFile(words[1].text())))
 		{
-			if ( isValidFile( CBuffer() << getDataFile(words[1].text()), SHIELDPOWER ) )
+			if ( noFoldersConfig || isValidFile( CBuffer() << getDataFile(words[1].text()), SHIELDPOWER ) )
 			{
 				shieldImage = words[1];
 				updateProp(SHIELDPOWER);
@@ -1969,7 +1972,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 					{
 						CString temp2( getDataFile( temp.text() ) );
 						if ( temp2.length() > 0 )
-							if ( isValidFile( temp2, SWORDPOWER ) )
+							if ( noFoldersConfig || isValidFile( temp2, SWORDPOWER ) )
 								swordImage = temp;		// Not temp2
 					}
 				}
@@ -1995,7 +1998,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 					{
 						CString temp2( getDataFile( temp.text() ) );
 						if ( temp2.length() > 0 )
-							if ( isValidFile( temp2, SHIELDPOWER ) )
+							if ( noFoldersConfig || isValidFile( temp2, SHIELDPOWER ) )
 								shieldImage = temp;		// Not temp2
 					}
 				}
@@ -2019,7 +2022,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 				if (len > 100)
 				{
 					CString temp( pProps.readChars(len-100) );
-					if ( isValidFile( temp, HEADGIF ) )
+					if ( noFoldersConfig || isValidFile( temp, HEADGIF ) )
 					{
 						headImage = temp;
 						forwardBuff2 << (char)index << getProp( index );
@@ -2116,7 +2119,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			if(len >= 0)
 			{
 				CString temp( pProps.readChars(len) );
-				if ( isValidFile( temp, -1 ) )
+				if ( noFoldersConfig || isValidFile( temp, -1 ) )
 					horseImage = temp;
 			}
 			//TO DO: add hack check
@@ -2218,7 +2221,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			if (len >= 0)
 			{
 				CString temp( pProps.readChars(len) );
-				if ( isValidFile( temp, BODYIMG ) )
+				if ( noFoldersConfig || isValidFile( temp, BODYIMG ) )
 					bodyImage = temp;
 			}
 			//TO DO: add hack check

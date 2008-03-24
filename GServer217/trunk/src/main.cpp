@@ -34,7 +34,7 @@
 typedef void (*sighandler_t)(int);
 
 bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, hasShutdown = false, lsConnected = false, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, staffOnly, vasesDrop, warptoforall, defaultweapons;
-bool clientsidePushPull, detailedconsole, underconstruction, baddyDropItems;
+bool clientsidePushPull, detailedconsole, underconstruction, baddyDropItems, noFoldersConfig;
 char fSep[] = "/";
 const char* __admin[]   = {"description", "detailedconsole", "language", "listport", "listip", "maxplayers", "myip", "name", "serverport", "sharefolder", "showconsolepackets", "underconstruction", "url", "worldname"};
 const char* __colours[] = {"white", "yellow", "orange", "pink", "red", "darkred", "lightgreen", "green", "darkgreen", "lightblue", "blue", "darkblue", "brown", "cynober", "purple", "darkpurple", "lightgray", "gray", "black", "transparent"};
@@ -401,6 +401,7 @@ bool loadSettings(char* pFile)
 	globalGuilds = CHECK_BOOL(findKey("globalguilds", "true"));
 	idleDisconnect = CHECK_BOOL(findKey("disconnectifnotmoved", "true"));
 	noExplosions = CHECK_BOOL(findKey("noexplosions", "false"));
+	noFoldersConfig = CHECK_BOOL(findKey("nofoldersconfig", "false"));
 	setbodyallowed = CHECK_BOOL(findKey("setbodyallowed", "true"));
 	setheadallowed = CHECK_BOOL(findKey("setheadallowed", "true"));
 	setswordallowed = CHECK_BOOL(findKey("setswordallowed", "true"));
