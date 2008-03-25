@@ -455,21 +455,78 @@ bool loadSettings(char* pFile)
 
 void getSubDirs()
 {
-	subDirs.clear();
-	subDirs.add(dataDir);
-	for (int i = 0; i < folderConfig.count(); i++)
+	// If foldersconfig.txt is turned off, use the old style.
+	if ( noFoldersConfig )
 	{
-		if (folderConfig[i][0] == '#')
-			continue;
+		getSubDirs_os( dataDir.text() );
+		if ( shareFolder.length() > 1 )
+			getSubDirs_os( shareFolder.text() );
+	}
+	else
+	{
+		subDirs.clear();
+		subDirs.add(dataDir);
+		for (int i = 0; i < folderConfig.count(); i++)
+		{
+			if (folderConfig[i][0] == '#')
+				continue;
 
-		CBuffer fmask, fname;
-		folderConfig[i].setRead(folderConfig[i].find(' '));
-		fmask = CBuffer() << dataDir << CBuffer(folderConfig[i].readString("")).trim();
-		fname = CBuffer() << fmask.readChars(fmask.findl(fSep[0])) << fSep;
-		if (subDirs.find(fname) == -1)
-			subDirs.add(fname);
+			CBuffer fmask, fname;
+			folderConfig[i].setRead(folderConfig[i].find(' '));
+			fmask = CBuffer() << dataDir << CBuffer(folderConfig[i].readString("")).trim();
+			fname = CBuffer() << fmask.readChars(fmask.findl(fSep[0])) << fSep;
+			if (subDirs.find(fname) == -1)
+				subDirs.add(fname);
+		}
 	}
 }
+
+#ifdef WIN32
+void getSubDirs_os(char *pDir)
+{
+	CString searchdir = CString() << pDir << "*";
+	WIN32_FIND_DATA filedata;
+	HANDLE hFind = FindFirstFile(searchdir.text(), &filedata);
+	subDirs.add(pDir);
+
+	if(hFind!=NULL)
+	{
+		do
+		{
+			if(filedata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			{
+				if(filedata.cFileName[0] != '.')
+				{
+					CString directory = CString() << pDir << filedata.cFileName << fSep;
+					getSubDirs_os(directory.text());
+				}
+			}
+		} while (FindNextFile(hFind, &filedata));
+	}
+	FindClose(hFind);
+}
+#else
+void getSubDirs_os(char *pDir)
+{
+	DIR *dir;
+	struct stat statx;
+	struct dirent *ent;
+	if ((dir = opendir(pDir)) == NULL)
+		return;
+	subDirs.add(pDir);
+	while ((ent = readdir(dir)) != NULL)
+	{
+		if (ent->d_name[0] != '.')
+		{
+			CString directory = CString() << pDir << ent->d_name << fSep;
+			stat(directory.text(), &statx);
+			if (statx.st_mode & S_IFDIR)
+				getSubDirs(directory.text());
+		}
+	}
+	closedir(dir);
+}
+#endif
 
 #if defined(WIN32)
 	void getSubFiles(char* pDir, CStringList& pOut, CString* search)

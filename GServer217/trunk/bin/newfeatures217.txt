@@ -32,7 +32,8 @@ Fixes:
 - Server now properly shuts down.
 - RC can now correctly reset broken accounts.
 - Players won't get disconnected for inactivity for no reason anymore.
-- Fixed more player props.
+- When an RC edits a player's attributes, it will now correctly send
+  head, body, ap, etc to everybody in that player's level.
 
 
 --------------------------------------------

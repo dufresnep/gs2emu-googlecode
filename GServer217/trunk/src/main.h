@@ -50,6 +50,7 @@ time_t getFileModTime(char* pFile);
 void CalculateMD5(char *buffer, int length, char *checksum);
 void errorOut(char *pFile, CBuffer pError, bool pWrite = true);
 void getSubDirs();
+void getSubDirs_os(char *pDir);
 void getSubFiles(char* pDir, CStringList& pOut, CString* search = 0);
 void loadServerMessage();
 void saveWeapons(char* pFile);
