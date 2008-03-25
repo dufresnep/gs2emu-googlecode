@@ -11,6 +11,7 @@
 #include "main.h"
 #include <sys/stat.h>
 #include <zlib.h>
+#include <math.h>
 
 pt2func CPlayer::msgFuncs[] = {
 			&CPlayer::msgLEVELWARP, &CPlayer::msgBOARDMODIFY,
@@ -191,7 +192,8 @@ CPlayer::CPlayer(CSocket* pSocket)
 	glovePower = bombPower = swordPower = shieldPower = 1;
 	power = maxPower = 3;
 	kills = deaths = udpPort = statusMsg;
-	rating = 0x0BB95E;
+	oldRating = rating = 0x0BB95E;	// 1500/350
+	lastSparTime = 0;
 	sprite = 2;
 	status = 20;
 	ap = 50;
@@ -491,6 +493,26 @@ void CPlayer::sendAccount()
 	// Give the player an id.
 	id = createPlayerId(this);
 
+	// Recalculate spar deviation.
+	if ( type == CLIENTPLAYER )
+	{
+		// 0 - current rating, 1 - new rating.
+		int rate[2] = { (rating & 0x1FF), 0 };
+
+		// c = sqrt( (350*350 - 50*50) / t )
+		// where t = 60 for number of rating periods for deviation to go from 50 to 350
+		const double c = 44.721;
+		int t = (getSysTime() - lastSparTime)/86400; // Convert seconds to days: 60/60/24
+
+		// Find the new deviation.
+		rate[1] = MIN( sqrt((rate[0]*rate[0]) + (c*c) * (double)t), 350 );
+
+		// Save the old rating and put the new deviation into the current rating.
+		oldRating = rating;
+		rating = ((rating >> 9) << 9) | (rate[1] & 0x1FF);
+	}
+
+	// Send out the player's login props.
 	if(type == CLIENTPLAYER)
 	{
 		saveAccount();
@@ -602,6 +624,7 @@ void CPlayer::sendAccount()
 			}
 			sendPacket(otherProps);
 		}
+
 		// If the player is an RC, send the RC specific props.
 		else if (type == CLIENTRC)
 		{
@@ -1939,7 +1962,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			{
 				float oldPower = power;
 				power = CLIP((float)pProps.readByte1()/2, 0.0f, maxPower);
-				if(power == 0 && oldPower > 0)
+				if ( power == 0 && oldPower > 0 && level->sparZone == false )
 					dropItems();
 				break;
 			}
@@ -2240,6 +2263,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 				break;
 
 			case RATING:
+				oldRating = rating;
 				rating = pProps.readByte3();
 				break;
 
@@ -2782,24 +2806,66 @@ void CPlayer::msgCLAIMPKER(CPacket& pPacket)
 {
 	CPlayer* other = (CPlayer*)playerIds[pPacket.readByte2()];
 	if ( other == NULL ) return;
+	if ( other == this ) return;
 
 	// Sparring zone rating code.
+	// Uses the glicko rating system.
 	if ( level->sparZone )
 	{
-		//0 - rating, 1 - deviation.
-		int killer_rate[2] = { ((other->rating >> 9) & 0xFFF), (other->rating & 0x1FF) };
-		int victim_rate[2] = { ((rating >> 9) & 0xFFF), (rating & 0x1FF) };
-		int new_rate[2] = { 0, 0 };
+		//0 - rating, 1 - deviation
+		//2 - old rating, 3 - old deviation
+		//4 - new rating, 5 - new deviation
+		int killer_rate[6] = {	((other->rating >> 9) & 0xFFF), (other->rating & 0x1FF),
+								((other->oldRating >> 9) & 0xFFF), (other->oldRating & 0x1FF),
+								0, 0 };
+		int victim_rate[6] = {	((rating >> 9) & 0xFFF), (rating & 0x1FF),
+								((oldRating >> 9) & 0xFFF), (oldRating & 0x1FF),
+								0, 0 };
 
-		// Do spar rating calculation here.
+		// Do the spar rating calculation for killer.
+		{
+			const double q = 0.0057565;
+			double g = 1 / sqrt(1 + 3 * (q * q) * victim_rate[1]);
+			double E = 1 / (1 + 10 - g * (killer_rate[0] - victim_rate[0]) / 400);
+			double d = (q * q) * (g * g) * E * (1 - E);
+			double s = 1.0;
 
-		other->rating = ((new_rate[0] & 0xFFF) << 9) | (new_rate[1] & 0x1FF);
+			killer_rate[4] = (int)floor((double)killer_rate[2] + (q / (1/killer_rate[1] + 1/d)) * g * (s - E));
+			killer_rate[5] = (int)floor(sqrt(pow( 1/(killer_rate[1]*killer_rate[1]) + 1/d, -1 )));
+		}
+
+		// Do the spar rating calculation for victim.
+		{
+			const double q = 0.0057565;
+			double g = 1 / sqrt(1 + 3 * (q * q) * killer_rate[1]);
+			double E = 1 / (1 + 10 - g * (victim_rate[0] - killer_rate[0]) / 400);
+			double d = (q * q) * (g * g) * E * (1 - E);
+			double s = 0.0;
+
+			victim_rate[4] = (int)floor((double)victim_rate[2] + (q / (1/victim_rate[1] + 1/d)) * g * (s - E));
+			victim_rate[5] = (int)floor(sqrt(pow( 1/(victim_rate[1]*victim_rate[1]) + 1/d, -1 )));
+		}
+
+		// Cap the rating.
+		killer_rate[4] = CLIP( killer_rate[4], 0, 4000 );
+		killer_rate[5] = CLIP( killer_rate[5], 50, 350 );
+		victim_rate[4] = CLIP( victim_rate[4], 0, 4000 );
+		victim_rate[5] = CLIP( victim_rate[5], 50, 350 );
+
+		// Update each player's last spar time.
+		other->lastSparTime = getSysTime();
+		this->lastSparTime = getSysTime();
+
+		// Update the player's rating.
+		other->rating = ((killer_rate[4] & 0xFFF) << 9) | (killer_rate[5] & 0x1FF);
+		this->rating = ((victim_rate[4] & 0xFFF) << 9) | (victim_rate[5] & 0x1FF);
 		other->updateProp( RATING );
+		this->updateProp( RATING );
 	}
 	else
 	{
 		if (!dontchangekills)
-			other->kills ++;
+			other->kills++;
 
 		if (apSystem)
 		{

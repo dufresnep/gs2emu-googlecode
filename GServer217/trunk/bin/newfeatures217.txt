@@ -25,6 +25,7 @@ Additions:
   will disable the foldersconfig.txt file.  Keep in mind that if you
   disable it, people will be able to do stuff like:
   sethead myminimap.png
+- Implemented spar rating.
 - A player's spar rating is now saved to their account.  Also, all new
   players will also start with a rating of 1500/350 instead of 0/50.
 
@@ -37,6 +38,8 @@ Fixes:
   variable.  This also fixes a bunch of player props.
 - When an RC edits a player's attributes, it will now correctly send
   head, body, ap, etc to everybody in that player's level.
+- When a player dies in a sparring zone and dropitems is enabled, the
+  player will no longer drop items.
 
 
 --------------------------------------------
