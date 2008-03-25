@@ -502,10 +502,10 @@ void CPlayer::sendAccount()
 		// c = sqrt( (350*350 - 50*50) / t )
 		// where t = 60 for number of rating periods for deviation to go from 50 to 350
 		const double c = 44.721;
-		int t = (getSysTime() - lastSparTime)/86400; // Convert seconds to days: 60/60/24
+		int t = (int)(getSysTime() - lastSparTime)/86400; // Convert seconds to days: 60/60/24
 
 		// Find the new deviation.
-		rate[1] = MIN( sqrt((rate[0]*rate[0]) + (c*c) * (double)t), 350 );
+		rate[1] = MIN( (int)sqrt((rate[0]*rate[0]) + (c*c) * (double)t), 350 );
 
 		// Save the old rating and put the new deviation into the current rating.
 		oldRating = rating;

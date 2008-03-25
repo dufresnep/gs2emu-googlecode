@@ -71,7 +71,7 @@ bool CAccount::loadDBAccount(CString pAccount, bool fromAccount)
 		else if (section == "DEATHS") deaths = atoi(val.text());
 		else if (section == "RATING") rating = atoi(val.text());
 		else if (section == "OLDRATING") oldRating = atoi(val.text());
-		else if (section == "LASTSPARTIME") lastSparTime = atoi(val.text());
+		else if (section == "LASTSPARTIME") lastSparTime = atol(val.text());
 		else if (section == "FLAG") myFlags.add(val);
 		else if (section == "ATTR1") myAttr[0] = val; // could trim these 30 lines into one.. but it'd probably go slower then a simple compare.. who knows.
 		else if (section == "ATTR2") myAttr[1] = val;
@@ -178,7 +178,7 @@ void CAccount::saveAccount(bool pAttributes)
 	newFile << "DEATHS " << toString(deaths) << "\n";
 	newFile << "RATING " << toString(rating) << "\n";
 	newFile << "OLDRATING " << toString(oldRating) << "\n";
-	newFile << "LASTSPARTIME " << toString(lastSparTime) << "\n";
+	newFile << "LASTSPARTIME " << toString((unsigned long)lastSparTime) << "\n";
 //	newFile << "PLATFORM " << platform << "\n";
 //	newFile << "CODEPAGE " << name << "\n";
 	for (int i = 0; i < (int)(sizeof((pAttributes ? oldAccount.myAttr : myAttr)) / 20); i++)
