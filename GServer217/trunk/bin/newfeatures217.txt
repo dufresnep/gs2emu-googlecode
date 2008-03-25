@@ -11,12 +11,12 @@ Additions:
 - If a player says 'sethead head30', the server will check png, mng,
   and gif files in that order for a match and return the first one
   found, if any.
-- It is now possible to build the gserver in 'localhost mode' by
-  defining DEBUG_LOCALHOSTMODE when you compile it. This mode disables
-  the listserver connection and authentication, allowing for
-  development in locations where an internet connection is unavailable
-  or when one needs to test scripts locally with multiple Graal
-  clients.
+- The gserver can now be set to 'localhost mode' by modifying the
+  'myip' option in the serveroptions.txt file and setting it to
+  'localhost'.  It will disable the listserver connection and
+  authentication allowing for development in locations where an
+  Internet connection is unavailable, or when one needs to test scripts
+  locally with multiple Graal clients.
 - Removed file exists check for when players change their gani.
   Clients can set their gani to gani's not allowed via
   foldersconfig.txt; however, if the gani location isn't in
@@ -25,13 +25,16 @@ Additions:
   will disable the foldersconfig.txt file.  Keep in mind that if you
   disable it, people will be able to do stuff like:
   sethead myminimap.png
-- A player's spar rating is now saved to their account.  All new
+- A player's spar rating is now saved to their account.  Also, all new
   players will also start with a rating of 1500/350 instead of 0/50.
 
 Fixes:
 - Server now properly shuts down.
 - RC can now correctly reset broken accounts.
 - Players won't get disconnected for inactivity for no reason anymore.
+- Fixed the spar rating player prop.  It was previously being sent as a
+  two-byte variable when it should have been sent as a three-byte
+  variable.  This also fixes a bunch of player props.
 - When an RC edits a player's attributes, it will now correctly send
   head, body, ap, etc to everybody in that player's level.
 

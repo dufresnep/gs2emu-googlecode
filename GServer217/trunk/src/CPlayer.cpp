@@ -423,7 +423,8 @@ void CPlayer::processLogin(CPacket& pPacket)
 	}
 
 	//Send a verification request to the server for account name and password
-	#ifdef DEBUG_LOCALHOSTMODE
+	if ( listServerFields[5] == "localhost" )
+	{
         for (int i = 0; i < newPlayers.count(); i++)
         {
             CPlayer *player = (CPlayer *)newPlayers[i];
@@ -434,7 +435,9 @@ void CPlayer::processLogin(CPacket& pPacket)
             }
         }
         errorOut("serverlog.txt", "[DEBUG_LOCALHOSTMODE] Password Check Bypassed.", true);
-	#else
+	}
+	else
+	{
         if (lsConnected)
             ListServer_Send(CPacket() << (char)SLSACCOUNT << (char)accountName.length() << accountName << (char)password.length() << password << "\n");
         else
@@ -443,7 +446,7 @@ void CPlayer::processLogin(CPacket& pPacket)
             sendPacket(CPacket() << (char)DISMESSAGE << "Unable to contact account server.");
             deleteMe = true;
         }
-	#endif
+	}
 }
 
 void CPlayer::sendAccount()

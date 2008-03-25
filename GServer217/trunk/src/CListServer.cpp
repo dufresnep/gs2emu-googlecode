@@ -34,24 +34,16 @@ void ListServer_Connect()
 
 void ListServer_End()
 {
-    #ifndef DEBUG_LOCALHOSTMODE
-        if (!lsConnected)
-            return;
+	if ( listServerFields[5] == "localhost" ) return;
+	if (!lsConnected) return;
 
-        listServer.closeSock();
-	#else
-		return;
-	#endif
+    listServer.closeSock();
 }
 
 void ListServer_Main()
 {
-#ifdef DEBUG_LOCALHOSTMODE
-	return;
-#endif
-
-    if (!lsConnected)
-        return;
+	if ( listServerFields[5] == "localhost" ) return;
+    if (!lsConnected) return;
 
 	CBuffer receiveBuff;
 	if (listServer.receiveBytes(receiveBuff, 65536) < 0)
@@ -301,16 +293,14 @@ void ListServer_Main()
 
 void ListServer_Send(CPacket &pPacket)
 {
-    #ifndef DEBUG_LOCALHOSTMODE
-        if (!lsConnected)
-        {
-            ListServer_Connect();
-            if (!lsConnected)
-                return;
-        }
+	if ( listServerFields[5] == "localhost" ) return;
 
-        listServer.sendBuffer(pPacket);
-	#else
-		return;
-	#endif
+	if (!lsConnected)
+    {
+        ListServer_Connect();
+        if (!lsConnected)
+            return;
+    }
+
+    listServer.sendBuffer(pPacket);
 }
