@@ -515,7 +515,7 @@ void CPlayer::sendAccount()
 		}
 		sendPacket(loginProps);
 
-		sendPacket( CPacket() << (char)SRPGWINDOW << "\"Welcome to " << listServerFields[0] << "\",\"Graal Reborn - Coded by 39ster, Agret, and Joey\"" );
+		sendPacket( CPacket() << (char)SRPGWINDOW << "\"Welcome to " << listServerFields[0] << "\",\"Graal Reborn - Coded by 39ster, Agret, Joey and Nalin\"" );
 	}
 
 	if (type == CLIENTPLAYER)
