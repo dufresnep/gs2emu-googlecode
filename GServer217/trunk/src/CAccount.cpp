@@ -58,7 +58,7 @@ bool CAccount::loadDBAccount(CString pAccount, bool fromAccount)
 		else if (section == "BODY") bodyImage = val;
 		else if (section == "SWORD") swordImage = val;
 		else if (section == "SHIELD") shieldImage = val;
-		else if (section == "COLORS") { CStringList t; t.load(val.text(), ","); for (int i = 0; i < t.count(); i++) colors[i] = atoi(t[i].text()); }
+		else if (section == "COLORS") { CStringList t; t.load(val.text(), ","); for (int i = 0; i < t.count() && i < 5; i++) colors[i] = atoi(t[i].text()); }
 		else if (section == "SPRITE") sprite = atoi(val.text());
 		else if (section == "STATUS") status = atoi(val.text());
 		else if (section == "MP") magicPoints = atoi(val.text());
@@ -69,6 +69,7 @@ bool CAccount::loadDBAccount(CString pAccount, bool fromAccount)
 		else if (section == "LANGUAGE") language = val;
 		else if (section == "KILLS") kills = atoi(val.text());
 		else if (section == "DEATHS") deaths = atoi(val.text());
+		else if (section == "RATING") rating = atoi(val.text());
 		else if (section == "FLAG") myFlags.add(val);
 		else if (section == "ATTR1") myAttr[0] = val; // could trim these 30 lines into one.. but it'd probably go slower then a simple compare.. who knows.
 		else if (section == "ATTR2") myAttr[1] = val;
@@ -173,6 +174,7 @@ void CAccount::saveAccount(bool pAttributes)
 	newFile << "LANGUAGE " << (pAttributes ? oldAccount.language : language) << "\n";
 	newFile << "KILLS " << toString(kills) << "\n";
 	newFile << "DEATHS " << toString(deaths) << "\n";
+	newFile << "RATING " << toString(rating) << "\n";
 //	newFile << "PLATFORM " << platform << "\n";
 //	newFile << "CODEPAGE " << name << "\n";
 	for (int i = 0; i < (int)(sizeof((pAttributes ? oldAccount.myAttr : myAttr)) / 20); i++)

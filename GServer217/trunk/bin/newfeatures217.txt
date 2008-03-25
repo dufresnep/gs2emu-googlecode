@@ -25,6 +25,8 @@ Additions:
   will disable the foldersconfig.txt file.  Keep in mind that if you
   disable it, people will be able to do stuff like:
   sethead myminimap.png
+- A player's spar rating is now saved to their account.  All new
+  players will also start with a rating of 1500/350 instead of 0/50.
 
 Fixes:
 - Server now properly shuts down.

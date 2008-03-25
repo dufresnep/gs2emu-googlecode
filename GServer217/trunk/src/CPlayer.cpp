@@ -190,7 +190,8 @@ CPlayer::CPlayer(CSocket* pSocket)
 	rubins = 0;
 	glovePower = bombPower = swordPower = shieldPower = 1;
 	power = maxPower = 3;
-	kills = deaths = udpPort = statusMsg= rating =0;
+	kills = deaths = udpPort = statusMsg;
+	rating = 0x0BB95E;
 	sprite = 2;
 	status = 20;
 	ap = 50;
@@ -1709,10 +1710,6 @@ CPacket CPlayer::getProp(int pProp)
 		retVal.writeByte1(bombPower);
 		break;
 
-	case PLAYERANI:
-		retVal << (char)gAni.length() << gAni;
-		break;
-
 	case SWORDPOWER:
 		retVal.writeByte1(swordPower+30);
 		retVal.writeByte1(swordImage.length());
@@ -1724,13 +1721,13 @@ CPacket CPlayer::getProp(int pProp)
 		retVal << (char)shieldImage.length() << shieldImage;
 		break;
 
+	case PLAYERANI:
+		retVal << (char)gAni.length() << gAni;
+		break;
+
 	case HEADGIF:
 		retVal.writeByte1(100 + headImage.length());
 		retVal << headImage;
-		break;
-
-	case BODYIMG:
-		retVal << (char)bodyImage.length() <<  bodyImage;
 		break;
 
 	case CURCHAT:
@@ -1783,6 +1780,14 @@ CPacket CPlayer::getProp(int pProp)
 		retVal.writeByte1(horseBushes);
 		break;
 
+	case EFFECTCOLORS:
+		retVal.writeByte1(0);
+		break;
+
+	case CARRYNPC:
+		retVal.writeByte3(0);
+		break;
+
 	case APCOUNTER:
 		retVal.writeByte2(apCounter+1);
 		break;
@@ -1798,13 +1803,7 @@ CPacket CPlayer::getProp(int pProp)
 	case DEATHSCOUNT:
 		retVal.writeByte3(deaths);
 		break;
-	case CARRYNPC:
-		retVal.writeByte3(0);
-		break;
 
-	case EFFECTCOLORS:
-		retVal.writeByte1(0);
-		break;
 	case ONLINESECS:
 		retVal.writeByte3(onlineSecs);
 		break;
@@ -1813,28 +1812,28 @@ CPacket CPlayer::getProp(int pProp)
 		retVal.writeByte5(lastIp);
 		break;
 
-	case PALIGNMENT:
-		retVal.writeByte1(ap);
+	case UDPPORT:
+		retVal.writeByte3(udpPort);
 		break;
 
-	case PACCOUNTNAME:
-		retVal << (char)accountName.length() << accountName;
+	case PALIGNMENT:
+		retVal.writeByte1(ap);
 		break;
 
 	case PADDITFLAGS:
 		retVal.writeByte1(additionalFlags);
 		break;
 
-	case PSTATUSMSG:
-		retVal.writeByte1(statusMsg);
+	case PACCOUNTNAME:
+		retVal << (char)accountName.length() << accountName;
 		break;
 
-	case UDPPORT:
-		retVal.writeByte3(udpPort);
+	case BODYIMG:
+		retVal << (char)bodyImage.length() <<  bodyImage;
 		break;
 
-	case PLANGUAGE:
-		retVal << (char)language.length() << language;
+	case RATING:
+		retVal.writeByte3(rating);
 		break;
 
 	case GATTRIB1: retVal << (char)myAttr[0].length() << myAttr[0]; break;
@@ -1842,10 +1841,28 @@ CPacket CPlayer::getProp(int pProp)
 	case GATTRIB3: retVal << (char)myAttr[2].length() << myAttr[2]; break;
 	case GATTRIB4: retVal << (char)myAttr[3].length() << myAttr[3]; break;
 	case GATTRIB5: retVal << (char)myAttr[4].length() << myAttr[4]; break;
+
+	case PLAYERZ:
+		retVal.writeByte1((char)(z * 2));
+		break;
+
 	case GATTRIB6: retVal << (char)myAttr[5].length() << myAttr[5]; break;
 	case GATTRIB7: retVal << (char)myAttr[6].length() << myAttr[6]; break;
 	case GATTRIB8: retVal << (char)myAttr[7].length() << myAttr[7]; break;
 	case GATTRIB9: retVal << (char)myAttr[8].length() << myAttr[8]; break;
+
+	case PCONNECTED:
+		// Isn't a stored property.
+		break;
+
+	case PLANGUAGE:
+		retVal << (char)language.length() << language;
+		break;
+
+	case PSTATUSMSG:
+		retVal.writeByte1(statusMsg);
+		break;
+
 	case GATTRIB10: retVal << (char)myAttr[9].length() << myAttr[9]; break;
 	case GATTRIB11: retVal << (char)myAttr[10].length() << myAttr[10]; break;
 	case GATTRIB12: retVal << (char)myAttr[11].length() << myAttr[11]; break;
@@ -1868,9 +1885,6 @@ CPacket CPlayer::getProp(int pProp)
 	case GATTRIB29: retVal << (char)myAttr[28].length() << myAttr[28]; break;
 	case GATTRIB30: retVal << (char)myAttr[29].length() << myAttr[29]; break;
 
-	case RATING:
-		retVal.writeByte2(rating);
-	break;
 	default:
 		errorOut("errorlog.txt", CString() << "Unknown getProp( " << toString(pProp) << " ) by " << accountName);
 		break;
@@ -1903,393 +1917,400 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 
 		switch (index)
 		{
-		case NICKNAME:
-		{
-			len = pProps.readByte1();
-			if (len <= 0 || len > 224)
+			case NICKNAME:
+			{
+				len = pProps.readByte1();
+				if (len <= 0 || len > 224)
+					break;
+
+				setNick(CString() << pProps.readChars(len), true);
+				forwardBuff2 << (char)index << getProp( index );
+			}
+			break;
+
+			case MAXPOWER:
+				maxPower = CLIP((float)pProps.readByte1(), 0.0f, (float)heartLimit);
 				break;
 
-			setNick(CString() << pProps.readChars(len), true);
-			forwardBuff2 << (char)index << getProp( index );
-		}
-		break;
-
-		case MAXPOWER:
-			maxPower = CLIP((float)pProps.readByte1(), 0.0f, (float)heartLimit);
-			break;
-
-		case CURPOWER:
-		{
-			float oldPower = power;
-			power = CLIP((float)pProps.readByte1()/2, 0.0f, maxPower);
-			if(power == 0 && oldPower > 0)
-				dropItems();
-			break;
-		}
-		case RUPEESCOUNT:
-			rubins = CLIP(pProps.readByte3(), 0, 9999999);
-			break;
-
-		case ARROWSCOUNT:
-			darts = CLIP(pProps.readByte1(), 0, 99);
-			break;
-
-		case BOMBSCOUNT:
-			bombs = CLIP(pProps.readByte1(), 0, 99);
-			break;
-
-		case GLOVEPOWER:
-			glovePower = CLIP(pProps.readByte1(), 0, 3);
-			//is 3 maximum??
-			break;
-
-		case BOMBPOWER:
-			bombPower = CLIP(pProps.readByte1(), 0, 3);
-			break;
-
-		case PLAYERANI:
-			len = pProps.readByte1();
-			if (len >= 0)
+			case CURPOWER:
 			{
-				CString temp( pProps.readChars(len) );
-				gAni = temp;
+				float oldPower = power;
+				power = CLIP((float)pProps.readByte1()/2, 0.0f, maxPower);
+				if(power == 0 && oldPower > 0)
+					dropItems();
+				break;
 			}
-			break;
+			case RUPEESCOUNT:
+				rubins = CLIP(pProps.readByte3(), 0, 9999999);
+				break;
 
-		case SWORDPOWER:
-		{
-			int sp = pProps.readByte1();
-			if(sp >= 30)
+			case ARROWSCOUNT:
+				darts = CLIP(pProps.readByte1(), 0, 99);
+				break;
+
+			case BOMBSCOUNT:
+				bombs = CLIP(pProps.readByte1(), 0, 99);
+				break;
+
+			case GLOVEPOWER:
+				glovePower = CLIP(pProps.readByte1(), 0, 3);
+				//is 3 maximum??
+				break;
+
+			case BOMBPOWER:
+				bombPower = CLIP(pProps.readByte1(), 0, 3);
+				break;
+
+			case SWORDPOWER:
 			{
-				sp -= 30;
-				len = pProps.readByte1();
-				if(len >= 0)
+				int sp = pProps.readByte1();
+				if(sp >= 30)
 				{
-					CString temp( pProps.readChars(len) );
-					if ( defaultSwordNames.find( temp ) != -1 )
-						swordImage = temp;
-					else
+					sp -= 30;
+					len = pProps.readByte1();
+					if(len >= 0)
 					{
-						CString temp2( getDataFile( temp.text() ) );
-						if ( temp2.length() > 0 )
-							if ( noFoldersConfig || isValidFile( temp2, SWORDPOWER ) )
-								swordImage = temp;		// Not temp2
+						CString temp( pProps.readChars(len) );
+						if ( defaultSwordNames.find( temp ) != -1 )
+							swordImage = temp;
+						else
+						{
+							CString temp2( getDataFile( temp.text() ) );
+							if ( temp2.length() > 0 )
+								if ( noFoldersConfig || isValidFile( temp2, SWORDPOWER ) )
+									swordImage = temp;		// Not temp2
+						}
 					}
-				}
-			} else if(sp <= 4)
-				swordImage = CString() << "sword" << toString(sp) << ".png";
-			swordPower = CLIP(sp, 0, swordLimit);
-			//check this
-			break;
-		}
-		case SHIELDPOWER:
-		{
-			int sp = pProps.readByte1();
-			if(sp >= 10)
+				} else if(sp <= 4)
+					swordImage = CString() << "sword" << toString(sp) << ".png";
+				swordPower = CLIP(sp, 0, swordLimit);
+				//check this
+				break;
+			}
+
+			case SHIELDPOWER:
 			{
-				sp -= 10;
-				len = pProps.readByte1();
-				if(len >= 0)
+				int sp = pProps.readByte1();
+				if(sp >= 10)
 				{
-					CString temp( pProps.readChars(len) );
-					if ( defaultShieldNames.find( temp ) != -1 )
-						shieldImage = temp;
-					else
+					sp -= 10;
+					len = pProps.readByte1();
+					if(len >= 0)
 					{
-						CString temp2( getDataFile( temp.text() ) );
-						if ( temp2.length() > 0 )
-							if ( noFoldersConfig || isValidFile( temp2, SHIELDPOWER ) )
-								shieldImage = temp;		// Not temp2
+						CString temp( pProps.readChars(len) );
+						if ( defaultShieldNames.find( temp ) != -1 )
+							shieldImage = temp;
+						else
+						{
+							CString temp2( getDataFile( temp.text() ) );
+							if ( temp2.length() > 0 )
+								if ( noFoldersConfig || isValidFile( temp2, SHIELDPOWER ) )
+									shieldImage = temp;		// Not temp2
+						}
 					}
-				}
-			} else if(sp <= 3)
-				shieldImage = CString() << "shield" << toString(sp) << ".png";
-			shieldPower = CLIP(sp, 0, shieldLimit);
-			//check this
-			break;
-		}
-		case HEADGIF:
-			len = pProps.readByte1();
-			if (len < 100)
-			{
+				} else if(sp <= 3)
+					shieldImage = CString() << "shield" << toString(sp) << ".png";
+				shieldPower = CLIP(sp, 0, shieldLimit);
+				//check this
+				break;
+			}
+
+			case PLAYERANI:
+				len = pProps.readByte1();
 				if (len >= 0)
 				{
-					headImage = CString() << "head" << toString(len) << ".png";
-					forwardBuff2 << (char)index << getProp( index );
+					CString temp( pProps.readChars(len) );
+					gAni = temp;
 				}
-			} else
-			{
-				if (len > 100)
+				break;
+
+			case HEADGIF:
+				len = pProps.readByte1();
+				if (len < 100)
 				{
-					CString temp( pProps.readChars(len-100) );
-					if ( noFoldersConfig || isValidFile( temp, HEADGIF ) )
+					if (len >= 0)
 					{
-						headImage = temp;
+						headImage = CString() << "head" << toString(len) << ".png";
 						forwardBuff2 << (char)index << getProp( index );
 					}
-				}
-			}
-		break;
-
-		case CURCHAT:
-			len = (unsigned char)pProps.readByte1();
-			len = (len < 0 ? 0 : len);
-
-			chatMsg = pProps.readChars(len);
-			chatMsg = (chatMsg.length() > 220 ? chatMsg.copy(0, 220) : chatMsg);
-
-			processChat(chatMsg);
-			lastChat = time(NULL);
-	   	break;
-
-		case PLAYERCOLORS:
-			for (int i = 0; i < 5; i ++)
-				colors[i] = pProps.readByte1();
-		break;
-
-		case PLAYERID:
-			pProps.readByte2();
-			break;
-
-		case PLAYERX:
-			x = (float)pProps.readByte1() / 2;
-			status &= (-1-1);
-			lastMovement = getTime();
-			//TO DO: add hack check;
-			break;
-
-		case PLAYERY:
-			y = (float)pProps.readByte1() / 2;
-			status &= (-1-1);
-			lastMovement = getTime();
-			//TO DO: add hack check;
-			break;
-
-		case PLAYERZ:
-			z = (float)pProps.readByte1() / 2;
-			status &= (-1-1);
-			lastMovement = getTime();
-			//TO DO: add hack check;
-			break;
-
-		case PLAYERSPRITE:
-			sprite = pProps.readByte1();
-			//TO DO: add hack check;
-			break;
-
-		case STATUS:
-		{
-			int oldStatus = status;
-			status = pProps.readByte1();
-
-			if ( id == -1 ) break;
-			if ((oldStatus & 8) == 0)
-			{
-				if ((status & 8) > 0) // dead
+				} else
 				{
-					power = CLIP((ap < 20 ? 3 : (ap < 40 ? 5 : maxPower)), 0.0f, maxPower);
-					if(!level->sparZone)
-						deaths++;
-					if (level->players.count() > 1 && level->players[0] == this)
+					if (len > 100)
 					{
-						level->players.remove(0);
-						level->players.add(this);
-						((CPlayer*)level->players[0])->sendPacket(CPacket() << (char)ISLEADER);
+						CString temp( pProps.readChars(len-100) );
+						if ( noFoldersConfig || isValidFile( temp, HEADGIF ) )
+						{
+							headImage = temp;
+							forwardBuff2 << (char)index << getProp( index );
+						}
 					}
 				}
+				break;
 
-			}
-		}
-		break;
+			case CURCHAT:
+				len = (unsigned char)pProps.readByte1();
+				len = (len < 0 ? 0 : len);
 
-		case CARRYSPRITE:
-			carrySprite = pProps.readByte1();
-			//TO DO: packet format may be outdated
-			break;
+				chatMsg = pProps.readChars(len);
+				chatMsg = (chatMsg.length() > 220 ? chatMsg.copy(0, 220) : chatMsg);
 
-		case CURLEVEL:
-			len = pProps.readByte1();
-			if(len >= 0)
-				levelName = pProps.readChars(len);
-			//TO DO: add hack check
-			break;
+				processChat(chatMsg);
+				lastChat = time(NULL);
+	   			break;
 
-		case HORSEGIF:
-			len = pProps.readByte1();
-			if(len >= 0)
+			case PLAYERCOLORS:
+				for (int i = 0; i < 5; i ++)
+					colors[i] = pProps.readByte1();
+				break;
+
+			case PLAYERID:
+				pProps.readByte2();
+				break;
+
+			case PLAYERX:
+				x = (float)pProps.readByte1() / 2;
+				status &= (-1-1);
+				lastMovement = getTime();
+				//TO DO: add hack check;
+				break;
+
+			case PLAYERY:
+				y = (float)pProps.readByte1() / 2;
+				status &= (-1-1);
+				lastMovement = getTime();
+				//TO DO: add hack check;
+				break;
+
+			case PLAYERSPRITE:
+				sprite = pProps.readByte1();
+				//TO DO: add hack check;
+				break;
+
+			case STATUS:
 			{
-				CString temp( pProps.readChars(len) );
-				if ( noFoldersConfig || isValidFile( temp, -1 ) )
-					horseImage = temp;
-			}
-			//TO DO: add hack check
-			break;
+				int oldStatus = status;
+				status = pProps.readByte1();
 
-		case HORSEBUSHES:
-			horseBushes = pProps.readByte1();
-			//TO DO: add hack check
-			break;
-
-		case APCOUNTER:
-			apCounter = pProps.readByte2();
-			//TO DO: add hack check
-			break;
-
-		case MAGICPOINTS:
-			magicPoints = CLIP(pProps.readByte1(), 0, 100);
-			//TO DO: add hack check
-			break;
-
-		case KILLSCOUNT:
-		   //kills = pProps.readByte3();
-		   pProps.readByte3();
-			//Why should any1 be able to change kills?
-			break;
-
-		case DEATHSCOUNT:
-			//deaths = pProps.readByte3();
-			pProps.readByte3();
-			//Why should any1 be able to change deaths?
-			break;
-
-		case CARRYNPC:
-			pProps.readByte3();
-			//this doesnt work even when i add the correct code...:/
-			//TO DO: add hack check
-			break;
-
-		case EFFECTCOLORS:
-			len = pProps.readByte1();
-			if ( len > 0 )
-				pProps.readByte4();
-//			pProps.readByte5();
-			break;
-
-		case ONLINESECS:
-			//onlineSecs = pProps.readByte3();
-			pProps.readByte3();
-			//Why should any1 be able to change online seconds?
-			break;
-
-		case LASTIP:
-			//lastIp = (int)pProps.readByte5();
-			pProps.readByte5();
-			//Why should any1 be able to change last ip?
-			break;
-
-		case PALIGNMENT:
-			ap = CLIP(pProps.readByte1(), 0, 100);
-			//TO DO: add hack check
-			break;
-
-		case UDPPORT:
-			udpPort = pProps.readByte3();
-			if(udpPort > 0)
-			{
-				sendPacket(CPacket() << (char)DISMESSAGE <<
-					"This server doesnt support UDP. Please disable UDP in general settings.");
-				deleteMe = true;
-			}
-
-			if ( id == -1 ) break;
-			for(int i = 0; i < playerList.count(); i++)
-			{
-				CPlayer* other = (CPlayer*)playerList[i];
-				if(other != this)
+				if ( id == -1 ) break;
+				if ((oldStatus & 8) == 0)
 				{
-					other->sendPacket(CPacket() << (char)OTHERPLPROPS <<
-						(short)id << (char)UDPPORT << (int)udpPort);
+					if ((status & 8) > 0) // dead
+					{
+						power = CLIP((ap < 20 ? 3 : (ap < 40 ? 5 : maxPower)), 0.0f, maxPower);
+						if(!level->sparZone)
+							deaths++;
+						if (level->players.count() > 1 && level->players[0] == this)
+						{
+							level->players.remove(0);
+							level->players.add(this);
+							((CPlayer*)level->players[0])->sendPacket(CPacket() << (char)ISLEADER);
+						}
+					}
+
 				}
 			}
-			//TO DO: add hack check
 			break;
 
-		case PADDITFLAGS:
-			additionalFlags = pProps.readByte1();
-			//TO DO: add hack check
-			break;
+			case CARRYSPRITE:
+				carrySprite = pProps.readByte1();
+				//TO DO: packet format may be outdated
+				break;
 
-		case PACCOUNTNAME:
-			len = pProps.readByte1();
-			if (len >= 0)
-				pProps.readChars(len);
-			//Do not allow account name change
-			break;
+			case CURLEVEL:
+				len = pProps.readByte1();
+				if(len >= 0)
+					levelName = pProps.readChars(len);
+				//TO DO: add hack check
+				break;
 
-		case BODYIMG:
-			len = pProps.readByte1();
-			if (len >= 0)
-			{
-				CString temp( pProps.readChars(len) );
-				if ( noFoldersConfig || isValidFile( temp, BODYIMG ) )
-					bodyImage = temp;
-			}
-			//TO DO: add hack check
-			break;
+			case HORSEGIF:
+				len = pProps.readByte1();
+				if(len >= 0)
+				{
+					CString temp( pProps.readChars(len) );
+					if ( noFoldersConfig || isValidFile( temp, -1 ) )
+						horseImage = temp;
+				}
+				//TO DO: add hack check
+				break;
 
-		case PSTATUSMSG:
-			statusMsg = pProps.readByte1();
+			case HORSEBUSHES:
+				horseBushes = pProps.readByte1();
+				//TO DO: add hack check
+				break;
 
-			// Allows proper RC login.
-			if ( id == -1 ) break;
+			case EFFECTCOLORS:
+				len = pProps.readByte1();
+				if ( len > 0 )
+					pProps.readByte4();
+	//			pProps.readByte5();
+				break;
 
-			for(int i = 0; i < playerList.count(); i++)
-			{
-				CPlayer*other = (CPlayer*)playerList[i];
-				if(other != this)
-					other->sendPacket(CPacket() << (char)OTHERPLPROPS << (short)id <<
-						(char)PSTATUSMSG << (char)statusMsg);
-			}
-			//TO DO: add hack check
-			break;
+			case CARRYNPC:
+				pProps.readByte3();
+				//this doesnt work even when i add the correct code...:/
+				//TO DO: add hack check
+				break;
 
-		case PLANGUAGE:
-			len = pProps.readByte1();
-			if(len >= 0)
-				language = pProps.readChars(len);
-			break;
+			case APCOUNTER:
+				apCounter = pProps.readByte2();
+				//TO DO: add hack check
+				break;
 
-		case GATTRIB1:  myAttr[0]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB2:  myAttr[1]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB3:  myAttr[2]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB4:  myAttr[3]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB5:  myAttr[4]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB6:  myAttr[5]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB7:  myAttr[6]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB8:  myAttr[7]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB9:  myAttr[8]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB10: myAttr[9]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB11: myAttr[10] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB12: myAttr[11] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB13: myAttr[12] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB14: myAttr[13] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB15: myAttr[14] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB16: myAttr[15] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB17: myAttr[16] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB18: myAttr[17] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB19: myAttr[18] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB20: myAttr[19] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB21: myAttr[20] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB22: myAttr[21] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB23: myAttr[22] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB24: myAttr[23] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB25: myAttr[24] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB26: myAttr[25] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB27: myAttr[26] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB28: myAttr[27] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB29: myAttr[28] = pProps.readChars((unsigned char)pProps.readByte1()); break;
-		case GATTRIB30: myAttr[29] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case MAGICPOINTS:
+				magicPoints = CLIP(pProps.readByte1(), 0, 100);
+				//TO DO: add hack check
+				break;
 
-		case RATING:
-			rating = pProps.readByte2();
-			break;
+			case KILLSCOUNT:
+			   //kills = pProps.readByte3();
+			   pProps.readByte3();
+				//Why should any1 be able to change kills?
+				break;
 
-		default:
-			errorOut("errorlog.txt", CString() << "Setprops error: " << toString(index) << " By " << accountName);
+			case DEATHSCOUNT:
+				//deaths = pProps.readByte3();
+				pProps.readByte3();
+				//Why should any1 be able to change deaths?
+				break;
 
-			// If they send bad props, kick them.
-			deleteMe = true;
-			return;
+			case ONLINESECS:
+				//onlineSecs = pProps.readByte3();
+				pProps.readByte3();
+				//Why should any1 be able to change online seconds?
+				break;
+
+			case LASTIP:
+				//lastIp = (int)pProps.readByte5();
+				pProps.readByte5();
+				//Why should any1 be able to change last ip?
+				break;
+
+			case UDPPORT:
+				udpPort = pProps.readByte3();
+				if(udpPort > 0)
+				{
+					sendPacket(CPacket() << (char)DISMESSAGE <<
+						"This server doesnt support UDP. Please disable UDP in general settings.");
+					deleteMe = true;
+				}
+
+				if ( id == -1 ) break;
+				for(int i = 0; i < playerList.count(); i++)
+				{
+					CPlayer* other = (CPlayer*)playerList[i];
+					if(other != this)
+					{
+						other->sendPacket(CPacket() << (char)OTHERPLPROPS <<
+							(short)id << (char)UDPPORT << (int)udpPort);
+					}
+				}
+				//TO DO: add hack check
+				break;
+
+			case PALIGNMENT:
+				ap = CLIP(pProps.readByte1(), 0, 100);
+				//TO DO: add hack check
+				break;
+
+			case PADDITFLAGS:
+				additionalFlags = pProps.readByte1();
+				//TO DO: add hack check
+				break;
+
+			case PACCOUNTNAME:
+				len = pProps.readByte1();
+				if (len >= 0)
+					pProps.readChars(len);
+				//Do not allow account name change
+				break;
+
+			case BODYIMG:
+				len = pProps.readByte1();
+				if (len >= 0)
+				{
+					CString temp( pProps.readChars(len) );
+					if ( noFoldersConfig || isValidFile( temp, BODYIMG ) )
+						bodyImage = temp;
+				}
+				//TO DO: add hack check
+				break;
+
+			case RATING:
+				rating = pProps.readByte3();
+				break;
+
+			case GATTRIB1:  myAttr[0]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB2:  myAttr[1]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB3:  myAttr[2]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB4:  myAttr[3]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB5:  myAttr[4]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
+
+			case PLAYERZ:
+				z = (float)pProps.readByte1() / 2;
+				status &= (-1-1);
+				lastMovement = getTime();
+				//TO DO: add hack check;
+				break;
+
+			case GATTRIB6:  myAttr[5]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB7:  myAttr[6]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB8:  myAttr[7]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB9:  myAttr[8]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
+
+			case PCONNECTED:
+				break;
+
+			case PLANGUAGE:
+				len = pProps.readByte1();
+				if(len >= 0)
+					language = pProps.readChars(len);
+				break;
+
+			case PSTATUSMSG:
+				statusMsg = pProps.readByte1();
+
+				// Allows proper RC login.
+				if ( id == -1 ) break;
+
+				for(int i = 0; i < playerList.count(); i++)
+				{
+					CPlayer*other = (CPlayer*)playerList[i];
+					if(other != this)
+						other->sendPacket(CPacket() << (char)OTHERPLPROPS << (short)id <<
+							(char)PSTATUSMSG << (char)statusMsg);
+				}
+				//TO DO: add hack check
+				break;
+
+			case GATTRIB10: myAttr[9]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB11: myAttr[10] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB12: myAttr[11] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB13: myAttr[12] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB14: myAttr[13] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB15: myAttr[14] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB16: myAttr[15] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB17: myAttr[16] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB18: myAttr[17] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB19: myAttr[18] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB20: myAttr[19] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB21: myAttr[20] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB22: myAttr[21] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB23: myAttr[22] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB24: myAttr[23] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB25: myAttr[24] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB26: myAttr[25] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB27: myAttr[26] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB28: myAttr[27] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB29: myAttr[28] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+			case GATTRIB30: myAttr[29] = pProps.readChars((unsigned char)pProps.readByte1()); break;
+
+			default:
+				errorOut("errorlog.txt", CString() << "Setprops error: " << toString(index) << " By " << accountName);
+
+				// If they send bad props, kick them.
+				deleteMe = true;
+				return;
 		}
 
 		if (pForward)
@@ -2757,20 +2778,35 @@ void CPlayer::msgDELEXTRA(CPacket& pPacket)
 void CPlayer::msgCLAIMPKER(CPacket& pPacket)
 {
 	CPlayer* other = (CPlayer*)playerIds[pPacket.readByte2()];
-	if (other == NULL || level->sparZone)
-		return;
+	if ( other == NULL ) return;
 
-	if (!dontchangekills)
-		other->kills ++;
-
-	if (apSystem)
+	// Sparring zone rating code.
+	if ( level->sparZone )
 	{
-		if (other->ap > 0 && ap > 19)
+		//0 - rating, 1 - deviation.
+		int killer_rate[2] = { ((other->rating >> 9) & 0xFFF), (other->rating & 0x1FF) };
+		int victim_rate[2] = { ((rating >> 9) & 0xFFF), (rating & 0x1FF) };
+		int new_rate[2] = { 0, 0 };
+
+		// Do spar rating calculation here.
+
+		other->rating = ((new_rate[0] & 0xFFF) << 9) | (new_rate[1] & 0x1FF);
+		other->updateProp( RATING );
+	}
+	else
+	{
+		if (!dontchangekills)
+			other->kills ++;
+
+		if (apSystem)
 		{
-			other->ap -= ((other->ap/20+1)*(ap/20));
-			if (other->ap < 0) other->ap = 0;
-			other->apCounter = (other->ap < 20 ? aptime[0] : (other->ap < 40 ? aptime[1] : (other->ap < 60 ? aptime[2] : (other->ap < 80 ? aptime[3] : aptime[4]))));
-			other->updateProp(PALIGNMENT);
+			if (other->ap > 0 && ap > 19)
+			{
+				other->ap -= ((other->ap/20+1)*(ap/20));
+				if (other->ap < 0) other->ap = 0;
+				other->apCounter = (other->ap < 20 ? aptime[0] : (other->ap < 40 ? aptime[1] : (other->ap < 60 ? aptime[2] : (other->ap < 80 ? aptime[3] : aptime[4]))));
+				other->updateProp(PALIGNMENT);
+			}
 		}
 	}
 }
