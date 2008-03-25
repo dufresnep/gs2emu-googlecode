@@ -22,23 +22,6 @@
 					<Add directory="lib\" />
 				</Linker>
 			</Target>
-			<Target title="Win32 (Localhost Mode)">
-				<Option output="..\bin\winGserver" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="..\bin\" />
-				<Option object_output="obj\Release\" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-DWIN32" />
-					<Add option="-DDEBUG_LOCALHOST" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
-					<Add library="wsock32" />
-					<Add library="libzdll" />
-					<Add directory="lib\" />
-				</Linker>
-			</Target>
 			<Target title="Linux">
 				<Option output="..\bin\winGserver" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="..\bin\" />
@@ -47,26 +30,6 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
-					<Add option="-pg" />
-					<Add library="sqliteLINUX" />
-					<Add library="z" />
-					<Add library="dl" />
-					<Add library="pthread" />
-					<Add directory="lib\" />
-				</Linker>
-			</Target>
-			<Target title="Linux (Localhost)">
-				<Option output="..\bin\winGserver" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="..\bin\" />
-				<Option object_output="obj\Release\" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-O2" />
-					<Add option="-DDEBUG_LOCALHOST" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
