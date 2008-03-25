@@ -32,6 +32,7 @@ Fixes:
 - Server now properly shuts down.
 - RC can now correctly reset broken accounts.
 - Players won't get disconnected for inactivity for no reason anymore.
+- Fixed more player props.
 
 
 --------------------------------------------

@@ -121,7 +121,7 @@ bool forwardLocal[propscount + 3] =
 	false, false, true,  true,  true,  true,  // 6-11
 	true,  true,  false, true,  true,  true,  // 12-17
 	true,  true,  true,  true,  false, false, // 18-23
-	false, true,  false, false, true,  true,  // 24-29
+	false, true,  false, false, false, true,  // 24-29
 	true,  false, true,  false, true,  true,  // 30-35
 	true,  true,  true,  true,  true,  true,  // 36-41
 	false, false, false, false, false, false, // 42-47
@@ -1678,216 +1678,216 @@ CPacket CPlayer::getProp(int pProp)
 	CPacket retVal;
 	switch (pProp)
 	{
-	case NICKNAME:
-		retVal << (char)nickName.length() << nickName;
-		break;
+		case NICKNAME:
+			retVal << (char)nickName.length() << nickName;
+			break;
 
-	case MAXPOWER:
-		retVal.writeByte1((char)maxPower);
-		break;
+		case MAXPOWER:
+			retVal.writeByte1((char)maxPower);
+			break;
 
-	case CURPOWER:
-		retVal.writeByte1((char)(power*2));
-		break;
+		case CURPOWER:
+			retVal.writeByte1((char)(power*2));
+			break;
 
-	case RUPEESCOUNT:
-		retVal.writeByte3(rubins);
-		break;
+		case RUPEESCOUNT:
+			retVal.writeByte3(rubins);
+			break;
 
-	case ARROWSCOUNT:
-		retVal.writeByte1(darts);
-		break;
+		case ARROWSCOUNT:
+			retVal.writeByte1(darts);
+			break;
 
-	case BOMBSCOUNT:
-		retVal.writeByte1(bombs);
-		break;
+		case BOMBSCOUNT:
+			retVal.writeByte1(bombs);
+			break;
 
-	case GLOVEPOWER:
-		retVal.writeByte1(glovePower);
-		break;
+		case GLOVEPOWER:
+			retVal.writeByte1(glovePower);
+			break;
 
-	case BOMBPOWER:
-		retVal.writeByte1(bombPower);
-		break;
+		case BOMBPOWER:
+			retVal.writeByte1(bombPower);
+			break;
 
-	case SWORDPOWER:
-		retVal.writeByte1(swordPower+30);
-		retVal.writeByte1(swordImage.length());
-		retVal << swordImage;
-		break;
+		case SWORDPOWER:
+			retVal.writeByte1(swordPower+30);
+			retVal.writeByte1(swordImage.length());
+			retVal << swordImage;
+			break;
 
-	case SHIELDPOWER:
-		retVal.writeByte1(shieldPower+10);
-		retVal << (char)shieldImage.length() << shieldImage;
-		break;
+		case SHIELDPOWER:
+			retVal.writeByte1(shieldPower+10);
+			retVal << (char)shieldImage.length() << shieldImage;
+			break;
 
-	case PLAYERANI:
-		retVal << (char)gAni.length() << gAni;
-		break;
+		case PLAYERANI:
+			retVal << (char)gAni.length() << gAni;
+			break;
 
-	case HEADGIF:
-		retVal.writeByte1(100 + headImage.length());
-		retVal << headImage;
-		break;
+		case HEADGIF:
+			retVal.writeByte1(100 + headImage.length());
+			retVal << headImage;
+			break;
 
-	case CURCHAT:
-		retVal << (char)chatMsg.length() << chatMsg;
-		break;
+		case CURCHAT:
+			retVal << (char)chatMsg.length() << chatMsg;
+			break;
 
-	case PLAYERCOLORS:
-		retVal.writeByte1(colors[0]);
-		retVal.writeByte1(colors[1]);
-		retVal.writeByte1(colors[2]);
-		retVal.writeByte1(colors[3]);
-		retVal.writeByte1(colors[4]);
-		break;
+		case PLAYERCOLORS:
+			retVal.writeByte1(colors[0]);
+			retVal.writeByte1(colors[1]);
+			retVal.writeByte1(colors[2]);
+			retVal.writeByte1(colors[3]);
+			retVal.writeByte1(colors[4]);
+			break;
 
-	case PLAYERID:
-		retVal.writeByte2(id);
-		break;
+		case PLAYERID:
+			retVal.writeByte2(id);
+			break;
 
-	case PLAYERX:
-		retVal.writeByte1((char)(x * 2));
-		break;
+		case PLAYERX:
+			retVal.writeByte1((char)(x * 2));
+			break;
 
-	case PLAYERY:
-		retVal.writeByte1((char)(y * 2));
-		break;
+		case PLAYERY:
+			retVal.writeByte1((char)(y * 2));
+			break;
 
-	case PLAYERSPRITE:
-		retVal.writeByte1(sprite);
-		break;
+		case PLAYERSPRITE:
+			retVal.writeByte1(sprite);
+			break;
 
-	case STATUS:
-		retVal.writeByte1(status);
-		break;
+		case STATUS:
+			retVal.writeByte1(status);
+			break;
 
-	case CARRYSPRITE:
-		retVal.writeByte1(carrySprite);
-		break;
+		case CARRYSPRITE:
+			retVal.writeByte1(carrySprite);
+			break;
 
-	case CURLEVEL:
-		if(type == CLIENTPLAYER)
-			retVal << (char)levelName.length() << levelName;
-		else retVal << (char)1 << " ";
-		break;
+		case CURLEVEL:
+			if(type == CLIENTPLAYER)
+				retVal << (char)levelName.length() << levelName;
+			else retVal << (char)1 << " ";
+			break;
 
-	case HORSEGIF:
-		retVal << (char)horseImage.length() << horseImage;
-		break;
+		case HORSEGIF:
+			retVal << (char)horseImage.length() << horseImage;
+			break;
 
-	case HORSEBUSHES:
-		retVal.writeByte1(horseBushes);
-		break;
+		case HORSEBUSHES:
+			retVal.writeByte1(horseBushes);
+			break;
 
-	case EFFECTCOLORS:
-		retVal.writeByte1(0);
-		break;
+		case EFFECTCOLORS:
+			retVal.writeByte1(0);
+			break;
 
-	case CARRYNPC:
-		retVal.writeByte3(0);
-		break;
+		case CARRYNPC:
+			retVal.writeByte3(0);
+			break;
 
-	case APCOUNTER:
-		retVal.writeByte2(apCounter+1);
-		break;
+		case APCOUNTER:
+			retVal.writeByte2(apCounter+1);
+			break;
 
-	case MAGICPOINTS:
-		retVal.writeByte1(magicPoints);
-		break;
+		case MAGICPOINTS:
+			retVal.writeByte1(magicPoints);
+			break;
 
-	case KILLSCOUNT:
-		retVal.writeByte3(kills);
-		break;
+		case KILLSCOUNT:
+			retVal.writeByte3(kills);
+			break;
 
-	case DEATHSCOUNT:
-		retVal.writeByte3(deaths);
-		break;
+		case DEATHSCOUNT:
+			retVal.writeByte3(deaths);
+			break;
 
-	case ONLINESECS:
-		retVal.writeByte3(onlineSecs);
-		break;
+		case ONLINESECS:
+			retVal.writeByte3(onlineSecs);
+			break;
 
-	case LASTIP:
-		retVal.writeByte5(lastIp);
-		break;
+		case LASTIP:
+			retVal.writeByte5(lastIp);
+			break;
 
-	case UDPPORT:
-		retVal.writeByte3(udpPort);
-		break;
+		case UDPPORT:
+			retVal.writeByte3(udpPort);
+			break;
 
-	case PALIGNMENT:
-		retVal.writeByte1(ap);
-		break;
+		case PALIGNMENT:
+			retVal.writeByte1(ap);
+			break;
 
-	case PADDITFLAGS:
-		retVal.writeByte1(additionalFlags);
-		break;
+		case PADDITFLAGS:
+			retVal.writeByte1(additionalFlags);
+			break;
 
-	case PACCOUNTNAME:
-		retVal << (char)accountName.length() << accountName;
-		break;
+		case PACCOUNTNAME:
+			retVal << (char)accountName.length() << accountName;
+			break;
 
-	case BODYIMG:
-		retVal << (char)bodyImage.length() <<  bodyImage;
-		break;
+		case BODYIMG:
+			retVal << (char)bodyImage.length() <<  bodyImage;
+			break;
 
-	case RATING:
-		retVal.writeByte3(rating);
-		break;
+		case RATING:
+			retVal.writeByte3(rating);
+			break;
 
-	case GATTRIB1: retVal << (char)myAttr[0].length() << myAttr[0]; break;
-	case GATTRIB2: retVal << (char)myAttr[1].length() << myAttr[1]; break;
-	case GATTRIB3: retVal << (char)myAttr[2].length() << myAttr[2]; break;
-	case GATTRIB4: retVal << (char)myAttr[3].length() << myAttr[3]; break;
-	case GATTRIB5: retVal << (char)myAttr[4].length() << myAttr[4]; break;
+		case GATTRIB1: retVal << (char)myAttr[0].length() << myAttr[0]; break;
+		case GATTRIB2: retVal << (char)myAttr[1].length() << myAttr[1]; break;
+		case GATTRIB3: retVal << (char)myAttr[2].length() << myAttr[2]; break;
+		case GATTRIB4: retVal << (char)myAttr[3].length() << myAttr[3]; break;
+		case GATTRIB5: retVal << (char)myAttr[4].length() << myAttr[4]; break;
 
-	case PLAYERZ:
-		retVal.writeByte1((char)(z * 2));
-		break;
+		case PLAYERZ:
+			retVal.writeByte1((char)(z * 2));
+			break;
 
-	case GATTRIB6: retVal << (char)myAttr[5].length() << myAttr[5]; break;
-	case GATTRIB7: retVal << (char)myAttr[6].length() << myAttr[6]; break;
-	case GATTRIB8: retVal << (char)myAttr[7].length() << myAttr[7]; break;
-	case GATTRIB9: retVal << (char)myAttr[8].length() << myAttr[8]; break;
+		case GATTRIB6: retVal << (char)myAttr[5].length() << myAttr[5]; break;
+		case GATTRIB7: retVal << (char)myAttr[6].length() << myAttr[6]; break;
+		case GATTRIB8: retVal << (char)myAttr[7].length() << myAttr[7]; break;
+		case GATTRIB9: retVal << (char)myAttr[8].length() << myAttr[8]; break;
 
-	case PCONNECTED:
-		// Isn't a stored property.
-		break;
+		case PCONNECTED:
+			// Isn't a stored property.
+			break;
 
-	case PLANGUAGE:
-		retVal << (char)language.length() << language;
-		break;
+		case PLANGUAGE:
+			retVal << (char)language.length() << language;
+			break;
 
-	case PSTATUSMSG:
-		retVal.writeByte1(statusMsg);
-		break;
+		case PSTATUSMSG:
+			retVal.writeByte1(statusMsg);
+			break;
 
-	case GATTRIB10: retVal << (char)myAttr[9].length() << myAttr[9]; break;
-	case GATTRIB11: retVal << (char)myAttr[10].length() << myAttr[10]; break;
-	case GATTRIB12: retVal << (char)myAttr[11].length() << myAttr[11]; break;
-	case GATTRIB13: retVal << (char)myAttr[12].length() << myAttr[12]; break;
-	case GATTRIB14: retVal << (char)myAttr[13].length() << myAttr[13]; break;
-	case GATTRIB15: retVal << (char)myAttr[14].length() << myAttr[14]; break;
-	case GATTRIB16: retVal << (char)myAttr[15].length() << myAttr[15]; break;
-	case GATTRIB17: retVal << (char)myAttr[16].length() << myAttr[16]; break;
-	case GATTRIB18: retVal << (char)myAttr[17].length() << myAttr[17]; break;
-	case GATTRIB19: retVal << (char)myAttr[18].length() << myAttr[18]; break;
-	case GATTRIB20: retVal << (char)myAttr[19].length() << myAttr[19]; break;
-	case GATTRIB21: retVal << (char)myAttr[20].length() << myAttr[20]; break;
-	case GATTRIB22: retVal << (char)myAttr[21].length() << myAttr[21]; break;
-	case GATTRIB23: retVal << (char)myAttr[22].length() << myAttr[22]; break;
-	case GATTRIB24: retVal << (char)myAttr[23].length() << myAttr[23]; break;
-	case GATTRIB25: retVal << (char)myAttr[24].length() << myAttr[24]; break;
-	case GATTRIB26: retVal << (char)myAttr[25].length() << myAttr[25]; break;
-	case GATTRIB27: retVal << (char)myAttr[26].length() << myAttr[26]; break;
-	case GATTRIB28: retVal << (char)myAttr[27].length() << myAttr[27]; break;
-	case GATTRIB29: retVal << (char)myAttr[28].length() << myAttr[28]; break;
-	case GATTRIB30: retVal << (char)myAttr[29].length() << myAttr[29]; break;
+		case GATTRIB10: retVal << (char)myAttr[9].length() << myAttr[9]; break;
+		case GATTRIB11: retVal << (char)myAttr[10].length() << myAttr[10]; break;
+		case GATTRIB12: retVal << (char)myAttr[11].length() << myAttr[11]; break;
+		case GATTRIB13: retVal << (char)myAttr[12].length() << myAttr[12]; break;
+		case GATTRIB14: retVal << (char)myAttr[13].length() << myAttr[13]; break;
+		case GATTRIB15: retVal << (char)myAttr[14].length() << myAttr[14]; break;
+		case GATTRIB16: retVal << (char)myAttr[15].length() << myAttr[15]; break;
+		case GATTRIB17: retVal << (char)myAttr[16].length() << myAttr[16]; break;
+		case GATTRIB18: retVal << (char)myAttr[17].length() << myAttr[17]; break;
+		case GATTRIB19: retVal << (char)myAttr[18].length() << myAttr[18]; break;
+		case GATTRIB20: retVal << (char)myAttr[19].length() << myAttr[19]; break;
+		case GATTRIB21: retVal << (char)myAttr[20].length() << myAttr[20]; break;
+		case GATTRIB22: retVal << (char)myAttr[21].length() << myAttr[21]; break;
+		case GATTRIB23: retVal << (char)myAttr[22].length() << myAttr[22]; break;
+		case GATTRIB24: retVal << (char)myAttr[23].length() << myAttr[23]; break;
+		case GATTRIB25: retVal << (char)myAttr[24].length() << myAttr[24]; break;
+		case GATTRIB26: retVal << (char)myAttr[25].length() << myAttr[25]; break;
+		case GATTRIB27: retVal << (char)myAttr[26].length() << myAttr[26]; break;
+		case GATTRIB28: retVal << (char)myAttr[27].length() << myAttr[27]; break;
+		case GATTRIB29: retVal << (char)myAttr[28].length() << myAttr[28]; break;
+		case GATTRIB30: retVal << (char)myAttr[29].length() << myAttr[29]; break;
 
-	default:
-		errorOut("errorlog.txt", CString() << "Unknown getProp( " << toString(pProp) << " ) by " << accountName);
-		break;
+		default:
+			errorOut("errorlog.txt", CString() << "Unknown getProp( " << toString(pProp) << " ) by " << accountName);
+			break;
 	}
 	return retVal;
 }
@@ -2313,7 +2313,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 				return;
 		}
 
-		if (pForward)
+		if ( pForward && forwardLocal[index] == true )
 		{
 			/*
 			int len2 = pProps.getRead() - startpos;
