@@ -121,7 +121,7 @@ bool forwardLocal[propscount + 3] =
 	false, false, true,  true,  true,  true,  // 6-11
 	true,  true,  false, true,  true,  true,  // 12-17
 	true,  true,  true,  true,  false, false, // 18-23
-	false, true,  false, false, false, true,  // 24-29
+	false, true,  false, false, false, false,  // 24-29
 	true,  false, true,  false, true,  true,  // 30-35
 	true,  true,  true,  true,  true,  true,  // 36-41
 	false, false, false, false, false, false, // 42-47
