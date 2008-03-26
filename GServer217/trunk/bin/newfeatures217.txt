@@ -40,6 +40,8 @@ Fixes:
   head, body, ap, etc to everybody in that player's level.
 - When a player dies in a sparring zone and dropitems is enabled, the
   player will no longer drop items.
+- Fixed a problem where 'sparringzone' levels weren't correctly being
+  marked as sparring zones on certain occasions.
 
 
 --------------------------------------------

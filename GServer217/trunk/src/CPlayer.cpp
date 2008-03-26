@@ -74,7 +74,7 @@ bool sendInit[] =
 	true , true,  true,  true,  true,  false, // 18-23
 	false, true,  true,  true,  false, false, // 24-29
 	false, false, true,  false, false, true,  // 30-35
-	false, true,  true,  true,  true,  true,  // 36-41
+	true, true,  true,  true,  true,  true,  // 36-41
 	false, false, false, false, false, false, // 42-47
 	false, false, false, false, false, false, // 48-53
 	true,  true,  true,  true,  true,  true,  // 54-59
@@ -122,7 +122,7 @@ bool forwardLocal[propscount + 3] =
 	false, false, true,  true,  true,  true,  // 6-11
 	true,  true,  false, true,  true,  true,  // 12-17
 	true,  true,  true,  true,  false, false, // 18-23
-	false, true,  false, false, false, false,  // 24-29
+	false, true,  false, false, false, false, // 24-29
 	true,  false, true,  false, true,  true,  // 30-35
 	true,  true,  true,  true,  true,  true,  // 36-41
 	false, false, false, false, false, false, // 42-47
@@ -142,7 +142,7 @@ bool sendOthersInit[propscount + 3] =
 	true,  true,  true,  true,  false, false, // 18-23
 	true,  false, false, false, false, false, // 24-29
 	true,  true,  true,  false, true,  true,  // 30-35
-	false, true , true,  true , true,  true,  // 36-41
+	true,  true,  true,  true,  true,  true,  // 36-41
 	false, false, false, false, false, false, // 42-47
 	false, false, false, false, false, false, // 48-53
 	false, false, false, false, false, false, // 54-59
@@ -496,20 +496,17 @@ void CPlayer::sendAccount()
 	// Recalculate spar deviation.
 	if ( type == CLIENTPLAYER )
 	{
-		// 0 - current rating, 1 - new rating.
-		int rate[2] = { (rating & 0x1FF), 0 };
-
 		// c = sqrt( (350*350 - 50*50) / t )
 		// where t = 60 for number of rating periods for deviation to go from 50 to 350
-		const double c = 44.721;
-		int t = (int)(getSysTime() - lastSparTime)/86400; // Convert seconds to days: 60/60/24
+		const float c = 44.721f;
+		float t = (float)(getSysTime() - lastSparTime)/86400.0f; // Convert seconds to days: 60/60/24
 
 		// Find the new deviation.
-		rate[1] = MIN( (int)sqrt(((double)rate[0]*(double)rate[0]) + (c*c) * (double)t), 350 );
+		float deviate = MIN( sqrt((deviation*deviation) + (c*c) * t), (float)350.0 );
 
-		// Save the old rating and put the new deviation into the current rating.
-		oldRating = rating;
-		rating = (rating & ~(0x1FF)) | (rate[1] & 0x1FF);
+		// Save the old rating and set the new one.
+		oldDeviation = deviation;
+		deviation = deviate;
 	}
 
 	// Send out the player's login props.
@@ -1859,8 +1856,11 @@ CPacket CPlayer::getProp(int pProp)
 			break;
 
 		case RATING:
-			retVal.writeByte3(rating);
-			break;
+		{
+			int temp = (((int)rating & 0xFFF) << 9) | ((int)deviation & 0x1FF);
+			retVal.writeByte3(temp);
+		}
+		break;
 
 		case GATTRIB1: retVal << (char)myAttr[0].length() << myAttr[0]; break;
 		case GATTRIB2: retVal << (char)myAttr[1].length() << myAttr[1]; break;
@@ -2263,8 +2263,12 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 				break;
 
 			case RATING:
-				rating = pProps.readByte3();
-				break;
+			{
+				int temp = pProps.readByte3();
+				rating = (float)((temp >> 9) & 0xFFF);
+				deviation = (float)(temp & 0x1FF);
+			}
+			break;
 
 			case GATTRIB1:  myAttr[0]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
 			case GATTRIB2:  myAttr[1]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
@@ -2814,46 +2818,52 @@ void CPlayer::msgCLAIMPKER(CPacket& pPacket)
 		//0 - rating, 1 - deviation
 		//2 - old rating, 3 - old deviation
 		//4 - new rating, 5 - new deviation
-		int killer_rate[6] = {	((other->rating >> 9) & 0xFFF), (other->rating & 0x1FF),
-								((other->oldRating >> 9) & 0xFFF), (other->oldRating & 0x1FF),
-								0, 0 };
-		int victim_rate[6] = {	((rating >> 9) & 0xFFF), (rating & 0x1FF),
-								((oldRating >> 9) & 0xFFF), (oldRating & 0x1FF),
-								0, 0 };
+		float killer_rate[6] = {	other->rating, other->deviation,
+									other->oldRating, other->oldDeviation,
+									0.0, 0.0 };
+		float victim_rate[6] = {	rating, deviation,
+									oldRating, oldDeviation,
+									0.0, 0.0 };
 
 		// Do the spar rating calculations.
 		{
-			const double q = 0.0057565;
-			const double q2 = 0.00003313729225;
-			double g[2] = {	1.0 / sqrt(1.0 + ((3.0 * q2 * (killer_rate[1]*killer_rate[1]))/3.14) ),
-							1.0 / sqrt(1.0 + ((3.0 * q2 * (victim_rate[1]*victim_rate[1]))/3.14) ) };
-			double E[2] = {	1.0 / ( 1.0 + pow(10.0, -g[0]*victim_rate[1]*(killer_rate[0] - victim_rate[0])/400.0) ),
-							1.0 / ( 1.0 + pow(10.0, -g[1]*killer_rate[1]*(victim_rate[0] - killer_rate[0])/400.0) ) };
-			double d2[2] = {pow(q2 * (g[1]*g[1]) * E[0] * (1.0 - E[0]), -1.0),
-							pow(q2 * (g[0]*g[0]) * E[1] * (1.0 - E[1]), -1.0) };
-			double s[2] = { 1.0, 0.0 };
+			const float q = 0.0057565f;
+			const float q2 = 0.00003313729225f;
+			float g[2] = {	1.0f / sqrt(1.0f + ((3.0f * q2 * (killer_rate[1]*killer_rate[1]))/3.14f) ),
+							1.0f / sqrt(1.0f + ((3.0f * q2 * (victim_rate[1]*victim_rate[1]))/3.14f) ) };
+			float E[2] = {	1.0f / ( 1.0f + pow(10.0f, -g[0]*victim_rate[1]*(killer_rate[0] - victim_rate[0])/400.0f) ),
+							1.0f / ( 1.0f + pow(10.0f, -g[1]*killer_rate[1]*(victim_rate[0] - killer_rate[0])/400.0f) ) };
+			float d2[2] = {	pow(q2 * (g[1]*g[1]) * E[0] * (1.0f - E[0]), -1),
+							pow(q2 * (g[0]*g[0]) * E[1] * (1.0f - E[1]), -1) };
+			float s[2] = {	1.0f, 0.0f };
 
-			killer_rate[4] = (int)floor((double)killer_rate[2] + ( q/( 1.0/((double)killer_rate[1]*(double)killer_rate[1]) + 1.0/d2[0] ) ) * g[1] * ( s[1] - E[0] ));
-			victim_rate[4] = (int)floor((double)victim_rate[2] + ( q/( 1.0/((double)victim_rate[1]*(double)victim_rate[1]) + 1.0/d2[1] ) ) * g[0] * ( s[0] - E[1] ));
+			killer_rate[4] = floor(killer_rate[2] + ( q/( 1.0f/(killer_rate[1]*killer_rate[1]) + 1.0f/d2[0] ) ) * g[1] * ( s[1] - E[0] ));
+			victim_rate[4] = floor(victim_rate[2] + ( q/( 1.0f/(victim_rate[1]*victim_rate[1]) + 1.0f/d2[1] ) ) * g[0] * ( s[0] - E[1] ));
 
-			killer_rate[5] = (int)floor(sqrt(pow( 1.0/((double)killer_rate[1]*(double)killer_rate[1]) + 1.0/d2[0], -1.0 )));
-			victim_rate[5] = (int)floor(sqrt(pow( 1.0/((double)victim_rate[1]*(double)victim_rate[1]) + 1.0/d2[1], -1.0 )));
+			killer_rate[5] = floor(sqrt(pow( 1.0f/(killer_rate[1]*killer_rate[1]) + 1.0f/d2[0], -1 )));
+			victim_rate[5] = floor(sqrt(pow( 1.0f/(victim_rate[1]*victim_rate[1]) + 1.0f/d2[1], -1 )));
 		}
 
 		// Cap the rating.
-		killer_rate[4] = CLIP( killer_rate[4], 0, 4000 );
-		killer_rate[5] = CLIP( killer_rate[5], 50, 350 );
-		victim_rate[4] = CLIP( victim_rate[4], 0, 4000 );
-		victim_rate[5] = CLIP( victim_rate[5], 50, 350 );
+		killer_rate[4] = CLIP( killer_rate[4], 0.0f, 4000.0f );
+		killer_rate[5] = CLIP( killer_rate[5], 50.0f, 350.0f );
+		victim_rate[4] = CLIP( victim_rate[4], 0.0f, 4000.0f );
+		victim_rate[5] = CLIP( victim_rate[5], 50.0f, 350.0f );
 
 		// Update each player's last spar time.
 		other->lastSparTime = this->lastSparTime = getSysTime();
 
-		// Update the player's rating.
+		// Back up the old values.
 		other->oldRating = other->rating;
 		this->oldRating = this->rating;
-		other->rating = ((killer_rate[4] & 0xFFF) << 9) | (killer_rate[5] & 0x1FF);
-		this->rating = ((victim_rate[4] & 0xFFF) << 9) | (victim_rate[5] & 0x1FF);
+		other->oldDeviation = other->deviation;
+		this->oldDeviation = this->deviation;
+
+		// Update the player's rating.
+		other->rating = killer_rate[4];
+		other->deviation = killer_rate[5];
+		this->rating = victim_rate[4];
+		this->deviation = victim_rate[5];
 		other->updateProp( RATING );
 		this->updateProp( RATING );
 	}
