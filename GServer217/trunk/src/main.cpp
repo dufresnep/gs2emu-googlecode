@@ -516,7 +516,7 @@ void getSubDirs_os(char *pDir)
 			CString directory = CString() << pDir << ent->d_name << fSep;
 			stat(directory.text(), &statx);
 			if (statx.st_mode & S_IFDIR)
-				getSubDirs(directory.text());
+				getSubDirs_os(directory.text());
 		}
 	}
 	closedir(dir);
