@@ -505,11 +505,11 @@ void CPlayer::sendAccount()
 		int t = (int)(getSysTime() - lastSparTime)/86400; // Convert seconds to days: 60/60/24
 
 		// Find the new deviation.
-		rate[1] = MIN( (int)sqrt((rate[0]*rate[0]) + (c*c) * (double)t), 350 );
+		rate[1] = MIN( (int)sqrt(((double)rate[0]*(double)rate[0]) + (c*c) * (double)t), 350 );
 
 		// Save the old rating and put the new deviation into the current rating.
 		oldRating = rating;
-		rating = ((rating >> 9) << 9) | (rate[1] & 0x1FF);
+		rating = (rating & ~(0x1FF)) | (rate[1] & 0x1FF);
 	}
 
 	// Send out the player's login props.
@@ -2825,19 +2825,19 @@ void CPlayer::msgCLAIMPKER(CPacket& pPacket)
 		{
 			const double q = 0.0057565;
 			const double q2 = 0.00003313729225;
-			double g[2] = {	1 / sqrt(1 + ((3 * q2 * (killer_rate[1]*killer_rate[1]))/3.14) ),
-							1 / sqrt(1 + ((3 * q2 * (victim_rate[1]*victim_rate[1]))/3.14) ) };
-			double E[2] = {	1 / ( 1 + pow(10, -g[0]*victim_rate[1]*(killer_rate[0] - victim_rate[0])/400) ),
-							1 / ( 1 + pow(10, -g[1]*killer_rate[1]*(victim_rate[0] - killer_rate[0])/400) ) };
-			double d2[2] = {pow(q2 * (g[1]*g[1]) * E[0] * (1 - E[0]), -1),
-							pow(q2 * (g[0]*g[0]) * E[1] * (1 - E[1]), -1) };
-			double s[2] = { 1.0, 0 };
+			double g[2] = {	1.0 / sqrt(1.0 + ((3.0 * q2 * (killer_rate[1]*killer_rate[1]))/3.14) ),
+							1.0 / sqrt(1.0 + ((3.0 * q2 * (victim_rate[1]*victim_rate[1]))/3.14) ) };
+			double E[2] = {	1.0 / ( 1.0 + pow(10.0, -g[0]*victim_rate[1]*(killer_rate[0] - victim_rate[0])/400.0) ),
+							1.0 / ( 1.0 + pow(10.0, -g[1]*killer_rate[1]*(victim_rate[0] - killer_rate[0])/400.0) ) };
+			double d2[2] = {pow(q2 * (g[1]*g[1]) * E[0] * (1.0 - E[0]), -1.0),
+							pow(q2 * (g[0]*g[0]) * E[1] * (1.0 - E[1]), -1.0) };
+			double s[2] = { 1.0, 0.0 };
 
-			killer_rate[4] = (int)floor((double)killer_rate[2] + ( q/( 1/((double)killer_rate[1]*(double)killer_rate[1]) + 1/d2[0] ) ) * g[1] * ( s[1] - E[0] ));
-			victim_rate[4] = (int)floor((double)victim_rate[2] + ( q/( 1/((double)victim_rate[1]*(double)victim_rate[1]) + 1/d2[1] ) ) * g[0] * ( s[0] - E[1] ));
+			killer_rate[4] = (int)floor((double)killer_rate[2] + ( q/( 1.0/((double)killer_rate[1]*(double)killer_rate[1]) + 1.0/d2[0] ) ) * g[1] * ( s[1] - E[0] ));
+			victim_rate[4] = (int)floor((double)victim_rate[2] + ( q/( 1.0/((double)victim_rate[1]*(double)victim_rate[1]) + 1.0/d2[1] ) ) * g[0] * ( s[0] - E[1] ));
 
-			killer_rate[5] = (int)floor(sqrt(pow( 1/((double)killer_rate[1]*(double)killer_rate[1]) + 1/d2[0], -1 )));
-			victim_rate[5] = (int)floor(sqrt(pow( 1/((double)victim_rate[1]*(double)victim_rate[1]) + 1/d2[1], -1 )));
+			killer_rate[5] = (int)floor(sqrt(pow( 1.0/((double)killer_rate[1]*(double)killer_rate[1]) + 1.0/d2[0], -1.0 )));
+			victim_rate[5] = (int)floor(sqrt(pow( 1.0/((double)victim_rate[1]*(double)victim_rate[1]) + 1.0/d2[1], -1.0 )));
 		}
 
 		// Cap the rating.
@@ -2847,8 +2847,7 @@ void CPlayer::msgCLAIMPKER(CPacket& pPacket)
 		victim_rate[5] = CLIP( victim_rate[5], 50, 350 );
 
 		// Update each player's last spar time.
-		other->lastSparTime = getSysTime();
-		this->lastSparTime = getSysTime();
+		other->lastSparTime = this->lastSparTime = getSysTime();
 
 		// Update the player's rating.
 		other->oldRating = other->rating;
