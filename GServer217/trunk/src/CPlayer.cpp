@@ -192,7 +192,8 @@ CPlayer::CPlayer(CSocket* pSocket)
 	glovePower = bombPower = swordPower = shieldPower = 1;
 	power = maxPower = 3;
 	kills = deaths = udpPort = statusMsg;
-	oldRating = rating = 0x0BB95E;	// 1500/350
+	oldRating = rating = 1500.0f;
+	oldDeviation = deviation = 350.0f;
 	lastSparTime = 0;
 	sprite = 2;
 	status = 20;
