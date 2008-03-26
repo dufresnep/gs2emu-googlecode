@@ -2834,15 +2834,15 @@ void CPlayer::msgCLAIMPKER(CPacket& pPacket)
 							1.0f / sqrt(1.0f + ((3.0f * q2 * (victim_rate[1]*victim_rate[1]))/3.14f) ) };
 			float E[2] = {	1.0f / ( 1.0f + pow(10.0f, -g[1]*(killer_rate[0] - victim_rate[0])/400.0f) ),
 							1.0f / ( 1.0f + pow(10.0f, -g[0]*(victim_rate[0] - killer_rate[0])/400.0f) ) };
-			float d2[2] = {	pow(q2 * (g[1]*g[1]) * E[0] * (1.0f - E[0]), -1.0f),
-							pow(q2 * (g[0]*g[0]) * E[1] * (1.0f - E[1]), -1.0f) };
+			float d2[2] = {	1.0f/(q2 * (g[1]*g[1]) * E[0] * (1.0f - E[0])),
+							1.0f/(q2 * (g[0]*g[0]) * E[1] * (1.0f - E[1])) };
 			float s[2] = {	1.0f, 0.0f };
 
 			killer_rate[4] = killer_rate[2] + ( q/( 1.0f/(killer_rate[1]*killer_rate[1]) + 1.0f/d2[0] ) ) * g[1] * ( s[1] - E[0] );
 			victim_rate[4] = victim_rate[2] + ( q/( 1.0f/(victim_rate[1]*victim_rate[1]) + 1.0f/d2[1] ) ) * g[0] * ( s[0] - E[1] );
 
-			killer_rate[5] = sqrt(pow( 1.0f/(killer_rate[1]*killer_rate[1]) + 1.0f/d2[0], -1.0f ));
-			victim_rate[5] = sqrt(pow( 1.0f/(victim_rate[1]*victim_rate[1]) + 1.0f/d2[1], -1.0f ));
+			killer_rate[5] = sqrt(1.0f/( 1.0f/(killer_rate[1]*killer_rate[1]) + 1.0f/d2[0] ));
+			victim_rate[5] = sqrt(1.0f/( 1.0f/(victim_rate[1]*victim_rate[1]) + 1.0f/d2[1] ));
 		}
 
 		// Cap the rating.
