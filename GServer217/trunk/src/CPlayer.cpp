@@ -2263,7 +2263,6 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 				break;
 
 			case RATING:
-				oldRating = rating;
 				rating = pProps.readByte3();
 				break;
 
@@ -2822,28 +2821,23 @@ void CPlayer::msgCLAIMPKER(CPacket& pPacket)
 								((oldRating >> 9) & 0xFFF), (oldRating & 0x1FF),
 								0, 0 };
 
-		// Do the spar rating calculation for killer.
+		// Do the spar rating calculations.
 		{
 			const double q = 0.0057565;
-			double g = 1 / sqrt(1 + 3 * (q * q) * victim_rate[1]);
-			double E = 1 / (1 + 10 - g * (killer_rate[0] - victim_rate[0]) / 400);
-			double d = (q * q) * (g * g) * E * (1 - E);
-			double s = 1.0;
+			const double q2 = 0.00003313729225;
+			double g[2] = {	1 / sqrt(1 + ((3 * q2 * (killer_rate[1]*killer_rate[1]))/3.14) ),
+							1 / sqrt(1 + ((3 * q2 * (victim_rate[1]*victim_rate[1]))/3.14) ) };
+			double E[2] = {	1 / ( 1 + pow(10, -g[0]*victim_rate[1]*(killer_rate[0] - victim_rate[0])/400) ),
+							1 / ( 1 + pow(10, -g[1]*killer_rate[1]*(victim_rate[0] - killer_rate[0])/400) ) };
+			double d2[2] = {pow(q2 * (g[1]*g[1]) * E[0] * (1 - E[0]), -1),
+							pow(q2 * (g[0]*g[0]) * E[1] * (1 - E[1]), -1) };
+			double s[2] = { 1.0, 0 };
 
-			killer_rate[4] = (int)floor((double)killer_rate[2] + (q / (1/killer_rate[1] + 1/d)) * g * (s - E));
-			killer_rate[5] = (int)floor(sqrt(pow( 1/(killer_rate[1]*killer_rate[1]) + 1/d, -1 )));
-		}
+			killer_rate[4] = (int)floor((double)killer_rate[2] + ( q/( 1/((double)killer_rate[1]*(double)killer_rate[1]) + 1/d2[0] ) ) * g[1] * ( s[1] - E[0] ));
+			victim_rate[4] = (int)floor((double)victim_rate[2] + ( q/( 1/((double)victim_rate[1]*(double)victim_rate[1]) + 1/d2[1] ) ) * g[0] * ( s[0] - E[1] ));
 
-		// Do the spar rating calculation for victim.
-		{
-			const double q = 0.0057565;
-			double g = 1 / sqrt(1 + 3 * (q * q) * killer_rate[1]);
-			double E = 1 / (1 + 10 - g * (victim_rate[0] - killer_rate[0]) / 400);
-			double d = (q * q) * (g * g) * E * (1 - E);
-			double s = 0.0;
-
-			victim_rate[4] = (int)floor((double)victim_rate[2] + (q / (1/victim_rate[1] + 1/d)) * g * (s - E));
-			victim_rate[5] = (int)floor(sqrt(pow( 1/(victim_rate[1]*victim_rate[1]) + 1/d, -1 )));
+			killer_rate[5] = (int)floor(sqrt(pow( 1/((double)killer_rate[1]*(double)killer_rate[1]) + 1/d2[0], -1 )));
+			victim_rate[5] = (int)floor(sqrt(pow( 1/((double)victim_rate[1]*(double)victim_rate[1]) + 1/d2[1], -1 )));
 		}
 
 		// Cap the rating.
@@ -2857,6 +2851,8 @@ void CPlayer::msgCLAIMPKER(CPacket& pPacket)
 		this->lastSparTime = getSysTime();
 
 		// Update the player's rating.
+		other->oldRating = other->rating;
+		this->oldRating = this->rating;
 		other->rating = ((killer_rate[4] & 0xFFF) << 9) | (killer_rate[5] & 0x1FF);
 		this->rating = ((victim_rate[4] & 0xFFF) << 9) | (victim_rate[5] & 0x1FF);
 		other->updateProp( RATING );

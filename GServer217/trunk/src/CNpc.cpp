@@ -17,8 +17,11 @@ CNpc::CNpc(CString& pImage, CString& pCode, float pX, float pY, CLevel* pLevel)
 	clientCode = pCode;
 	removeComments();
 	weaponName = getFunctionParameter("toweapons ");
-	if(clientCode.length() < 20)
-		level->sparZone = (clientCode.find("sparringzone") >= 0);
+	if ( clientCode.length() < 20 )
+	{
+		if ( level->sparZone == false && clientCode.find("sparringzone") >= 0 )
+			level->sparZone = true;
+	}
 
 	id = createNpcId(this);
 	npcList.add(this);
