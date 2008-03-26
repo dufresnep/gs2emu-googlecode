@@ -153,13 +153,13 @@ bool sendOthersInit[propscount + 3] =
 
 bool sendRcProps[propscount] =
 {
-	false,true ,true ,true ,true ,true ,
-	true ,true ,true ,true ,true ,true ,
-	false ,true ,false,true ,true,false,
-	true ,false ,true, true ,true,true,		   //19 Status
-	false ,false ,true ,true,true,true,
-	true ,false ,true ,false ,false ,true ,
-	false ,false,false ,false,false,false,
+	false, true,  true,  true,  true,  true,  // 0-5
+	true,  true,  true,  true,  true,  true,  // 6-11
+	false, true,  false, true,  true,  false, // 12-17
+	true,  false, true,  true,  true,  true,  // 18-23 (19 Status)
+	false, false, true,  true,  true,  true,  // 24-29
+	true,  false, true,  false, false, true,  // 30-35
+	true,  false, false, false, false, false, // 36-41
 	false, false, false, false, false, false, // 42-47
 	false, false, false, false, false, false  // 48-53
 };
