@@ -225,7 +225,7 @@ void ListServer_Main()
 						}
 					}
 					else if (a[1] == "playerrating")
-						n = toString(player2->rating);
+						n = toString((int)player2->rating) << "/" << toString((int)player2->deviation);
 					else if (a[1] == "playerap")
 						n = toString(player2->ap);
 					else if (a[1] == "playerrupees")

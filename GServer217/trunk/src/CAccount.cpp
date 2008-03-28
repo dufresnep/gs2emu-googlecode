@@ -70,10 +70,9 @@ bool CAccount::loadDBAccount(CString pAccount, bool fromAccount)
 		else if (section == "KILLS") kills = atoi(val.text());
 		else if (section == "DEATHS") deaths = atoi(val.text());
 		else if (section == "RATING") rating = (float)atof(val.text());
-		else if (section == "OLDRATING") oldRating = (float)atof(val.text());
 		else if (section == "DEVIATION") deviation = (float)atof(val.text());
 		else if (section == "OLDDEVIATION") oldDeviation = (float)atof(val.text());
-		else if (section == "LASTSPARTIME") lastSparTime = atol(val.text());
+		else if (section == "LASTSPARTIME") lastSparTime = (time_t)atol(val.text());
 		else if (section == "FLAG") myFlags.add(val);
 		else if (section == "ATTR1") myAttr[0] = val; // could trim these 30 lines into one.. but it'd probably go slower then a simple compare.. who knows.
 		else if (section == "ATTR2") myAttr[1] = val;
@@ -179,7 +178,6 @@ void CAccount::saveAccount(bool pAttributes)
 	newFile << "KILLS " << toString(kills) << "\n";
 	newFile << "DEATHS " << toString(deaths) << "\n";
 	newFile << "RATING " << toString(rating) << "\n";
-	newFile << "OLDRATING " << toString(oldRating) << "\n";
 	newFile << "DEVIATION " << toString(deviation) << "\n";
 	newFile << "OLDDEVIATION " << toString(oldDeviation) << "\n";
 	newFile << "LASTSPARTIME " << toString((unsigned long)lastSparTime) << "\n";

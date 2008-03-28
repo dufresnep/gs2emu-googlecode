@@ -16,7 +16,7 @@ class CAccount
 		CString accountName, adminIp, banReason, bodyImage, comments, gAni, headImage, horseImage, language, lastFolder, levelName, myAttr[30], nickName, shieldImage, swordImage;
 		char colors[5];
 		int adminRights, ap, apCounter, bombs, bombPower, darts, deaths, glovePower, horseBushes, kills, lastIp, magicPoints, onlineSecs, rubins, shieldPower, sprite, status, swordPower, type;
-		float rating, oldRating, deviation, oldDeviation;
+		float rating, deviation, oldDeviation;
 		time_t lastSparTime;
 		float x, y, z, power, maxPower;
 		CStringList myChests, myFlags, myFolders, myWeapons;

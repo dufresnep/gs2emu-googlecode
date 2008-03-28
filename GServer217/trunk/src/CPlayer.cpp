@@ -10,7 +10,7 @@
 #include "CWeapon.h"
 #include "main.h"
 #include <sys/stat.h>
-#include <zlib.h>
+#include "zlib.h"
 #include <math.h>
 
 pt2func CPlayer::msgFuncs[] = {
@@ -503,10 +503,9 @@ void CPlayer::sendAccount()
 		float t = (float)(getSysTime() - lastSparTime)/86400.0f; // Convert seconds to days: 60/60/24
 
 		// Find the new deviation.
-		float deviate = MIN( sqrt((deviation*deviation) + (c*c) * t), (float)350.0 );
+		float deviate = MIN( sqrt((oldDeviation*oldDeviation) + (c*c) * t), 350.0f );
 
 		// Save the old rating and set the new one.
-		oldDeviation = deviation;
 		deviation = deviate;
 	}
 
@@ -2277,6 +2276,18 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			case GATTRIB4:  myAttr[3]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
 			case GATTRIB5:  myAttr[4]  = pProps.readChars((unsigned char)pProps.readByte1()); break;
 
+			case PEMPTY42:	//Caused when losing a spar? - Beholder
+				errorOut( "debuglog.txt", CString() << accountName << " sent PEMPTY42.  Sparring zone? " << ((level->sparZone == true) ? "Yes." : "No.") );
+				break;
+
+			case PEMPTY43:	//Caused when tieing a spar? - Beholder
+				errorOut( "debuglog.txt", CString() << accountName << " sent PEMPTY43.  Sparring zone? " << ((level->sparZone == true) ? "Yes." : "No.") );
+				break;
+
+			case PEMPTY44:	//Caused when winning a spar? - Beholder
+				errorOut( "debuglog.txt", CString() << accountName << " sent PEMPTY44.  Sparring zone? " << ((level->sparZone == true) ? "Yes." : "No.") );
+				break;
+
 			case PLAYERZ:
 				z = (float)pProps.readByte1() / 2;
 				status &= (-1-1);
@@ -2816,57 +2827,33 @@ void CPlayer::msgCLAIMPKER(CPacket& pPacket)
 	// Uses the glicko rating system.
 	if ( level->sparZone )
 	{
-		//0 - rating, 1 - deviation
-		//2 - old rating, 3 - old deviation
-		//4 - new rating, 5 - new deviation
-		float killer_rate[6] = {	other->rating, other->deviation,
-									other->oldRating, other->oldDeviation,
-									0.0, 0.0 };
-		float victim_rate[6] = {	rating, deviation,
-									oldRating, oldDeviation,
-									0.0, 0.0 };
+		float gSpar[2] = {1 / pow((1+3*pow(0.0057565,2)*(pow(other->deviation,2))/pow(3.14159265,2)),0.5),	//Winner
+					  	  1 / pow((1+3*pow(0.0057565,2)*(pow(deviation,2))/pow(3.14159265,2)),0.5)};		//Loser
+		float ESpar[2] = {1 / (1 + pow(10,(-gSpar[1]*(other->rating-rating)/400))),							//Winner
+						  1 / (1 + pow(10,(-gSpar[0]*(rating-other->rating)/400)))};						//Loser
+		float dSpar[2] = {1 / (pow(0.0057565,2)*pow(gSpar[0],2)*ESpar[0]*(1-ESpar[0])),						//Winner
+						  1 / (pow(0.0057565,2)*pow(gSpar[1],2)*ESpar[1]*(1-ESpar[1]))};					//Loser
 
-		// Do the spar rating calculations.
-		{
-			const float q = 0.0057565f;
-			const float q2 = 0.00003313729225f;
-			float g[2] = {	1.0f / sqrt(1.0f + ((3.0f * q2 * (killer_rate[1]*killer_rate[1]))/3.14f) ),
-							1.0f / sqrt(1.0f + ((3.0f * q2 * (victim_rate[1]*victim_rate[1]))/3.14f) ) };
-			float E[2] = {	1.0f / ( 1.0f + pow(10.0f, -g[1]*(killer_rate[0] - victim_rate[0])/400.0f) ),
-							1.0f / ( 1.0f + pow(10.0f, -g[0]*(victim_rate[0] - killer_rate[0])/400.0f) ) };
-			float d2[2] = {	1.0f/(q2 * (g[1]*g[1]) * E[0] * (1.0f - E[0])),
-							1.0f/(q2 * (g[0]*g[0]) * E[1] * (1.0f - E[1])) };
-			float s[2] = {	1.0f, 0.0f };
-
-			killer_rate[4] = killer_rate[2] + ( q/( 1.0f/(killer_rate[1]*killer_rate[1]) + 1.0f/d2[0] ) ) * g[1] * ( s[1] - E[0] );
-			victim_rate[4] = victim_rate[2] + ( q/( 1.0f/(victim_rate[1]*victim_rate[1]) + 1.0f/d2[1] ) ) * g[0] * ( s[0] - E[1] );
-
-			killer_rate[5] = sqrt(1.0f/( 1.0f/(killer_rate[1]*killer_rate[1]) + 1.0f/d2[0] ));
-			victim_rate[5] = sqrt(1.0f/( 1.0f/(victim_rate[1]*victim_rate[1]) + 1.0f/d2[1] ));
-		}
+		float tWinRating = other->rating + (0.0057565 / ( 1 / pow(other->deviation,2) + 1/dSpar[0])) * (gSpar[0] * (1 - ESpar[0]));
+		float tLoseRating = rating + (0.0057565 / ( 1 / pow(deviation,2) + 1/dSpar[1])) * (gSpar[1] * (0 - ESpar[1]));
+  		float tWinDeviation = pow((1/(1/pow(other->deviation,2)+1/dSpar[0])),0.5);
+  		float tLoseDeviation = pow((1/(1/pow(deviation,2)+1/dSpar[1])),0.5);
 
 		// Cap the rating.
-		killer_rate[4] = CLIP( killer_rate[4], 0.0f, 4000.0f );
-		killer_rate[5] = CLIP( killer_rate[5], 50.0f, 350.0f );
-		victim_rate[4] = CLIP( victim_rate[4], 0.0f, 4000.0f );
-		victim_rate[5] = CLIP( victim_rate[5], 50.0f, 350.0f );
+		tWinRating = CLIP( tWinRating, 0.0f, 4000.0f );
+		tLoseRating = CLIP( tLoseRating, 0.0f, 4000.0f );
+		tWinDeviation = CLIP( tWinDeviation, 50.0f, 350.0f );
+		tLoseDeviation = CLIP( tLoseDeviation, 50.0f, 350.0f );
 
-		// Update each player's last spar time.
+		// Update the Ratings.
+		other->rating = tWinRating;
+		other->deviation = other->oldDeviation = tWinDeviation;
+		this->rating = tLoseRating;
+		this->deviation = this->oldDeviation = tLoseDeviation;
 		other->lastSparTime = this->lastSparTime = getSysTime();
 
-		// Back up the old values.
-		other->oldRating = other->rating;
-		this->oldRating = this->rating;
-		other->oldDeviation = other->deviation;
-		this->oldDeviation = this->deviation;
-
-		// Update the player's rating.
-		other->rating = killer_rate[4];
-		other->deviation = killer_rate[5];
-		this->rating = victim_rate[4];
-		this->deviation = victim_rate[5];
 		other->updateProp( RATING );
-		this->updateProp( RATING );
+		this->updateProp(RATING );
 	}
 	else
 	{
