@@ -192,7 +192,7 @@ CPlayer::CPlayer(CSocket* pSocket)
 	glovePower = bombPower = swordPower = shieldPower = 1;
 	power = maxPower = 3;
 	kills = deaths = udpPort = statusMsg;
-	oldRating = rating = 1500.0f;
+	rating = 1500.0f;
 	oldDeviation = deviation = 350.0f;
 	lastSparTime = 0;
 	sprite = 2;
@@ -2827,17 +2827,17 @@ void CPlayer::msgCLAIMPKER(CPacket& pPacket)
 	// Uses the glicko rating system.
 	if ( level->sparZone )
 	{
-		float gSpar[2] = {1 / pow((1+3*pow(0.0057565,2)*(pow(other->deviation,2))/pow(3.14159265,2)),0.5),	//Winner
-					  	  1 / pow((1+3*pow(0.0057565,2)*(pow(deviation,2))/pow(3.14159265,2)),0.5)};		//Loser
-		float ESpar[2] = {1 / (1 + pow(10,(-gSpar[1]*(other->rating-rating)/400))),							//Winner
-						  1 / (1 + pow(10,(-gSpar[0]*(rating-other->rating)/400)))};						//Loser
-		float dSpar[2] = {1 / (pow(0.0057565,2)*pow(gSpar[0],2)*ESpar[0]*(1-ESpar[0])),						//Winner
-						  1 / (pow(0.0057565,2)*pow(gSpar[1],2)*ESpar[1]*(1-ESpar[1]))};					//Loser
+		float gSpar[2] = {1.0f / pow((1.0f+3.0f*pow(0.0057565f,2)*(pow(other->deviation,2))/pow(3.14159265f,2)),0.5f),	//Winner
+					  	  1.0f / pow((1.0f+3.0f*pow(0.0057565f,2)*(pow(deviation,2))/pow(3.14159265f,2)),0.5f)};		//Loser
+		float ESpar[2] = {1.0f / (1.0f + pow(10.0f,(-gSpar[1]*(other->rating-rating)/400.0f))),							//Winner
+						  1.0f / (1.0f + pow(10.0f,(-gSpar[0]*(rating-other->rating)/400.0f)))};						//Loser
+		float dSpar[2] = {1.0f / (pow(0.0057565f,2)*pow(gSpar[0],2)*ESpar[0]*(1.0f-ESpar[0])),							//Winner
+						  1.0f / (pow(0.0057565f,2)*pow(gSpar[1],2)*ESpar[1]*(1.0f-ESpar[1]))};							//Loser
 
-		float tWinRating = other->rating + (0.0057565 / ( 1 / pow(other->deviation,2) + 1/dSpar[0])) * (gSpar[0] * (1 - ESpar[0]));
-		float tLoseRating = rating + (0.0057565 / ( 1 / pow(deviation,2) + 1/dSpar[1])) * (gSpar[1] * (0 - ESpar[1]));
-  		float tWinDeviation = pow((1/(1/pow(other->deviation,2)+1/dSpar[0])),0.5);
-  		float tLoseDeviation = pow((1/(1/pow(deviation,2)+1/dSpar[1])),0.5);
+		float tWinRating = other->rating + (0.0057565f / ( 1.0f / pow(other->deviation,2) + 1.0f/dSpar[0])) * (gSpar[0] * (1.0f - ESpar[0]));
+		float tLoseRating = rating + (0.0057565f / ( 1.0f / pow(deviation,2) + 1.0f/dSpar[1])) * (gSpar[1] * (0.0f - ESpar[1]));
+  		float tWinDeviation = pow((1.0f/(1.0f/pow(other->deviation,2)+1/dSpar[0])),0.5f);
+  		float tLoseDeviation = pow((1.0f/(1.0f/pow(deviation,2)+1/dSpar[1])),0.5f);
 
 		// Cap the rating.
 		tWinRating = CLIP( tWinRating, 0.0f, 4000.0f );
