@@ -2,14 +2,14 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="winGserver" />
+		<Option title="Graal Emulation Server" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Win32">
-				<Option output="..\bin\winGserver" prefix_auto="1" extension_auto="1" />
+				<Option output="..\bin\WGserver" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="..\bin\" />
-				<Option object_output="obj\Release\" />
+				<Option object_output="obj\Win32\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -22,10 +22,27 @@
 					<Add directory="lib\" />
 				</Linker>
 			</Target>
-			<Target title="Linux">
-				<Option output="..\bin\winGserver" prefix_auto="1" extension_auto="1" />
+			<Target title="Win32 (Localhost)">
+				<Option output="..\bin\WGserver-Local" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="..\bin\" />
-				<Option object_output="obj\Release\" />
+				<Option object_output="obj\Win32Local\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-DDEBUG_LOCALHOST" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="wsock32" />
+					<Add library="libzdll" />
+					<Add directory="lib\" />
+				</Linker>
+			</Target>
+			<Target title="Linux">
+				<Option output="..\bin\LGserver" prefix_auto="1" extension_auto="0" />
+				<Option working_dir="..\bin\" />
+				<Option object_output="obj\Linux\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -40,6 +57,98 @@
 					<Add library="pthread" />
 					<Add directory="lib\" />
 				</Linker>
+			</Target>
+			<Target title="Linux (Localhost)">
+				<Option output="..\bin\LGserver-Local" prefix_auto="1" extension_auto="0" />
+				<Option working_dir="..\bin\" />
+				<Option object_output="obj\LinuxLocal\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-DDEBUG_LOCALHOST" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-pg" />
+					<Add library="sqliteLINUX" />
+					<Add library="z" />
+					<Add library="dl" />
+					<Add library="pthread" />
+					<Add directory="lib\" />
+				</Linker>
+			</Target>
+			<Target title="PSP">
+				<Option output="..\bin\PGserver.elf" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj\PSP\" />
+				<Option type="1" />
+				<Option compiler="pspcompiler" />
+				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-O2 -G0" />
+					<Add option="-DPSPSDK" />
+					<Add option="-DPSP_FW_VERSION=150" />
+				</Compiler>
+				<Linker>
+					<Add option="-lstdc++ -lc -lz -lm -lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspsdk -lc -lpspnet -lpspnet_inet -lpspnet_apctl -lpspnet_resolver -lpsputility -lpspuser -lpspkernel" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="psp-fixup-imports $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).elf" />
+					<Add after="mksfo &apos;$(PROJECT_NAME)&apos; $(PSP_EBOOT_SFO)" />
+					<Add after="psp-strip $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).elf -o $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)_strip.elf" />
+					<Add after="pack-pbp $(TARGET_OUTPUT_DIR)$(PSP_EBOOT) $(PSP_EBOOT_SFO) $(PSP_EBOOT_ICON) $(PSP_EBOOT_ICON1) $(PSP_EBOOT_UNKPNG) $(PSP_EBOOT_PIC1) $(PSP_EBOOT_SND0) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)_strip.elf $(PSP_EBOOT_PSAR)" />
+					<Add after="rm -f $(PSP_EBOOT_SFO)" />
+					<Add after="rm -f $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).elf" />
+					<Add after="rm -f $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)_strip.elf" />
+					<Mode after="always" />
+				</ExtraCommands>
+				<Environment>
+					<Variable name="PSP_EBOOT_ICON" value="lib/ICON0.PNG" />
+					<Variable name="PSP_EBOOT" value="EBOOT.PBP" />
+					<Variable name="PSP_EBOOT_SFO" value="lib/PARAM.SFO" />
+					<Variable name="PSP_EBOOT_UNKPNG" value="NULL" />
+					<Variable name="PSP_EBOOT_SND0" value="NULL" />
+					<Variable name="PSP_EBOOT_PSAR" value="NULL" />
+					<Variable name="PSP_EBOOT_TITLE" value='&quot;Graal Emulation Server&quot;' />
+					<Variable name="PSP_EBOOT_ICON1" value="NULL" />
+					<Variable name="PSP_EBOOT_PIC1" value="lib/PIC1.PNG" />
+				</Environment>
+			</Target>
+			<Target title="PSP (Localhost)">
+				<Option output="..\bin\PGserver-Local.elf" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj\PSPLocal\" />
+				<Option type="1" />
+				<Option compiler="pspcompiler" />
+				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-O2 -G0" />
+					<Add option="-DPSPSDK" />
+					<Add option="-DPSP_FW_VERSION=150" />
+				</Compiler>
+				<Linker>
+					<Add option="-lstdc++ -lc -lz -lpspdebug -lpspdisplay_driver -lpspctrl_driver -lpspsdk" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="psp-fixup-imports $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).elf" />
+					<Add after="mksfo &apos;$(PROJECT_NAME)&apos; $(PSP_EBOOT_SFO)" />
+					<Add after="psp-strip $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).elf -o $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)_strip.elf" />
+					<Add after="pack-pbp $(TARGET_OUTPUT_DIR)$(PSP_EBOOT) $(PSP_EBOOT_SFO) $(PSP_EBOOT_ICON) $(PSP_EBOOT_ICON1) $(PSP_EBOOT_UNKPNG) $(PSP_EBOOT_PIC1) $(PSP_EBOOT_SND0) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)_strip.elf $(PSP_EBOOT_PSAR)" />
+					<Add after="rm -f $(PSP_EBOOT_SFO)" />
+					<Add after="rm -f $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).elf" />
+					<Add after="rm -f $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)_strip.elf" />
+					<Mode after="always" />
+				</ExtraCommands>
+				<Environment>
+					<Variable name="PSP_EBOOT_ICON" value="lib/ICON0.PNG" />
+					<Variable name="PSP_EBOOT" value="EBOOT.PBP" />
+					<Variable name="PSP_EBOOT_SFO" value="lib/PARAM.SFO" />
+					<Variable name="PSP_EBOOT_UNKPNG" value="NULL" />
+					<Variable name="PSP_EBOOT_SND0" value="NULL" />
+					<Variable name="PSP_EBOOT_PSAR" value="NULL" />
+					<Variable name="PSP_EBOOT_TITLE" value='&quot;Graal Emulation Server&quot;' />
+					<Variable name="PSP_EBOOT_ICON1" value="NULL" />
+					<Variable name="PSP_EBOOT_PIC1" value="lib/PIC1.PNG" />
+				</Environment>
 			</Target>
 		</Build>
 		<Compiler>

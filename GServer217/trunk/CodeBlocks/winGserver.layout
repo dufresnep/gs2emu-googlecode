@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Win32" />
+	<ActiveTarget name="PSP" />
 	<File name="..\src\CAccount.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="7380" topLine="141" />
 	</File>
@@ -20,7 +20,7 @@
 		<Cursor position="7018" topLine="309" />
 	</File>
 	<File name="..\src\CDatabase.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="3244" topLine="87" />
+		<Cursor position="2980" topLine="87" />
 	</File>
 	<File name="..\src\CDatabase.h" open="0" top="0" tabpos="3">
 		<Cursor position="243" topLine="0" />
@@ -37,14 +37,17 @@
 	<File name="..\src\CLevel.h" open="0" top="0" tabpos="3">
 		<Cursor position="1647" topLine="31" />
 	</File>
+	<File name="..\src\CLinkedList.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="1335" topLine="59" />
+	</File>
 	<File name="..\src\CList.cpp" open="0" top="0" tabpos="19">
 		<Cursor position="415" topLine="30" />
 	</File>
 	<File name="..\src\CList.h" open="0" top="0" tabpos="0">
 		<Cursor position="829" topLine="10" />
 	</File>
-	<File name="..\src\CListServer.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="3124" topLine="98" />
+	<File name="..\src\CListServer.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="1864" topLine="45" />
 	</File>
 	<File name="..\src\CListServer.h" open="0" top="0" tabpos="0">
 		<Cursor position="237" topLine="0" />
@@ -62,7 +65,7 @@
 		<Cursor position="1102" topLine="33" />
 	</File>
 	<File name="..\src\COther.h" open="0" top="0" tabpos="6">
-		<Cursor position="788" topLine="23" />
+		<Cursor position="174" topLine="0" />
 	</File>
 	<File name="..\src\CPacket.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="14" topLine="0" />
@@ -71,16 +74,16 @@
 		<Cursor position="112" topLine="0" />
 	</File>
 	<File name="..\src\CPlayer.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="20916" topLine="633" />
+		<Cursor position="13153" topLine="376" />
 	</File>
 	<File name="..\src\CPlayer.h" open="0" top="0" tabpos="1">
-		<Cursor position="10603" topLine="356" />
+		<Cursor position="8525" topLine="348" />
 	</File>
-	<File name="..\src\CSocket.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="4706" topLine="180" />
+	<File name="..\src\CSocket.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="4805" topLine="170" />
 	</File>
-	<File name="..\src\CSocket.h" open="0" top="0" tabpos="10">
-		<Cursor position="508" topLine="18" />
+	<File name="..\src\CSocket.h" open="0" top="0" tabpos="3">
+		<Cursor position="336" topLine="0" />
 	</File>
 	<File name="..\src\CStringList.cpp" open="0" top="0" tabpos="20">
 		<Cursor position="1192" topLine="34" />
@@ -95,15 +98,15 @@
 		<Cursor position="366" topLine="20" />
 	</File>
 	<File name="..\src\CWordFilter.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="800" topLine="78" />
+		<Cursor position="191" topLine="0" />
 	</File>
 	<File name="..\src\CWordFilter.h" open="0" top="0" tabpos="2">
 		<Cursor position="783" topLine="36" />
 	</File>
 	<File name="..\src\main.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="3721" topLine="64" />
+		<Cursor position="7881" topLine="240" />
 	</File>
 	<File name="..\src\main.h" open="0" top="0" tabpos="7">
-		<Cursor position="934" topLine="4" />
+		<Cursor position="2244" topLine="33" />
 	</File>
 </CodeBlocks_layout_file>

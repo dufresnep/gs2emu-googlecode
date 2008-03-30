@@ -1049,46 +1049,46 @@
 	<unistd.h>
 	<dirent.h>
 
-1203404696 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\caccount.cpp
+1206828971 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\caccount.cpp
 	"CAccount.h"
 	"CDatabase.h"
 	"CIni.h"
 	"main.h"
 
-1203404696 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\caccount.h
+1206828971 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\caccount.h
 	"CString.h"
 	"CStringList.h"
 
-1192759526 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cstring.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cstring.h
 	"CBuffer.h"
 
-1171232673 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cbuffer.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cbuffer.h
 	<cstdlib>
 	<cstring>
 	<cstdio>
 
-1203405560 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cstringlist.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cstringlist.h
 	<cstdlib>
 	<cstring>
 	<cstdio>
 	"CList.h"
 	"CBuffer.h"
 
-1169421858 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clist.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clist.h
 	<cstdlib>
 	<cstring>
 	<cstdio>
 
-1168676094 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cdatabase.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cdatabase.h
 	"CPacket.h"
 	"CStringList.h"
 	"CPlayer.h"
 	"CAccount.h"
 
-1169421858 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cpacket.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cpacket.h
 	"CBuffer.h"
 
-1203404696 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cplayer.h
+1206828971 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cplayer.h
 	"CString.h"
 	"CStringList.h"
 	"CSocket.h"
@@ -1098,7 +1098,7 @@
 	"CMap.h"
 	"crypt.h"
 
-1203433141 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\csocket.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\csocket.h
 	<windows.h>
 	<pspkernel.h>
 	<pspdebug.h>
@@ -1118,7 +1118,7 @@
 	<errno.h>
 	"CPacket.h"
 
-1203404696 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clevel.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clevel.h
 	"CString.h"
 	"CList.h"
 	"CStringList.h"
@@ -1127,34 +1127,36 @@
 	"CBaddy.h"
 	"CPlayer.h"
 
-1203405690 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cother.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cother.h
 	<windows.h>
 	<pspthreadman.h>
 	<unistd.h>
+	"CBuffer.h"
 
-1203404696 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cbaddy.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cbaddy.h
 	"CString.h"
 	"CStringList.h"
 	"CPacket.h"
 	"COther.h"
 
-1192759380 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cmap.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cmap.h
 	"CString.h"
 	"CStringList.h"
 	"CList.h"
 	"CLevel.h"
 
-1168676094 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\crypt.h
+1206828968 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\crypt.h
 	<stdint.h>
 	<cstdlib>
 
-1203405722 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cini.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cini.h
 	<cstdio>
 	<cstring>
 	<cstdlib>
 	"CList.h"
+	"CBuffer.h"
 
-1203494966 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\main.h
+1206831624 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\main.h
 	"CList.h"
 	"CListServer.h"
 	"CString.h"
@@ -1164,37 +1166,38 @@
 	"CWordFilter.h"
 	<time.h>
 
-1203404696 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clistserver.h
+1206828968 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clistserver.h
 	"CBuffer.h"
 	"CList.h"
 	"CPacket.h"
 	"CSocket.h"
 	"CStringList.h"
 
-1169421858 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cnpc.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cnpc.h
 	<stdarg.h>
 	"CString.h"
 	"CLevel.h"
 	"CPacket.h"
 
-1198579134 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cwordfilter.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cwordfilter.h
 
-1203404696 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cbaddy.cpp
+1206828969 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cbaddy.cpp
 	"CBaddy.h"
 	"main.h"
 
-1203481277 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cbuffer.cpp
+1206828969 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cbuffer.cpp
 	"CBuffer.h"
 	"CStringList.h"
 
-1171232673 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cdatabase.cpp
+1206833843 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cdatabase.cpp
 	"CDatabase.h"
 	"main.h"
 
-1169421858 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cini.cpp
+1206828969 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cini.cpp
 	"CIni.h"
+	"CBuffer.h"
 
-1203404696 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clevel.cpp
+1206828968 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clevel.cpp
 	"CLevel.h"
 	"main.h"
 	"CNpc.h"
@@ -1204,65 +1207,66 @@
 	"CList.h"
 	"CWeapon.h"
 
-1169421858 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cweapon.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cweapon.h
 	"CPacket.h"
 	"CString.h"
 
-1169421858 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clinkedlist.cpp
+1206828969 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clinkedlist.cpp
 	"CLinkedList.h"
 
-1169421858 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clinkedlist.h
+1206828968 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clinkedlist.h
 
-1169421858 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clist.cpp
+1206828969 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clist.cpp
 	"CList.h"
 	<stdio.h>
 
-1169421858 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cmap.cpp
+1206828969 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cmap.cpp
 	"CMap.h"
 	"main.h"
 
-1203404696 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cnpc.cpp
+1206828971 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cnpc.cpp
 	<stdarg.h>
 	"CNpc.h"
 	"main.h"
 
-1169421858 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cpacket.cpp
+1206828969 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cpacket.cpp
 	"CPacket.h"
 
-1203487105 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cplayer.cpp
+1206828971 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cplayer.cpp
 	"CBaddy.h"
 	"CDatabase.h"
 	"CIni.h"
 	"CListServer.h"
 	"CPlayer.h"
 	"CWeapon.h"
-	"zlib.h"
 	"main.h"
 	<sys/stat.h>
+	"zlib.h"
+	<math.h>
 
-1169421858 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\zlib.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\zlib.h
 	"zconf.h"
 
-1169421858 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\zconf.h
+1206828969 c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\zconf.h
 	<windows.h>
 	<sys/types.h>
 	<unistd.h>
 	<unixio.h>
 
-1203485144 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\csocket.cpp
+1206828969 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\csocket.cpp
 	"CSocket.h"
 
-1169421858 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cstringlist.cpp
+1206828968 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cstringlist.cpp
 	"CStringList.h"
 
-1169421858 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cweapon.cpp
+1206828969 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cweapon.cpp
 	"CWeapon.h"
 
-1203448129 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cwordfilter.cpp
+1206828969 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cwordfilter.cpp
 	"main.h"
 	"CWordFilter.h"
 
-1203495524 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\main.cpp
+1206828971 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\main.cpp
 	"main.h"
 	"CIni.h"
 	"CPlayer.h"
@@ -1270,9 +1274,11 @@
 	"CWeapon.h"
 	"CDatabase.h"
 	"CLevel.h"
+	"CBuffer.h"
 	<time.h>
 	<sys/stat.h>
 	<stdlib.h>
+	<signal.h>
 	<windows.h>
 	<pspkernel.h>
 	<pspdebug.h>
@@ -1280,7 +1286,12 @@
 	<unistd.h>
 	<dirent.h>
 
-1203446909 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clistserver.cpp
+1206828971 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\clistserver.cpp
 	"CListServer.h"
 	"main.h"
+
+1206828969 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\cother.cpp
+
+1206828969 source:c:\documents and settings\administrator\desktop\junk\graal217\svn\gserver217\trunk\src\codec.cpp
+	"crypt.h"
 
