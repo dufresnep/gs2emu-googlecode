@@ -36,6 +36,9 @@ Additions:
   if they exist on the server in an altered form.  This protects
   clients from receiving bad and/or altered files from malicious or
   misconfigured servers.
+- You can now use the =, >, >=, <, <=, and != conditionals when
+  searching for accounts.  Also, searching for numbers has been
+  improved.
 
 Fixes:
 - Server now properly shuts down.
@@ -53,6 +56,8 @@ Fixes:
 - Tabs in the foldersconfig.txt file won't break it anymore.
 - Altering the foldersconfig.txt file via RC will now correctly set the
   new configuration without requiring the server to be restarted.
+- Fixed some bugs in the account searching code that could potentially
+  return incorrect results.
 
 
 --------------------------------------------

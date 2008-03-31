@@ -778,3 +778,25 @@ unsigned int CBuffer::checkSum()
 		b -= 65521;
 	return b << 16 | a;
 }
+
+bool CBuffer::isNumber()
+{
+	const char numbers[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
+	char periodCount = 0;
+	for ( int i = 0; i < count; ++i )
+	{
+		bool isNum = false;
+		for ( int j = 0; j < 11; ++j )
+		{
+			if ( data[i] == numbers[j] )
+			{
+				if ( j == 10 ) periodCount++;
+				isNum = true;
+				j = 11;
+			}
+		}
+		if ( isNum == false || periodCount > 1 )
+			return false;
+	}
+	return true;
+}

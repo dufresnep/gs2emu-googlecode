@@ -107,6 +107,7 @@ class CBuffer
 	char* text();
 	int bytesLeft();
 	int length();
+	bool isNumber();
 
 	//Operators
 	CBuffer& operator=(const CBuffer& pBuffer);

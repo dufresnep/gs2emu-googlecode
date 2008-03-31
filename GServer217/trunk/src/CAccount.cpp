@@ -206,6 +206,7 @@ void CAccount::saveAccount(bool pAttributes)
 
 bool CAccount::meetsConditions( CString pAccount, CString conditions )
 {
+	const char* conditional[] = { ">=", "<=", "!=", "=", ">", "<" };
 	CStringList file;
 	CString fileName;
 	fileName = CString() << "accounts" << fSep << pAccount << ".txt";
@@ -219,9 +220,9 @@ bool CAccount::meetsConditions( CString pAccount, CString conditions )
 	conditions.removeAll( "'" );
 	conditions.replaceAll( "%", "*" );
 	cond.load( conditions.text(), "," );
+	bool* conditionsMet = new bool[cond.count()];
 
 	// Go through each line of the loaded file.
-	int conditionsMet = 0;
 	for (int i = 0; i < file.count(); i++)
 	{
 		int sep = file[i].find(' ');
@@ -233,9 +234,23 @@ bool CAccount::meetsConditions( CString pAccount, CString conditions )
 		// Check each line against the conditions specified.
 		for ( int j = 0; j < cond.count(); ++j )
 		{
+			int cond_num = -1;
+
 			// Read out the name and value.
 			cond[j].setRead(0);
-			CString cname = cond[j].readString( "=" );
+
+			// Find out what conditional we are using.
+			for ( int k = 0; k < 6; ++k )
+			{
+				if ( cond[j].find( conditional[k] ) != -1 )
+				{
+					cond_num = k;
+					k = 6;
+				}
+			}
+			if ( cond_num == -1 ) continue;
+
+			CString cname = cond[j].readString( conditional[cond_num] );
 			CString cvalue = cond[j].readString( "" );
 			cond[j].setRead(0);
 
@@ -246,25 +261,147 @@ bool CAccount::meetsConditions( CString pAccount, CString conditions )
 			if ( strcasecmp( section.text(), cname.text() ) == 0 )
 #endif
 			{
-				// If we are in a section that was passed as a conditional,
-				// do a mask compare.  If it returns false, don't include this
-				// account in the search.
-				if ( val.match( cvalue.text() ) == false )
+				switch ( cond_num )
 				{
-					CBuffer cnameUp = cname.toUpper();
-					if ( !(cnameUp == "CHEST" || cnameUp == "WEAPON" ||
-						cnameUp == "FLAG" || cnameUp == "FOLDERRIGHT") )
-						return false;
+					case 0:
+					case 1:
+					{
+						// 0: >=
+						// 1: <=
+						// Check if it is a number.  If so, do a number comparison.
+						bool condmet = false;
+						if ( val.isNumber() )
+						{
+							double vNum[2] = { atof( val.text() ), atof( cvalue.text() ) };
+							if ( ((cond_num == 4) ? (vNum[0] <= vNum[1]) : (vNum[0] >= vNum[1])) )
+							{
+								conditionsMet[j] = true;
+								condmet = true;
+							}
+						}
+						else
+						{
+							// If not a number, do a string comparison.
+							int ret = strcmp( val.text(), cvalue.text() );
+							if ( ((cond_num == 4) ? (ret <= 0) : (ret >= 0)) )
+							{
+								conditionsMet[j] = true;
+								condmet = true;
+							}
+						}
+
+						// No conditions met means we see if we can fail.
+						if ( condmet == false )
+						{
+							CBuffer cnameUp = cname.toUpper();
+							if ( !(cnameUp == "CHEST" || cnameUp == "WEAPON" ||
+								cnameUp == "FLAG" || cnameUp == "FOLDERRIGHT") )
+								goto condAbort;
+						}
+						break;
+					}
+
+					case 4:
+					case 5:
+					{
+						// 4: >
+						// 5: <
+						bool condmet = false;
+						if ( val.isNumber() )
+						{
+							double vNum[2] = { atof( val.text() ), atof( cvalue.text() ) };
+							if ( ((cond_num == 3) ? (vNum[0] < vNum[1]) : (vNum[0] > vNum[1])) )
+							{
+								conditionsMet[j] = true;
+								condmet = true;
+							}
+						}
+						else
+						{
+							int ret = strcmp( val.text(), cvalue.text() );
+							if ( ((cond_num == 3) ? (ret < 0) : (ret > 0)) )
+							{
+								conditionsMet[j] = true;
+								condmet = true;
+							}
+						}
+
+						if ( condmet == false )
+						{
+							CBuffer cnameUp = cname.toUpper();
+							if ( !(cnameUp == "CHEST" || cnameUp == "WEAPON" ||
+								cnameUp == "FLAG" || cnameUp == "FOLDERRIGHT") )
+								goto condAbort;
+						}
+						break;
+					}
+
+					case 2:
+					{
+						// 2: !=
+						// If we find a match, return false.
+						if ( val.isNumber() )
+						{
+							double vNum[2] = { atof( val.text() ), atof( cvalue.text() ) };
+							if ( vNum[0] == vNum[1] ) goto condAbort;
+							conditionsMet[j] = true;
+						}
+						else
+						{
+							if ( val.match( cvalue.text() ) == true ) goto condAbort;
+							conditionsMet[j] = true;
+						}
+						break;
+					}
+
+					case 3:
+					default:
+					{
+						// 0 - equals
+						// If it returns false, don't include this account in the search.
+						bool condmet = false;
+						if ( val.isNumber() )
+						{
+							double vNum[2] = { atof( val.text() ), atof( cvalue.text() ) };
+							if ( vNum[0] == vNum[1] )
+							{
+								conditionsMet[j] = true;
+								condmet = true;
+							}
+						}
+						else
+						{
+							if ( val.match( cvalue.text() ) == true )
+							{
+								conditionsMet[j] = true;
+								condmet = true;
+							}
+						}
+
+						if ( condmet == false )
+						{
+							CBuffer cnameUp = cname.toUpper();
+							if ( !(cnameUp == "CHEST" || cnameUp == "WEAPON" ||
+								cnameUp == "FLAG" || cnameUp == "FOLDERRIGHT") )
+								goto condAbort;
+						}
+						break;
+					}
 				}
-				else
-					conditionsMet++;
 			}
 		}
 	}
 
 	// Check if all the conditions were met.
-	if ( conditionsMet >= cond.count() )
-		return true;
+	for ( int i = 0; i < cond.count(); ++i )
+		if ( conditionsMet[i] == false ) goto condAbort;
 
+	// Clean up.
+	delete [] conditionsMet;
+
+	return true;
+
+condAbort:
+	delete [] conditionsMet;
 	return false;
 }
