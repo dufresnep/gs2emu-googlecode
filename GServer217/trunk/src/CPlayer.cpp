@@ -717,7 +717,7 @@ void CPlayer::parsePacket(CPacket& pPacket)
 	else
 	{
 		deleteMe = true;
-		errorOut( "errorlog.txt", CString() << accountName << " sent an incorrect message id [" << toString(messageId) << "]\nPacket: " << pPacket.text() << "\n" << "MPacket: " << packet.text(), true );
+		errorOut( "errorlog.txt", CString() << accountName << " sent an incorrect message id [" << toString(messageId) << "]\r\nPacket: " << pPacket.text() << "\r\nMPacket: " << packet.text(), true );
 		sendPacket( CPacket() << (char)DISMESSAGE << "You sent an incorrect packet" );
 		return;
 	}
@@ -3093,7 +3093,10 @@ void CPlayer::msgNPCWEAPONIMG(CPacket& pPacket)
 }
 
 void CPlayer::msgEMPTY25(CPacket& pPacket)
-{}
+{
+	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY25:\r\n" << pPacket.text(), false );
+}
+
 void CPlayer::msgHURTPLAYER(CPacket& pPacket)
 {
 	if ( id == -1 ) return;
@@ -3256,11 +3259,15 @@ void CPlayer::msgUPDATEFILE(CPacket& pPacket)
 }
 
 void CPlayer::msgEMPTY36(CPacket& pPacket)
-{}
+{
+	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY36:\r\n" << pPacket.text(), false );
+}
+
 void CPlayer::msgLANGUAGE(CPacket& pPacket)
 {
 	language = pPacket.text()+1;
 }
+
 void CPlayer::msgTRIGGERACTION(CPacket& pPacket)
 {
 	if ( id == -1 ) return;
@@ -3279,8 +3286,12 @@ void CPlayer::msgTRIGGERACTION(CPacket& pPacket)
 			other->sendPacket(packet);
 	}
 }
+
 void CPlayer::msgEMPTY39(CPacket& pPacket)
-{}
+{
+	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY39:\r\n" << pPacket.text(), false );
+}
+
 void CPlayer::msgCSHOOT(CPacket& pPacket)
 {
 	if ( id == -1 ) return;
@@ -3293,12 +3304,21 @@ void CPlayer::msgCSHOOT(CPacket& pPacket)
 			other->sendPacket(packet);
 	}
 }
+
 void CPlayer::msgEMPTY41(CPacket& pPacket)
-{}
+{
+	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY41:\r\n" << pPacket.text(), false );
+}
+
 void CPlayer::msgEMPTY42(CPacket& pPacket)
-{}
+{
+	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY42:\r\n" << pPacket.text(), false );
+}
+
 void CPlayer::msgEMPTY43(CPacket& pPacket)
-{}
+{
+	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY43:\r\n" << pPacket.text(), false );
+}
 
 void CPlayer::msgSLISTPROCESSES(CPacket& pPacket)
 {/*
@@ -3331,17 +3351,34 @@ void CPlayer::msgSLISTPROCESSES(CPacket& pPacket)
 }
 
 void CPlayer::msgEMPTY45(CPacket& pPacket)
-{}
+{
+	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY45:\r\n" << pPacket.text(), false );
+}
+
 void CPlayer::msgEMPTY46(CPacket& pPacket)
-{}
+{
+	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY46:\r\n" << pPacket.text(), false );
+}
+
 void CPlayer::msgEMPTY47(CPacket& pPacket)
-{}
+{
+	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY47:\r\n" << pPacket.text(), false );
+}
+
 void CPlayer::msgEMPTY48(CPacket& pPacket)
-{}
+{
+	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY48:\r\n" << pPacket.text(), false );
+}
+
 void CPlayer::msgEMPTY49(CPacket& pPacket)
-{}
+{
+	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY49:\r\n" << pPacket.text(), false );
+}
+
 void CPlayer::msgEMPTY50(CPacket& pPacket)
-{}
+{
+	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY50:\r\n" << pPacket.text(), false );
+}
 
 //RC
 inline bool CPlayer::hasRight(int pRight)

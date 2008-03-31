@@ -236,7 +236,7 @@ enum {
 	SSTATUSLIST = 180, // 180 Client status list
 	SPROCCESSES = 182 // use for hack-detection?
 };
-#define clientpackages 100
+#define clientpackages 99
 // Player properties types
 enum
 {
