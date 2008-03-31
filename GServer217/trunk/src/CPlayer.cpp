@@ -717,7 +717,7 @@ void CPlayer::parsePacket(CPacket& pPacket)
 	else
 	{
 		deleteMe = true;
-		errorOut( "errorlog.txt", CString() << accountName << " sent an incorrect message id [" << toString(messageId) << "]\nPacket: " << pPacket.text() << "\n", true );
+		errorOut( "errorlog.txt", CString() << accountName << " sent an incorrect message id [" << toString(messageId) << "]\nPacket: " << pPacket.text() << "\n" << "MPacket: " << packet.text(), true );
 		sendPacket( CPacket() << (char)DISMESSAGE << "You sent an incorrect packet" );
 		return;
 	}
@@ -1557,6 +1557,12 @@ void CPlayer::sendFiles()
 
 		if(longName.length())
 		{
+			// Don't send default files!
+			if ( defaultGaniNames.find( CString(shortName) << ".gani" ) ||
+				defaultSwordNames.find( shortName ) ||
+				defaultShieldNames.find( shortName ) )
+				goto hardFail;
+
 			modTime = getFileModTime(longName.text());
 			if (modTime != file->modTime)
 			{
@@ -1569,6 +1575,7 @@ void CPlayer::sendFiles()
 				}
 			}
 		}
+hardFail:
 		if(failed)
 			sendPacket(CPacket() << (char)GIFFAILED << shortName);
 		delete file;
@@ -3447,10 +3454,13 @@ void CPlayer::msgSETRCFOLDERS(CPacket& pPacket)
 		return;
 	}
 
+	// Save the foldersconfig.txt and load it.
 	CString data = pPacket.text() + 1;
 	data.untokenize();
 	data.save("foldersconfig.txt");
 	folderConfig.load("foldersconfig.txt");
+	getSubDirs();
+
 	errorOut( "rclog.txt", CString() << accountName << " has updated the folder configuration." );
 	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " has updated the folder configuration.");
 }

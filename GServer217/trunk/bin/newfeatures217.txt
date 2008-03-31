@@ -28,6 +28,14 @@ Additions:
 - Implemented spar rating.
 - A player's spar rating is now saved to their account.  Also, all new
   players will also start with a rating of 1500/350 instead of 0/50.
+- If you start a directory in foldersconfig.txt with a ./ then it will
+  use the directory of the gserver instead of the world/ directory.
+  For example: ./accounts/* will search for serverDIR/accounts/
+  For example: accounts/* will search for serverDIR/world/accounts/
+- The default ganis, swords, and shields will not be sent to clients
+  if they exist on the server in an altered form.  This protects
+  clients from receiving bad and/or altered files from malicious or
+  misconfigured servers.
 
 Fixes:
 - Server now properly shuts down.
@@ -42,6 +50,9 @@ Fixes:
   player will no longer drop items.
 - Fixed a problem where 'sparringzone' levels weren't correctly being
   marked as sparring zones on certain occasions.
+- Tabs in the foldersconfig.txt file won't break it anymore.
+- Altering the foldersconfig.txt file via RC will now correctly set the
+  new configuration without requiring the server to be restarted.
 
 
 --------------------------------------------

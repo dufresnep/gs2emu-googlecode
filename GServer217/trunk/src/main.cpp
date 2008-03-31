@@ -39,14 +39,16 @@ char fSep[] = "/";
 const char* __admin[]   = {"description", "detailedconsole", "language", "listport", "listip", "maxplayers", "myip", "name", "serverport", "sharefolder", "showconsolepackets", "underconstruction", "url", "worldname"};
 const char* __colours[] = {"white", "yellow", "orange", "pink", "red", "darkred", "lightgreen", "green", "darkgreen", "lightblue", "blue", "darkblue", "brown", "cynober", "purple", "darkpurple", "lightgray", "gray", "black", "transparent"};
 const char* __cloths[]  = {"setskin", "setcoat", "setsleeve", "setshoe", "setbelt", "setsleeves", "setshoes"};
+const char* __defaultgani[] = {"carried","carry","carrystill","carrypeople","dead","def","ghostani","grab","gralats","hatoff","haton","hidden","hiddenstill","hurt","idle","kick","lava","lift","maps1","maps2","maps3","pull","push","ride","rideeat","ridefire","ridehurt","ridejump","ridestill","ridesword","shoot","sit","skip","sleep","spin","swim","sword","walk","walkslow"};
 const char* __defaultsword[] = {"sword1.png", "sword2.png", "sword3.png", "sword4.png"};
 const char* __defaultshield[] = {"shield1.png", "shield2.png", "shield3.png"};
 CLevel* NOLEVEL = new CLevel();
 CList newPlayers, playerList, playerIds, settingList, weaponList, npcList, npcIds, levelList;
 CSocket responseSock, serverSock;
 CString dataDir, listServerFields[6], listServerIp, serverMessage, shareFolder, staffHead, worldName, unstickmeLevel;
+CString programDir;
 CStringList adminNames, cheatwindows, clothCommands, colourNames, globalGuildList, jailLevels, mapNames, profileList, RCBans, RCMessage, RCHelpMessage, serverFlags, staffGuilds, staffList, statusList, subDirs;
-CStringList folderConfig, defaultSwordNames, defaultShieldNames;
+CStringList folderConfig, defaultGaniNames, defaultSwordNames, defaultShieldNames;
 CWordFilter WordFilter;
 float unstickmeX, unstickmeY;
 int aptime[5], baddyRespawn, cheatwindowstime, gameTime = 1, heartLimit, horseLife, idleDisconnect, listServerPort, maxNoMovement, maxPlayers, nwTime, serverPort, serverTime = 0, shieldLimit, swordLimit, tileRespawn;
@@ -96,12 +98,15 @@ int main(int argc, char *argv[])
 
 	/* Setup Data-Directory */
 	dataDir = CBuffer(argv[0]).replaceAll("\\", "/");
-	dataDir = dataDir.copy(0, dataDir.findl('/') + 1) << "world/";
+	dataDir = dataDir.copy(0, dataDir.findl('/') + 1);
+	programDir = dataDir;
+	dataDir << "world/";
 
 	/* Main Initiating */
 	adminNames.load( __admin, sizeof(__admin) / sizeof(const char*) );
 	colourNames.load( __colours, sizeof(__colours) / sizeof(const char*) );
 	clothCommands.load( __cloths, sizeof(__cloths) / sizeof(const char*) );
+	defaultGaniNames.load( __defaultgani, sizeof(__defaultgani) / sizeof(const char*) );
 	defaultSwordNames.load( __defaultsword, sizeof(__defaultsword) / sizeof(const char*) );
 	defaultShieldNames.load( __defaultshield, sizeof(__defaultshield) / sizeof(const char*) );
 	playerIds.add(0);
@@ -467,8 +472,25 @@ void getSubDirs()
 				continue;
 
 			CBuffer fmask, fname;
+
+			// Get rid of all \t and replace with ' '.
+			// Also, trim.
+			folderConfig[i].replaceAll( "\t", " " );
+
+			// Read past the identifier.
 			folderConfig[i].setRead(folderConfig[i].find(' '));
-			fmask = CBuffer() << dataDir << CBuffer(folderConfig[i].readString("")).trim();
+
+			// Read the mask
+			CBuffer temp = folderConfig[i].readString( "" );
+			temp.trim();
+
+			// If it starts with ./, use . instead of world/ as the search dir.
+			if ( temp.find( "./" ) == 0 )
+				fmask = CBuffer() << programDir << temp;
+			else
+				fmask = CBuffer() << dataDir << temp;
+
+			// Pull off the file mask and only save the directory.
 			fname = CBuffer() << fmask.readChars(fmask.findl(fSep[0])) << fSep;
 			if (subDirs.find(fname) == -1)
 				subDirs.add(fname);
