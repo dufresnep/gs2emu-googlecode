@@ -221,6 +221,7 @@ bool CAccount::meetsConditions( CString pAccount, CString conditions )
 	conditions.replaceAll( "%", "*" );
 	cond.load( conditions.text(), "," );
 	bool* conditionsMet = new bool[cond.count()];
+	memset( (void*)conditionsMet, 0, sizeof(bool) * cond.count() );
 
 	// Go through each line of the loaded file.
 	for (int i = 0; i < file.count(); i++)
