@@ -1561,7 +1561,7 @@ void CPlayer::sendFiles()
 			if ( defaultGaniNames.find( CString(shortName) << ".gani" ) ||
 				defaultSwordNames.find( shortName ) ||
 				defaultShieldNames.find( shortName ) )
-				goto hardFail;
+				continue;
 
 			modTime = getFileModTime(longName.text());
 			if (modTime != file->modTime)
@@ -1575,7 +1575,7 @@ void CPlayer::sendFiles()
 				}
 			}
 		}
-hardFail:
+
 		if(failed)
 			sendPacket(CPacket() << (char)GIFFAILED << shortName);
 		delete file;
