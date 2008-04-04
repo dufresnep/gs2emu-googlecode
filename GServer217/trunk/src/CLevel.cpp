@@ -226,7 +226,7 @@ CString CLevel::processNpcLine(CString& pLine)
 	//Find join codes
 	CString retVal(pLine);
 	int ret = 0;
-	while ( (ret = retVal.find("join ", ret) + 1) >= 0 )
+	while ( (ret = retVal.find("join ", ret) + 1) > 0 )
 	{
 		// Trim the line.
 		retVal.trimLeft();
