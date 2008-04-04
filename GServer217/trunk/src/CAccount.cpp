@@ -274,7 +274,7 @@ bool CAccount::meetsConditions( CString pAccount, CString conditions )
 						if ( val.isNumber() )
 						{
 							double vNum[2] = { atof( val.text() ), atof( cvalue.text() ) };
-							if ( ((cond_num == 4) ? (vNum[0] <= vNum[1]) : (vNum[0] >= vNum[1])) )
+							if ( ((cond_num == 1) ? (vNum[0] <= vNum[1]) : (vNum[0] >= vNum[1])) )
 							{
 								conditionsMet[j] = true;
 								condmet = true;
@@ -284,7 +284,7 @@ bool CAccount::meetsConditions( CString pAccount, CString conditions )
 						{
 							// If not a number, do a string comparison.
 							int ret = strcmp( val.text(), cvalue.text() );
-							if ( ((cond_num == 4) ? (ret <= 0) : (ret >= 0)) )
+							if ( ((cond_num == 1) ? (ret <= 0) : (ret >= 0)) )
 							{
 								conditionsMet[j] = true;
 								condmet = true;
@@ -311,7 +311,7 @@ bool CAccount::meetsConditions( CString pAccount, CString conditions )
 						if ( val.isNumber() )
 						{
 							double vNum[2] = { atof( val.text() ), atof( cvalue.text() ) };
-							if ( ((cond_num == 3) ? (vNum[0] < vNum[1]) : (vNum[0] > vNum[1])) )
+							if ( ((cond_num == 5) ? (vNum[0] < vNum[1]) : (vNum[0] > vNum[1])) )
 							{
 								conditionsMet[j] = true;
 								condmet = true;
@@ -320,7 +320,7 @@ bool CAccount::meetsConditions( CString pAccount, CString conditions )
 						else
 						{
 							int ret = strcmp( val.text(), cvalue.text() );
-							if ( ((cond_num == 3) ? (ret < 0) : (ret > 0)) )
+							if ( ((cond_num == 5) ? (ret < 0) : (ret > 0)) )
 							{
 								conditionsMet[j] = true;
 								condmet = true;
