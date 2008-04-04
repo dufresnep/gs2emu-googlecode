@@ -58,6 +58,8 @@ Fixes:
   from being sent to clients.
 - Spaces in the 'Conditions' field when searching for accounts won't
   break the search anymore.
+- Fixed a level loading bug dealing with the word 'join' that was
+  inadvertently found by HandupOnYoHip.
 
 
 --------------------------------------------
