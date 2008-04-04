@@ -1558,9 +1558,9 @@ void CPlayer::sendFiles()
 		if(longName.length())
 		{
 			// Don't send default files!
-			if ( defaultGaniNames.find( CString(shortName) << ".gani" ) ||
-				defaultSwordNames.find( shortName ) ||
-				defaultShieldNames.find( shortName ) )
+			if ( defaultGaniNames.find( CString(shortName) << ".gani" ) != -1 ||
+				defaultSwordNames.find( shortName ) != -1 ||
+				defaultShieldNames.find( shortName ) != -1 )
 			{
 				//failed = true;
 			}
@@ -3959,7 +3959,7 @@ void CPlayer::msgDRCCHAT(CPacket& pPacket)
 			sendPacket(CPacket() << (char)DRCLOG << RCHelpMessage[i]);
 		}
 	}
-		else if (words[0] == "/find" && words.count() >= 2)
+	else if (words[0] == "/find" && words.count() >= 2)
 	{
 		words.remove(0);
 		CString search = words.join(" ");
