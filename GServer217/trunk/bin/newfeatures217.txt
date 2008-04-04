@@ -32,10 +32,6 @@ Additions:
   use the directory of the gserver instead of the world/ directory.
   For example: ./accounts/* will search for serverDIR/accounts/
   For example: accounts/* will search for serverDIR/world/accounts/
-- The default ganis, swords, and shields will not be sent to clients
-  if they exist on the server in an altered form.  This protects
-  clients from receiving bad and/or altered files from malicious or
-  misconfigured servers.
 - You can now use the =, >, >=, <, <=, and != conditionals when
   searching for accounts.  Also, searching for numbers has been
   improved.
@@ -58,6 +54,10 @@ Fixes:
   new configuration without requiring the server to be restarted.
 - Fixed some bugs in the account searching code that could potentially
   return incorrect results.
+- The default ganis, swords, and shields will now properly be prevented
+  from being sent to clients.
+- Spaces in the 'Conditions' field when searching for accounts won't
+  break the search anymore.
 
 
 --------------------------------------------

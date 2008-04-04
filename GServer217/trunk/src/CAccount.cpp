@@ -253,6 +253,8 @@ bool CAccount::meetsConditions( CString pAccount, CString conditions )
 
 			CString cname = cond[j].readString( conditional[cond_num] );
 			CString cvalue = cond[j].readString( "" );
+			cname.trim();
+			cvalue.trim();
 			cond[j].setRead(0);
 
 			// Now, do a case-insensitive comparison of the section name.
