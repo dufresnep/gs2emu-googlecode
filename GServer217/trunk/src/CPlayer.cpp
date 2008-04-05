@@ -1479,8 +1479,10 @@ void CPlayer::leaveLevel()
 	{
 		CPlayer* other = (CPlayer*)level->players[i];
 		other->sendPacket(otherProps);
+		other->compressAndSend();
 		sendPacket(CPacket() << (char)OTHERPLPROPS << (short)other->id << (char)50 << (char)0);
 	}
+	compressAndSend();
 
 	// Remember when the player last visited the level.
 	enteredLevels.add(new CEnteredLevel(level, getSysTime()));
