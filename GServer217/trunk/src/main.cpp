@@ -36,7 +36,7 @@ typedef void (*sighandler_t)(int);
 bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, hasShutdown = false, lsConnected = false, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, staffOnly, vasesDrop, warptoforall, defaultweapons;
 bool clientsidePushPull, detailedconsole, underconstruction, baddyDropItems, noFoldersConfig;
 char fSep[] = "/";
-const char* __admin[]   = {"description", "detailedconsole", "language", "listport", "listip", "maxplayers", "myip", "name", "serverport", "sharefolder", "showconsolepackets", "underconstruction", "url", "worldname"};
+const char* __admin[]   = {"description", "detailedconsole", "language", "listport", "listip", "maxplayers", "myip", "name", "nofoldersconfig", "serverport", "sharefolder", "showconsolepackets", "underconstruction", "url", "worldname"};
 const char* __colours[] = {"white", "yellow", "orange", "pink", "red", "darkred", "lightgreen", "green", "darkgreen", "lightblue", "blue", "darkblue", "brown", "cynober", "purple", "darkpurple", "lightgray", "gray", "black", "transparent"};
 const char* __cloths[]  = {"setskin", "setcoat", "setsleeve", "setshoe", "setbelt", "setsleeves", "setshoes"};
 const char* __defaultgani[] = {"carried","carry","carrystill","carrypeople","dead","def","ghostani","grab","gralats","hatoff","haton","hidden","hiddenstill","hurt","idle","kick","lava","lift","maps1","maps2","maps3","pull","push","ride","rideeat","ridefire","ridehurt","ridejump","ridestill","ridesword","shoot","sit","skip","sleep","spin","swim","sword","walk","walkslow"};
@@ -110,8 +110,17 @@ int main(int argc, char *argv[])
 	defaultSwordNames.load( __defaultsword, sizeof(__defaultsword) / sizeof(const char*) );
 	defaultShieldNames.load( __defaultshield, sizeof(__defaultshield) / sizeof(const char*) );
 	playerIds.add(0);
+	playerIds.add(0);
 	npcIds.add(0);
 	srand((int)time(NULL));
+
+	/* Load Important Files */
+	updateFile("rchelp.txt");
+	updateFile("rcmessage.txt");
+	updateFile("rules.txt");
+	updateFile("serverflags.txt");
+	updateFile("servermessage.html");
+	updateFile("foldersconfig.txt");
 
 	/* Load Settings */
 	if (!loadSettings("serveroptions.txt"))
@@ -136,20 +145,7 @@ int main(int argc, char *argv[])
 		errorOut("errorlog.txt", CString() << "SOCK ERROR: Unable to listen on port: " << toString(serverPort));
 		return 1;
 	}
-
 	serverSock.setSync(false);
-
-	/* Load Important Files */
-	updateFile("rchelp.txt");
-	updateFile("rcmessage.txt");
-	updateFile("rules.txt");
-	updateFile("serverflags.txt");
-	updateFile("servermessage.html");
-	updateFile("foldersconfig.txt");
-
-	/* Load Maps */
-	for(int i = 0; i < mapNames.count(); i++)
-		CMap::openMap(mapNames[i].trim());
 
 	/* Server Finished Loading */
 	printf("GServer 2 by 39ster\nSpecial thanks to Marlon, Agret, Pac300, 39ster and others for porting the \noriginal 1.39 gserver to 2.1\nServer listening on port: %i\nServer version: Build %s\n\n", serverPort, listServerFields[3].text());
@@ -450,6 +446,13 @@ bool loadSettings(char* pFile)
 	if ( underconstruction && !listServerFields[0].match( "U *" ) )
 		listServerFields[0] = CBuffer() << "U " << listServerFields[0];
 
+	/* Load Maps */
+	for(int i = 0; i < CMap::mapList.count(); i++)
+		delete((CMap*)CMap::mapList[i]);
+	CMap::mapList.clear();
+	for(int i = 0; i < mapNames.count(); i++)
+		CMap::openMap(mapNames[i].trim());
+
 	return true;
 }
 
@@ -738,7 +741,7 @@ int getFileSize(char* pFile)
 
 int createPlayerId(CPlayer* pPlayer)
 {
-	for(int i = 1; i < playerIds.count(); i++)
+	for(int i = 2; i < playerIds.count(); i++)
 	{
 		if(playerIds[i] == NULL)
 		{

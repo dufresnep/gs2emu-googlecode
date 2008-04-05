@@ -22,10 +22,11 @@ Additions:
   foldersconfig.txt; however, if the gani location isn't in
   foldersconfig.txt, the gani won't be sent to the player.
 - Added new boolean server option, nofoldersconfig.  If set to true, it
-  will disable the foldersconfig.txt file.  Keep in mind that if you
-  disable it, people will be able to do stuff like:
-  sethead myminimap.png
-- Implemented spar rating.
+  will disable the foldersconfig.txt file.  It can only be changed by
+  people who have the "change staff accounts" right.  Keep in mind that
+  if you disable it, people will be able to do stuff like:
+  sethead flash-sword.png
+- Implemented spar rating.  It uses the glicko formula.
 - A player's spar rating is now saved to their account.  Also, all new
   players will also start with a rating of 1500/350 instead of 0/50.
 - If you start a directory in foldersconfig.txt with a ./ then it will
@@ -37,7 +38,7 @@ Additions:
   improved.
 
 Fixes:
-- Server now properly shuts down.
+- The server now properly shuts down when you hit CTRL+C.
 - RC can now correctly reset broken accounts.
 - Players won't get disconnected for inactivity for no reason anymore.
 - Fixed the spar rating player prop.  It was previously being sent as a
@@ -61,8 +62,12 @@ Fixes:
 - Fixed a level loading bug dealing with the word 'join' that was
   inadvertently found by HandupOnYoHip.
 - The "maps" option in serveroptions.txt works properly again.  Set it
-  to your bigmap.txt type level list to view players moving in
-  adjacent levels.
+  to your bigmap.txt type level list to view players moving and talking
+  in adjacent levels.
+- Fixed the annoying bug where when you logged into the server your
+  head on the minimap would be "linked" to the head of the first person
+  on the server.  When that happened, changing your head would also
+  change the look of their head on the minimap.
 
 
 --------------------------------------------
