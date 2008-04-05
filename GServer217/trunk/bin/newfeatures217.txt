@@ -60,6 +60,9 @@ Fixes:
   break the search anymore.
 - Fixed a level loading bug dealing with the word 'join' that was
   inadvertently found by HandupOnYoHip.
+- The "maps" option in serveroptions.txt works properly again.  Set it
+  to your bigmap.txt type level list to view players moving in
+  adjacent levels.
 
 
 --------------------------------------------

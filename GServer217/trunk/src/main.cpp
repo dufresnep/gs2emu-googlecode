@@ -139,10 +139,6 @@ int main(int argc, char *argv[])
 
 	serverSock.setSync(false);
 
-	/* Load Maps */
-	for(int i = 0; i < mapNames.count(); i++)
-		CMap::openMap(mapNames[i].trim());
-
 	/* Load Important Files */
 	updateFile("rchelp.txt");
 	updateFile("rcmessage.txt");
@@ -150,6 +146,10 @@ int main(int argc, char *argv[])
 	updateFile("serverflags.txt");
 	updateFile("servermessage.html");
 	updateFile("foldersconfig.txt");
+
+	/* Load Maps */
+	for(int i = 0; i < mapNames.count(); i++)
+		CMap::openMap(mapNames[i].trim());
 
 	/* Server Finished Loading */
 	printf("GServer 2 by 39ster\nSpecial thanks to Marlon, Agret, Pac300, 39ster and others for porting the \noriginal 1.39 gserver to 2.1\nServer listening on port: %i\nServer version: Build %s\n\n", serverPort, listServerFields[3].text());
