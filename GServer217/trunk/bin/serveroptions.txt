@@ -22,7 +22,6 @@ horselifetime = 10
 jaillevels = police2.graal,police4.graal
 maps = newmainmap.txt
 noexplosions = false
-nofoldersconfig = false
 normaladminscanchangegralats = true
 playerlisticons = Online,Away,DND,Eating,Hiding,No PMs,RPing,Sparring,PKing
 profilevars = Kills:=playerkills,Deaths:=playerdeaths,Maxpower:=playerfullhearts,Rating:=playerrating,Alignment:=playerap,Gralat:=playerrupees,Swordpower:=playerswordpower,Spin Attack:=canspin
@@ -52,6 +51,7 @@ listip = listserver.graal.in
 maxplayers = 128
 myip = AUTO
 name = My Server
+nofoldersconfig = false
 serverport = 14802
 sharefolder = 
 showconsolepackets = false
