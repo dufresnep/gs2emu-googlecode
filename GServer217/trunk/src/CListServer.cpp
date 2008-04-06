@@ -194,12 +194,12 @@ void ListServer_Main()
 				profile << (char)player2->accountName.length() << player2->accountName << line.readString("");
 
 				int time = player2->onlineSecs;
-				CString line;
+				CString line2;
 				//Online time
-				line << toString((int)time/3600) << " hrs ";
-				line << toString((int)(time/60)%60) << " mins ";
-				line << toString((int)time%60) << " secs";
-				profile << (char)line.length() << line;
+				line2 << toString((int)time/3600) << " hrs ";
+				line2 << toString((int)(time/60)%60) << " mins ";
+				line2 << toString((int)time%60) << " secs";
+				profile << (char)line2.length() << line2;
 
 				for (int i = 0; i < profileList.count(); i++)
 				{

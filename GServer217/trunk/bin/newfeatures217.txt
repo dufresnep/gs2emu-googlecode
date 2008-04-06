@@ -69,6 +69,12 @@ Fixes:
   on the server.  When that happened, changing your head would also
   change the look of their head on the minimap.
 - Fixed a nasty update level bug.
+- Potentially fixed profiles screwing up.
+- Messing around with NPC props again.
+- Flowers should properly animate when you join a cached level.
+- Changing NPC props, adding/removing bombs, adding/removing horses,
+  arrows, horse fire attacks, adding/removing items, and changing baddy
+  props should now be sent to everyone in levels adjacent to you.
 
 
 --------------------------------------------

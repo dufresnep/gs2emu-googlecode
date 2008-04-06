@@ -56,7 +56,7 @@ CPacket CNpc::getPropertyList(time_t newTime)
 	CPacket retVal;
 	for ( int i = 0; i < npcpropcount; i++ )
 	{
-		if ( modTime[i] >= newTime && modTime[i] > 0 )
+		if ( modTime[i] != newTime )// && modTime[i] > 0 )
 			retVal << (char)i << getProperty(i);
 	}
 	return retVal;

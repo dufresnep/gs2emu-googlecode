@@ -33,7 +33,7 @@ pt2func CPlayer::msgFuncs[] = {
 			&CPlayer::msgTAKEEXTRA,&CPlayer::msgADDWEAPON2,
 			&CPlayer::msgUPDATEFILE,&CPlayer::msgOUTTERMAP,
 			&CPlayer::msgEMPTY36,&CPlayer::msgLANGUAGE,
-			&CPlayer::msgTRIGGERACTION,&CPlayer::msgEMPTY39,
+			&CPlayer::msgTRIGGERACTION,&CPlayer::msgMAPINFO,
 			&CPlayer::msgCSHOOT,&CPlayer::msgEMPTY41,
 			&CPlayer::msgEMPTY42,&CPlayer::msgEMPTY43,
 			&CPlayer::msgSLISTPROCESSES,&CPlayer::msgEMPTY45,
@@ -2589,8 +2589,16 @@ void CPlayer::msgOUTTERMAP(CPacket& pPacket)
 	if (outterLevel == NOLEVEL)
 		return;
 
+	bool alreadyVisited = false;
+	for (int i = 0; i < enteredLevels.count(); i++)
+	{
+		CEnteredLevel* entered = (CEnteredLevel*)enteredLevels[i];
+		if ( entered->level == outterLevel )
+			alreadyVisited = true;
+	}
+
 	sendPacket(CPacket() << (char)LEVELNAME << mapName);
-	if (modTime != outterLevel->modTime)
+	if ((modTime != outterLevel->modTime) || alreadyVisited == false)
 	{
 		sendPacket(CPacket() << (char)100 << (int)(1+(64*64*2)+1));
 		packet.clear();
@@ -2661,12 +2669,7 @@ void CPlayer::msgNPCPROPS(CPacket& pPacket)
 		return;
 
 	packet << (char)SNPCPROPS << pPacket.text() + 1;
-	for (int i = 0; i < level->players.count(); i++)
-	{
-		CPlayer* other = (CPlayer*)level->players[i];
-		if (other != this)
-			other->sendPacket(packet);
-	}
+	sendLocally( packet );
 	npc->setProps(pPacket);
 }
 
@@ -2675,24 +2678,14 @@ void CPlayer::msgADDBOMB(CPacket& pPacket)
 	if ( id == -1 ) return;
 	CPacket bombData;
 	bombData << (char)SADDBOMB << (short)id << pPacket.text() + 1;
-	for (int i = 0; i < level->players.count(); i++)
-	{
-		CPlayer* other = (CPlayer*)level->players[i];
-		if (other != this)
-			other->sendPacket(bombData);
-	}
+	sendLocally( bombData );
 }
 
 void CPlayer::msgDELBOMB(CPacket& pPacket)
 {
 	CPacket bombData;
 	bombData << (char)SDELBOMB << pPacket.text()+1;
-	for (int i = 0; i < level->players.count(); i++)
-	{
-		CPlayer* other = (CPlayer*)level->players[i];
-		if (other != this)
-			other->sendPacket(bombData);
-	}
+	sendLocally( bombData );
 }
 
 void CPlayer::msgTOALLMSG(CPacket& pPacket)
@@ -2717,12 +2710,7 @@ void CPlayer::msgADDHORSE(CPacket& pPacket)
 {
 	CPacket horseData;
 	horseData << (char)SADDHORSE << pPacket.text() + 1;
-	for (int i = 0; i < level->players.count(); i++)
-	{
-		CPlayer* other = (CPlayer*)level->players[i];
-		if (other != this)
-			other->sendPacket(horseData);
-	}
+	sendLocally( horseData );
 
 	float hX = (float)(pPacket.readByte1())/2;
 	float hY = (float)(pPacket.readByte1())/2;
@@ -2734,12 +2722,7 @@ void CPlayer::msgDELHORSE(CPacket& pPacket)
 {
 	CPacket horseData;
 	horseData << (char)SDELHORSE << pPacket.text() + 1;
-	for (int i = 0; i < level->players.count(); i++)
-	{
-		CPlayer* other = (CPlayer*)level->players[i];
-		if (other != this)
-			other->sendPacket(horseData);
-	}
+	sendLocally( horseData );
 
 	float hX = (float)(pPacket.readByte1()/2);
 	float hY = (float)(pPacket.readByte1()/2);
@@ -2750,13 +2733,8 @@ void CPlayer::msgADDARROW(CPacket& pPacket)
 	if ( id == -1 ) return;
 
 	CPacket arrowData;
-	arrowData << (char)SADDARROW<< (short)id << pPacket.text() + 1;
-	for (int i = 0; i < level->players.count(); i++)
-	{
-		CPlayer* other = (CPlayer*)level->players[i];
-		if (other != this)
-			other->sendPacket(arrowData);
-	}
+	arrowData << (char)SADDARROW << (short)id << pPacket.text() + 1;
+	sendLocally( arrowData );
 }
 
 void CPlayer::msgFIRESPY(CPacket& pPacket)
@@ -2765,12 +2743,7 @@ void CPlayer::msgFIRESPY(CPacket& pPacket)
 
 	CPacket fireData;
 	fireData << (char)SFIRESPY << (short)id << pPacket.text() + 1;
-	for (int i = 0; i < level->players.count(); i++)
-	{
-		CPlayer* other = (CPlayer*)level->players[i];
-		if (other != this)
-			other->sendPacket(fireData);
-	}
+	sendLocally( fireData );
 }
 void CPlayer::msgCARRYTHROWN(CPacket& pPacket)
 {
@@ -2786,24 +2759,14 @@ void CPlayer::msgADDEXTRA(CPacket& pPacket)
 	level->items.add(new CItem(iX, iY, item));
 	packet << (char)SADDEXTRA << pPacket.text() +1;
 
-	for (int i = 0; i < level->players.count(); i++)
-	{
-		CPlayer* other = (CPlayer*)level->players[i];
-		if (other != this)
-			other->sendPacket(packet);
-	}
+	sendLocally( packet );
 }
 void CPlayer::msgTAKEEXTRA(CPacket& pPacket)
 {
 	CPacket packet;
 
 	packet << (char)SDELEXTRA << pPacket.text() +1;
-	for (int i = 0; i < level->players.count(); i++)
-	{
-		CPlayer* other = (CPlayer*)level->players[i];
-		if (other != this)
-			other->sendPacket(packet);
-	}
+	sendLocally( packet );
 
 	float iX = ((float)pPacket.readByte1())/2;
 	float iY = ((float)pPacket.readByte1())/2;
@@ -2893,9 +2856,10 @@ void CPlayer::msgBADDYPROPS(CPacket& pPacket)
 	if (baddy == NULL)
 		return;
 	CPacket baddyProps;
+	CPacket packet;
 	baddyProps << pPacket.text()+2;
-	for (int i = 1; i < level->players.count(); i++)
-		((CPlayer*)level->players[i])->sendPacket(CPacket() << (char) SBADDYPROPS << (char)baddy->id << baddyProps);
+	packet << (char)SBADDYPROPS << (char)baddy->id << baddyProps;
+	sendLocally( packet );
 	baddy->setProps(baddyProps);
 
 }
@@ -2928,9 +2892,7 @@ void CPlayer::msgADDBADDY(CPacket& pPacket)
 
 	CPacket baddyProps;
 	baddyProps << (char)SBADDYPROPS << (char)baddy->id << baddy->getPropList();
-	for (int i = 0; i < level->players.count(); i++)
-		((CPlayer*)level->players[i])->sendPacket(baddyProps);
-
+	sendLocally( baddyProps );
 }
 
 void CPlayer::msgSETFLAG(CPacket& pPacket)
@@ -3293,9 +3255,9 @@ void CPlayer::msgTRIGGERACTION(CPacket& pPacket)
 	}
 }
 
-void CPlayer::msgEMPTY39(CPacket& pPacket)
+void CPlayer::msgMAPINFO(CPacket& pPacket)
 {
-	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY39:\r\n" << pPacket.text(), false );
+	errorOut( "debuglog.txt", CString() << accountName << " sent packet MAPINFO:\r\n" << pPacket.text(), false );
 }
 
 void CPlayer::msgCSHOOT(CPacket& pPacket)
@@ -3303,12 +3265,7 @@ void CPlayer::msgCSHOOT(CPacket& pPacket)
 	if ( id == -1 ) return;
 	CPacket packet;
 	packet << (char)SSHOOT << (short)id << pPacket.text() + 1;
-	for(int i = 0; i < level->players.count(); i++)
-	{
-		CPlayer* other = (CPlayer*)level->players[i];
-		if(other != this)
-			other->sendPacket(packet);
-	}
+	sendLocally( packet );
 }
 
 void CPlayer::msgEMPTY41(CPacket& pPacket)
