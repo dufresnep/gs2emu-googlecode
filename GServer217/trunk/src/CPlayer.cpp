@@ -2678,14 +2678,24 @@ void CPlayer::msgADDBOMB(CPacket& pPacket)
 	if ( id == -1 ) return;
 	CPacket bombData;
 	bombData << (char)SADDBOMB << (short)id << pPacket.text() + 1;
-	sendLocally( bombData );
+	for (int i = 0; i < level->players.count(); i++)
+	{
+		CPlayer* other = (CPlayer*)level->players[i];
+		if (other != this)
+			other->sendPacket(bombData);
+	}
 }
 
 void CPlayer::msgDELBOMB(CPacket& pPacket)
 {
 	CPacket bombData;
 	bombData << (char)SDELBOMB << pPacket.text()+1;
-	sendLocally( bombData );
+	for (int i = 0; i < level->players.count(); i++)
+	{
+		CPlayer* other = (CPlayer*)level->players[i];
+		if (other != this)
+			other->sendPacket(bombData);
+	}
 }
 
 void CPlayer::msgTOALLMSG(CPacket& pPacket)
@@ -2710,7 +2720,12 @@ void CPlayer::msgADDHORSE(CPacket& pPacket)
 {
 	CPacket horseData;
 	horseData << (char)SADDHORSE << pPacket.text() + 1;
-	sendLocally( horseData );
+	for (int i = 0; i < level->players.count(); i++)
+	{
+		CPlayer* other = (CPlayer*)level->players[i];
+		if (other != this)
+			other->sendPacket(horseData);
+	}
 
 	float hX = (float)(pPacket.readByte1())/2;
 	float hY = (float)(pPacket.readByte1())/2;
@@ -2722,7 +2737,12 @@ void CPlayer::msgDELHORSE(CPacket& pPacket)
 {
 	CPacket horseData;
 	horseData << (char)SDELHORSE << pPacket.text() + 1;
-	sendLocally( horseData );
+	for (int i = 0; i < level->players.count(); i++)
+	{
+		CPlayer* other = (CPlayer*)level->players[i];
+		if (other != this)
+			other->sendPacket(horseData);
+	}
 
 	float hX = (float)(pPacket.readByte1()/2);
 	float hY = (float)(pPacket.readByte1()/2);
@@ -2733,8 +2753,13 @@ void CPlayer::msgADDARROW(CPacket& pPacket)
 	if ( id == -1 ) return;
 
 	CPacket arrowData;
-	arrowData << (char)SADDARROW << (short)id << pPacket.text() + 1;
-	sendLocally( arrowData );
+	arrowData << (char)SADDARROW<< (short)id << pPacket.text() + 1;
+	for (int i = 0; i < level->players.count(); i++)
+	{
+		CPlayer* other = (CPlayer*)level->players[i];
+		if (other != this)
+			other->sendPacket(arrowData);
+	}
 }
 
 void CPlayer::msgFIRESPY(CPacket& pPacket)
@@ -2759,14 +2784,24 @@ void CPlayer::msgADDEXTRA(CPacket& pPacket)
 	level->items.add(new CItem(iX, iY, item));
 	packet << (char)SADDEXTRA << pPacket.text() +1;
 
-	sendLocally( packet );
+	for (int i = 0; i < level->players.count(); i++)
+	{
+		CPlayer* other = (CPlayer*)level->players[i];
+		if (other != this)
+			other->sendPacket(packet);
+	}
 }
 void CPlayer::msgTAKEEXTRA(CPacket& pPacket)
 {
 	CPacket packet;
 
 	packet << (char)SDELEXTRA << pPacket.text() +1;
-	sendLocally( packet );
+	for (int i = 0; i < level->players.count(); i++)
+	{
+		CPlayer* other = (CPlayer*)level->players[i];
+		if (other != this)
+			other->sendPacket(packet);
+	}
 
 	float iX = ((float)pPacket.readByte1())/2;
 	float iY = ((float)pPacket.readByte1())/2;
@@ -2856,10 +2891,9 @@ void CPlayer::msgBADDYPROPS(CPacket& pPacket)
 	if (baddy == NULL)
 		return;
 	CPacket baddyProps;
-	CPacket packet;
 	baddyProps << pPacket.text()+2;
-	packet << (char)SBADDYPROPS << (char)baddy->id << baddyProps;
-	sendLocally( packet );
+	for (int i = 1; i < level->players.count(); i++)
+		((CPlayer*)level->players[i])->sendPacket(CPacket() << (char) SBADDYPROPS << (char)baddy->id << baddyProps);
 	baddy->setProps(baddyProps);
 
 }
@@ -2892,7 +2926,9 @@ void CPlayer::msgADDBADDY(CPacket& pPacket)
 
 	CPacket baddyProps;
 	baddyProps << (char)SBADDYPROPS << (char)baddy->id << baddy->getPropList();
-	sendLocally( baddyProps );
+	for (int i = 0; i < level->players.count(); i++)
+		((CPlayer*)level->players[i])->sendPacket(baddyProps);
+
 }
 
 void CPlayer::msgSETFLAG(CPacket& pPacket)
@@ -3265,7 +3301,12 @@ void CPlayer::msgCSHOOT(CPacket& pPacket)
 	if ( id == -1 ) return;
 	CPacket packet;
 	packet << (char)SSHOOT << (short)id << pPacket.text() + 1;
-	sendLocally( packet );
+	for(int i = 0; i < level->players.count(); i++)
+	{
+		CPlayer* other = (CPlayer*)level->players[i];
+		if(other != this)
+			other->sendPacket(packet);
+	}
 }
 
 void CPlayer::msgEMPTY41(CPacket& pPacket)

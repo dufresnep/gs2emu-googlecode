@@ -70,9 +70,8 @@ Fixes:
   change the look of their head on the minimap.
 - Fixed a nasty update level bug.
 - Flowers should properly animate when you join a cached level.
-- Changing NPC props, adding/removing bombs, adding/removing horses,
-  arrows, horse fire attacks, adding/removing items, and changing baddy
-  props should now be sent to everyone in levels adjacent to you.
+- Changing NPC props and horse fire attacks should now be sent to
+  everyone in levels adjacent to you.
 
 
 --------------------------------------------
