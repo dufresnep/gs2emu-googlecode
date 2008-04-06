@@ -683,7 +683,7 @@ void CLevel::updateLevel(CString& pFileName)
 	for ( int i = 0; i < playerList.count(); ++i )
 	{
 		CPlayer* player = (CPlayer*)playerList[i];
-		for ( int j = player->enteredLevels.count() - 1; j >= 0; ++j )
+		for ( int j = player->enteredLevels.count() - 1; j >= 0; --j )
 		{
 			CEnteredLevel* entered = (CEnteredLevel*)player->enteredLevels[j];
 			if ( entered == 0 || entered->level == level )
