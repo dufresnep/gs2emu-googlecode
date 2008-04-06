@@ -438,7 +438,7 @@ class CPlayer : public CAccount
 		void msgEMPTY36(CPacket&);
 		void msgLANGUAGE(CPacket&);
 		void msgTRIGGERACTION(CPacket&);
-		void msgEMPTY39(CPacket&);
+		void msgMAPINFO(CPacket&);
 		void msgCSHOOT(CPacket&);
 		void msgEMPTY41(CPacket&);
 		void msgEMPTY42(CPacket&);
