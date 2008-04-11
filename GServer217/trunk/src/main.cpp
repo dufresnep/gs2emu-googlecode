@@ -453,6 +453,24 @@ bool loadSettings(char* pFile)
 	for(int i = 0; i < mapNames.count(); i++)
 		CMap::openMap(mapNames[i].trim());
 
+	// Now fix all the levels.
+	for ( int i = 0; i < levelList.count(); ++i )
+	{
+		CLevel* level = (CLevel*)levelList[i];
+
+		//Find our map id
+		level->map = 0;
+		for ( int j = 0; j < CMap::mapList.count(); ++j )
+		{
+			CMap* m = (CMap*)CMap::mapList[j];
+			if ( (level->levelIndex = m->getLevelpos(level->fileName)) >= 0 )
+			{
+				level->map = m;
+				break;
+			}
+		}
+	}
+
 	return true;
 }
 
