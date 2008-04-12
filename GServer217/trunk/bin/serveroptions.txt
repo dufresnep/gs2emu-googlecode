@@ -25,6 +25,10 @@ normaladminscanchangegralats = true
 # These guilds appear in the "Staff" section of the player list.
 staffguilds = Server,Manager,Owner,Admin,FAQ,LAT,NAT,GAT,GP,GP Chief,Bugs Admin,NPC Admin,Gani Team,GFX Admin,Events Team,Events Admin,Guild Admin
 
+# Accounts which are recognized by the server as staff.  To be allowed access to RC, your account must be here.
+# (Manager) and the like are just placeholders to organize the list.  They are not guilds.
+staff = (Manager),YOURACCOUNT
+
 # Enables/disables item dropping from various sources.
 # bushitems also affects certain tiles other than bushes.
 # tiledroprate affects bushitems only.
@@ -77,10 +81,6 @@ shieldlimit = 3
 # Enables or disables the putnpc script command.
 putnpcenabled = true
 
-# Accounts which are recognized by the server as staff.  To be allowed access to RC, your account must be here.
-# (Manager) and the like are just placeholders to organize the list.  They are not guilds.
-staff = (Manager),YOURACCOUNT
-
 # If true, disable the ability.
 dontchangekills = false
 dontaddserverflags = false
@@ -129,15 +129,15 @@ sharefolder =
 # Sets the language.  Currently not implemented.
 language = English
 
-# Specifies the location of the list server.
-# DON'T CHANGE IF YOU DON'T KNOW WHAT YOU ARE DOING.
-listip = listserver.graal.in
-listport = 14900
-
 # The information of the computer hosting the gserver.  This gets sent to people wanting to connect.
 # If myip is set to AUTO, it uses the IP address exposed to the list server.
 myip = AUTO
 serverport = 14802
+
+# Specifies the location of the list server.
+# DON'T CHANGE IF YOU DON'T KNOW WHAT YOU ARE DOING.
+listip = listserver.graal.in
+listport = 14900
 
 # Console settings.
 detailedconsole = false
