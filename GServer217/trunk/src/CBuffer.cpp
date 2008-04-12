@@ -630,8 +630,6 @@ CBuffer& CBuffer::untokenize()
 	CBuffer nData( data );
 	nData.trim();
 
-printf( "%s\n", nData );
-
 	// Check to see if it starts with a quotation mark.  If not, set pos[1] to 0.
 	if ( nData[0] != '\"' ) pos[1] = 0;
 
@@ -675,6 +673,7 @@ printf( "%s\n", nData );
 
 		// Check if the string is valid and if it is, copy it.
 		t2.replaceAll( "\"\"", "\"" );
+		t2.replaceAll( "''", "'" );
 		t2.removeAll( "\n" );
 		t2.removeAll( "\r" );
 
