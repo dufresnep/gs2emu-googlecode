@@ -35,8 +35,10 @@ typedef void (*sighandler_t)(int);
 
 bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, hasShutdown = false, lsConnected = false, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, staffOnly, vasesDrop, warptoforall, defaultweapons;
 bool clientsidePushPull, detailedconsole, underconstruction, baddyDropItems, noFoldersConfig;
+bool healswords, putnpcenabled, adminCanChangeGralat;
+int mindeathgralats, maxdeathgralats, tiledroprate;
 char fSep[] = "/";
-const char* __admin[]   = {"description", "detailedconsole", "language", "listport", "listip", "maxplayers", "myip", "name", "nofoldersconfig", "serverport", "sharefolder", "showconsolepackets", "underconstruction", "url", "worldname"};
+const char* __admin[]   = {"description", "detailedconsole", "language", "listport", "listip", "maxplayers", "myip", "name", "nofoldersconfig", "onlystaff", "serverport", "sharefolder", "showconsolepackets", "underconstruction", "url", "worldname"};
 const char* __colours[] = {"white", "yellow", "orange", "pink", "red", "darkred", "lightgreen", "green", "darkgreen", "lightblue", "blue", "darkblue", "brown", "cynober", "purple", "darkpurple", "lightgray", "gray", "black", "transparent"};
 const char* __cloths[]  = {"setskin", "setcoat", "setsleeve", "setshoe", "setbelt", "setsleeves", "setshoes"};
 const char* __defaultgani[] = {"carried","carry","carrystill","carrypeople","dead","def","ghostani","grab","gralats","hatoff","haton","hidden","hiddenstill","hurt","idle","kick","lava","lift","maps1","maps2","maps3","pull","push","ride","rideeat","ridefire","ridehurt","ridejump","ridestill","ridesword","shoot","sit","skip","sleep","spin","swim","sword","walk","walkslow"};
@@ -385,7 +387,7 @@ bool loadSettings(char* pFile)
 
 	/* BOOL Server-Options */
 	apSystem = CHECK_BOOL(findKey("apsystem", "true"));
-	baddyDropItems = CHECK_BOOL(findKey("baddydropitems", "false"));
+	baddyDropItems = CHECK_BOOL(findKey("baddyitems", "false"));
 	bushesDrop = CHECK_BOOL(findKey("bushitems", "true"));
 	cheatwindowsban = CHECK_BOOL(findKey("cheatwindowsban", "false"));
 	clientsidePushPull = CHECK_BOOL(findKey("clientsidepushpull", "true"));
@@ -395,15 +397,18 @@ bool loadSettings(char* pFile)
 	dontchangekills = CHECK_BOOL(findKey("dontchangekills", "false"));
 	dropItemsDead = CHECK_BOOL(findKey("dropitemsdead", "true"));
 	globalGuilds = CHECK_BOOL(findKey("globalguilds", "true"));
+	healswords = CHECK_BOOL(findKey("healswords", "false"));
 	idleDisconnect = CHECK_BOOL(findKey("disconnectifnotmoved", "true"));
 	noExplosions = CHECK_BOOL(findKey("noexplosions", "false"));
 	noFoldersConfig = CHECK_BOOL(findKey("nofoldersconfig", "false"));
+	putnpcenabled = CHECK_BOOL(findKey("putnpcenabled", "true"));
+	adminCanChangeGralat = CHECK_BOOL(findKey("normaladminscanchangegralats", "true"));
 	setbodyallowed = CHECK_BOOL(findKey("setbodyallowed", "true"));
 	setheadallowed = CHECK_BOOL(findKey("setheadallowed", "true"));
 	setswordallowed = CHECK_BOOL(findKey("setswordallowed", "true"));
 	setshieldallowed = CHECK_BOOL(findKey("setshieldallowed", "true"));
 	showConsolePackets = CHECK_BOOL(findKey("showconsolepackets", "false"));
-	staffOnly = CHECK_BOOL(findKey("staffonly", "false"));
+	staffOnly = CHECK_BOOL(findKey("onlystaff", "false"));
 	underconstruction = CHECK_BOOL(findKey("underconstruction", "false"));
 	vasesDrop = CHECK_BOOL(findKey("vasesdrop", "true"));
 	warptoforall  = CHECK_BOOL(findKey("warptoforall", "false"));
@@ -422,10 +427,13 @@ bool loadSettings(char* pFile)
 	listServerPort = atoi(findKey("listport", "14900"));
 	maxNoMovement = atoi(findKey("maxnomovement", "1200"));
 	maxPlayers = atoi(findKey("maxplayers", "128"));
+	mindeathgralats = atoi(findKey("mindeathgralats","1"));
+	maxdeathgralats = atoi(findKey("maxdeathgralats","50"));
 	serverPort = atoi(findKey("serverport", "14802"));
 	shieldLimit = atoi(findKey("shieldlimit", "3"));
-	swordLimit = atoi(findKey("swordlimit", "4"));
-	tileRespawn = atoi(findKey("tilerespawn"));
+	swordLimit = CLIP(atoi(findKey("swordlimit", "4")), -25, 25);
+	tiledroprate = CLIP(atoi(findKey("tiledroprate", "50")), 0, 100);
+	tileRespawn = atoi(findKey("respawntime"));
 	unstickmeX = (float)atof(findKey("unstickmex", "30"));
 	unstickmeY = (float)atof(findKey("unstickmey", "30.5"));
 

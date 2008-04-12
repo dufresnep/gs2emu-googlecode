@@ -36,6 +36,28 @@ Additions:
 - You can now use the =, >, >=, <, <=, and != conditionals when
   searching for accounts.  Also, searching for numbers has been
   improved.
+- Renamed the following serveroptions.txt values to be more in line
+  with the official Graal server options:
+  tilerespawn -> respawntime
+  staffonly -> onlystaff
+  baddydropitems -> baddyitems
+- The onlystaff option in serveroptions.txt now requires the Change
+  Staff Accounts right.
+- The normaladminscanchangegralats, globalguilds, and
+  allowedglobalguilds server options now work.  If globalguilds is set
+  to false, only guilds listed in allowedglobalguilds will be allowed.
+- New death item dropping logic.  Use the new mindeathgralats and
+  maxdeathgralats options in serveroptions.txt to change how much money
+  is dropped.  mindeathgralats defaults to 1 while maxdeathgralats
+  defaults to 50.
+- New server option healswords.  If set to true, the gserver will allow
+  swords with a negative power.  It defaults to false.
+- New server option putnpcenabled.  If set to false, the gserver will
+  not allow new NPCs created by the putnpc scripting command.  It
+  defaults to true.
+- New server option tiledroprate.  It affects the rate that items drop
+  from tiles like bushes.  The value is a percentage from 0 to 100.  It
+  defaults to 50.
 
 Fixes:
 - The server now properly shuts down when you hit CTRL+C.
@@ -72,6 +94,11 @@ Fixes:
 - Flowers should properly animate when you join a cached level.
 - Changing NPC props and horse fire attacks should now be sent to
   everyone in levels adjacent to you.
+- Fixed the tokenizing code so blank lines are no longer eaten in RC.
+- Fixed a bug where RCs who didn't have the right to alter the
+  restricted options in serveroptions.txt could in fact end up altering
+  half of them.  Also improved the code involving the loading/setting
+  of server options through RC by limited rights admins.
 
 
 --------------------------------------------

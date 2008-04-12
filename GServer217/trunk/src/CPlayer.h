@@ -382,7 +382,7 @@ class CPlayer : public CAccount
 		void sendFiles();
 		time_t getLeavingTime(CLevel* pLevel);
 		CPacket getProp(int pProp);
-		void setProps(CPacket& pProps, bool pForward);
+		void setProps(CPacket& pProps, bool pForward, CPlayer* rc = 0);
 		void getItem(int pItem);
 		void sendLocally(CPacket& pPacket);
 		bool loadAccount();
@@ -392,7 +392,7 @@ class CPlayer : public CAccount
 		void sendAccount();
 		void processLogin(CPacket& pPacket);
 		CPacket getAccPropsRC();
-		void setAccPropsRc(CPacket& pPacket);
+		void setAccPropsRc(CPacket& pPacket, CPlayer* rc);
 
 		/* Helper-Functions */
 		void setBan(CBuffer &pReason, bool pBan, bool pAppend = true);

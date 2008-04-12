@@ -21,6 +21,8 @@
 
 extern bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, lsConnected, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, showQuery, staffOnly, vasesDrop, warptoforall, defaultweapons;
 extern bool clientsidePushPull, detailedconsole, underconstruction, baddyDropItems, noFoldersConfig;
+extern bool healswords, putnpcenabled, adminCanChangeGralat;
+extern int mindeathgralats, maxdeathgralats, tiledroprate;
 extern char fSep[];
 extern CLevel *NOLEVEL;
 extern CList newPlayers, playerList, playerIds, settingList, weaponList, npcList, npcIds, levelList;

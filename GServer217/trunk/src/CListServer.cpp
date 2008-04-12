@@ -110,7 +110,15 @@ void ListServer_Main()
 				if (player != NULL)
 				{
 					CString nick = line.readChars((unsigned char)line.readByte1());
-					player->setNick(nick, false);
+					CString guild = nick.copy( nick.findl( '(' ) ).remove( ")" );
+
+					if ( globalGuilds == false )
+					{
+						if ( globalGuildList.find( guild ) != -1 )
+							player->setNick(nick, false);
+					}
+					else
+						player->setNick(nick, false);
 				}
 
 				break;

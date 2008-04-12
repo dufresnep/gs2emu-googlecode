@@ -1171,14 +1171,14 @@ void CPlayer::setNick(CString& pNewNick, bool pVerifyGuild)
 }
 
 
-void CPlayer::setAccPropsRc(CPacket& pPacket)
+void CPlayer::setAccPropsRc(CPacket& pPacket, CPlayer* rc)
 {
 	CPacket props, temp;
 	//Skip playerworld
 	pPacket.readChars(pPacket.readByte1());
 	int len = (unsigned char)pPacket.readByte1();
 	props << pPacket.readChars(len);
-	setProps(props, true);
+	setProps(props, true, rc);
 	sendPacket(CPacket() <<(char)SPLAYERPROPS << props);
 
 	// Clear Flags + Weapons
@@ -1641,64 +1641,64 @@ void CPlayer::dropItems()
 	if(!dropItemsDead)
 		return;
 
-	for (int i = 0; i < 10; i ++)
+	// Remove gralats from the account.
+	int gralats = CLIP( rand() % maxdeathgralats, mindeathgralats, maxdeathgralats );
+	rubins -= gralats;
+	if ( rubins < 0 ) rubins = 0;
+	updateProp( RUPEESCOUNT );
+
+	// Drop the gralats.
+	while ( gralats > 0 )
 	{
-		int itemId = rand()%10;
-		bool valid = false;
-
-		switch (itemId)
+		int itemId = 0;
+		if ( gralats % 100 != gralats )
 		{
-			case GREENRUPEE:
-				if (rubins >= 1)
-				{
-					valid = true;
-					rubins--;
-					updateProp(RUPEESCOUNT);
-				}
-			break;
-
-			case BLUERUPEE:
-				if (rubins >= 5)
-				{
-					valid = true;
-					rubins -= 5;
-					updateProp(RUPEESCOUNT);
-				}
-			break;
-
-			case REDRUPEE:
-				if (rubins >= 30)
-				{
-					valid = true;
-					rubins -= 30;
-					updateProp(RUPEESCOUNT);
-				}
-			break;
-
-			case BOMBS:
-				if (bombs >= 5)
-				{
-					valid = true;
-					bombs -= 5;
-					updateProp(BOMBSCOUNT);
-				}
-			break;
-
-			case DARTS:
-				if (darts >= 5)
-				{
-					valid = true;
-					darts -= 5;
-					updateProp(ARROWSCOUNT);
-				}
-			break;
-
-			default:
-				continue;
+			gralats -= 100;
+			itemId = GOLDRUPEE;
+		}
+		if ( gralats % 30 != gralats )
+		{
+			gralats -= 30;
+			itemId = REDRUPEE;
+		}
+		else if ( gralats % 5 != gralats )
+		{
+			gralats -= 5;
+			itemId = BLUERUPEE;
+		}
+		else if ( gralats > 0 )
+		{
+			gralats--;
+			itemId = GREENRUPEE;
 		}
 
-		if (valid)
+		// Place the item on the level.
+		float pX = x + (rand()%7)-2;
+		float pY = y + (rand()%7)-2;
+		level->items.add(new CItem(pX, pY, itemId));
+
+		for (int ii = 0; ii < level->players.count(); ii++)
+			((CPlayer*)level->players[ii])->sendPacket(CPacket() << (char)SADDEXTRA << (char)(pX*2) << (char)(pY*2) << (char)itemId);
+	}
+
+	// Drop bombs/darts.
+	for ( int i = 0; i < 6; ++i )
+	{
+		int itemId = 0;
+		if ( rand() % 3 == 0 )	// 33% chance.
 		{
+			if ( i % 2 == 0 )
+			{
+				bombs -= 5;
+				itemId = BOMBS;
+			}
+			else
+			{
+				darts -= 5;
+				itemId = DARTS;
+			}
+
+			// Place the item on the level.
 			float pX = x + (rand()%7)-2;
 			float pY = y + (rand()%7)-2;
 			level->items.add(new CItem(pX, pY, itemId));
@@ -1707,6 +1707,8 @@ void CPlayer::dropItems()
 				((CPlayer*)level->players[ii])->sendPacket(CPacket() << (char)SADDEXTRA << (char)(pX*2) << (char)(pY*2) << (char)itemId);
 		}
 	}
+	updateProp(BOMBSCOUNT);
+	updateProp(ARROWSCOUNT);
 }
 
 CPacket CPlayer::getProp(int pProp)
@@ -1931,7 +1933,7 @@ CPacket CPlayer::getProp(int pProp)
 	return retVal;
 }
 
-void CPlayer::setProps(CPacket& pProps, bool pForward)
+void CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 {
 	int len;
 	CPacket forwardBuff;
@@ -1980,7 +1982,14 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 				break;
 			}
 			case RUPEESCOUNT:
-				rubins = CLIP(pProps.readByte3(), 0, 9999999);
+				if ( rc != 0 )
+				{
+					if ( adminCanChangeGralat == true || (rc->type == CLIENTRC && rc->hasStaff() && rc->hasRight(CANCHANGESTAFFACC)) )
+						rubins = CLIP(pProps.readByte3(), 0, 9999999);
+					else
+						pProps.readByte3();
+				}
+				else rubins = CLIP(pProps.readByte3(), 0, 9999999);
 				break;
 
 			case ARROWSCOUNT:
@@ -2003,54 +2012,44 @@ void CPlayer::setProps(CPacket& pProps, bool pForward)
 			case SWORDPOWER:
 			{
 				int sp = pProps.readByte1();
-				if(sp >= 30)
+				if ( sp <= 4 )
+					swordImage = CString() << "sword" << toString(sp) << ".png";
+				else
 				{
 					sp -= 30;
 					len = pProps.readByte1();
-					if(len >= 0)
+					if ( len >= 0 )
 					{
-						CString temp( pProps.readChars(len) );
-						if ( defaultSwordNames.find( temp ) != -1 )
-							swordImage = temp;
-						else
-						{
-							CString temp2( getDataFile( temp.text() ) );
-							if ( temp2.length() > 0 )
-								if ( noFoldersConfig || isValidFile( temp2, SWORDPOWER ) )
-									swordImage = temp;		// Not temp2
-						}
+						CString temp( pProps.readChars( len ) );
+						CString temp2( getDataFile( temp.text() ) );
+						if ( temp2.length() > 0 )
+							if ( noFoldersConfig || isValidFile( temp2, SWORDPOWER ) )
+								swordImage = temp;		// Not temp2
 					}
-				} else if(sp <= 4)
-					swordImage = CString() << "sword" << toString(sp) << ".png";
-				swordPower = CLIP(sp, 0, swordLimit);
-				//check this
+				}
+				swordPower = CLIP(sp, ((healswords == true) ? -swordLimit : 0), swordLimit);
 				break;
 			}
 
 			case SHIELDPOWER:
 			{
 				int sp = pProps.readByte1();
-				if(sp >= 10)
+				if ( sp >= 10 )
 				{
 					sp -= 10;
 					len = pProps.readByte1();
-					if(len >= 0)
+					if ( len >= 0 )
 					{
 						CString temp( pProps.readChars(len) );
-						if ( defaultShieldNames.find( temp ) != -1 )
-							shieldImage = temp;
-						else
-						{
-							CString temp2( getDataFile( temp.text() ) );
-							if ( temp2.length() > 0 )
-								if ( noFoldersConfig || isValidFile( temp2, SHIELDPOWER ) )
-									shieldImage = temp;		// Not temp2
-						}
+						CString temp2( getDataFile( temp.text() ) );
+						if ( temp2.length() > 0 )
+							if ( noFoldersConfig || isValidFile( temp2, SHIELDPOWER ) )
+								shieldImage = temp;		// Not temp2
 					}
-				} else if(sp <= 3)
+				}
+				else if ( sp <= 3)
 					shieldImage = CString() << "shield" << toString(sp) << ".png";
 				shieldPower = CLIP(sp, 0, shieldLimit);
-				//check this
 				break;
 			}
 
@@ -2626,21 +2625,29 @@ void CPlayer::msgBOARDMODIFY(CPacket& pPacket)
 	if (bX < 0 || bX > 63 || bY < 0 || bY > 63)
 		return;
 
-	//Lay items when u destroy objects
+	// Lay items when you destroy objects.
 	short oldTile = level->tiles[bX+(bY*64)];
 	int dropItem = -1;
-	//Bushes, grass, swamp
+
+	// Bushes, grass, swamp
 	if ((oldTile == 2 || oldTile == 0x1a4 || oldTile == 0x1ff ||
 			oldTile == 0x3ff)&& bushesDrop)
 	{
-		int index = rand()%10;
-		if (index <= 5)
-			dropItem = index;
+		if ( tiledroprate > 0 )
+		{
+			if ( (rand() % 100) < tiledroprate )
+			{
+				int index = rand() % 6;
+				dropItem = index;
+			}
+		}
 
-	}//vase
+	}
+	// Vase.
 	else if (oldTile == 0x2ac && vasesDrop)
 		dropItem = 5;
 
+	// Send the item now.
 	if (dropItem >= 0)
 	{
 		CPacket packet;
@@ -3048,14 +3055,13 @@ void CPlayer::msgOPENCHEST(CPacket& pPacket)
 
 void CPlayer::msgADDNPC(CPacket& pPacket)
 {
-
 	CString image = pPacket.readChars(pPacket.readByte1());
 	CString codeFile = pPacket.readChars(pPacket.readByte1());
 	float nX = (float)(pPacket.readByte1()/2);
 	float nY = (float)(pPacket.readByte1()/2);
-	level->addNewNpc(image, codeFile, nX, nY);
 
-
+	if ( putnpcenabled == true )
+		level->addNewNpc(image, codeFile, nX, nY);
 }
 
 void CPlayer::msgDELNPC(CPacket& pPacket)
@@ -3407,21 +3413,6 @@ void CPlayer::msgSWANTSOPTIONS(CPacket& pPacket)
 	CStringList serverOptions;
 	serverOptions.load("serveroptions.txt");
 
-	if (!hasRight(CANCHANGESTAFFACC))
-	{
-		for (int i = 0; i < serverOptions.count(); i++)
-		{
-			CString name = serverOptions[i].copy(0, serverOptions[i].find("="));
-			name.trim();
-
-			if (adminNames.find(name) >= 0 || serverOptions[i] == "#Serveroptions")
-			{
-				serverOptions.remove(i);
-				i--;
-			}
-		}
-	}
-
 	sendPacket(CPacket() << (char)DSENDSOPTIONS << serverOptions.join("\n").tokenize());
 }
 
@@ -3445,23 +3436,12 @@ void CPlayer::msgSSETOPTIONS(CPacket& pPacket)
 	{
 		CStringList serverOptions;
 		serverOptions.load("serveroptions.txt");
-		for (int i = 0; i < newOps.count(); i++)
+		for ( int i = 0; i < newOps.count(); i++ )
 		{
 			CString name = newOps[i].copy(0, newOps[i].find("="));
 			name.trim();
-			if (adminNames.findI(name) >= 0)
-				newOps.remove(i);
-		}
-
-		newOps.add(" ");
-		newOps.add("#Serveroptions");
-
-		for (int i = 0; i < serverOptions.count(); i++)
-		{
-			CString name = serverOptions[i].copy(0, serverOptions[i].find("="));
-			name.trim();
-			if (adminNames.findI(name) >= 0)
-				newOps.add(serverOptions[i]);
+			if ( adminNames.findI(name) >= 0 )
+				newOps.replace( newOps[i], serverOptions[serverOptions.find(name)] );
 		}
 	}
 
@@ -3549,7 +3529,7 @@ void CPlayer::msgSETPLPROPS(CPacket& pPacket)
 		return;
 	}
 
-	player->setAccPropsRc(pPacket);
+	player->setAccPropsRc(pPacket, this);
 	player->saveAccount();
 	errorOut( "rclog.txt", CString() << accountName << " set the attributes of player " << player->accountName );
 	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " set the attributes of player " << player->accountName);
@@ -3836,7 +3816,7 @@ void CPlayer::msgDSETACCPLPROPS(CPacket& pPacket)
 
 	errorOut( "rclog.txt", CString() << accountName << " set the attributes of player " << player->accountName );
 	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " set the attributes of player " << player->accountName);
-	player->setAccPropsRc(pPacket);
+	player->setAccPropsRc(pPacket, this);
 	player->saveAccount();
 	if (player->id == -1)
 		delete player;
