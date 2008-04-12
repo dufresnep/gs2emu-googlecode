@@ -630,16 +630,18 @@ CBuffer& CBuffer::untokenize()
 	CBuffer nData( data );
 	nData.trim();
 
+printf( "%s\n", nData );
+
 	// Check to see if it starts with a quotation mark.  If not, set pos[1] to 0.
 	if ( nData[0] != '\"' ) pos[1] = 0;
 
 	// Untokenize.
 	while (	(pos[0] = nData.find( ",", pos[1] )) != -1  )
 	{
-		// Don't parse empty blocks.
+		// Empty blocks are blank lines.
 		if ( pos[0] == pos[1] )
 		{
-			pos[1]++;
+			temp.add( "\n" );
 			continue;
 		}
 
@@ -653,7 +655,7 @@ CBuffer& CBuffer::untokenize()
 			while ( true )
 			{
 				if ( pos[0] == -1 ) break;
-				if (	(nData[pos[0]-1] != '\"') ||
+				if ((nData[pos[0]-1] != '\"') ||
 					(nData[pos[0]-1] == '\"' && nData[pos[0]-2] == '\"') )
 					pos[0] = nData.find( ",", pos[0] + 1 );
 				else
@@ -676,9 +678,8 @@ CBuffer& CBuffer::untokenize()
 		t2.removeAll( "\n" );
 		t2.removeAll( "\r" );
 
-		// If we still have something left, we can add it.
-		if ( t2.length() > 0 )
-			temp.add( t2.text() );
+		// Add it.
+		temp.add( t2.text() );
 
 		// Move forward the correct number of spaces.
 		if ( pos[0] + 1 != nData.length() && nData[pos[0] + 1] == '\"' )
