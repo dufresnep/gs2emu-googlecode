@@ -609,6 +609,7 @@ CBuffer& CBuffer::tokenize()
 		CBuffer temp;
 		temp << copy( pos[1], pos[0] - pos[1] );
 		temp.replaceAll( "\"", "\"\"" );	// Change all " to ""
+		temp.replaceAll( "'", "''" );		// Change all ' to ''
 		temp.removeAll( "\r" );
 		//if ( temp.length() > 0 )
 		retVal << "\"" << temp << "\",";
