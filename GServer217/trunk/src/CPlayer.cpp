@@ -2725,7 +2725,12 @@ void CPlayer::msgNPCPROPS(CPacket& pPacket)
 		return;
 
 	packet << (char)SNPCPROPS << pPacket.text() + 1;
-	sendLocally( packet );
+	for (int i = 0; i < level->players.count(); i++)
+	{
+		CPlayer* other = (CPlayer*)level->players[i];
+		if (other != this)
+			other->sendPacket(packet);
+	}
 	npc->setProps(pPacket);
 }
 
