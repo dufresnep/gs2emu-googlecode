@@ -3504,7 +3504,7 @@ void CPlayer::msgWANTRCFOLDERS(CPacket& pPacket)
 	// Don't allow .. in the folder path.
 	for ( int i = 0; i < temp.count(); ++i )
 	{
-		if ( ((CBuffer)temp[i]).find( ".." ) )
+		if ( ((CBuffer)temp[i]).find( ".." ) != -1 )
 		{
 			temp.remove(i);
 			--i;
