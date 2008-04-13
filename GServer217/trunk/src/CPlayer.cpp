@@ -3427,10 +3427,13 @@ void CPlayer::msgSSETOPTIONS(CPacket& pPacket)
 
 	CString data = pPacket.text() + 1;
 	data.untokenize();
-	data.removeAll( "\r" );		// Workaround strtok() limitation.
 
 	CStringList newOps;
 	newOps.load(data.text(), "\n");
+
+	// Workaround a limitation/feature of strtok().
+	for ( int i = 0; i < newOps.count(); ++i )
+		newOps[i].removeAll( "\r" );
 
 	if (!hasRight(CANCHANGESTAFFACC))
 	{
