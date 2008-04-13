@@ -3468,7 +3468,11 @@ void CPlayer::msgSSETOPTIONS(CPacket& pPacket)
 			CString name = newOps[i].copy(0, newOps[i].find("="));
 			name.trim();
 			if ( adminNames.findI(name) >= 0 )
-				newOps.replace( newOps[i], serverOptions[serverOptions.find(name)] );
+			{
+				CBuffer opt( (CBuffer)newOps[i] );
+				int sOptLoc = serverOptions.findI( name );
+				if ( sOptLoc >= 0 && ((CBuffer() << serverOptions[sOptLoc]).trimLeft()).copy(0, name.length()) == name )
+					newOps.replace( opt, serverOptions[sOptLoc] );
 		}
 	}
 
