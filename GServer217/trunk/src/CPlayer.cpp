@@ -1354,7 +1354,10 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 
 	// Now we restore the AP.
 	if ( wasInSpar == true && level->sparZone == false )
-		updateProp( PALIGNMENT );
+	{
+		sendLocally( CPacket() << (char)OTHERPLPROPS << (short)id << (char)PALIGNMENT << getProp(PALIGNMENT));
+		sendPacket(CPacket() << (char)SPLAYERPROPS << (char)PALIGNMENT << getProp(PALIGNMENT));
+	}
 
 	time_t l_time = getLeavingTime(level);
 	if ( l_time <= 0 )
@@ -1486,7 +1489,10 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 
 	// If we are in a sparring zone and we have 100 AP, adjust temporarily.
 	if ( level->sparZone && ap == 100 )
-		updateProp( PALIGNMENT );
+	{
+		sendLocally( CPacket() << (char)OTHERPLPROPS << (short)id << (char)PALIGNMENT << getProp(PALIGNMENT));
+		sendPacket(CPacket() << (char)SPLAYERPROPS << (char)PALIGNMENT << getProp(PALIGNMENT));
+	}
 
 	compressAndSend();
 	return true;
