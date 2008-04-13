@@ -1345,13 +1345,6 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	levelName = nextLevel->fileName;
 	firstLevel = false;
 
-	// Now we restore the AP.
-	if ( wasInSpar == true && level->sparZone == false )
-	{
-		sendLocally( CPacket() << (char)OTHERPLPROPS << (short)id << (char)PALIGNMENT << getProp(PALIGNMENT));
-		sendPacket(CPacket() << (char)SPLAYERPROPS << (char)PALIGNMENT << getProp(PALIGNMENT));
-	}
-
 	time_t l_time = getLeavingTime(level);
 	if ( l_time <= 0 )
 	{
