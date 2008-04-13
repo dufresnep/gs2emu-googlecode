@@ -1382,6 +1382,10 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	}
 	sendPacket(packet);
 
+	// If you are the only person in the level, send the ISLEADER packet.
+	if ( level->players.count() == 1 )
+		sendPacket(CPacket() << (char)ISLEADER);
+
 	//Send chests
 	for (int i = 0; i < level->chests.count(); i ++)
 	{
@@ -1439,10 +1443,6 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 		apCounter = 1;
 		updateProp( PALIGNMENT );
 	}
-
-	// If you are the only person in the level, send the ISLEADER packet.
-	if ( level->players.count() == 1 )
-		sendPacket(CPacket() << (char)ISLEADER);
 
 	//tell others i changed maps
 	packet.clear();
@@ -2170,21 +2170,22 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 				status = pProps.readByte1();
 
 				if ( id == -1 ) break;
-				if ((oldStatus & 8) == 0)
-				{
-					if ((status & 8) > 0) // dead
-					{
-						power = CLIP((ap < 20 ? 3 : (ap < 40 ? 5 : maxPower)), 0.0f, maxPower);
-						if(!level->sparZone)
-							deaths++;
-						if (level->players.count() > 1 && level->players[0] == this)
-						{
-							level->players.remove(0);
-							level->players.add(this);
-							((CPlayer*)level->players[0])->sendPacket(CPacket() << (char)ISLEADER);
-						}
-					}
 
+				// When they come back to life, give them hearts.
+				if ( (oldStatus & 8) > 0 && (status & 8) == 0 )
+					power = CLIP((ap < 20 ? 3 : (ap < 40 ? 5 : maxPower)), 0.0f, maxPower);
+
+				// When they die, increase deaths and make somebody else level leader.
+				if ( (oldStatus & 8) == 0 && (status & 8) > 0 )
+				{
+					if(!level->sparZone)
+						deaths++;
+					if (level->players.count() > 1 && level->players[0] == this)
+					{
+						level->players.remove(0);
+						level->players.add(this);
+						((CPlayer*)level->players[0])->sendPacket(CPacket() << (char)ISLEADER);
+					}
 				}
 			}
 			break;
