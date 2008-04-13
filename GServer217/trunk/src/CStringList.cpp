@@ -139,10 +139,20 @@ void CStringList::save(const char* pFileName)
 
 CString CStringList::join(char* pSep)
 {
+/*
+escapeStr() was needed for SQL stuff, but since join() is used for a lot of
+different things now, escapeStr() just breaks things.
 	CString retVal;
 	for(int i = 0; i < count()-1; i++)
 		retVal << item(i).escapeStr() << pSep;
 	if(count())
 		retVal << item(count()-1).escapeStr();
+	return retVal;
+*/
+	CString retVal;
+	for(int i = 0; i < count()-1; i++)
+		retVal << item(i) << pSep;
+	if(count())
+		retVal << item(count()-1);
 	return retVal;
 }

@@ -609,7 +609,6 @@ CBuffer& CBuffer::tokenize()
 		CBuffer temp;
 		temp << copy( pos[1], pos[0] - pos[1] );
 		temp.replaceAll( "\"", "\"\"" );	// Change all " to ""
-		temp.replaceAll( "'", "''" );		// Change all ' to ''
 		temp.removeAll( "\r" );
 		//if ( temp.length() > 0 )
 		retVal << "\"" << temp << "\",";
@@ -640,6 +639,7 @@ CBuffer& CBuffer::untokenize()
 		// Empty blocks are blank lines.
 		if ( pos[0] == pos[1] )
 		{
+			pos[1]++;
 			temp.add( "\n" );
 			continue;
 		}
@@ -674,7 +674,6 @@ CBuffer& CBuffer::untokenize()
 
 		// Check if the string is valid and if it is, copy it.
 		t2.replaceAll( "\"\"", "\"" );
-		t2.replaceAll( "''", "'" );
 		t2.removeAll( "\n" );
 		t2.removeAll( "\r" );
 
