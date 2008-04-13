@@ -2888,6 +2888,9 @@ void CPlayer::msgCLAIMPKER(CPacket& pPacket)
 	// Uses the glicko rating system.
 	if ( level->sparZone )
 	{
+		// If the IPs are the same, don't update the rating to prevent cheating.
+		if ( (CString() << other->playerSock->tcpIp()) == (CString() << this->playerSock->tcpIp()) ) return;
+
 		float gSpar[2] = {1.0f / pow((1.0f+3.0f*pow(0.0057565f,2)*(pow(other->deviation,2))/pow(3.14159265f,2)),0.5f),	//Winner
 					  	  1.0f / pow((1.0f+3.0f*pow(0.0057565f,2)*(pow(deviation,2))/pow(3.14159265f,2)),0.5f)};		//Loser
 		float ESpar[2] = {1.0f / (1.0f + pow(10.0f,(-gSpar[1]*(other->rating-rating)/400.0f))),							//Winner
