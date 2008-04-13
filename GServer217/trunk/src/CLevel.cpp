@@ -688,8 +688,9 @@ void CLevel::updateLevel(CString& pFileName)
 			CEnteredLevel* entered = (CEnteredLevel*)player->enteredLevels[j];
 			if ( entered == 0 || entered->level == level )
 			{
-				delete entered;
-				player->enteredLevels.remove( j );
+				entered->time = 0;
+				//delete entered;
+				//player->enteredLevels.remove( j );
 				break;
 			}
 		}

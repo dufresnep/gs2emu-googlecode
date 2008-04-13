@@ -283,7 +283,7 @@ CPacket CNpc::getProperty(int pId)
 		case NEMPTY42:
 		case NEMPTY43:
 			errorOut( "debuglog.txt", CString() << "CNpc::getProperty() requested NEMPTY" << toString(pId) );
-			CPlayer::sendGlobally( CPacket() << "CNpc::getProperty() requested NEMPTY" << toString(pId) );
+			CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "\"CNpc::getProperty() requested NEMPTY" << toString(pId) << "\"" );
 			break;
 
 		case NGATTRIB6:
@@ -322,7 +322,7 @@ CPacket CNpc::getProperty(int pId)
 
 		default:
 			errorOut( "debuglog.txt", CString() << "CNpc::getProperty() requested unknown prop " << toString(pId) );
-			CPlayer::sendGlobally( CPacket() << "CNpc::getProperty() requested unknown prop " << toString(pId) );
+			CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "\"CNpc::getProperty() requested unknown prop " << toString(pId) << "\"" );
 			break;
 
 	}
@@ -568,7 +568,7 @@ void CNpc::setProps(CPacket& pProps)
 			case NEMPTY42:
 			case NEMPTY43:
 				errorOut( "debuglog.txt", CString() << "CNpc::setProps() tried to set NEMPTY" << toString(index) );
-				CPlayer::sendGlobally( CPacket() << "CNpc::setProps tried to set NEMPTY" << toString(index) );
+				CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "\"CNpc::setProps tried to set NEMPTY" << toString(index) << "\"" );
 				break;
 
 			case NGATTRIB6:
@@ -606,7 +606,7 @@ void CNpc::setProps(CPacket& pProps)
 
 			default:
 				errorOut( "debuglog.txt", CString() << "CNpc::setProps() tried to set unknown " << toString(index) );
-				CPlayer::sendGlobally( CPacket() << "CNpc::setProps tried to set unknown " << toString(index) );
+				CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "\"CNpc::setProps tried to set unknown " << toString(index) << "\"" );
 				if ( detailedconsole )
 					printf("[%s] UNKNOWN NPC PROP: %i, Prev: %i, Value: %s\n", getTimeStr(1).text(), index, previousMessage, (pProps.text() + pProps.getRead()));
 			return;
