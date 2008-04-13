@@ -28,6 +28,8 @@ class CStringList:
 	int find(CString& pString);
 	int findI(const char* pString);
 	int findI(CString& pString);
+	int findIn(const char* pString);
+	int findIn(CString& pString);
 	void clear();
 	CString& item(int pIndex);
 	CString& operator[](int pPos);
@@ -71,6 +73,12 @@ inline int CStringList::findI(CString& pString)
 {
 	return findI(pString.text());
 }
+
+inline int CStringList::findIn(CString& pString)
+{
+	return findIn( pString.text() );
+}
+
 inline void CStringList::replace(CString& pOldString, CString& pNewString)
 {
 	replace(pOldString.text(), pNewString.text());

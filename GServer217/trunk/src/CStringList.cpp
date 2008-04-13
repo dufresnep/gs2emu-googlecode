@@ -129,6 +129,16 @@ int CStringList::findI(const char* pString)
 	return -1;
 }
 
+int CStringList::findIn(const char* pString)
+{
+	for ( int i = 0; i < count(); ++i )
+	{
+		if ( item(i).find( pString ) != -1 )
+			return i;
+	}
+	return -1;
+}
+
 void CStringList::save(const char* pFileName)
 {
 	FILE* file = fopen(pFileName, "wb");
