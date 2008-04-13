@@ -1180,8 +1180,7 @@ void CPlayer::setAccPropsRc(CPacket& pPacket, CPlayer* rc)
 	pPacket.readChars(pPacket.readByte1());
 	int len = (unsigned char)pPacket.readByte1();
 	props << pPacket.readChars(len);
-	setProps(props, true, rc);
-	sendPacket(CPacket() <<(char)SPLAYERPROPS << props);
+	sendPacket(CPacket() <<(char)SPLAYERPROPS << setProps(props, true, rc));
 
 	// Clear Flags + Weapons
 	for (int i = 0; i < myFlags.count(); i++)
@@ -1948,11 +1947,12 @@ CPacket CPlayer::getProp(int pProp)
 	return retVal;
 }
 
-void CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
+CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 {
 	int len;
 	CPacket forwardBuff;
 	CPacket forwardBuff2;
+	CPacket ret;
 	forwardBuff << (char)OTHERPLPROPS << (short)id;
 	forwardBuff2 << (char)OTHERPLPROPS << (short)id;
 
@@ -2379,7 +2379,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 
 				// If they send bad props, kick them.
 				deleteMe = true;
-				return;
+				return CPacket();
 		}
 
 		if ( pForward && forwardLocal[index] == true )
@@ -2393,6 +2393,7 @@ void CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 			}
 			*/
 			forwardBuff << (char)index << getProp(index);
+			ret << (char)index << getProp(index);
 		}
 	}
 
@@ -2417,6 +2418,8 @@ void CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 		sendLocally(forwardBuff);
 		compressAndSend();
 	}
+
+	return ret;
 }
 
 

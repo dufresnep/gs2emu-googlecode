@@ -382,7 +382,7 @@ class CPlayer : public CAccount
 		void sendFiles();
 		time_t getLeavingTime(CLevel* pLevel);
 		CPacket getProp(int pProp);
-		void setProps(CPacket& pProps, bool pForward, CPlayer* rc = 0);
+		CPacket setProps(CPacket& pProps, bool pForward, CPlayer* rc = 0);
 		void getItem(int pItem);
 		void sendLocally(CPacket& pPacket);
 		bool loadAccount();
