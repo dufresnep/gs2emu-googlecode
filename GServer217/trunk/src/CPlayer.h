@@ -385,6 +385,7 @@ class CPlayer : public CAccount
 		CPacket setProps(CPacket& pProps, bool pForward, CPlayer* rc = 0);
 		void getItem(int pItem);
 		void sendLocally(CPacket& pPacket);
+		static void sendGlobally(CPacket& pPacket);
 		bool loadAccount();
 		bool hasRight(int pRight);
 		bool hasStaff();

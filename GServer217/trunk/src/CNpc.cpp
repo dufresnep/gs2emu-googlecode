@@ -279,6 +279,13 @@ CPacket CNpc::getProperty(int pId)
 		}
 		break;
 
+		case NEMPTY41:
+		case NEMPTY42:
+		case NEMPTY43:
+			errorOut( "debuglog.txt", CString() << "CNpc::getProperty() requested NEMPTY" << toString(pId) );
+			CPlayer::sendGlobally( CPacket() << "CNpc::getProperty() requested NEMPTY" << toString(pId) );
+			break;
+
 		case NGATTRIB6:
 		case NGATTRIB7:
 		case NGATTRIB8:
@@ -312,6 +319,12 @@ CPacket CNpc::getProperty(int pId)
 			con_print( "NGATTRIB%d\n", index );
 		}
 		break;
+
+		default:
+			errorOut( "debuglog.txt", CString() << "CNpc::getProperty() requested unknown prop " << toString(pId) );
+			CPlayer::sendGlobally( CPacket() << "CNpc::getProperty() requested unknown prop " << toString(pId) );
+			break;
+
 	}
 	con_print( "Packet: %s\n\n", retVal.text() );
 	return retVal;
@@ -551,6 +564,13 @@ void CNpc::setProps(CPacket& pProps)
 				con_print( "NGATTRIB%d: len: %d attrib: %s\n", index-NGATTRIB1, len, gAttribs[index-NGATTRIB1].text() );
 			break;
 
+			case NEMPTY41:
+			case NEMPTY42:
+			case NEMPTY43:
+				errorOut( "debuglog.txt", CString() << "CNpc::setProps() tried to set NEMPTY" << toString(index) );
+				CPlayer::sendGlobally( CPacket() << "CNpc::setProps tried to set NEMPTY" << toString(index) );
+				break;
+
 			case NGATTRIB6:
 			case NGATTRIB7:
 			case NGATTRIB8:
@@ -585,6 +605,8 @@ void CNpc::setProps(CPacket& pProps)
 			break;
 
 			default:
+				errorOut( "debuglog.txt", CString() << "CNpc::setProps() tried to set unknown " << toString(index) );
+				CPlayer::sendGlobally( CPacket() << "CNpc::setProps tried to set unknown " << toString(index) );
 				if ( detailedconsole )
 					printf("[%s] UNKNOWN NPC PROP: %i, Prev: %i, Value: %s\n", getTimeStr(1).text(), index, previousMessage, (pProps.text() + pProps.getRead()));
 			return;

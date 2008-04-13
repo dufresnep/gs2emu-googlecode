@@ -1663,6 +1663,15 @@ void CPlayer::sendLocally(CPacket& pPacket)
 	}
 }
 
+void CPlayer::sendGlobally(CPacket& pPacket)
+{
+	for ( int i = 0; i < playerList.count(); ++i )
+	{
+		CPlayer* other = (CPlayer*)playerList[i];
+		other->sendPacket( pPacket );
+	}
+}
+
 void CPlayer::updateProp(int pPropIndex)
 {
 	CPacket props;
@@ -3165,6 +3174,7 @@ void CPlayer::msgNPCWEAPONIMG(CPacket& pPacket)
 
 void CPlayer::msgEMPTY25(CPacket& pPacket)
 {
+	CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "EMPTY25 was just sent." );
 	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY25:\r\n" << pPacket.text(), false );
 }
 
@@ -3331,6 +3341,7 @@ void CPlayer::msgUPDATEFILE(CPacket& pPacket)
 
 void CPlayer::msgEMPTY36(CPacket& pPacket)
 {
+	CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "EMPTY36 was just sent." );
 	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY36:\r\n" << pPacket.text(), false );
 }
 
@@ -3378,16 +3389,19 @@ void CPlayer::msgCSHOOT(CPacket& pPacket)
 
 void CPlayer::msgEMPTY41(CPacket& pPacket)
 {
+	CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "EMPTY41 was just sent." );
 	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY41:\r\n" << pPacket.text(), false );
 }
 
 void CPlayer::msgEMPTY42(CPacket& pPacket)
 {
+	CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "EMPTY42 was just sent." );
 	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY42:\r\n" << pPacket.text(), false );
 }
 
 void CPlayer::msgEMPTY43(CPacket& pPacket)
 {
+	CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "EMPTY43 was just sent." );
 	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY43:\r\n" << pPacket.text(), false );
 }
 
@@ -3423,31 +3437,37 @@ void CPlayer::msgSLISTPROCESSES(CPacket& pPacket)
 
 void CPlayer::msgEMPTY45(CPacket& pPacket)
 {
+	CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "EMPTY45 was just sent." );
 	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY45:\r\n" << pPacket.text(), false );
 }
 
 void CPlayer::msgEMPTY46(CPacket& pPacket)
 {
+	CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "EMPTY46 was just sent." );
 	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY46:\r\n" << pPacket.text(), false );
 }
 
 void CPlayer::msgEMPTY47(CPacket& pPacket)
 {
+	CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "EMPTY47 was just sent." );
 	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY47:\r\n" << pPacket.text(), false );
 }
 
 void CPlayer::msgEMPTY48(CPacket& pPacket)
 {
+	CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "EMPTY48 was just sent." );
 	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY48:\r\n" << pPacket.text(), false );
 }
 
 void CPlayer::msgEMPTY49(CPacket& pPacket)
 {
+	CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "EMPTY49 was just sent." );
 	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY49:\r\n" << pPacket.text(), false );
 }
 
 void CPlayer::msgEMPTY50(CPacket& pPacket)
 {
+	CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "EMPTY50 was just sent." );
 	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY50:\r\n" << pPacket.text(), false );
 }
 
