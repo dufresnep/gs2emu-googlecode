@@ -348,7 +348,7 @@ bool updateFile(char *pFile)
 		// Don't allow .. in the folder path.
 		for ( int i = 0; i < folderConfig.count(); ++i )
 		{
-			if ( ((CBuffer)folderConfig[i]).find( ".." ) )
+			if ( ((CBuffer)folderConfig[i]).find( ".." ) != -1 )
 			{
 				folderConfig.remove(i);
 				--i;
