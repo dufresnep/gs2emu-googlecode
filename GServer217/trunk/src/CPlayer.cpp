@@ -3471,8 +3471,9 @@ void CPlayer::msgSSETOPTIONS(CPacket& pPacket)
 			{
 				CBuffer opt( (CBuffer)newOps[i] );
 				int sOptLoc = serverOptions.findI( name );
-				if ( sOptLoc >= 0 && ((CBuffer() << serverOptions[sOptLoc]).trimLeft()).copy(0, name.length()) == name )
+				if ( sOptLoc >= 0 && ((CBuffer() << (CBuffer)serverOptions[sOptLoc]).trimLeft()).copy(0, name.length()) == name )
 					newOps.replace( opt, serverOptions[sOptLoc] );
+			}
 		}
 	}
 
