@@ -1174,6 +1174,8 @@ void CPlayer::setNick(CString& pNewNick, bool pVerifyGuild)
 void CPlayer::setAccPropsRc(CPacket& pPacket, CPlayer* rc)
 {
 	CPacket props, temp;
+	bool hadBomb = false;
+
 	//Skip playerworld
 	pPacket.readChars(pPacket.readByte1());
 	int len = (unsigned char)pPacket.readByte1();
@@ -1189,8 +1191,14 @@ void CPlayer::setAccPropsRc(CPacket& pPacket, CPlayer* rc)
 		temp << (char)SDELNPCWEAPON << myWeapons[i] << "\n";
 
 		// Attempt to fix the funky client bomb capitalization issue.
+		// Also fix the bomb coming back when you set the player props through RC.
 		if ( myWeapons[i] == "bomb" )
+		{
 			temp << (char)SDELNPCWEAPON << "Bomb" << "\n";
+			hadBomb = true;
+		}
+		if ( myWeapons[i] == "Bomb" )
+			hadBomb = true;
 	}
 	sendPacket(temp);
 
@@ -1223,6 +1231,9 @@ void CPlayer::setAccPropsRc(CPacket& pPacket, CPlayer* rc)
 		weaponSend.add(wpn);
 	}
 	sendWeapons();
+
+	// If we never had the bomb, don't let it come back.
+	if ( hadBomb == false ) allowBomb = false;
 
 	// Re-send the level to the player to update chests and whatnot.
 	if ( id != -1 )

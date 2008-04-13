@@ -99,6 +99,8 @@ Fixes:
   restricted options in serveroptions.txt could in fact end up altering
   half of them.  Also improved the code involving the loading/setting
   of server options through RC by limited rights admins.
+- Fixed the problem where the bomb would come back if you set a
+  player's props through RC.
 
 
 --------------------------------------------
