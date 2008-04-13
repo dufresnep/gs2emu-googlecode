@@ -103,6 +103,11 @@ Fixes:
   player's props through RC.
 - Fixed the Linux Makefile to correctly compile with debugging info.
 - Fixed a security vulnerability related to the File Browser.
+- Fixed a nasty bug regarding the gserver network code.  It should no
+  longer discard half-complete packets.  It will now properly keep the
+  packet in memory until the rest arrives.  This should fix a bunch of
+  the crazy packet and attribute problems experienced by people with
+  slow Internet connections.
 
 
 --------------------------------------------

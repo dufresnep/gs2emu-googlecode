@@ -277,8 +277,10 @@ CPlayer::~CPlayer()
 void CPlayer::main()
 {
 	char packets[65536];
+	static CBuffer packetBuffer;
 	CBuffer receiveBuff;
 	int size=0;
+
 	if ((size = playerSock->receiveBytes(receiveBuff, 65536)) < 0)
 	{
 		if ( size != -1 )
@@ -287,8 +289,9 @@ void CPlayer::main()
 		compressAndSend();
 		return;
 	}
+	packetBuffer << receiveBuff;
 
-	if (receiveBuff.length() >= 128*1024)
+	if (packetBuffer.length() >= 128*1024)
 	{
 		errorOut("errorlog.txt", CString() << "Client " << accountName << "has sent to much data (input buffer >=128k)");
 		sendPacket(CPacket() << (char)DISMESSAGE << "Your Graal.exe has sent to much data (>=128k in the input buffer)");
@@ -296,29 +299,20 @@ void CPlayer::main()
 		return;
 	}
 
-	while (receiveBuff.length() >= 2)
+	while (packetBuffer.length() >= 2)
 	{
 		lastData = time(NULL);
 		int error, cLen = sizeof(packets);
-		unsigned int len = (((unsigned int)(unsigned char)receiveBuff[0]) << 8) + (unsigned int)(unsigned char)receiveBuff[1];
+		unsigned int len = (((unsigned int)(unsigned char)packetBuffer[0]) << 8) + (unsigned int)(unsigned char)packetBuffer[1];
 
 		// Packet might not be fully in yet.
-		if ( len > (unsigned int)receiveBuff.length() - 2 )
+		if ( len > (unsigned int)packetBuffer.length() - 2 )
 		{
-			errorOut( "debuglog.txt", CString() << accountName << ": Packet not fully in yet?", true );
+			//errorOut( "debuglog.txt", CString() << accountName << ": Packet not fully in yet?", true );
 			break;
 		}
-/*
-		if(len > receiveBuff.length() - 2 || len < 0)
-		{
-			errorOut("errorlog.txt", CString() << "Client " << accountName << " sent a wrong data package length: " << toString(len) << "->" << toString(receiveBuff.length()));
-			sendPacket(CPacket() << (char)DISMESSAGE << "Your Graal.exe has sent a wrong data package length.");
-			deleteMe = true;
-			return;
-		}
-*/
 
-		if ((error = uncompress((Bytef*)packets,(uLongf*)&cLen,(const Bytef*)receiveBuff.text()+2, len)) == Z_OK)
+		if ((error = uncompress((Bytef*)packets,(uLongf*)&cLen,(const Bytef*)packetBuffer.text()+2, len)) == Z_OK)
 		{
 			CPacket lines;
 			if(cLen <= 0)
@@ -358,7 +352,7 @@ void CPlayer::main()
 				if(deleteMe)
 					return;
 			}
-			receiveBuff.remove(0, len+2);
+			packetBuffer.remove(0, len+2);
 		}
 		else
 		{
