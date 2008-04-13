@@ -3500,6 +3500,16 @@ void CPlayer::msgWANTRCFOLDERS(CPacket& pPacket)
 
 	CStringList temp;
 	temp.load("foldersconfig.txt");
+
+	// Don't allow .. in the folder path.
+	for ( int i = 0; i < temp.count(); ++i )
+	{
+		if ( ((CBuffer)temp[i]).find( ".." ) )
+		{
+			temp.remove(i);
+			--i;
+		}
+	}
 	sendPacket(CPacket() << (char)SSENDFOLDER << temp.join("\n").tokenize());
 }
 
@@ -3516,8 +3526,7 @@ void CPlayer::msgSETRCFOLDERS(CPacket& pPacket)
 	CString data = pPacket.text() + 1;
 	data.untokenize();
 	data.save("foldersconfig.txt");
-	folderConfig.load("foldersconfig.txt");
-	getSubDirs();
+	updateFile( "foldersconfig.txt" );
 
 	errorOut( "rclog.txt", CString() << accountName << " has updated the folder configuration." );
 	sendRCPacket(CPacket() << (char)DRCLOG << accountName << " has updated the folder configuration.");

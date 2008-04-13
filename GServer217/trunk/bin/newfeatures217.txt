@@ -102,6 +102,7 @@ Fixes:
 - Fixed the problem where the bomb would come back if you set a
   player's props through RC.
 - Fixed the Linux Makefile to correctly compile with debugging info.
+- Fixed a security vulnerability related to the File Browser.
 
 
 --------------------------------------------

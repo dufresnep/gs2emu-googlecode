@@ -344,6 +344,17 @@ bool updateFile(char *pFile)
 	else if ( strcmp(pFile, "foldersconfig.txt") == 0 )
 	{
 		folderConfig.load( "foldersconfig.txt" );
+
+		// Don't allow .. in the folder path.
+		for ( int i = 0; i < folderConfig.count(); ++i )
+		{
+			if ( ((CBuffer)folderConfig[i]).find( ".." ) )
+			{
+				folderConfig.remove(i);
+				--i;
+			}
+		}
+
 		getSubDirs();
 	}
 	else
