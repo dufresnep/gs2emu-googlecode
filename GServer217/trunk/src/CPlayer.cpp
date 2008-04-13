@@ -2894,6 +2894,8 @@ void CPlayer::msgCLAIMPKER(CPacket& pPacket)
 	// Uses the glicko rating system.
 	if ( level->sparZone )
 	{
+		float oldStats[4] = { rating, deviation, other->rating, other->deviation };
+
 		// If the IPs are the same, don't update the rating to prevent cheating.
 		if ( (CString() << other->playerSock->tcpIp()) == (CString() << this->playerSock->tcpIp()) ) return;
 
@@ -2922,8 +2924,10 @@ void CPlayer::msgCLAIMPKER(CPacket& pPacket)
 		this->deviation = this->oldDeviation = tLoseDeviation;
 		other->lastSparTime = this->lastSparTime = getSysTime();
 
-		other->updateProp( RATING );
-		this->updateProp(RATING );
+		if ( oldStats[2] != other->rating || oldStats[3] != other->deviation )
+			other->updateProp( RATING );
+		if ( oldStats[0] != rating || oldStats[1] != deviation )
+			this->updateProp( RATING );
 	}
 	else
 	{
