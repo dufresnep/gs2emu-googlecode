@@ -1658,7 +1658,13 @@ void CPlayer::dropItems()
 	// Remove gralats from the account.
 	int gralats = CLIP( rand() % maxdeathgralats, mindeathgralats, maxdeathgralats );
 	rubins -= gralats;
-	if ( rubins < 0 ) rubins = 0;
+
+	// Don't allow a negative number of gralats and don't drop more than the player has.
+	if ( rubins < 0 )
+	{
+		gralats -= -rubins;
+		rubins = 0;
+	}
 	updateProp( RUPEESCOUNT );
 
 	// Drop the gralats.
