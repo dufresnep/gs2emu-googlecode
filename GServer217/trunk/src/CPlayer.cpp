@@ -1231,6 +1231,11 @@ void CPlayer::setAccPropsRc(CPacket& pPacket, CPlayer* rc)
 			continue;
 		CString wpn = pPacket.readChars(len);
 		weaponSend.add(wpn);
+		if ( wpn == "bomb" || wpn == "Bomb" )
+		{
+			hadBomb = true;
+			allowBomb = true;
+		}
 	}
 	sendWeapons();
 
