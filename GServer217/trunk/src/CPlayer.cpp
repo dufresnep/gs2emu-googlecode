@@ -1333,9 +1333,17 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	if(pos >= 0)
 		newLevel = newLevel.copy(pos+1, newLevel.length()-pos-1);
 
+	// If we were previously in a sparring zone and we had 100 ap,
+	// we will want to restore it after we leave the level.
+	// Do before leaveLevel().
+	bool wasInSpar = false;
+	if ( level->sparZone && ap == 100 )
+		wasInSpar = true;
+
 	CLevel* nextLevel = CLevel::openMap(newLevel);
 	if (nextLevel == NOLEVEL)
 		return false;
+
 	leaveLevel();
 	level = nextLevel;
 	level->players.add(this);
@@ -1343,6 +1351,11 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	y = pY;
 	levelName = nextLevel->fileName;
 	firstLevel = false;
+
+	// Now we restore the AP.
+	if ( wasInSpar == true && level->sparZone == false )
+		updateProp( PALIGNMENT );
+
 	time_t l_time = getLeavingTime(level);
 	if ( l_time <= 0 )
 	{
@@ -1470,6 +1483,10 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 		sendPacket(otherProps);
 		other->sendPacket(packet);
 	}
+
+	// If we are in a sparring zone and we have 100 AP, adjust temporarily.
+	if ( level->sparZone && ap == 100 )
+		updateProp( PALIGNMENT );
 
 	compressAndSend();
 	return true;
@@ -1874,7 +1891,10 @@ CPacket CPlayer::getProp(int pProp)
 			break;
 
 		case PALIGNMENT:
-			retVal.writeByte1(ap);
+			if ( level->sparZone == true && ap == 100 )
+				retVal.writeByte1( (char)99 );
+			else
+				retVal.writeByte1(ap);
 			break;
 
 		case PADDITFLAGS:
@@ -3322,7 +3342,7 @@ void CPlayer::msgTRIGGERACTION(CPacket& pPacket)
 
 void CPlayer::msgMAPINFO(CPacket& pPacket)
 {
-	errorOut( "debuglog.txt", CString() << accountName << " sent packet MAPINFO:\r\n" << pPacket.text(), false );
+//	errorOut( "debuglog.txt", CString() << accountName << " sent packet MAPINFO:\r\n" << pPacket.text(), false );
 }
 
 void CPlayer::msgCSHOOT(CPacket& pPacket)

@@ -294,10 +294,10 @@ void doTimer()
 
 			if (apSystem)
 			{
-				if(!(player->status & 1))
+				if ( !(player->status & 1) && player->level->sparZone == false )
 					player->apCounter--;
 
-				if (player->apCounter <= 0)
+				if ( player->apCounter <= 0 )
 				{
 					if (player->ap < 100)
 					{
