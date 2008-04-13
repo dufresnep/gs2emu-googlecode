@@ -640,11 +640,11 @@ CBuffer& CBuffer::untokenize()
 		if ( pos[0] == pos[1] )
 		{
 			pos[1]++;
-			temp.add( "\n" );
+			temp.add( "\r" );		// Ugly as hell.  Workaround strtok() limitation.
 			continue;
 		}
 
-		// Check for ,,"""
+		// Check for ,,"""blah"
 		if ( nData[pos[1]] == '\"' && nData[pos[1]+1] != '\"' ) pos[1]++;
 
 		// Check and see if the comma is outside or inside of the thing string.

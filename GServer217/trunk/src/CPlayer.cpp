@@ -3427,7 +3427,7 @@ void CPlayer::msgSSETOPTIONS(CPacket& pPacket)
 
 	CString data = pPacket.text() + 1;
 	data.untokenize();
-	//data.replaceAll("\n", "\n");
+	data.removeAll( "\r" );		// Workaround strtok() limitation.
 
 	CStringList newOps;
 	newOps.load(data.text(), "\n");
