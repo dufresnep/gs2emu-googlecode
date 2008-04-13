@@ -1200,6 +1200,9 @@ void CPlayer::setAccPropsRc(CPacket& pPacket, CPlayer* rc)
 		if ( myWeapons[i] == "Bomb" )
 			hadBomb = true;
 	}
+
+	// If we never had the bomb, don't let it come back.
+	if ( hadBomb == false ) allowBomb = false;
 	sendPacket(temp);
 
 	myFlags.clear();
@@ -1232,8 +1235,9 @@ void CPlayer::setAccPropsRc(CPacket& pPacket, CPlayer* rc)
 	}
 	sendWeapons();
 
-	// If we never had the bomb, don't let it come back.
-	if ( hadBomb == false ) allowBomb = false;
+	// KILL THE BOMB DEAD
+	if ( hadBomb == false )
+		sendPacket(CPacket() << (char)SDELNPCWEAPON << "Bomb");
 
 	// Re-send the level to the player to update chests and whatnot.
 	if ( id != -1 )
