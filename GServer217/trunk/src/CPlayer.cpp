@@ -1174,7 +1174,9 @@ void CPlayer::setAccPropsRc(CPacket& pPacket, CPlayer* rc)
 	pPacket.readChars(pPacket.readByte1());
 	int len = (unsigned char)pPacket.readByte1();
 	props << pPacket.readChars(len);
-	sendPacket(CPacket() <<(char)SPLAYERPROPS << setProps(props, true, rc));
+
+	CPacket pProps = setProps( props, true, rc );
+	sendPacket(CPacket() <<(char)SPLAYERPROPS << pProps);
 
 	// Clear Flags + Weapons
 	for (int i = 0; i < myFlags.count(); i++)
@@ -2419,8 +2421,8 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 			}
 			*/
 			forwardBuff << (char)index << getProp(index);
-			ret << (char)index << getProp(index);
 		}
+		ret << (char)index << getProp(index);
 	}
 
 	// Send head and nick changes to players not in the level.
