@@ -108,6 +108,8 @@ Fixes:
   packet in memory until the rest arrives.  This should fix a bunch of
   the crazy packet and attribute problems experienced by people with
   slow Internet connections.
+- Fixed NPCs disappearing when calling update level while two or more
+  people were in the level.
 
 
 --------------------------------------------

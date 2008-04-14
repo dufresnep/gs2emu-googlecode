@@ -142,7 +142,7 @@ bool CLevel::loadNW(CString& pFileName)
 
 				// Create the new NPC.  Do this before parsing the join commands.
 				// The CNpc constructor will remove all comments.
-				CNpc* jnpc = new CNpc( image, code, x, y, this );
+				CNpc* jnpc = new CNpc( image, code, x, y, this, true );
 
 				// Now filter out the join commands.
 				CStringList npcData;
@@ -476,7 +476,7 @@ void CLevel::loadNpcs(CPacket& levelData)
 		// Create the new NPC.  Do this before parsing the join commands.
 		// The CNpc constructor will remove all comments.
 		CString code2;
-		CNpc* jnpc = new CNpc( image, code, x, y, this );
+		CNpc* jnpc = new CNpc( image, code, x, y, this, true );
 
 		// Now filter out the join commands.
 		CStringList npcData;
@@ -614,7 +614,7 @@ void CLevel::addNewNpc(CString& pImage, CString& pCodeFile, float pX, float pY)
 	// Create the new NPC.  Do this before parsing the join commands.
 	// The CNpc constructor will remove all comments.
 	CString code2;
-	CNpc* npc = new CNpc( pImage, code, pX, pY, this );
+	CNpc* npc = new CNpc( pImage, code, pX, pY, this, false );
 
 	// Now filter out the join commands.
 	CStringList npcData;
@@ -712,12 +712,15 @@ void CLevel::reset()
 		for(int ii = 0; ii < playerList.count(); ii++)
 		{
 			CPlayer* player = (CPlayer*)playerList[ii];
-/*
-			// SDELNPC doesn't work, so this terrible hack will do.
-			player->sendPacket( CPacket() << (char)SNPCPROPS << (int)npc->id <<
-				(char)ACTIONSCRIPT << (short)0 << (char)VISFLAGS << (char)0 <<
-				(char)BLOCKFLAGS << (char)0 << (char)NPCMESSAGE << (char)0 );
-*/
+
+			// Terrible hack to fix the destroy; command on putnpc npcs.
+			if ( npc->levelNPC == false )
+			{
+				// SDELNPC doesn't work, so this terrible hack will do.
+				player->sendPacket( CPacket() << (char)SNPCPROPS << (int)npc->id <<
+					(char)ACTIONSCRIPT << (short)0 << (char)VISFLAGS << (char)0 <<
+					(char)BLOCKFLAGS << (char)0 << (char)NPCMESSAGE << (char)0 );
+			}
 			player->sendPacket(CPacket() << (char)SDELNPC << (int)npc->id);
 			player->compressAndSend();
 		}

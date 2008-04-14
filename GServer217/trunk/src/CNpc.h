@@ -95,12 +95,14 @@ class CNpc
 	public:
 		time_t modTime[npcpropcount];
 		CNpc(CString& pImage, CString& pCode, float pX, float pY, CLevel* pLevel);
+		CNpc(CString& pImage, CString& pCode, float pX, float pY, CLevel* pLevel, bool levelNPC);
 		~CNpc();
 		CString serverCode, clientCode, gAttribs[9];
 		CLevel* level;
 		CString image, gAni, swordImage, shieldImage, bowImage, chatMsg, nickName, horseImage, headImage, weaponName, imagePart, bodyImage;
 		char saves[10];
 		int id, rupees, darts, bombs, glovePower, visFlags, blockFlags, sprite, colors[8], bombPower, ap, swordPower, shieldPower, power;
+		bool levelNPC;
 		float x, y, hurtX, hurtY;
 		void removeComments();
 		CPacket getProperty(int pId);

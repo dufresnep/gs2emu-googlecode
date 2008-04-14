@@ -8,12 +8,18 @@
 
 CNpc::CNpc(CString& pImage, CString& pCode, float pX, float pY, CLevel* pLevel)
 {
+	CNpc( pImage, pCode, pX, pY, pLevel, false );
+}
+
+CNpc::CNpc(CString& pImage, CString& pCode, float pX, float pY, CLevel* pLevel, bool levelNPC)
+{
 	x = pX;
 	y = pY;
 
 	level = pLevel;
 	hurtX = hurtY = 0;
 	image = pImage;
+	this->levelNPC = levelNPC;
 	clientCode = pCode;
 	removeComments();
 	weaponName = getFunctionParameter("toweapons ");
