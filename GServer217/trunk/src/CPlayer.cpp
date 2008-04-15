@@ -3329,8 +3329,9 @@ void CPlayer::msgUPDATEFILE(CPacket& pPacket)
 
 void CPlayer::msgEMPTY36(CPacket& pPacket)
 {
-	CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "\"EMPTY36 was just sent.\"" );
-	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY36:\r\n" << pPacket.text(), false );
+	// Possibly hitobjects
+	//CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "\"EMPTY36 was just sent.\"" );
+	//errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY36:\r\n" << pPacket.text(), false );
 }
 
 void CPlayer::msgLANGUAGE(CPacket& pPacket)
