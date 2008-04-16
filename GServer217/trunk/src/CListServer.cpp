@@ -47,6 +47,7 @@ void ListServer_Main()
 
 	static CBuffer packetBuffer;
 	CBuffer receiveBuff;
+	CStringList lines;
 	if (listServer.receiveBytes(receiveBuff, 65536) < 0)
 	{
 		errorOut("serverlog.txt", "Disconnected from list server.");
@@ -55,24 +56,16 @@ void ListServer_Main()
 	}
 	packetBuffer << receiveBuff;
 
-	// Loop grabbing all the packets we can.
-	CStringList lines;
-	while ( packetBuffer.length() > 0 )
-	{
-		// Search for a packet.  If none is found, break out of the loop.
-		int lineEnd = packetBuffer.find( '\n' );
-		if ( lineEnd == -1 ) break;
+	// Search for a packet.  If none is found, break out of the loop.
+	int lineEnd = packetBuffer.findl( '\n' );
+	if ( lineEnd == -1 ) return;
 
-		// Copy the packet out and remove the \n
-		packetBuffer.setRead( 0 );
-		CBuffer line( packetBuffer.readString( "\n" ) );
-		packetBuffer.setWrite( 0 );
-		packetBuffer.remove(0, line.length() + 1);
-		line.removeAll( "\n" );
+	// Copy the packet out and remove the \n
+	CBuffer line = (CBuffer() << packetBuffer.text()).copy( 0, lineEnd + 1 );
+	packetBuffer.remove(0, line.length() + 1);
 
-		// Add the packet to the list of packets to parse.
-		lines.add( line );
-	}
+	// Process the packet.
+	lines.load( line.text(), "\n" );
 //	lines.load(receiveBuff.text(), "\n");
 
 	for (int i = 0; i < lines.count(); i++)
