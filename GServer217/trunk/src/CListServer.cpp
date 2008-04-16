@@ -66,9 +66,9 @@ void ListServer_Main()
 		// Copy the packet out and remove the \n
 		packetBuffer.setRead( 0 );
 		CBuffer line( packetBuffer.readString( "\n" ) );
-		line.removeAll( "\n" );
 		packetBuffer.setWrite( 0 );
 		packetBuffer.remove(0, line.length() + 1);
+		line.removeAll( "\n" );
 
 		// Add the packet to the list of packets to parse.
 		lines.add( line );
