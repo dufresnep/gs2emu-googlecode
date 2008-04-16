@@ -364,6 +364,8 @@ class CPlayer : public CAccount
 			codec mcodec;
 		#endif
 
+		CBuffer packetBuffer;
+
 		CPlayer(CSocket* pSocket);
 		~CPlayer();
 		void main();

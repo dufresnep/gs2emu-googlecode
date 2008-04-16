@@ -277,7 +277,6 @@ CPlayer::~CPlayer()
 void CPlayer::main()
 {
 	char packets[65536];
-	static CBuffer packetBuffer;
 	CBuffer receiveBuff;
 	int size=0;
 
