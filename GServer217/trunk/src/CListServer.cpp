@@ -45,7 +45,7 @@ void ListServer_Main()
 	if ( listServerFields[5] == "localhost" ) return;
     if (!lsConnected) return;
 
-	static CBuffer packetBuffer;
+	//static CBuffer packetBuffer;
 	CBuffer receiveBuff;
 	CStringList lines;
 	if (listServer.receiveBytes(receiveBuff, 65536) < 0)
@@ -54,8 +54,8 @@ void ListServer_Main()
 		lsConnected = false;
 		return;
 	}
-	packetBuffer << receiveBuff;
-
+	//packetBuffer << receiveBuff;
+/*
 	// Search for a packet.  If none is found, break out of the loop.
 	int lineEnd = packetBuffer.findl( '\n' );
 	if ( lineEnd == -1 ) return;
@@ -66,7 +66,8 @@ void ListServer_Main()
 
 	// Process the packet.
 	lines.load( line.text(), "\n" );
-//	lines.load(receiveBuff.text(), "\n");
+*/
+	lines.load(receiveBuff.text(), "\n");
 
 	for (int i = 0; i < lines.count(); i++)
 	{
