@@ -1585,7 +1585,7 @@ void CPlayer::sendFiles()
 		if(longName.length())
 		{
 			// Don't send default files!
-			if ( defaultGaniNames.find( CString(shortName) ) != -1 ||
+			if ( defaultGaniNames.find( shortName ) != -1 ||
 				defaultSwordNames.find( shortName ) != -1 ||
 				defaultShieldNames.find( shortName ) != -1 )
 			{
