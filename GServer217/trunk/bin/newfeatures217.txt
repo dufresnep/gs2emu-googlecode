@@ -5,6 +5,7 @@ New features/bug fixes in v2.171 build 57b
 Fixes:
 - Fixed a network bug while communication with the list server.  This
   should most likely fix the problem where profiles would get mangled.
+- Fixed default gani's sending to players when they shouldn't be.
 
 
 --------------------------------------------
