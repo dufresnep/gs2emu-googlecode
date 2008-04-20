@@ -174,7 +174,6 @@ char* itemNames[] = {
 #define itemcount 25
 
 CPlayer::CPlayer(CSocket* pSocket)
-: ftpOn( false )
 {
 	playerSock = pSocket;
 	loadOnly = deleteMe = allowBomb = false;

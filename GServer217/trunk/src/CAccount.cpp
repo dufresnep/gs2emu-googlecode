@@ -8,6 +8,7 @@
 #include "main.h"
 
 CAccount::CAccount()
+: ftpOn( false )
 {
 	banned = loadOnly = false;
 	adminRights = 0;
