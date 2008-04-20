@@ -74,13 +74,13 @@ bool sendInit[] =
 	true , true,  true,  true,  true,  false, // 18-23
 	false, true,  true,  true,  false, false, // 24-29
 	false, false, true,  false, false, true,  // 30-35
-	true, true,  true,  true,  true,  true,  // 36-41
+	true,  true,  true,  true,  true,  true,  // 36-41
 	false, false, false, false, false, false, // 42-47
 	false, false, false, false, false, false, // 48-53
 	true,  true,  true,  true,  true,  true,  // 54-59
 	true,  true,  true,  true,  true,  true,  // 60-65
 	true,  true,  true,  true,  true,  true,  // 66-71
-	true,  true,  true, false, false, false,  // 72-77
+	true,  true,  true,  false, false, false, // 72-77
 };
 
 /*
@@ -144,7 +144,7 @@ bool sendOthersInit[propscount + 3] =
 	true,  true,  true,  false, true,  true,  // 30-35
 	true,  true,  true,  true,  true,  true,  // 36-41
 	false, false, false, false, false, false, // 42-47
-	false, false, false, false, false, false, // 48-53
+	false, false, false, false, false, true, // 48-53
 	false, false, false, false, false, false, // 54-59
 	false, false, false, false, false, false, // 60-65
 	false, false, false, false, false, false, // 66-71

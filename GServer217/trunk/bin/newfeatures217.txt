@@ -29,6 +29,8 @@ Fixes:
 - Disabling the folders config through the server options via RC will
   now correctly re-cache all the sub-directories.
 - warpto no longer requires the "Warp players" right to work.
+- The player's status message will now be sent to new players who just
+  logged on.
 
 
 --------------------------------------------
