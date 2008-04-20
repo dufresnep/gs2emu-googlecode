@@ -2,6 +2,11 @@
 New features/bug fixes in v2.171 build 58
 --------------------------------------------
 
+Additions:
+- If you have the "Chance staff accounts" right, you can now give any
+  right to an account.  Previously you would need that right to be able
+  to set it.
+
 Changes:
 - Players no longer need to be in the staff= section of the server
   options in order to gain access to rights such as update level,

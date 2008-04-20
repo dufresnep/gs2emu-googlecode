@@ -968,12 +968,13 @@ void CPlayer::processChat(CString& pMessage)
 
 		if (words.count() == 2)
 		{
-			if ( !hasRight(CANWARPPLAYER) && !warptoforall )
+			if ( !hasRight(CANWARPTOPLAYER) && !warptoforall )
 			{
 				chatMsg = CString() << "(not authorized to warp)";
 				updateProp( CURCHAT );
 				return;
 			}
+
 			CPlayer* other = findPlayerId( words[1], true );
 			if ( other == NULL )
 				return;
@@ -4222,11 +4223,15 @@ void CPlayer::msgDSETRIGHTS(CPacket& pPacket)
 	}
 
 	// Don't allow RCs to give rights they don't have.
+	// Only affect people who don't have CANCHANGESTAFFACC.
 	int n_adminRights = (int)pPacket.readByte5();
-	for ( int i = 0; i < 20; ++i )
+	if ( !hasRight(CANCHANGESTAFFACC) )
 	{
-		if ( (this->adminRights & (1<<i)) == 0 )
-			n_adminRights &= ~(1<<i);
+		for ( int i = 0; i < 20; ++i )
+		{
+			if ( (this->adminRights & (1<<i)) == 0 )
+				n_adminRights &= ~(1<<i);
+		}
 	}
 
 	player->adminRights = n_adminRights;
