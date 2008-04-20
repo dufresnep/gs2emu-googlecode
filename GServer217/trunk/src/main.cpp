@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 		// Every 30 seconds
 		if (gameTime % 30 == 0)
 		{
-			ListServer_Send(CPacket() << (char)SLSPING);
+			ListServer_Send(CPacket() << (char)SLSPING << "\n");
 		}
 
 		// Every 10 seconds

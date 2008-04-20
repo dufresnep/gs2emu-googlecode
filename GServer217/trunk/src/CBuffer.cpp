@@ -529,7 +529,7 @@ CBuffer& CBuffer::remove(int pStart, int pCount)
 {
 	if(pStart + pCount > count || pStart < 0 || pCount <= 0)
 		return *this;
-	memcpy(data + pStart, data + pStart + pCount, count - pStart - pCount);
+	memmove(data + pStart, data + pStart + pCount, count - pStart - pCount);
 	count -= pCount;
 	clipCounters();
 	data[count] = 0;

@@ -256,7 +256,7 @@ CPlayer::~CPlayer()
 			sendRCPacket(CPacket() << (char)DRCLOG << "RC Disconnected: " << accountName);
 		}
 
-		ListServer_Send(CPacket() << (char)SLSPLAYERREM << (char)type << accountName);
+		ListServer_Send(CPacket() << (char)SLSPLAYERREM << (char)type << accountName << "\n");
 	}
 	else newPlayers.remove(this);
 	delete playerSock;
@@ -661,7 +661,7 @@ void CPlayer::sendAccount()
 	}
 
 	// Tell the list server that the player connected.
-	ListServer_Send(CPacket() << (char)SLSPLAYERADD << (char)accountName.length() << accountName << getProp(NICKNAME) << getProp(CURLEVEL) << getProp(PLAYERX) << getProp(PLAYERY) << getProp(PALIGNMENT) << (char)type);
+	ListServer_Send(CPacket() << (char)SLSPLAYERADD << (char)accountName.length() << accountName << getProp(NICKNAME) << getProp(CURLEVEL) << getProp(PLAYERX) << getProp(PLAYERY) << getProp(PALIGNMENT) << (char)type << "\n");
 }
 
 void CPlayer::parsePacket(CPacket& pPacket)
@@ -1031,7 +1031,7 @@ void CPlayer::processChat(CString& pMessage)
 			}
 		}
 		else
-			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)0 << (char)words[1].length() << words[1]);
+			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)0 << (char)words[1].length() << words[1] << "\n");
 	}
 	else if (words[0] == "setbody")
 	{
@@ -1047,7 +1047,7 @@ void CPlayer::processChat(CString& pMessage)
 			}
 		}
 		else
-			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)1 << (char)words[1].length() << words[1]);
+			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)1 << (char)words[1].length() << words[1] << "\n");
 	}
 	else if(words[0] == "setsword")
 	{
@@ -1063,7 +1063,7 @@ void CPlayer::processChat(CString& pMessage)
 			}
 		}
 		else
-			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)2 << (char)words[1].length() << words[1]);
+			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)2 << (char)words[1].length() << words[1] << "\n");
 	}
 	else if(words[0] == "setshield")
 	{
@@ -1079,7 +1079,7 @@ void CPlayer::processChat(CString& pMessage)
 			}
 		}
 		else
-			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)3 << (char)words[1].length() << words[1]);
+			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)3 << (char)words[1].length() << words[1] << "\n");
 	}
 
 	//colour commands
@@ -1125,7 +1125,7 @@ void CPlayer::setNick(CString& pNewNick, bool pVerifyGuild)
 		{
 			if (!guildMemberExists(tmpGuild, accountName, tmpNick))
 			{
-				ListServer_Send(CPacket() << (char)SLSGUILD << (short)id << (char)accountName.length() << accountName << (char)tmpNick.length() << tmpNick << (char)tmpGuild.length() << tmpGuild);
+				ListServer_Send(CPacket() << (char)SLSGUILD << (short)id << (char)accountName.length() << accountName << (char)tmpNick.length() << tmpNick << (char)tmpGuild.length() << tmpGuild << "\n");
 				tmpGuild = "";
 			}
 		}
@@ -1141,7 +1141,7 @@ void CPlayer::setNick(CString& pNewNick, bool pVerifyGuild)
 	nickName  = tmpNick;
 	guildName = tmpGuild;
 
-	ListServer_Send(CPacket() << (char)SLSNICKNAME << (char)accountName.length() << accountName << getProp(NICKNAME));
+	ListServer_Send(CPacket() << (char)SLSNICKNAME << (char)accountName.length() << accountName << getProp(NICKNAME) << "\n");
 	sendPacket(CPacket() << (char)SPLAYERPROPS << (char)NICKNAME << getProp(NICKNAME));
 
 	// When RC's log in, they will send their nickname.  When that happens, they still have
@@ -4127,7 +4127,7 @@ void CPlayer::msgDRCCHAT(CPacket& pPacket)
 void CPlayer::msgDGETPROFILE(CPacket& pPacket)
 {
 	if ( id == -1 ) return;
-	ListServer_Send(CPacket() << (char)SLSPROFREQ << (short)id << pPacket);
+	ListServer_Send(CPacket() << (char)SLSPROFREQ << (short)id << pPacket << "\n");
 }
 
 void CPlayer::msgDSETPROFILE(CPacket& pPacket)
@@ -4136,7 +4136,7 @@ void CPlayer::msgDSETPROFILE(CPacket& pPacket)
 	if (findPlayerId(account) != this)
 		return;
 
-	ListServer_Send(CPacket() << (char)SLSPROFSET << pPacket);
+	ListServer_Send(CPacket() << (char)SLSPROFSET << pPacket << "\n");
 }
 
 void CPlayer::msgWARPPLAYER(CPacket& pPacket)
