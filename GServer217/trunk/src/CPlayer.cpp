@@ -1022,7 +1022,7 @@ void CPlayer::processChat(CString& pMessage)
 		}
 
 		// Try and load now.
-		if( file )
+		if ( strlen( file ) != 0 )
 		{
 			if ( noFoldersConfig || isValidFile( CBuffer() << file, HEADGIF ) )
 			{
@@ -1031,16 +1031,14 @@ void CPlayer::processChat(CString& pMessage)
 			}
 		}
 		else
-		{
 			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)0 << (char)words[1].length() << words[1]);
-		}
 	}
 	else if (words[0] == "setbody")
 	{
 		if (words.count() <= 1 || !setbodyallowed)
 			return;
 
-		if(strlen(getDataFile(words[1].text())))
+		if ( strlen( getDataFile(words[1].text()) ) != 0 )
 		{
 			if ( noFoldersConfig || isValidFile( CBuffer() << getDataFile(words[1].text()), BODYIMG ) )
 			{
@@ -1049,15 +1047,14 @@ void CPlayer::processChat(CString& pMessage)
 			}
 		}
 		else
-		{
 			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)1 << (char)words[1].length() << words[1]);
-		}
-	} else if(words[0] == "setsword")
+	}
+	else if(words[0] == "setsword")
 	{
 		if(words.count() <= 1 || !setswordallowed)
 			return;
 
-		if(strlen(getDataFile(words[1].text())))
+		if ( strlen(getDataFile(words[1].text()) ) != 0 )
 		{
 			if ( noFoldersConfig || isValidFile( CBuffer() << getDataFile(words[1].text()), SWORDPOWER ) )
 			{
@@ -1066,15 +1063,14 @@ void CPlayer::processChat(CString& pMessage)
 			}
 		}
 		else
-		{
 			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)2 << (char)words[1].length() << words[1]);
-		}
-	} else if(words[0] == "setshield")
+	}
+	else if(words[0] == "setshield")
 	{
 		if(words.count() <= 1 || !setshieldallowed)
 			return;
 
-		if (strlen(getDataFile(words[1].text())))
+		if ( strlen(getDataFile(words[1].text())) != 0 )
 		{
 			if ( noFoldersConfig || isValidFile( CBuffer() << getDataFile(words[1].text()), SHIELDPOWER ) )
 			{
@@ -1083,9 +1079,7 @@ void CPlayer::processChat(CString& pMessage)
 			}
 		}
 		else
-		{
 			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)3 << (char)words[1].length() << words[1]);
-		}
 	}
 
 	//colour commands
@@ -3462,7 +3456,7 @@ void CPlayer::msgEMPTY50(CPacket& pPacket)
 //RC
 inline bool CPlayer::hasRight(int pRight)
 {
-	return ((adminRights & pRight) > 0 && hasStaff());
+	return ((adminRights & pRight) > 0 && (CBuffer() << playerSock->tcpIp()).match( adminIp.text() ) == true);
 }
 
 inline bool CPlayer::hasStaff()

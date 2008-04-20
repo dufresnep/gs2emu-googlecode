@@ -2,10 +2,19 @@
 New features/bug fixes in v2.171 build 57b
 --------------------------------------------
 
+Changes:
+- Players no longer need to be in the staff= section of the server
+  options in order to gain access to rights such as update level,
+  warpto, and summon.  The staff= section now only lists players who
+  are allowed to log on via RC.
+
 Fixes:
 - Fixed a network bug while communication with the list server.  This
   should most likely fix the problem where profiles would get mangled.
 - Fixed default gani's sending to players when they shouldn't be.
+- If the command sethead fails to find a head on the server, it will
+  now properly ask the list server if the specified head exists
+  globally.
 
 
 --------------------------------------------
