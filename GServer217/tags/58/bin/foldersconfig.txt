@@ -1,0 +1,18 @@
+# Folder Configuration
+body    bodies/*.png
+head    heads/*
+sword   swords/*
+shield  shields/*
+level   *.graal
+level   *.nw
+level   *.gmap
+file    *.png
+file    *.mng
+file    *.gif
+file    *.gani
+file    *.wav
+file    *.txt
+file    *.gmap
+file    images/*.png
+file    images/*.gif
+file    images/*.mng
