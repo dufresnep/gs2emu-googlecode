@@ -174,6 +174,7 @@ char* itemNames[] = {
 #define itemcount 25
 
 CPlayer::CPlayer(CSocket* pSocket)
+: ftpOn( false )
 {
 	playerSock = pSocket;
 	loadOnly = deleteMe = allowBomb = false;
@@ -1580,10 +1581,12 @@ void CPlayer::sendFiles()
 		{
 			// Don't send default files!
 			if ( defaultGaniNames.find( shortName ) != -1 ||
+				defaultGaniNames.find( (CString() << shortName << ".gani") ) != -1 ||
 				defaultSwordNames.find( shortName ) != -1 ||
 				defaultShieldNames.find( shortName ) != -1 )
 			{
-				//failed = true;
+				failed = true;
+				modTime = 0;		// Just in case the compiler tries to optimize this out.
 			}
 			else
 			{
@@ -4238,7 +4241,7 @@ void CPlayer::msgDSETRIGHTS(CPacket& pPacket)
 		}
 	}
 
-	if (player->ftpOn) player->msgDWANTFTP(CPacket() << "");
+	if ( player->type == CLIENTRC && player->ftpOn == true ) player->msgDWANTFTP(CPacket() << "");
 	player->saveAccount(true);
 	if (player->id == -1)
 	{

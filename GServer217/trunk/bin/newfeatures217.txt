@@ -14,7 +14,10 @@ Fixes:
 - Fixed default gani's sending to players when they shouldn't be.
 - If the command sethead fails to find a head on the server, it will
   now properly ask the list server if the specified head exists
-  globally.
+  globally and download it.
+- When setting a player's rights, it would sometimes (almost always)
+  trigger a "[Hack] Account attempted to open a FileBrowser session."
+  message.
 
 
 --------------------------------------------
