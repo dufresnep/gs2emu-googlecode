@@ -6,11 +6,14 @@ Changes:
 - Players no longer need to be in the staff= section of the server
   options in order to gain access to rights such as update level,
   warpto, and summon.  The staff= section now only lists players who
-  are allowed to log on via RC.
+  are allowed to log on via RC (and players who can warp out of jail
+  levels).
 
 Fixes:
 - Fixed a network bug while communication with the list server.  This
   should most likely fix the problem where profiles would get mangled.
+  It should also fix bugs where files retrieved from the list server
+  could become corrupted.
 - Fixed default gani's sending to players when they shouldn't be.
 - If the command sethead fails to find a head on the server, it will
   now properly ask the list server if the specified head exists
@@ -20,6 +23,7 @@ Fixes:
   message.
 - Disabling the folders config through the server options via RC will
   now correctly re-cache all the sub-directories.
+- warpto no longer requires the "Warp players" right to work.
 
 
 --------------------------------------------

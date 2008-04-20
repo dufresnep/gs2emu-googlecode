@@ -958,36 +958,44 @@ void CPlayer::processChat(CString& pMessage)
 	}
 	*/
 
-	if (words[0] == "warpto" && (hasRight(CANWARPPLAYER) || hasRight(CANWARPXY) || warptoforall))
+	if ( words[0] == "warpto" )
 	{
-		if(words.count() <= 1)
+		if(words.count() < 2)
 			return;
-		if (!hasRight(CANWARPPLAYER) && !warptoforall)
-		{
-			chatMsg = CString() << "(not authorized to warp)";
-			updateProp(CURCHAT);
-			return;
-		}
 
 		CString name;
 		name = levelName;
 
 		if (words.count() == 2)
 		{
-			CPlayer* other = findPlayerId(words[1], true);
-			if(other == NULL)
+			if ( !hasRight(CANWARPPLAYER) && !warptoforall )
+			{
+				chatMsg = CString() << "(not authorized to warp)";
+				updateProp( CURCHAT );
+				return;
+			}
+			CPlayer* other = findPlayerId( words[1], true );
+			if ( other == NULL )
 				return;
 			name = other->levelName;
 			x = other->x;
 			y = other->y;
-		} else if(words.count() >= 3 && (hasRight(CANWARPXY) || warptoforall))
+		}
+		else if ( words.count() > 2 )
 		{
-			x = (float)atof(words[1].text());
-			y = (float)atof(words[2].text());
-			if(words.count() >= 4)
+			if ( !hasRight(CANWARPXY) && !warptoforall )
+			{
+				chatMsg = CString() << "(not authorized to warp)";
+				updateProp( CURCHAT );
+				return;
+			}
+
+			x = (float)atof( words[1].text() );
+			y = (float)atof( words[2].text() );
+			if ( words.count() > 3 )
 				name = words[3];
 		}
-		warp(name, x, y);
+		warp( name, x, y );
 	}
 	else if (words[0] == "summon")
 	{
