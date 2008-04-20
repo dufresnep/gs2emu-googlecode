@@ -3,7 +3,7 @@ New features/bug fixes in v2.171 build 58
 --------------------------------------------
 
 Additions:
-- If you have the "Chance staff accounts" right, you can now give any
+- If you have the "Change staff accounts" right, you can now give any
   right to an account.  Previously you would need that right to be able
   to set it.
 
@@ -19,13 +19,13 @@ Fixes:
   should most likely fix the problem where profiles would get mangled.
   It should also fix bugs where files retrieved from the list server
   could become corrupted.
-- Fixed default gani's sending to players when they shouldn't be.
+- Fixed default ganis sending to players when they shouldn't be.
 - If the command sethead fails to find a head on the server, it will
   now properly ask the list server if the specified head exists
   globally and download it.
 - When setting a player's rights, it would sometimes (almost always)
   trigger a "[Hack] Account attempted to open a FileBrowser session."
-  message.
+  message.  (Actually a 1/4294967295 chance to not declare as a hack.)
 - Disabling the folders config through the server options via RC will
   now correctly re-cache all the sub-directories.
 - warpto no longer requires the "Warp players" right to work.
