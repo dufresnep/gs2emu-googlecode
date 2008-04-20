@@ -490,6 +490,9 @@ bool loadSettings(char* pFile)
 		}
 	}
 
+	// In case we turned off folders config, get the new sub dirs.
+	getSubDirs();
+
 	return true;
 }
 
@@ -498,6 +501,7 @@ void getSubDirs()
 	// If foldersconfig.txt is turned off, use the old style.
 	if ( noFoldersConfig )
 	{
+		subDirs.clear();
 		getSubDirs_os( dataDir.text() );
 		if ( shareFolder.length() > 1 )
 			getSubDirs_os( shareFolder.text() );

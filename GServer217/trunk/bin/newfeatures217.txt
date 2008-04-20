@@ -18,6 +18,8 @@ Fixes:
 - When setting a player's rights, it would sometimes (almost always)
   trigger a "[Hack] Account attempted to open a FileBrowser session."
   message.
+- Disabling the folders config through the server options via RC will
+  now correctly re-cache all the sub-directories.
 
 
 --------------------------------------------
