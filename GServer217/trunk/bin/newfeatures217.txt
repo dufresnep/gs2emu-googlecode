@@ -1,4 +1,15 @@
 --------------------------------------------
+New features/bug fixes in v2.171 build 59 (pre-release)
+--------------------------------------------
+
+Maintenance:
+- Some constructor reworking.
+
+Fixes:
+- Fixed the status list bugs that could cause crashes.
+
+
+--------------------------------------------
 New features/bug fixes in v2.171 build 58
 --------------------------------------------
 

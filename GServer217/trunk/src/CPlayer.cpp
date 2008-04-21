@@ -174,46 +174,15 @@ char* itemNames[] = {
 #define itemcount 25
 
 CPlayer::CPlayer(CSocket* pSocket)
+: additionalFlags(0), carrySprite(-1), failAttempts(0), key(0), iterator(0),
+id(-1), packCount(0), udpPort(0), lastNick(0), statusMsg(0),
+firstPacket(true), firstLevel(true), deleteMe(false), allowBomb(false),
+level(NOLEVEL), playerSock(pSocket)
 {
-	playerSock = pSocket;
-	loadOnly = deleteMe = allowBomb = false;
-	firstPacket = firstLevel = true;
-	key = adminRights =  0;
 	lastData = lastChat = lastSave = loginTime = getSysTime();
 	lastMessage = lastMovement = getTime();
-	lastNick = 0;
 
 	iterator = 0x04A80B38;
-	x = y = 32;
-	z = 0;
-	darts = 10;
-	bombs = 5;
-	rubins = 0;
-	glovePower = bombPower = swordPower = shieldPower = 1;
-	power = maxPower = 3;
-	kills = deaths = udpPort = statusMsg;
-	rating = 1500.0f;
-	oldDeviation = deviation = 350.0f;
-	lastSparTime = 0;
-	sprite = 2;
-	status = 20;
-	ap = 50;
-	onlineSecs = horseBushes = magicPoints = 0;
-	apCounter = 100;
-	type = lastIp = additionalFlags = 0;
-	memset(colors, 0, sizeof(colors));
-	levelName = "";
-	gAni = "idle";
-	headImage = "head0.png";
-	swordImage = "sword1.png";
-	bodyImage = "body.png";
-	nickName = "unknown";
-	shieldImage = "shield1.png";
-	id = -1;
-	level = NOLEVEL;
-	carrySprite = -1;
-	packCount = failAttempts = 0;
-	banned = false;
 }
 
 CPlayer::~CPlayer()
@@ -1946,7 +1915,8 @@ CPacket CPlayer::getProp(int pProp)
 			break;
 
 		case PSTATUSMSG:
-			retVal.writeByte1(statusMsg);
+			if ( statusMsg > statusList.count() - 1 )  retVal.writeByte1( 0 );
+			else retVal.writeByte1( (char)statusMsg );
 			break;
 
 		case GATTRIB10: retVal << (char)myAttr[9].length() << myAttr[9]; break;
@@ -2369,15 +2339,15 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 				break;
 
 			case PSTATUSMSG:
-				statusMsg = pProps.readByte1();
+				statusMsg = (unsigned char)pProps.readByte1();
 
 				// Allows proper RC login.
 				if ( id == -1 ) break;
 
-				for(int i = 0; i < playerList.count(); i++)
+				for ( int i = 0; i < playerList.count(); i++ )
 				{
-					CPlayer*other = (CPlayer*)playerList[i];
-					if(other != this)
+					CPlayer* other = (CPlayer*)playerList[i];
+					if ( other != this )
 						other->sendPacket(CPacket() << (char)OTHERPLPROPS << (short)id <<
 							(char)PSTATUSMSG << (char)statusMsg);
 				}

@@ -12,15 +12,12 @@ CNpc::CNpc(CString& pImage, CString& pCode, float pX, float pY, CLevel* pLevel)
 }
 
 CNpc::CNpc(CString& pImage, CString& pCode, float pX, float pY, CLevel* pLevel, bool levelNPC)
+: x(pX), y(pY), hurtX(0), hurtY(0), level(pLevel), image(pImage),
+levelNPC(levelNPC), clientCode(pCode),
+rupees(0), darts(0), bombs(0), glovePower(0), blockFlags(0), bombPower(0),
+power(0), sprite(2), shieldPower(0), swordPower(0),
+visFlags(1);
 {
-	x = pX;
-	y = pY;
-
-	level = pLevel;
-	hurtX = hurtY = 0;
-	image = pImage;
-	this->levelNPC = levelNPC;
-	clientCode = pCode;
 	removeComments();
 	weaponName = getFunctionParameter("toweapons ");
 	if ( clientCode.length() < 20 )
@@ -35,12 +32,6 @@ CNpc::CNpc(CString& pImage, CString& pCode, float pX, float pY, CLevel* pLevel, 
 	memset(colors, 0, sizeof(colors));
 	memset(modTime, 0, sizeof(modTime));
 	gAni = "idle";
-	rupees = darts = bombs = glovePower = blockFlags = bombPower = power = 0;
-	sprite = 2;
-	shieldPower = swordPower = 0;
-	shieldImage = "";
-	swordImage = "";
-	visFlags = 1;
 	for (int i = 0; i < 6; i++)
 		imagePart.writeByte(32);
 
