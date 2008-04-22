@@ -975,8 +975,11 @@ void errorOut(char *pFile, CBuffer pError, bool pWrite)
 	char buffer[60] = "logs/";
 	strcpy(buffer+5, pFile);
 	FILE *file = fopen(buffer, "a");
-	fprintf(file, "[%s] %s\r\n", getTimeStr(0).text(), pError.text());
-	fclose(file);
+	if ( file )
+	{
+		fprintf(file, "[%s] %s\r\n", getTimeStr(0).text(), pError.text());
+		fclose(file);
+	}
 }
 
 CPacket listFiles(char *pDir, char *pRights)
