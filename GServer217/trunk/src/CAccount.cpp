@@ -14,7 +14,7 @@ bombPower(1), glovePower(1), shieldPower(1), swordPower(1),
 deaths(0), kills(0), horseBushes(0), ap(50), apCounter(100),
 magicPoints(0), rubins(0), bombs(5), darts(10),
 x(32.0f), y(32.0f), z(0.0f), power(3.0f), maxPower(3.0f),
-rating(1500.0f), deviation(350.0f), oldDeviation(350.0f), lastSparTime(0.0f)
+rating(1500.0f), deviation(350.0f), oldDeviation(350.0f), lastSparTime(0)
 {
 	adminIp = "0.0.0.0";
 	memset(colors, 0, sizeof(colors));

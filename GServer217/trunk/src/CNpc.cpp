@@ -16,7 +16,7 @@ CNpc::CNpc(CString& pImage, CString& pCode, float pX, float pY, CLevel* pLevel, 
 levelNPC(levelNPC), clientCode(pCode),
 rupees(0), darts(0), bombs(0), glovePower(0), blockFlags(0), bombPower(0),
 power(0), sprite(2), shieldPower(0), swordPower(0),
-visFlags(1);
+visFlags(1)
 {
 	removeComments();
 	weaponName = getFunctionParameter("toweapons ");
