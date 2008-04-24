@@ -3,6 +3,10 @@ body    bodies/*.png
 head    heads/*
 sword   swords/*
 shield  shields/*
+body    global/*.png
+head    global/*
+sword   global/*
+shield  global/*
 level   *.graal
 level   *.nw
 level   *.gmap
@@ -16,3 +20,4 @@ file    *.gmap
 file    images/*.png
 file    images/*.gif
 file    images/*.mng
+file    global/*

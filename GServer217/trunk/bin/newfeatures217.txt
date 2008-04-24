@@ -4,6 +4,8 @@ New features/bug fixes in v2.171 build 59 (pre-release)
 
 Maintenance:
 - Some constructor reworking.
+- Updated defaultaccount.txt with some default values.
+- Updated foldersconfig.txt with the global directory pre set up.
 
 Fixes:
 - Fixed the status list bugs that could cause crashes.
