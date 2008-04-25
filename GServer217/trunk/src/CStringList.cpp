@@ -142,6 +142,7 @@ int CStringList::findIn(const char* pString)
 void CStringList::save(const char* pFileName)
 {
 	FILE* file = fopen(pFileName, "wb");
+	if ( file == 0 ) return;
 	for(int i = 0; i < count(); i++)
 		fprintf(file, "%s\r\n", item(i).text());
 	fclose(file);
