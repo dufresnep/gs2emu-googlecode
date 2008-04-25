@@ -324,5 +324,9 @@ void ListServer_Send(CPacket &pPacket)
             return;
     }
 
+	// Make sure a newline is sent after the message.
+	if ( pPacket[ pPacket.length() - 1 ] != '\n' )
+		pPacket << "\n";
+
     listServer.sendBuffer(pPacket);
 }
