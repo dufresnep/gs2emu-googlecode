@@ -610,8 +610,10 @@ CBuffer& CBuffer::tokenize()
 		temp << copy( pos[1], pos[0] - pos[1] );
 		temp.replaceAll( "\"", "\"\"" );	// Change all " to ""
 		temp.removeAll( "\r" );
-		//if ( temp.length() > 0 )
-		retVal << "\"" << temp << "\",";
+		if ( temp.length() > 0 )
+			retVal << "\"" << temp << "\",";
+		else
+			retVal << ",";
 		pos[1] = pos[0] + 1;
 	}
 
@@ -645,7 +647,12 @@ CBuffer& CBuffer::untokenize()
 		}
 
 		// Check for ,,"""blah"
-		if ( nData[pos[1]] == '\"' && nData[pos[1]+1] != '\"' ) pos[1]++;
+		if ( nData[pos[1]] == '\"' && nData[pos[1]+1] != '\"' )
+		{
+			// Check to make sure it isn't ,"",
+			if ( !(pos[1] + 2 < nData.count() && nData[pos[1]+2] == ',') )
+				pos[1]++;
+		}
 
 		// Check and see if the comma is outside or inside of the thing string.
 		// If pos[1] points to a quotation mark we have to find the closing quotation mark.
