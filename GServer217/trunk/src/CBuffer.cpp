@@ -650,7 +650,7 @@ CBuffer& CBuffer::untokenize()
 		if ( nData[pos[1]] == '\"' && nData[pos[1]+1] != '\"' )
 		{
 			// Check to make sure it isn't ,"",
-			if ( !(pos[1] + 2 < nData.count() && nData[pos[1]+2] == ',') )
+			if ( !(pos[1] + 2 < nData.length() && nData[pos[1]+2] == ',') )
 				pos[1]++;
 		}
 
