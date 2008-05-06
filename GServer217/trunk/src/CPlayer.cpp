@@ -3757,7 +3757,17 @@ void CPlayer::msgDDELACCOUNT(CPacket& pPacket)
 		return;
 	}
 
+	// Get the account name.
 	CString accname = pPacket.readString("");
+
+	// Don't let anybody delete the defaultaccount.
+	if ( accname == "defaultaccount" )
+	{
+		sendPacket( CPacket() << (char)DRCLOG << "Server: Not allowed to delete the default account.  If you wish to do this, manually delete the account from the server." );
+		return;
+	}
+
+	// Remove the account.
 	if (remove(CString(CString() << "accounts" << fSep << accname << ".txt").text()) == 0)
 	{
 		errorOut( "rclog.txt", CString() << accountName << " has deleted the account:" << accname );

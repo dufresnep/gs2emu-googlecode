@@ -7,6 +7,11 @@ Maintenance:
 - Updated defaultaccount.txt with some default values.
 - Updated foldersconfig.txt with the global directory pre set up.
 
+Changes:
+- You can no longer delete the defaultaccount account through RC.  If
+  you ever wish to do that, you will need to manually delete it through
+  the File Browser or through some other means.
+
 Fixes:
 - Fixed the status list bugs that could cause crashes.
 - Fixed some crash bugs related to not checking if fopen succeeded.
