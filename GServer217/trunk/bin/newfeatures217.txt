@@ -15,6 +15,9 @@ Changes:
 Fixes:
 - Fixed the status list bugs that could cause crashes.
 - Fixed some crash bugs related to not checking if fopen succeeded.
+- Fixed a bug where fractional values didn't work with putnpc.  Before,
+  if you tried to place an npc at (30.5, 27.5), it would instead place
+  it at (30, 27).
 
 
 --------------------------------------------

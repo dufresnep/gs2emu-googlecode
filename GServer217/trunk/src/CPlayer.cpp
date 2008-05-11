@@ -3089,8 +3089,8 @@ void CPlayer::msgADDNPC(CPacket& pPacket)
 {
 	CString image = pPacket.readChars(pPacket.readByte1());
 	CString codeFile = pPacket.readChars(pPacket.readByte1());
-	float nX = (float)(pPacket.readByte1()/2);
-	float nY = (float)(pPacket.readByte1()/2);
+	float nX = (float)(pPacket.readByte1())/2;
+	float nY = (float)(pPacket.readByte1())/2;
 
 	if ( putnpcenabled == true )
 		level->addNewNpc(image, codeFile, nX, nY);
