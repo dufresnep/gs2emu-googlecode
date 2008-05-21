@@ -6,6 +6,7 @@
 #include "CDatabase.h"
 #include "CIni.h"
 #include "main.h"
+#include <time.h>
 
 CAccount::CAccount()
 : banned(false), ftpOn(false), loadOnly(false), lastIp(0), onlineSecs(0),

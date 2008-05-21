@@ -11,7 +11,7 @@
 #include "CList.h"
 #include "CWeapon.h"
 
-CString base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+CString base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 CString signText = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 				"0123456789!?-.,#>()#####\"####':/~&### <####;\n";
 CString signSymbols = "ABXYudlrhxyz#4.";

@@ -6,6 +6,7 @@
 #define CACCOUNTH
 #include "CString.h"
 #include "CStringList.h"
+#include <time.h>
 
 class CAccount
 {
