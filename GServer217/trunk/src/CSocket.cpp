@@ -45,7 +45,7 @@ bool CSocket::connectSock(char* pAddress, int pPort)
 
 	addr.sin_family = AF_INET;
 	addr.sin_addr = *((in_addr*)*hostEntry->h_addr_list);
-	addr.sin_port = htons((u_short)pPort);
+	addr.sin_port = htons((unsigned short)pPort);
     if (connect(sockId, (sockaddr*)&addr, sizeof(sockaddr_in)) == -1)
     {
         sockId = 0;
