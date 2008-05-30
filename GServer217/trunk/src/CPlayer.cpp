@@ -1129,7 +1129,7 @@ void CPlayer::setNick(CString& pNewNick, bool pVerifyGuild)
 		for (int i = 0; i < playerList.count(); i++)
 		{
 			CPlayer*other = (CPlayer*)playerList[i];
-			if (other != this)
+			if (other != this || other->type == CLIENTRC)
 				other->sendPacket(CPacket() << (char)OTHERPLPROPS << (short)id << (char)NICKNAME << getProp(NICKNAME));
 		}
 	}

@@ -18,6 +18,8 @@ Fixes:
 - Fixed a bug where fractional values didn't work with putnpc.  Before,
   if you tried to place an npc at (30.5, 27.5), it would instead place
   it at (30, 27).
+- If an RC changes their name, the new name should now be visible in
+  the RC player list.
 
 
 --------------------------------------------
