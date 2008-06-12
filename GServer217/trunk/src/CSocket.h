@@ -51,6 +51,10 @@
 	#include <errno.h>
 #endif
 
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0x2000
+#endif
+
 #include "CPacket.h"
 
 class CSocket

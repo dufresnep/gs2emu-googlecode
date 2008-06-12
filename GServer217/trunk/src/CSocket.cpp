@@ -157,7 +157,7 @@ int CSocket::sendBytes(char* pSource, int pLength, char* pIp, int pPort)
             return -1;
         else return size;
     }
-    size = send(sockId, pSource, pLength, 0);
+    size = send(sockId, pSource, pLength, MSG_NOSIGNAL);
     if(size == 0)
         return -1;
     else return size;
@@ -199,7 +199,7 @@ int CSocket::receiveBytes(CBuffer& pDestination, int pCount, int pMode)
 		if(len < 0)
 			return size;
 
-		int a = recv(sockId, buff, len, 0);
+		int a = recv(sockId, buff, len, MSG_NOSIGNAL);
 		if (a == 0)
 			return -1;
 
