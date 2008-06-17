@@ -261,7 +261,7 @@ void CPlayer::main()
 
 	if (packetBuffer.length() >= 128*1024)
 	{
-		errorOut("errorlog.txt", CString() << "Client " << accountName << "has sent to much data (input buffer >=128k)");
+		errorOut("errorlog.txt", CString() << "Client " << accountName << " has sent to much data (input buffer >=128k)");
 		sendPacket(CPacket() << (char)DISMESSAGE << "Your Graal.exe has sent to much data (>=128k in the input buffer)");
 		deleteMe = true;
 		return;
@@ -4212,6 +4212,15 @@ void CPlayer::msgDSETRIGHTS(CPacket& pPacket)
 			if ( (this->adminRights & (1<<i)) == 0 )
 				n_adminRights &= ~(1<<i);
 		}
+	}
+
+	// Don't allow you to remove your own CANCHANGESTAFFACC or CANCHANGERIGHTS.
+	if ( player == this )
+	{
+		if ( (n_adminRights & CANCHANGESTAFFACC) == 0 )
+			n_adminRights |= CANCHANGESTAFFACC;
+		if ( (n_adminRights & CANCHANGERIGHTS) == 0 )
+			n_adminRights |= CANCHANGERIGHTS;
 	}
 
 	player->adminRights = n_adminRights;

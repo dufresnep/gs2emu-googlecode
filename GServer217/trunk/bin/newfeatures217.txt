@@ -11,6 +11,8 @@ Changes:
 - You can no longer delete the defaultaccount account through RC.  If
   you ever wish to do that, you will need to manually delete it through
   the File Browser or through some other means.
+- You can no longer remove your own "Change Rights" or "Change Staff
+  Account" rights through RC.
 
 Fixes:
 - Fixed the status list bugs that could cause crashes.
