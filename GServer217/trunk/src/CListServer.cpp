@@ -11,6 +11,7 @@ void ListServer_Connect()
 {
         if ((lsConnected = listServer.connectSock(findKey("listip"), atoi(findKey("listport")))) == false)
         {
+			listServer.closeSock();
             errorOut("errorlog.txt", CBuffer() << "Unable to connect to list server.", true);
             return;
         }
