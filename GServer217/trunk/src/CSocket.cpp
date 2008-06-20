@@ -2,6 +2,7 @@
     $Id$
  (C) GraalReborn 2007 */
 
+#include "main.h"
 #include "CSocket.h"
 #define MIN(a, b) (a < b ? a : b)
 
@@ -37,11 +38,17 @@ bool CSocket::connectSock(char* pAddress, int pPort)
 	if(sockId == 0)
 	{
         if((sockId = (int)socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == 0)
+		{
+			errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - socket() returned 0.", true );
             return false;
+		}
 	}
 
     if((hostEntry = gethostbyname(pAddress)) == NULL)
+	{
+		errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - gethostbyname() returned 0.", true );
 		return false;
+	}
 
 	addr.sin_family = AF_INET;
 	addr.sin_addr = *((in_addr*)*hostEntry->h_addr_list);
@@ -49,6 +56,7 @@ bool CSocket::connectSock(char* pAddress, int pPort)
     if (connect(sockId, (sockaddr*)&addr, sizeof(sockaddr_in)) == -1)
     {
         sockId = 0;
+		errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - connect() failed.  Returned " << toString(errno), true );
         return false;
     }
 	return true;
