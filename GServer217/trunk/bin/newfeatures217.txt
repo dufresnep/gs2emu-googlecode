@@ -13,6 +13,8 @@ Changes:
   the File Browser or through some other means.
 - You can no longer remove your own "Change Rights" or "Change Staff
   Account" rights through RC.
+- png, mng, and gif auto detection has now been added for all of the
+  setbody, sethead, etc commands.
 
 Fixes:
 - Fixed the status list bugs that could cause crashes.

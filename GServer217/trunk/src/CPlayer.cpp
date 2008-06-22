@@ -996,7 +996,10 @@ void CPlayer::processChat(CString& pMessage)
 			int i = 0;
 			char* ext[] = {".png", ".mng", ".gif"};
 			while ( i < 3 && strlen(file) == 0 )
-				file = getDataFile( (CString() << words[1] << ext[i++]).text() );
+			{
+				file = getDataFile( (CString() << words[1] << ext[i]).text() );
+				i++;
+			}
 		}
 
 		// Try and load now.
@@ -1016,9 +1019,24 @@ void CPlayer::processChat(CString& pMessage)
 		if (words.count() <= 1 || !setbodyallowed)
 			return;
 
-		if ( strlen( getDataFile(words[1].text()) ) != 0 )
+		// Check if we can find the file.
+		char* file = getDataFile(words[1].text());
+		if ( strlen(file) == 0 )
 		{
-			if ( noFoldersConfig || isValidFile( CBuffer() << getDataFile(words[1].text()), BODYIMG ) )
+			// File not found.  Try appending extensions.
+			int i = 0;
+			char* ext[] = {".png", ".mng", ".gif"};
+			while ( i < 3 && strlen(file) == 0 )
+			{
+				file = getDataFile( (CString() << words[1] << ext[i]).text() );
+				i++;
+			}
+		}
+
+		// Try and load now.
+		if ( strlen( file ) != 0 )
+		{
+			if ( noFoldersConfig || isValidFile( CBuffer() << file, BODYIMG ) )
 			{
 				bodyImage = words[1];
 				updateProp(BODYIMG);
@@ -1032,9 +1050,24 @@ void CPlayer::processChat(CString& pMessage)
 		if(words.count() <= 1 || !setswordallowed)
 			return;
 
-		if ( strlen(getDataFile(words[1].text()) ) != 0 )
+		// Check if we can find the file.
+		char* file = getDataFile(words[1].text());
+		if ( strlen(file) == 0 )
 		{
-			if ( noFoldersConfig || isValidFile( CBuffer() << getDataFile(words[1].text()), SWORDPOWER ) )
+			// File not found.  Try appending extensions.
+			int i = 0;
+			char* ext[] = {".png", ".mng", ".gif"};
+			while ( i < 3 && strlen(file) == 0 )
+			{
+				file = getDataFile( (CString() << words[1] << ext[i]).text() );
+				i++;
+			}
+		}
+
+		// Try and load now.
+		if ( strlen( file ) != 0 )
+		{
+			if ( noFoldersConfig || isValidFile( CBuffer() << file, SWORDPOWER ) )
 			{
 				swordImage = words[1];
 				updateProp(SWORDPOWER);
@@ -1048,9 +1081,24 @@ void CPlayer::processChat(CString& pMessage)
 		if(words.count() <= 1 || !setshieldallowed)
 			return;
 
-		if ( strlen(getDataFile(words[1].text())) != 0 )
+		// Check if we can find the file.
+		char* file = getDataFile(words[1].text());
+		if ( strlen(file) == 0 )
 		{
-			if ( noFoldersConfig || isValidFile( CBuffer() << getDataFile(words[1].text()), SHIELDPOWER ) )
+			// File not found.  Try appending extensions.
+			int i = 0;
+			char* ext[] = {".png", ".mng", ".gif"};
+			while ( i < 3 && strlen(file) == 0 )
+			{
+				file = getDataFile( (CString() << words[1] << ext[i]).text() );
+				i++;
+			}
+		}
+
+		// Try and load now.
+		if ( strlen( file ) != 0 )
+		{
+			if ( noFoldersConfig || isValidFile( CBuffer() << file, SHIELDPOWER ) )
 			{
 				shieldImage = words[1];
 				updateProp(SHIELDPOWER);
