@@ -61,6 +61,7 @@ class CSocket
 {
 	int sockId;
 	bool blocking, udp;
+    sockaddr_in addr;
 
 	public:
 		CSocket(char* pAddress, int pPort);

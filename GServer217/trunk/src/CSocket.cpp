@@ -28,11 +28,11 @@ CSocket::CSocket(int pSockId)
     udp = (type == SOCK_DGRAM);
 	blocking = false;
 	sockId = pSockId;
+	memset( (void *)&addr, 0, sizeof(sockaddr_in) );
 }
 
 bool CSocket::connectSock(char* pAddress, int pPort)
 {
-    sockaddr_in addr;
 	hostent*  hostEntry;
 	udp = false;
 	if(sockId == 0)
@@ -44,15 +44,19 @@ bool CSocket::connectSock(char* pAddress, int pPort)
 		}
 	}
 
-    if((hostEntry = gethostbyname(pAddress)) == NULL)
+	if ( addr.sin_family != AF_INET )
 	{
-		errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - gethostbyname() returned 0.", true );
-		return false;
+		if((hostEntry = gethostbyname(pAddress)) == NULL)
+		{
+			errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - gethostbyname() returned 0.", true );
+			return false;
+		}
+
+		addr.sin_family = AF_INET;
+		addr.sin_addr = *((in_addr*)*hostEntry->h_addr_list);
+		addr.sin_port = htons((unsigned short)pPort);
 	}
 
-	addr.sin_family = AF_INET;
-	addr.sin_addr = *((in_addr*)*hostEntry->h_addr_list);
-	addr.sin_port = htons((unsigned short)pPort);
     if (connect(sockId, (sockaddr*)&addr, sizeof(sockaddr_in)) == -1)
     {
         sockId = 0;
