@@ -611,9 +611,9 @@ void CNpc::setProps(CPacket& pProps)
 		previousMessage = index;
 
 		// If a prop changed, adjust its mod time.
-		if(index >= 0 && index < npcpropcount)
+		if ( index >= 0 && index < npcpropcount )
 		{
-			if ( oldProp != getProperty(index) )
+			if ( (oldProp != getProperty(index)) || (index == NPCANI) )
 				modTime[index] = getSysTime();
 		}
 	}
