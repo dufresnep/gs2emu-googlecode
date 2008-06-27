@@ -1512,6 +1512,20 @@ void CPlayer::leaveLevel()
 	if (level == NOLEVEL)
 		return;
 
+	// Remember when the player last visited the level.
+	bool found = false;
+	for ( int i = 0; i < enteredLevels.count(); ++i )
+	{
+		CEnteredLevel* entered = (CEnteredLevel*)enteredLevels[i];
+		if ( entered->level == level )
+		{
+			found = true;
+			entered->time = getSysTime();
+		}
+	}
+	if ( found == false )
+		enteredLevels.add(new CEnteredLevel(level, getSysTime()));
+
 	// Leave the level.
 	level->players.remove(this);
 	if ( level->players.count() > 0 )
@@ -1528,9 +1542,6 @@ void CPlayer::leaveLevel()
 		sendPacket(CPacket() << (char)OTHERPLPROPS << (short)other->id << (char)50 << (char)0);
 	}
 	compressAndSend();
-
-	// Remember when the player last visited the level.
-	enteredLevels.add(new CEnteredLevel(level, getSysTime()));
 
 	// Sad hack to try to fix npcs.
 	//if ( level->players.count() == 0 ) CLevel::updateLevel(level->fileName);

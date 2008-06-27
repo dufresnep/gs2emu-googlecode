@@ -686,19 +686,20 @@ void CLevel::updateLevel(CString& pFileName)
 		for ( int j = player->enteredLevels.count() - 1; j >= 0; --j )
 		{
 			CEnteredLevel* entered = (CEnteredLevel*)player->enteredLevels[j];
-			if ( entered == 0 || entered->level == level )
+			if ( entered == 0 )
 			{
-				entered->time = 0;
-				//delete entered;
-				//player->enteredLevels.remove( j );
-				break;
+				player->enteredLevels.remove( j );
+				continue;
 			}
+			if ( entered->level == level )
+				entered->time = 0;
 		}
 	}
 
 	for ( int i = 0; i < playerTemp.count(); i++ )
 	{
 		CPlayer* player = (CPlayer*)playerTemp[i];
+		player->sendPacket(CPacket() << (char)PLAYERWARPED << player->getProp(PLAYERX) << player->getProp(PLAYERY) << pFileName);
 		player->sendPacket(CPacket() << (char)LEVELNAME << pFileName);
 		player->sendLevel(pFileName, player->x, player->y, 0);
 	}

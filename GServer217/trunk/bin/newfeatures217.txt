@@ -24,6 +24,14 @@ Fixes:
   it at (30, 27).
 - If an RC changes their name, the new name should now be visible in
   the RC player list.
+- Potentially solved a problem where the gserver refuses to reconnect
+  to the listserver without restarting the entire program, even when
+  the listserver is up.
+- Fixed some bugs related to level caching.  This fixes a memory leak
+  (it would constantly allocate new data when it shouldn't have) and it
+  might fix some more evil NPC props stuff.  Also, it now sends a
+  PLAYERWARPED packet when you update the level.  This might fix some
+  more stuff.
 
 
 --------------------------------------------
