@@ -2208,7 +2208,12 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 
 				// When they come back to life, give them hearts.
 				if ( (oldStatus & 8) > 0 && (status & 8) == 0 )
+				{
 					power = CLIP((ap < 20 ? 3 : (ap < 40 ? 5 : maxPower)), 0.0f, maxPower);
+					if ( level->players.count() == 1 )
+						sendLevel( level->fileName, getProp(PLAYERX), getProp(PLAYERY), getSysTime() );
+//						warp( level->fileName, getProp(PLAYERX), getProp(PLAYERY), getSysTime() );
+				}
 
 				// When they die, increase deaths and make somebody else level leader.
 				if ( (oldStatus & 8) == 0 && (status & 8) > 0 )

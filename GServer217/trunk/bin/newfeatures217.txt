@@ -32,6 +32,8 @@ Fixes:
   might fix some more evil NPC props stuff.  Also, it now sends a
   PLAYERWARPED packet when you update the level.  This might fix some
   more stuff.
+- If you are the only person in the level and you die, npcs won't break
+  anymore.  Yay.
 
 
 --------------------------------------------
