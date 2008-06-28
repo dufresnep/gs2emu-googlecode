@@ -39,7 +39,7 @@ bool CSocket::connectSock(char* pAddress, int pPort)
 	{
         if((sockId = (int)socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == 0)
 		{
-			errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - socket() returned 0.", true );
+			errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - socket() returned " << toString(errno) << ".", true );
             return false;
 		}
 	}
@@ -48,7 +48,7 @@ bool CSocket::connectSock(char* pAddress, int pPort)
 	{
 		if((hostEntry = gethostbyname(pAddress)) == NULL)
 		{
-			errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - gethostbyname() returned 0.", true );
+			errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - gethostbyname() returned " << toString(h_errno) << ".", true );
 			return false;
 		}
 
