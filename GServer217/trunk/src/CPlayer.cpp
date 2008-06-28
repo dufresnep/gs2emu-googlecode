@@ -2211,7 +2211,7 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 				{
 					power = CLIP((ap < 20 ? 3 : (ap < 40 ? 5 : maxPower)), 0.0f, maxPower);
 					if ( level->players.count() == 1 )
-						sendLevel( level->fileName, getProp(PLAYERX), getProp(PLAYERY), getSysTime() );
+						sendLevel( level->fileName, this->x, this->y, getSysTime() );
 //						warp( level->fileName, getProp(PLAYERX), getProp(PLAYERY), getSysTime() );
 				}
 
