@@ -993,12 +993,17 @@ void CPlayer::processChat(CString& pMessage)
 		if ( strlen(file) == 0 )
 		{
 			// File not found.  Try appending extensions.
-			int i = 0;
+			int j = 0;
 			char* ext[] = {".png", ".mng", ".gif"};
-			while ( i < 3 && strlen(file) == 0 )
+			while ( j < 3 )
 			{
-				file = getDataFile( (CString() << words[1] << ext[i]).text() );
-				i++;
+				file = getDataFile( (CString() << words[1] << ext[j]).text() );
+				if ( strlen(file) != 0 )
+				{
+					words[1] << ext[j];
+					break;
+				}
+				j++;
 			}
 		}
 
@@ -1024,12 +1029,17 @@ void CPlayer::processChat(CString& pMessage)
 		if ( strlen(file) == 0 )
 		{
 			// File not found.  Try appending extensions.
-			int i = 0;
+			int j = 0;
 			char* ext[] = {".png", ".mng", ".gif"};
-			while ( i < 3 && strlen(file) == 0 )
+			while ( j < 3 )
 			{
-				file = getDataFile( (CString() << words[1] << ext[i]).text() );
-				i++;
+				file = getDataFile( (CString() << words[1] << ext[j]).text() );
+				if ( strlen(file) != 0 )
+				{
+					words[1] << ext[j];
+					break;
+				}
+				j++;
 			}
 		}
 
@@ -1055,12 +1065,17 @@ void CPlayer::processChat(CString& pMessage)
 		if ( strlen(file) == 0 )
 		{
 			// File not found.  Try appending extensions.
-			int i = 0;
+			int j = 0;
 			char* ext[] = {".png", ".mng", ".gif"};
-			while ( i < 3 && strlen(file) == 0 )
+			while ( j < 3 )
 			{
-				file = getDataFile( (CString() << words[1] << ext[i]).text() );
-				i++;
+				file = getDataFile( (CString() << words[1] << ext[j]).text() );
+				if ( strlen(file) != 0 )
+				{
+					words[1] << ext[j];
+					break;
+				}
+				j++;
 			}
 		}
 
@@ -1086,12 +1101,17 @@ void CPlayer::processChat(CString& pMessage)
 		if ( strlen(file) == 0 )
 		{
 			// File not found.  Try appending extensions.
-			int i = 0;
+			int j = 0;
 			char* ext[] = {".png", ".mng", ".gif"};
-			while ( i < 3 && strlen(file) == 0 )
+			while ( j < 3 )
 			{
-				file = getDataFile( (CString() << words[1] << ext[i]).text() );
-				i++;
+				file = getDataFile( (CString() << words[1] << ext[j]).text() );
+				if ( strlen(file) != 0 )
+				{
+					words[1] << ext[j];
+					break;
+				}
+				j++;
 			}
 		}
 

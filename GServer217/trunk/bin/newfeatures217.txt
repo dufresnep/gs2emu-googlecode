@@ -34,6 +34,7 @@ Fixes:
   more stuff.
 - If you are the only person in the level and you die, npcs won't break
   anymore.  Yay.
+- Fixed a bug that caused png/mng/gif auto detection to fail to work.
 
 
 --------------------------------------------
