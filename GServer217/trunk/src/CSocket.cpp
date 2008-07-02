@@ -39,7 +39,11 @@ bool CSocket::connectSock(char* pAddress, int pPort)
 	{
         if((sockId = (int)socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == 0)
 		{
-			errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - socket() returned " << toString(errno) << ".", true );
+#ifdef _WIN32
+			errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - socket() returned " << toString(h_errno) << ".", true );
+#else
+			errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - socket() returned " << toString(errno) << ": " << strerror(errno), true );
+#endif
             return false;
 		}
 	}
@@ -48,7 +52,11 @@ bool CSocket::connectSock(char* pAddress, int pPort)
 	{
 		if((hostEntry = gethostbyname(pAddress)) == NULL)
 		{
+#ifdef _WIN32
 			errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - gethostbyname() returned " << toString(h_errno) << ".", true );
+#else
+			errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - gethostbyname() returned " << toString(h_errno) << ": " << hstrerror(errno), true );
+#endif
 			return false;
 		}
 
@@ -60,7 +68,11 @@ bool CSocket::connectSock(char* pAddress, int pPort)
     if (connect(sockId, (sockaddr*)&addr, sizeof(sockaddr_in)) == -1)
     {
         sockId = 0;
-		errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - connect() failed.  Returned " << toString(errno), true );
+#ifdef _WIN32
+		errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - connect() failed.  Returned " << toString(h_errno) << ".", true );
+#else
+		errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - connect() failed.  Returned " << toString(errno) << ": " << strerror(errno), true );
+#endif
         return false;
     }
 	return true;
