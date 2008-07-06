@@ -9,7 +9,8 @@ CSocket listServer;
 
 void ListServer_Connect()
 {
-	listServer.init( CString(findKey("listip")), CString(findKey("listport")) );
+	CString ip(findKey("listip")), port(findKey("listport"));
+	listServer.init( ip, port );
 	if ( (lsConnected = (listServer.connect() == 0 ? false : true)) )
 	{
 		errorOut("errorlog.txt", CBuffer() << "Unable to connect to list server.", true);
