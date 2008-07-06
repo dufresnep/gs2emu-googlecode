@@ -41,6 +41,7 @@
 	#include <netinet/in.h>
  	#include <sys/socket.h>
 	#include <sys/types.h>
+	#include <arpa/inet.h>
 #endif
 
 //! Properties to pass to the socket.

@@ -9,6 +9,7 @@
 #include "CPlayer.h"
 #include "CWeapon.h"
 #include "main.h"
+#include "CSocket.h"
 #include <sys/stat.h>
 #include "zlib.h"
 #include <math.h>

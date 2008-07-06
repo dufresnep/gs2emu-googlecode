@@ -334,7 +334,11 @@ CSocket* CSocket::accept()
 	unsigned int handle = 0;
 
 	// Try to accept a new connection.
+#if defined(_WIN32) || defined(_WIN64)
 	handle = (unsigned int)::accept( properties.handle, (struct sockaddr*)&addr, &addrlen );
+#else
+	handle = (unsigned int)::accept( properties.handle, (struct sockaddr*)&addr, (socklen_t*)&addrlen );
+#endif
 	if ( handle == -1 )
 	{
 		identifyError( 1 );
