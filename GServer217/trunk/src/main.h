@@ -30,7 +30,8 @@ extern CString dataDir, listServerFields[6], serverMessage, staffHead, unstickme
 extern CStringList adminNames, cheatwindows, clothCommands, colourNames, globalGuildList, jailLevels, mapNames, profileList, RCBans, RCMessage, RCHelpMessage, serverFlags, staffGuilds, staffList, statusList, subDirs;
 extern CStringList folderConfig, defaultGaniNames, defaultSwordNames, defaultShieldNames;
 extern float unstickmeX, unstickmeY;
-extern int aptime[5], baddyRespawn, cheatwindowstime, gameTime, heartLimit, horseLife, maxNoMovement, maxPlayers, nwTime, serverPort, shieldLimit, swordLimit, tileRespawn;
+extern int aptime[5], baddyRespawn, cheatwindowstime, gameTime, heartLimit, horseLife, maxNoMovement, maxPlayers, nwTime, shieldLimit, swordLimit, tileRespawn;
+extern CString serverPort;
 extern CWordFilter WordFilter;
 
 bool isValidFile(CBuffer& file, int type);

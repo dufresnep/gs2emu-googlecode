@@ -14,6 +14,7 @@
 
 bool CServerBot::connect(char* pServer, int pPort)
 {
+/*
 	CString username = "SERVBOT";
 	CString pass = "SERVBOT";
 
@@ -25,11 +26,12 @@ bool CServerBot::connect(char* pServer, int pPort)
 	packet << (char)2 << "GSRVBOT" << (char)0 <<
 		(char)username.length() << username << (char)pass.length() << pass << "\n";
 	sendPacket(packet);
+*/
 	return true;
 }
 bool CServerBot::main()
 {
-	/*
+/*
 	char uncompressedData[9001];
 	CBuffer receiveBuff;
 	if (botSock->receiveBytes(receiveBuff, 9000) < 0)
@@ -59,21 +61,24 @@ bool CServerBot::main()
 			printf("Compression error in server bot\n");
 			return false;
 		}
-	}*/
+	}
 	CBuffer receiveBuff;
 	if(botSock->receiveBytes(receiveBuff, 9000) < 0)
 		return false;
+*/
 	return true;
 }
 
 void CServerBot::parsePacket(CPacket& pPacket)
 {
+/*
 	int messageId = pPacket.readByte1();
 	printf("SERVERBOT: %i\n", messageId);
-
+*/
 }
 void CServerBot::sendPacket(CPacket& pPacket)
 {
+/*
 	char buffer[65535];
 	unsigned long clen = 65535;
 	compress((unsigned char*)buffer,&clen,(unsigned char*)pPacket.text(), pPacket.length());
@@ -82,4 +87,5 @@ void CServerBot::sendPacket(CPacket& pPacket)
 	sendString.writeByte((char)(clen & 0xFF));
 	sendString.writeBytes(buffer, clen);
 	botSock->sendBuffer(sendString);
+*/
 }

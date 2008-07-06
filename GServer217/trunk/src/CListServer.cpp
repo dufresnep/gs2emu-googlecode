@@ -9,28 +9,27 @@ CSocket listServer;
 
 void ListServer_Connect()
 {
-        if ((lsConnected = listServer.connectSock(findKey("listip"), atoi(findKey("listport")))) == false)
-        {
-			listServer.closeSock();
-            errorOut("errorlog.txt", CBuffer() << "Unable to connect to list server.", true);
-            return;
-        }
+	listServer.init( CString(findKey("listip")), CString(findKey("listport")) );
+	if ( (lsConnected = (listServer.connect() == 0 ? false : true)) )
+	{
+		errorOut("errorlog.txt", CBuffer() << "Unable to connect to list server.", true);
+		return;
+	}
 
-        errorOut("serverlog.txt", CBuffer() << "Connected to the list server successfully.", true);
-        listServer.setSync(false);
+	errorOut("serverlog.txt", CBuffer() << "Connected to the list server successfully.", true);
 
-        // send gserver info to listserver
-        ListServer_Send(CPacket() << (char)SLSNAME << listServerFields[0]  << "\n" << (char)SLSDESC << listServerFields[1]  << "\n" << (char)SLSLANG << listServerFields[2]  << "\n" << (char)SLSVER  << listServerFields[3]  << "\n" << (char)SLSURL  << listServerFields[4]  << "\n" << (char)SLSIP   << listServerFields[5]  << "\n" << (char)SLSPORT << toString(serverPort) << "\n");
+	// send gserver info to listserver
+	ListServer_Send(CPacket() << (char)SLSNAME << listServerFields[0]  << "\n" << (char)SLSDESC << listServerFields[1]  << "\n" << (char)SLSLANG << listServerFields[2]  << "\n" << (char)SLSVER  << listServerFields[3]  << "\n" << (char)SLSURL  << listServerFields[4]  << "\n" << (char)SLSIP   << listServerFields[5]  << "\n" << (char)SLSPORT << serverPort << "\n");
 
-        // send players to listserver
-        CPacket pPacket;
-        for (int i = 0; i < playerList.count(); i++)
-        {
-            CPlayer *player = (CPlayer *)playerList[i];
-            pPacket << (char)player->accountName.length() << player->accountName << player->getProp(NICKNAME) << player->getProp(CURLEVEL) << player->getProp(PLAYERX) << player->getProp(PLAYERY) << player->getProp(PALIGNMENT) << (char)player->type;
-        }
+	// send players to listserver
+	CPacket pPacket;
+	for (int i = 0; i < playerList.count(); i++)
+	{
+		CPlayer *player = (CPlayer *)playerList[i];
+		pPacket << (char)player->accountName.length() << player->accountName << player->getProp(NICKNAME) << player->getProp(CURLEVEL) << player->getProp(PLAYERX) << player->getProp(PLAYERY) << player->getProp(PALIGNMENT) << (char)player->type;
+	}
 
-        ListServer_Send(CPacket() << (char)SLSCOUNT << (char)playerList.count() << pPacket << "\n");
+	ListServer_Send(CPacket() << (char)SLSCOUNT << (char)playerList.count() << pPacket << "\n");
 }
 
 void ListServer_End()
@@ -38,25 +37,28 @@ void ListServer_End()
 	if ( listServerFields[5] == "localhost" ) return;
 	if (!lsConnected) return;
 
-    listServer.closeSock();
+	listServer.disconnect();
 }
 
 void ListServer_Main()
 {
+	static CBuffer packetBuffer;
+	CStringList lines;
+
 	if ( listServerFields[5] == "localhost" ) return;
     if (!lsConnected) return;
 
-	static CBuffer packetBuffer;
-	CBuffer receiveBuff;
-	CStringList lines;
-	if (listServer.receiveBytes(receiveBuff, 65536) < 0)
+	// Read any new data into the socket.
+	if ( listServer.getData() == -1 )
 	{
-		errorOut("serverlog.txt", "Disconnected from list server.");
+		errorOut( "serverlog.txt", "Disconnected from list server." );
 		lsConnected = false;
 		return;
 	}
 
-	packetBuffer << receiveBuff;
+	// Grab all the data from the socket buffer.
+	packetBuffer << listServer.getBuffer();
+	listServer.getBuffer().clear();
 
 	// Search for a packet.  If none is found, break out of the loop.
 	int lineEnd = packetBuffer.findl( '\n' );
@@ -329,7 +331,7 @@ void ListServer_Send(CPacket &pPacket)
 	if ( pPacket[ pPacket.length() - 1 ] != '\n' )
 		pPacket << "\n";
 
-    if ( listServer.sendBuffer(pPacket) == -1 )
+    if ( listServer.sendData( pPacket ) )
 	{
 		errorOut("serverlog.txt", "Disconnected from list server.");
 		lsConnected = false;

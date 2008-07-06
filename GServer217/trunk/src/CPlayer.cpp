@@ -246,24 +246,25 @@ CPlayer::~CPlayer()
 void CPlayer::main()
 {
 	char packets[65536];
-	CBuffer receiveBuff;
-	int size=0;
 
-	if ((size = playerSock->receiveBytes(receiveBuff, 65536)) < 0)
+	// Get data.
+	if ( playerSock->getData() == -1 )
 	{
-		if ( size != -1 )
-			errorOut("errorlog.txt", CString() << "Client " << accountName << " disconnected with sock error: " << toString(size));
+		errorOut("errorlog.txt", CString() << "Client " << accountName << " disconnected with sock error." );
 		deleteMe = true;
-		compressAndSend();
 		return;
 	}
-	packetBuffer << receiveBuff;
+
+	// Add obtained data to buffer.
+	packetBuffer << playerSock->getBuffer();
+	playerSock->getBuffer().clear();
 
 	if (packetBuffer.length() >= 128*1024)
 	{
 		errorOut("errorlog.txt", CString() << "Client " << accountName << " has sent to much data (input buffer >=128k)");
 		sendPacket(CPacket() << (char)DISMESSAGE << "Your Graal.exe has sent to much data (>=128k in the input buffer)");
 		deleteMe = true;
+		compressAndSend();
 		return;
 	}
 
@@ -327,6 +328,7 @@ void CPlayer::main()
 			errorOut("errorlog.txt", CString() << "Decompression error for player " << accountName);
 			deleteMe = true;
 			sendPacket(CPacket() << (char)DISMESSAGE << "Decompression error\n");
+			compressAndSend();
 			return;
 		}
 	}
@@ -738,6 +740,15 @@ void CPlayer::sendOutGoing()
 		return;
 	}
 
+	if ( playerSock->sendData( sendBuff ) )
+	{
+		errorOut( "errorlog.txt", CString() << "Send error to " << accountName );
+		deleteMe = true;
+		return;
+	}
+	else
+		sendBuff.clear();
+	/*
 	while (sendBuff.length()>0)
 	{
 		sendLength = MIN(sendBuff.length(), 1024);
@@ -752,6 +763,7 @@ void CPlayer::sendOutGoing()
 		}
 		else break;
 	}
+	*/
 }
 
 void CPlayer::warp(CString& pLevel, float pX, float pY, time_t pModTime)

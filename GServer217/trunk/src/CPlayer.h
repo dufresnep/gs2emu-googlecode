@@ -352,7 +352,8 @@ class CPlayer : public CAccount
 {
 	public:
 		bool firstPacket, deleteMe, firstLevel, allowBomb;
-		CBuffer bowImage, chatMsg, guildName, language, outBuff, sendBuff, version;
+		CBuffer bowImage, chatMsg, guildName, language, outBuff, version;
+		CPacket sendBuff;
 		CLevel *level;
 		CList enteredLevels, fileList;
 		CSocket *playerSock;

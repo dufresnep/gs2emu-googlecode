@@ -15,8 +15,10 @@
 #include <stdlib.h>
 #include <signal.h>
 
-#ifdef WIN32
-	#define WIN32_LEAN_AND_MEAN
+#ifdef _WIN32
+	#ifndef WIN32_LEAN_AND_MEAN
+		#define WIN32_LEAN_AND_MEAN
+	#endif
 	#include <windows.h>
 #elif defined(PSPSDK)
 	#include <pspkernel.h>
@@ -53,7 +55,8 @@ CStringList adminNames, cheatwindows, clothCommands, colourNames, globalGuildLis
 CStringList folderConfig, defaultGaniNames, defaultSwordNames, defaultShieldNames;
 CWordFilter WordFilter;
 float unstickmeX, unstickmeY;
-int aptime[5], baddyRespawn, cheatwindowstime, gameTime = 1, heartLimit, horseLife, idleDisconnect, listServerPort, maxNoMovement, maxPlayers, nwTime, serverPort, serverTime = 0, shieldLimit, swordLimit, tileRespawn;
+int aptime[5], baddyRespawn, cheatwindowstime, gameTime = 1, heartLimit, horseLife, idleDisconnect, listServerPort, maxNoMovement, maxPlayers, nwTime, serverTime = 0, shieldLimit, swordLimit, tileRespawn;
+CString serverPort;
 
 void acceptNewPlayers(CSocket &pSocket);
 void doTimer();
@@ -139,15 +142,18 @@ int main(int argc, char *argv[])
 	}
 
 	/* Initialize Sockets */
-	if (CSocket::sockStart() != 0)
+	serverSock.setType( SOCKET_TYPE_SERVER );
+	serverSock.setProtocol( SOCKET_PROTOCOL_TCP );
+	serverSock.setDescription( "serverSock" );
+	if ( serverSock.init( CString(), serverPort ) )
 		return 1;
 
-	if(!serverSock.listenSock(serverPort, 20))
+	// Connect server socket.
+	if ( serverSock.connect() )
 	{
-		errorOut("errorlog.txt", CString() << "SOCK ERROR: Unable to listen on port: " << toString(serverPort));
+		errorOut("errorlog.txt", CString() << "SOCK ERROR: Unable to listen on port: " << serverPort);
 		return 1;
 	}
-	serverSock.setSync(false);
 
 	/* Server Finished Loading */
 	printf("GServer 2 by 39ster\nSpecial thanks to Marlon, Agret, Pac300, 39ster and others for porting the \noriginal 1.39 gserver to 2.1\nServer listening on port: %i\nServer version: Build %s\n\n", serverPort, listServerFields[3].text());
@@ -318,8 +324,6 @@ void acceptNewPlayers(CSocket& pSocket)
 	if(newSock == 0)
 		return;
 
-	newSock->setSync(false);
-	newSock->setNagle(false);
 	newPlayers.add(new CPlayer(newSock));
 	printf( "[%s] Incoming connection: [%s]\n", getTimeStr(1).text(), newSock->tcpIp() );
 }
@@ -440,7 +444,6 @@ bool loadSettings(char* pFile)
 	maxPlayers = atoi(findKey("maxplayers", "128"));
 	mindeathgralats = atoi(findKey("mindeathgralats","1"));
 	maxdeathgralats = atoi(findKey("maxdeathgralats","50"));
-	serverPort = atoi(findKey("serverport", "14802"));
 	shieldLimit = atoi(findKey("shieldlimit", "3"));
 	swordLimit = CLIP(atoi(findKey("swordlimit", "4")), -25, 25);
 	tiledroprate = CLIP(atoi(findKey("tiledroprate", "50")), 0, 100);
@@ -456,6 +459,7 @@ bool loadSettings(char* pFile)
 	listServerFields[2] = findKey("language", "English");
 	listServerFields[4] = findKey("url", "http://www.graal.in");
 	listServerFields[5] = findKey("myip", "AUTO");
+	serverPort = findKey("serverport", "14802");
 	shareFolder = findKey("sharefolder");
 	staffHead = findKey("staffhead", "head25.png");
 	worldName = findKey("worldname", "main");
@@ -941,7 +945,7 @@ void shutdownServer( int signal )
 	if(lsConnected)
 		ListServer_End();
 	errorOut("serverlog.txt", "Server shutdown.");
-	serverSock.closeSock();
+	serverSock.disconnect();
 	saveWeapons("weapons.txt");
 	serverFlags.save("serverflags.txt");
 	for(int i = playerList.count()-1; i >= 0; i--)
