@@ -145,7 +145,8 @@ int main(int argc, char *argv[])
 	serverSock.setType( SOCKET_TYPE_SERVER );
 	serverSock.setProtocol( SOCKET_PROTOCOL_TCP );
 	serverSock.setDescription( "serverSock" );
-	if ( serverSock.init( CString(), serverPort ) )
+	CString empty;
+	if ( serverSock.init( empty, serverPort ) )
 		return 1;
 
 	// Connect server socket.
