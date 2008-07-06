@@ -6,18 +6,21 @@
 #include "main.h"
 
 CSocket listServer;
+bool setSock = false;
 
 void ListServer_Connect()
 {
-	if ( listServer.getDescription() == 0 )
+	if ( setSock == false )
 	{
+		setSock = true;
 		listServer.setDescription( "listserver" );
 		listServer.setProtocol( SOCKET_PROTOCOL_TCP );
 		listServer.setType( SOCKET_TYPE_CLIENT );
+		listServer.setOptions( SOCKET_OPTION_NONBLOCKING );
 	}
 	CString ip(findKey("listip")), port(findKey("listport"));
 	listServer.init( ip, port );
-	if ( (lsConnected = (listServer.connect() == 0 ? false : true)) )
+	if ( !(lsConnected = (listServer.connect() == 0 ? true : false)) )
 	{
 		errorOut("errorlog.txt", CBuffer() << "Unable to connect to list server.", true);
 		return;

@@ -144,6 +144,7 @@ int main(int argc, char *argv[])
 	/* Initialize Sockets */
 	serverSock.setType( SOCKET_TYPE_SERVER );
 	serverSock.setProtocol( SOCKET_PROTOCOL_TCP );
+	serverSock.setOptions( SOCKET_OPTION_NONBLOCKING );
 	serverSock.setDescription( "serverSock" );
 	CString empty;
 	if ( serverSock.init( empty, serverPort ) )
@@ -943,14 +944,14 @@ void shutdownServer( int signal )
 		return;
 	hasShutdown = true;
 	serverRunning = false;
-	if(lsConnected)
-		ListServer_End();
-	errorOut("serverlog.txt", "Server shutdown.");
 	serverSock.disconnect();
 	saveWeapons("weapons.txt");
 	serverFlags.save("serverflags.txt");
 	for(int i = playerList.count()-1; i >= 0; i--)
 		delete ((CPlayer*)playerList[i]);
+
+	if(lsConnected)
+		ListServer_End();
 
 	for(int i = 0; i < levelList.count(); i++)
 	{
@@ -964,6 +965,8 @@ void shutdownServer( int signal )
 
 	for(int i = 0; i < weaponList.count(); i++)
 		delete ((CWeapon*)weaponList[i]);
+
+	errorOut("serverlog.txt", "Server shutdown.");
 
 	#ifdef PSPSDK
 		sceKernelExitGame();

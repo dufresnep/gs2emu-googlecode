@@ -19,7 +19,7 @@
 #define SOCKET_TYPE_CLIENT				0
 #define SOCKET_TYPE_SERVER				1
 
-#define SOCKET_OPTION_PROTECTED			(unsigned int)0x8000	// 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  - Don't let plugins delete
+#define SOCKET_OPTION_NONBLOCKING		(unsigned int)0x0001
 
 #define SOCKET_STATE_DISCONNECTED		0
 #define SOCKET_STATE_CONNECTING			1

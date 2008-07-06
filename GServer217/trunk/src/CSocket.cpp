@@ -126,7 +126,7 @@ int CSocket::init( CString& host, CString& port )
 	memset( (void*)&hints, 0, sizeof(hints) );
 	if ( properties.protocol == SOCKET_PROTOCOL_TCP ) hints.ai_socktype = SOCK_STREAM;
 	if ( properties.protocol == SOCKET_PROTOCOL_UDP ) hints.ai_socktype = SOCK_DGRAM;
-	hints.ai_family = AF_UNSPEC;
+	hints.ai_family = AF_INET;
 
 	// 	Create the host.
 	int error;
@@ -137,6 +137,8 @@ int CSocket::init( CString& host, CString& port )
 		hints.ai_flags = AI_PASSIVE;		// Local socket.
 		error = getaddrinfo( 0, port.text(), &hints, &res );
 	}
+	else
+		return SOCKET_ERROR;
 
 	// Check for errors.
 	if ( error )
@@ -211,25 +213,14 @@ int CSocket::connect()
 		return SOCKET_INVALID;
 	}
 
-	// Turn on non-blocking mode.
-#if defined(WIN32)
-	unsigned long i = 1;
-	ioctlsocket( properties.handle, FIONBIO, &i );
-#elif defined(PSPSDK)
-	unsigned long i = 1;
-	sceNetInetSetsockopt( properties.handle, SOL_SOCKET, 0x1009, (const char*)&i, sizeof(u32) );
-#else
-	fcntl( properties.handle, F_SETFL, O_NONBLOCK );
-#endif
-
 	// 	Bind the socket if it is a server-type socket.
 	if ( properties.type == SOCKET_TYPE_SERVER )
 	{
 		errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Binding socket..." );
 		if ( ::bind( properties.handle, (struct sockaddr *)&properties.address, sizeof(properties.address) ) == SOCKET_ERROR )
 		{
-			errorOut( "debuglog.txt", "[CSocket::sock_connect] bind() returned SOCKET_ERROR." );
 			identifyError();
+			errorOut( "debuglog.txt", "[CSocket::sock_connect] bind() returned SOCKET_ERROR." );
 			#if defined(_WIN32) || defined(_WIN64)
 				closesocket( properties.handle );
 			#else
@@ -246,8 +237,8 @@ int CSocket::connect()
 	{
 		if ( ::connect( properties.handle, (struct sockaddr *)&properties.address, sizeof(properties.address) ) == SOCKET_ERROR )
 		{
-			errorOut( "debuglog.txt", "[CSocket::sock_connect] connect() returned SOCKET_ERROR." );
 			identifyError();
+			errorOut( "debuglog.txt", "[CSocket::sock_connect] connect() returned SOCKET_ERROR." );
 			#if defined(WIN32) || defined(WIN64)
 				closesocket( properties.handle );
 			#else
@@ -287,6 +278,20 @@ int CSocket::connect()
 
 			properties.state = SOCKET_STATE_LISTENING;
 		}
+	}
+
+	// Turn on non-blocking mode.
+	if ( properties.options & SOCKET_OPTION_NONBLOCKING )
+	{
+#if defined(WIN32)
+		unsigned long i = 1;
+		ioctlsocket( properties.handle, FIONBIO, &i );
+#elif defined(PSPSDK)
+		unsigned long i = 1;
+		sceNetInetSetsockopt( properties.handle, SOL_SOCKET, 0x1009, (const char*)&i, sizeof(u32) );
+#else
+		fcntl( properties.handle, F_SETFL, O_NONBLOCK );
+#endif
 	}
 
 	return 0;
@@ -380,6 +385,19 @@ int CSocket::sendData( CPacket& data )
 	if ( properties.state == SOCKET_STATE_DISCONNECTED )
 		return SOCKET_INVALID;
 
+	// Wait for the socket to be ready for a write.
+	if ( properties.options & SOCKET_OPTION_NONBLOCKING )
+	{
+		fd_set set;
+		struct timeval tm;
+		tm.tv_sec = tm.tv_usec = 0;
+		FD_ZERO( &set );
+		FD_SET( properties.handle, &set );
+		select( properties.handle + 1, 0, &set, 0, &tm );
+		if ( !FD_ISSET( properties.handle, &set ) )
+			return 0;
+	}
+
 	// 	Send our data, yay!
 	if ( send( properties.handle, data.text(), data.length(), 0 ) == SOCKET_ERROR )
 	{
@@ -407,13 +425,26 @@ int CSocket::sendData( CPacket& data )
 
 int CSocket::getData()
 {
-	int intError;
+	int size = 0;
+	int intError = 0;
 	char buff[ 0x10000 ]; // 65536 bytes, 64KB
 	CPacket temp;
 
 	// 	Make sure it is connected!
 	if ( properties.state == SOCKET_STATE_DISCONNECTED )
 		return SOCKET_ERROR;
+
+	if ( properties.options & SOCKET_OPTION_NONBLOCKING )
+	{
+		fd_set set;
+		struct timeval tm;
+		tm.tv_sec = tm.tv_usec = 0;
+		FD_ZERO( &set );
+		FD_SET( properties.handle, &set );
+		select( properties.handle + 1, &set, 0, 0, &tm );
+		if ( !FD_ISSET( properties.handle, &set ) )
+			return 0;
+	}
 
 	do
 	{
@@ -422,15 +453,15 @@ int CSocket::getData()
 
 		// 	Get our data
 		if ( properties.protocol == SOCKET_PROTOCOL_UDP )
-			intError = recvfrom( properties.handle, buff, 0x10000, 0, 0, 0 );
+			size = recvfrom( properties.handle, buff, 0x10000, 0, 0, 0 );
 		else
-			intError = recv( properties.handle, buff, 0x10000, 0 );
+			size = recv( properties.handle, buff, 0x10000, 0 );
 
 		// Add to the buffer.
 		temp << buff;
 
 		// 	Check for error!
-		if ( intError == SOCKET_ERROR )
+		if ( size == SOCKET_ERROR )
 		{
 			intError = identifyError();
 			switch ( intError )
@@ -451,13 +482,17 @@ int CSocket::getData()
 					break;
 			}
 		}
-	} while ( intError > 0 );
+	} while ( size > 0 && intError == 0 );
+
+	// If size is 0, the socket was disconnected.
+	if ( size == 0 )
+		disconnect();
 
 	// Add the data we just got to the buffer.
 	buffer << temp;
 
 	// 	Return the amount of data obtained.
-	if ( temp.length() == 0 ) return -1;
+	//if ( temp.length() == 0 ) return -1;
 	return temp.length();
 }
 
@@ -613,7 +648,7 @@ void CSocket::socketSystemDestroy()
 
 int identifyError( int source )
 {
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	int i_error = WSAGetLastError();
 #else
 	int i_error;
@@ -622,6 +657,10 @@ int identifyError( int source )
 	else
 		i_error = errno;
 #endif
+	// These can happen a lot.  Don't display any errors about them.
+	if ( i_error == EWOULDBLOCK || i_error == EINPROGRESS )
+		return i_error;
+
 	errorOut( "debuglog.txt", CString() << "Socket error: [" << toString(i_error) << "]" );
 
 	switch ( i_error )
