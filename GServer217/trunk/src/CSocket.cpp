@@ -46,6 +46,7 @@
 	#include <netdb.h>
 	#include <errno.h>
 	#include <unistd.h>
+	#include <fcntl.h>
 
 	#include <sys/socket.h>
 	#include <netinet/in.h>
@@ -218,7 +219,7 @@ int CSocket::connect()
 	unsigned long i = 1;
 	sceNetInetSetsockopt( properties.handle, SOL_SOCKET, 0x1009, (const char*)&i, sizeof(u32) );
 #else
-	fcntl(sockId, F_SETFL, O_NONBLOCK);
+	fcntl( properties.handle, F_SETFL, O_NONBLOCK );
 #endif
 
 	// 	Bind the socket if it is a server-type socket.
