@@ -9,6 +9,12 @@ CSocket listServer;
 
 void ListServer_Connect()
 {
+	if ( listServer.getDescription() == 0 )
+	{
+		listServer.setDescription( "listserver" );
+		listServer.setProtocol( SOCKET_PROTOCOL_TCP );
+		listServer.setType( SOCKET_TYPE_CLIENT );
+	}
 	CString ip(findKey("listip")), port(findKey("listport"));
 	listServer.init( ip, port );
 	if ( (lsConnected = (listServer.connect() == 0 ? false : true)) )

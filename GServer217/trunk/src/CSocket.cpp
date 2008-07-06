@@ -210,6 +210,17 @@ int CSocket::connect()
 		return SOCKET_INVALID;
 	}
 
+	// Turn on non-blocking mode.
+#if defined(WIN32)
+	unsigned long i = 1;
+	ioctlsocket( properties.handle, FIONBIO, &i );
+#elif defined(PSPSDK)
+	unsigned long i = 1;
+	sceNetInetSetsockopt( properties.handle, SOL_SOCKET, 0x1009, (const char*)&i, sizeof(u32) );
+#else
+	fcntl(sockId, F_SETFL, O_NONBLOCK);
+#endif
+
 	// 	Bind the socket if it is a server-type socket.
 	if ( properties.type == SOCKET_TYPE_SERVER )
 	{
