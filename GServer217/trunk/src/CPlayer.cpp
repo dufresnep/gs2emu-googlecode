@@ -741,30 +741,21 @@ void CPlayer::sendOutGoing()
 		return;
 	}
 
-	if ( playerSock->sendData( sendBuff ) )
+	// Send data.
+	while ( sendBuff.length() > 0 )
 	{
-		errorOut( "errorlog.txt", CString() << "Send error to " << accountName );
-		deleteMe = true;
-		return;
-	}
-	else
-		sendBuff.clear();
-	/*
-	while (sendBuff.length()>0)
-	{
-		sendLength = MIN(sendBuff.length(), 1024);
 		int len = 0;
-		if ((len = playerSock->sendBytes(sendBuff.text(), sendLength)) > 0)
-			sendBuff.remove(0, len);
-		else if(len < 0)
+		if ( (len = playerSock->sendData( sendBuff )) > 0 )
+			sendBuff.remove( 0, len );
+		else if ( len != 0 )
 		{
-			errorOut("errorlog.txt", CString() << "Send error to " << accountName << " [id: " << toString(len) << "]" );
+			errorOut( "errorlog.txt", CString() << "Send error to " << accountName );
 			deleteMe = true;
 			return;
 		}
-		else break;
+		else
+			break;
 	}
-	*/
 }
 
 void CPlayer::warp(CString& pLevel, float pX, float pY, time_t pModTime)

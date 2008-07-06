@@ -344,7 +344,7 @@ void ListServer_Send(CPacket &pPacket)
 	if ( pPacket[ pPacket.length() - 1 ] != '\n' )
 		pPacket << "\n";
 
-    if ( listServer.sendData( pPacket ) )
+    if ( listServer.sendData( pPacket ) < 0 )
 	{
 		errorOut("serverlog.txt", "Disconnected from list server.");
 		lsConnected = false;

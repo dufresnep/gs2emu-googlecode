@@ -13,7 +13,7 @@
 #ifndef __GNUC__ // rain
 	#pragma comment( lib, "ws2_32.lib" )
 #endif
-	// 	Some of these might not be valid in Linux, but I don't really care right now.
+	// Some of these might not be valid in Linux, but I don't really care right now.
 	//#define WSANOTINITIALISED	WSANOTINITIALISED
 	#define ENETDOWN			WSAENETDOWN
 	#define EADDRINUSE			WSAEADDRINUSE
@@ -94,7 +94,7 @@ CSocket::CSocket( CString& host, CString& port, sock_properties* properties )
 
 CSocket::~CSocket()
 {
-	// 	Destroy if still connected.
+	// Destroy if still connected.
 	if ( properties.state != SOCKET_STATE_DISCONNECTED )
 		disconnect();
 }
@@ -107,18 +107,20 @@ int CSocket::init( CString& host, CString& port )
 	// Type: 6 = TCP, 17 = UDP
 	// PF_INET, SOCK_STREAM, IPPROTO_TCP/IPPROTO_UDP
 
-	// 	Make sure a TCP socket is disconnected.
+	// Make sure a TCP socket is disconnected.
 	if ( properties.protocol == SOCKET_PROTOCOL_TCP && properties.state != SOCKET_STATE_DISCONNECTED )
 	{
-		errorOut( "debuglog.txt", "[CSocket::sock_init] TCP socket must be disconnected first." );
+		errorOut( "errorlog.txt", "[CSocket::init] TCP socket must be disconnected first." );
 		return SOCKET_ALREADY_CONNECTED;
 	}
 
-	// 	Announce what we are going to do.
+	// Announce what we are going to do.
+	/*
 	if ( properties.type == SOCKET_TYPE_CLIENT )
 		errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Pointing socket to " << host << ":" << port << "... " );
 	else
 		errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Setting socket to port " << port );
+	*/
 
 	// Start creating the hints.
 	memset( (struct sockaddr_storage*)&properties.address, 0, sizeof(struct sockaddr_storage) );
@@ -127,7 +129,7 @@ int CSocket::init( CString& host, CString& port )
 	if ( properties.protocol == SOCKET_PROTOCOL_UDP ) hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_family = AF_INET;
 
-	// 	Create the host.
+	// Create the host.
 	int error;
 	if ( properties.type == SOCKET_TYPE_CLIENT && host.length() != 0 )
 		error = getaddrinfo( host.text(), port.text(), &hints, &res );
@@ -142,7 +144,7 @@ int CSocket::init( CString& host, CString& port )
 	// Check for errors.
 	if ( error )
 	{
-		errorOut( "debuglog.txt", "[CSocket::sock_init] getaddrinfo() returned an error." );
+		errorOut( "errorlog.txt", "[CSocket::init] getaddrinfo() returned an error." );
 		return SOCKET_HOST_UNKNOWN;
 	}
 	else
@@ -153,14 +155,14 @@ int CSocket::init( CString& host, CString& port )
 
 void CSocket::destroy()
 {
-	// 	Shut down the socket.
-	errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Shutting down socket..." );
+	// Shut down the socket.
+	//errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Shutting down socket..." );
 	if ( shutdown( properties.handle, SHUT_WR ) == SOCKET_ERROR )
 		identifyError();
 
 	properties.state = SOCKET_STATE_TERMINATING;
 
-	// 	Destroy the socket of d00m.
+	// Destroy the socket of d00m.
 #if defined(_WIN32) || defined(_WIN64)
 	if ( closesocket( properties.handle ) == SOCKET_ERROR )
 	{
@@ -168,51 +170,51 @@ void CSocket::destroy()
 	if ( close( properties.handle ) == SOCKET_ERROR )
 	{
 #endif
-		errorOut( "debuglog.txt", CString() << "[CSocket::sock_destroy] Error closing socket: " << properties.description );
+		errorOut( "errorlog.txt", CString() << "[CSocket::destroy] Error closing socket: " << properties.description );
 		identifyError();
 	}
 
-	// 	Reset the socket state.
+	// Reset the socket state.
 	properties.state = SOCKET_STATE_DISCONNECTED;
 }
 
 int CSocket::connect()
 {
-	// 	Make sure the socket is disconnected.
+	// Make sure the socket is disconnected.
 	if ( properties.state != SOCKET_STATE_DISCONNECTED )
 	{
-		errorOut( "debuglog.txt", "[CSocket::connect] Socket is already connected." );
+		errorOut( "errorlog.txt", "[CSocket::connect] Socket is already connected." );
 		return SOCKET_ALREADY_CONNECTED;
 	}
 
-	// 	Announce what we are going to do.
-	errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Establishing socket..." );
+	// Announce what we are going to do.
+	//errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Establishing socket..." );
 
-	// 	Flag the socket as connecting.
+	// Flag the socket as connecting.
 	properties.state = SOCKET_STATE_CONNECTING;
 
-	// 	Create socket.
+	// Create socket.
 	if ( properties.protocol == SOCKET_PROTOCOL_TCP && properties.handle == 0 )
 		properties.handle = (unsigned int)socket( AF_INET, SOCK_STREAM, 0 );
 	else
 		properties.handle = (unsigned int)socket( AF_INET, SOCK_DGRAM, 0 );
 
-	// 	Make sure the socket was created correctly.
+	// Make sure the socket was created correctly.
 	if ( properties.handle == INVALID_SOCKET )
 	{
-		errorOut( "debuglog.txt", "[CSocket::connect] socket() returned INVALID_SOCKET." );
+		errorOut( "errorlog.txt", "[CSocket::connect] socket() returned INVALID_SOCKET." );
 		properties.state = SOCKET_STATE_DISCONNECTED;
 		return SOCKET_INVALID;
 	}
 
-	// 	Bind the socket if it is a server-type socket.
+	// Bind the socket if it is a server-type socket.
 	if ( properties.type == SOCKET_TYPE_SERVER )
 	{
-		errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Binding socket..." );
+		//errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Binding socket..." );
 		if ( ::bind( properties.handle, (struct sockaddr *)&properties.address, sizeof(properties.address) ) == SOCKET_ERROR )
 		{
 			identifyError();
-			errorOut( "debuglog.txt", "[CSocket::connect] bind() returned SOCKET_ERROR." );
+			errorOut( "errorlog.txt", "[CSocket::connect] bind() returned SOCKET_ERROR." );
 			#if defined(_WIN32) || defined(_WIN64)
 				closesocket( properties.handle );
 			#else
@@ -223,14 +225,14 @@ int CSocket::connect()
 		}
 	}
 
-	// 	Connect the socket.
-	errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Connecting socket..." );
+	// Connect the socket.
+	//errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Connecting socket..." );
 	if ( properties.type != SOCKET_TYPE_SERVER )
 	{
 		if ( ::connect( properties.handle, (struct sockaddr *)&properties.address, sizeof(properties.address) ) == SOCKET_ERROR )
 		{
 			identifyError();
-			errorOut( "debuglog.txt", "[CSocket::connect] connect() returned SOCKET_ERROR." );
+			errorOut( "errorlog.txt", "[CSocket::connect] connect() returned SOCKET_ERROR." );
 			#if defined(WIN32) || defined(WIN64)
 				closesocket( properties.handle );
 			#else
@@ -241,23 +243,23 @@ int CSocket::connect()
 		}
 	}
 
-	// 	Socket connected!
+	// Socket connected!
 	properties.state = SOCKET_STATE_CONNECTED;
 
-	// 	Listening sockets.
+	// Listening sockets.
 	if ( properties.type == SOCKET_TYPE_SERVER )
 	{
 		if ( properties.protocol == SOCKET_PROTOCOL_UDP )
 		{
-			errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Socket entering a listening state." );
+			//errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Socket entering a listening state." );
 			properties.state = SOCKET_STATE_LISTENING;
 		}
 		else if ( properties.protocol == SOCKET_PROTOCOL_TCP )
 		{
-			errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Setting socket to a listening state..." );
+			//errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Setting socket to a listening state..." );
 			if ( ::listen( properties.handle, SOMAXCONN ) == SOCKET_ERROR )
 			{
-				errorOut( "debuglog.txt", "[CSocket::connect] listen() returned SOCKET_ERROR." );
+				errorOut( "errorlog.txt", "[CSocket::connect] listen() returned SOCKET_ERROR." );
 				identifyError();
 				#if defined(WIN32) || defined(WIN64)
 					closesocket( properties.handle );
@@ -320,7 +322,7 @@ int CSocket::reconnect( long delay, int tries )
 			case SOCKET_BIND_ERROR:
 			case SOCKET_CONNECT_ERROR:
 			default:
-				// 	Do nothing.
+				// Do nothing.
 				break;
 		}
 		if ( delay != 0 ) wait( delay );
@@ -330,7 +332,7 @@ int CSocket::reconnect( long delay, int tries )
 
 CSocket* CSocket::accept()
 {
-	// 	Make sure the socket is connected!
+	// Make sure the socket is connected!
 	if ( properties.state == SOCKET_STATE_DISCONNECTED )
 		return 0;
 
@@ -374,14 +376,15 @@ CSocket* CSocket::accept()
 int CSocket::sendData( CPacket& data )
 {
 	int intError;
+	int size;
 
-	// 	Make sure the socket is connected!
+	// Make sure the socket is connected!
 	if ( properties.state == SOCKET_STATE_DISCONNECTED )
 		return SOCKET_INVALID;
 
-	// Wait for the socket to be ready for a write.
-	if ( properties.options & SOCKET_OPTION_NONBLOCKING )
-	{
+	// Wait for the socket to be ready for a write if we are blocking.
+	//if ( properties.options & SOCKET_OPTION_NONBLOCKING == 0 )
+	//{
 		fd_set set;
 		struct timeval tm;
 		tm.tv_sec = tm.tv_usec = 0;
@@ -390,10 +393,10 @@ int CSocket::sendData( CPacket& data )
 		select( properties.handle + 1, 0, &set, 0, &tm );
 		if ( !FD_ISSET( properties.handle, &set ) )
 			return 0;
-	}
+	//}
 
-	// 	Send our data, yay!
-	if ( ::send( properties.handle, data.text(), data.length(), 0 ) == SOCKET_ERROR )
+	// Send our data, yay!
+	if ( (size = ::send( properties.handle, data.text(), data.length(), 0 )) == SOCKET_ERROR )
 	{
 		intError = identifyError();
 		switch ( intError )
@@ -406,15 +409,16 @@ int CSocket::sendData( CPacket& data )
 			case ECONNRESET:
 			case ETIMEDOUT:
 				// Destroy the bad socket and create a new one.
-				errorOut( "debuglog.txt", CString() << ":: " << properties.description << " connection lost!" );
+				errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!" );
 				disconnect();
 				return intError;
 				break;
 		}
+		if ( intError == EWOULDBLOCK || intError == EINPROGRESS ) return 0;
 		return intError;
 	}
 
-	return 0;
+	return size;
 }
 
 int CSocket::getData()
@@ -426,12 +430,13 @@ int CSocket::getData()
 	int bufflen = 0x2000;
 	CPacket temp;
 
-	// 	Make sure it is connected!
+	// Make sure it is connected!
 	if ( properties.state == SOCKET_STATE_DISCONNECTED )
 		return SOCKET_ERROR;
 
-	if ( properties.options & SOCKET_OPTION_NONBLOCKING )
-	{
+	// If we have blocking sockets, let's first check if we can read.
+	//if ( properties.options & SOCKET_OPTION_NONBLOCKING == 0 )
+	//{
 		fd_set set;
 		struct timeval tm;
 		tm.tv_sec = tm.tv_usec = 0;
@@ -440,23 +445,24 @@ int CSocket::getData()
 		select( properties.handle + 1, &set, 0, 0, &tm );
 		if ( !FD_ISSET( properties.handle, &set ) )
 			return 0;
-	}
+	//}
 
 	do
 	{
 		// Allocate buff.
 		memset( (void*)buff, 0, bufflen );
 
-		// 	Get our data
+		// Get our data
 		if ( properties.protocol == SOCKET_PROTOCOL_UDP )
 			size = recvfrom( properties.handle, buff, bufflen, 0, 0, 0 );
 		else
 			size = recv( properties.handle, buff, bufflen, 0 );
 
 		// Add to the buffer.
-		temp.writeBytes( buff, size );
+		if ( size > 0 )
+			temp.writeBytes( buff, size );
 
-		// 	Check for error!
+		// Check for error!
 		if ( size == SOCKET_ERROR )
 		{
 			intError = identifyError();
@@ -470,8 +476,8 @@ int CSocket::getData()
 				case ECONNRESET:
 				case ETIMEDOUT:
 				case ESHUTDOWN:
-					// 	Destroy the bad socket and create a new one.
-					errorOut( "debuglog.txt", CString() << ":: " << properties.description << " connection lost!" );
+					// Destroy the bad socket and create a new one.
+					errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!" );
 					disconnect();
 					break;
 				default:
@@ -482,12 +488,16 @@ int CSocket::getData()
 
 	// If size is 0, the socket was disconnected.
 	if ( size == 0 )
+	{
+		errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!" );
 		disconnect();
+	}
 
 	// Add the data we just got to the buffer.
-	buffer.writeBytes( temp.text(), temp.length() );
+	if ( temp.length() > 0 )
+		buffer.writeBytes( temp.text(), temp.length() );
 
-	// 	Return the amount of data obtained.
+	// Return the amount of data obtained.
 	return temp.length();
 }
 
@@ -498,21 +508,21 @@ char* CSocket::peekData()
 	int intError;
 	char *buff = 0;
 
-	// 	Make sure it is connected!
+	// Make sure it is connected!
 	if ( properties.state == SOCKET_STATE_DISCONNECTED )
 		return 0;
 
-	// 	Make a buffer to store data!
+	// Make a buffer to store data!
 	buff = new char[ recvsize ];
 	memset( (char *)buff, 0, recvsize );
 
-	// 	Get our data
+	// Get our data
 	if ( properties.protocol == SOCKET_PROTOCOL_UDP )
 		intError = recvfrom( properties.handle, buff, recvsize, MSG_PEEK, NULL, NULL );
 	else
 		intError = recv( properties.handle, buff, recvsize, MSG_PEEK );
 
-	// 	Check for error!
+	// Check for error!
 	if ( intError == SOCKET_ERROR )
 	{
 		intError = identifyError();
@@ -526,8 +536,8 @@ char* CSocket::peekData()
 			case ECONNRESET:
 			case ETIMEDOUT:
 			case ESHUTDOWN:
-				// 	Destroy the bad socket and create a new one.
-				errorOut( "debuglog.txt", CString() << ":: " << properties.description << " connection lost!" );
+				// Destroy the bad socket and create a new one.
+				errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!" );
 				disconnect();
 				break;
 			default:
@@ -541,7 +551,7 @@ char* CSocket::peekData()
 		return 0;
 	}
 
-	// 	Return the data.
+	// Return the data.
 	return buff;
 }
 
@@ -568,6 +578,7 @@ int CSocket::setOptions( int iOptions )
 	bool changeBlocking = false;
 	unsigned long i;
 
+	// If we change the SOCKET_OPTION_NONBLOCKING option, adjust the socket mode.
 	if ( iOptions & SOCKET_OPTION_NONBLOCKING && !(properties.options & SOCKET_OPTION_NONBLOCKING) )
 	{
 		changeBlocking = true;
@@ -577,9 +588,9 @@ int CSocket::setOptions( int iOptions )
 	{
 		changeBlocking = true;
 		i = 0;
-		errorOut( "debuglog.txt", "Disabling non-blocking" );
 	}
 
+	// Do the changes.
 	if ( changeBlocking )
 	{
 #if defined(WIN32)
@@ -624,6 +635,7 @@ const char* CSocket::tcpIp()
 	char host[1025];
 	memset( (void*)host, 0, 1025 );
 
+	// Grab the IP address.
 	int error = getnameinfo( (struct sockaddr*)&properties.address, sizeof( struct sockaddr ), host, 1025, 0, 0, NI_NUMERICHOST );
 	if ( error ) return 0;
 	hostret = host;
@@ -632,7 +644,7 @@ const char* CSocket::tcpIp()
 
 int CSocket::socketSystemInit()
 {
-	errorOut( "debuglog.txt", ":: Initializing socket system..." );
+//	errorOut( "debuglog.txt", ":: Initializing socket system..." );
 #if defined(_WIN32) || defined(_WIN64)
 	WORD wVersionRequested;
 	WSADATA wsaData;
@@ -641,11 +653,15 @@ int CSocket::socketSystemInit()
 	wVersionRequested = MAKEWORD( 2, 2 );
 
 	err = WSAStartup( wVersionRequested, &wsaData );
-	if ( err != 0 ) {
+	if ( err != 0 )
+	{
+		errorOut( "errorlog.txt", "Failed to initialize winsocks!" );
 		return 1;
 	}
 
-	if ( LOBYTE( wsaData.wVersion ) != 2 || HIBYTE( wsaData.wVersion ) != 2 ) {
+	if ( LOBYTE( wsaData.wVersion ) != 2 || HIBYTE( wsaData.wVersion ) != 2 )
+	{
+		errorOut( "errorlog.txt", "Failed to initialize winsocks!  Wasn't version 2.2!" );
 		WSACleanup();
 		return 1;
 	}
@@ -656,7 +672,7 @@ int CSocket::socketSystemInit()
 
 void CSocket::socketSystemDestroy()
 {
-	errorOut( "debuglog.txt", ":: Destroying socket system..." );
+//	errorOut( "debuglog.txt", ":: Destroying socket system..." );
 #if defined(_WIN32) || defined(_WIN64)
 	int intTimeCheck = 0;
 
@@ -684,422 +700,68 @@ int identifyError( int source )
 	if ( i_error == EWOULDBLOCK || i_error == EINPROGRESS )
 		return i_error;
 
-	errorOut( "debuglog.txt", CString() << "Socket error: [" << toString(i_error) << "]" );
-
+	errorOut( "errorlog.txt", CString() << "Socket error: [" << toString(i_error) << "]" );
+/*
 	switch ( i_error )
 	{
 #if defined(_WIN32) || defined(_WIN64)
 		case WSANOTINITIALISED:
-			errorOut( "debuglog.txt", "WSANOTINITIALISED" ); break;
+			errorOut( "errorlog.txt", "WSANOTINITIALISED" ); break;
 #endif
 		case ENETDOWN:
-			errorOut( "debuglog.txt", "ENETDOWN" ); break;
+			errorOut( "errorlog.txt", "ENETDOWN" ); break;
 		case EADDRINUSE:
-			errorOut( "debuglog.txt", "EADDRINUSE" ); break;
+			errorOut( "errorlog.txt", "EADDRINUSE" ); break;
 		case EINTR:
-			errorOut( "debuglog.txt", "EINTR" ); break;
+			errorOut( "errorlog.txt", "EINTR" ); break;
 		case EINPROGRESS:
-			errorOut( "debuglog.txt", "EINPROGRESS" ); break;
+			errorOut( "errorlog.txt", "EINPROGRESS" ); break;
 		case EALREADY:
-			errorOut( "debuglog.txt", "EALREADY" ); break;
+			errorOut( "errorlog.txt", "EALREADY" ); break;
 		case EADDRNOTAVAIL:
-			errorOut( "debuglog.txt", "EADDRNOTAVAIL" ); break;
+			errorOut( "errorlog.txt", "EADDRNOTAVAIL" ); break;
 		case EAFNOSUPPORT:
-			errorOut( "debuglog.txt", "EAFNOSUPPORT" ); break;
+			errorOut( "errorlog.txt", "EAFNOSUPPORT" ); break;
 		case ECONNREFUSED:
-			errorOut( "debuglog.txt", "ECONNREFUSED" ); break;
+			errorOut( "errorlog.txt", "ECONNREFUSED" ); break;
 		case EFAULT:
-			errorOut( "debuglog.txt", "EFAULT" ); break;
+			errorOut( "errorlog.txt", "EFAULT" ); break;
 		case EINVAL:
-			errorOut( "debuglog.txt", "EINVAL" ); break;
+			errorOut( "errorlog.txt", "EINVAL" ); break;
 		case EISCONN:
-			errorOut( "debuglog.txt", "EISCONN" ); break;
+			errorOut( "errorlog.txt", "EISCONN" ); break;
 		case ENETUNREACH:
-			errorOut( "debuglog.txt", "ENETUNREACH" ); break;
+			errorOut( "errorlog.txt", "ENETUNREACH" ); break;
 		case ENOBUFS:
-			errorOut( "debuglog.txt", "ENOBUFS" ); break;
+			errorOut( "errorlog.txt", "ENOBUFS" ); break;
 		case ENOTSOCK:
-			errorOut( "debuglog.txt", "ENOTSOCK" ); break;
+			errorOut( "errorlog.txt", "ENOTSOCK" ); break;
 		case ETIMEDOUT:
-			errorOut( "debuglog.txt", "ETIMEDOUT" ); break;
+			errorOut( "errorlog.txt", "ETIMEDOUT" ); break;
 		case EWOULDBLOCK:
-			errorOut( "debuglog.txt", "EWOULDBLOCK" ); break;
+			errorOut( "errorlog.txt", "EWOULDBLOCK" ); break;
 		case EACCES:
-			errorOut( "debuglog.txt", "EACCES" ); break;
+			errorOut( "errorlog.txt", "EACCES" ); break;
 		case ENOTCONN:
-			errorOut( "debuglog.txt", "ENOTCONN" ); break;
+			errorOut( "errorlog.txt", "ENOTCONN" ); break;
 		case ENETRESET:
-			errorOut( "debuglog.txt", "ENETRESET" ); break;
+			errorOut( "errorlog.txt", "ENETRESET" ); break;
 		case EOPNOTSUPP:
-			errorOut( "debuglog.txt", "EOPNOTSUPP" ); break;
+			errorOut( "errorlog.txt", "EOPNOTSUPP" ); break;
 		case ESHUTDOWN:
-			errorOut( "debuglog.txt", "ESHUTDOWN" ); break;
+			errorOut( "errorlog.txt", "ESHUTDOWN" ); break;
 		case EMSGSIZE:
-			errorOut( "debuglog.txt", "EMSGSIZE" ); break;
+			errorOut( "errorlog.txt", "EMSGSIZE" ); break;
 		case ECONNABORTED:
-			errorOut( "debuglog.txt", "ECONNABORTED" ); break;
+			errorOut( "errorlog.txt", "ECONNABORTED" ); break;
 		case ECONNRESET:
-			errorOut( "debuglog.txt", "ECONNRESET" ); break;
+			errorOut( "errorlog.txt", "ECONNRESET" ); break;
 		case EHOSTUNREACH:
-			errorOut( "debuglog.txt", "EHOSTUNREACH" ); break;
+			errorOut( "errorlog.txt", "EHOSTUNREACH" ); break;
 		default:
 			break;
 			//g_printf( "\n" ); break;
 	}
-
+*/
 	return i_error;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-#include "main.h"
-#include "CSocket.h"
-#define MIN(a, b) (a < b ? a : b)
-
-CSocket::CSocket(char* pAddress, int pPort)
-{
-	udp = false;
-	sockId = 0;
-	blocking = false;
-	connectSock(pAddress, pPort);
-}
-
-void CSocket::setNagle(bool pOn)
-{
-	int nagle = !pOn;
-	setsockopt(sockId, IPPROTO_TCP, 1,(char*)&nagle, sizeof(nagle));
-
-}
-CSocket::CSocket(int pSockId)
-{
-	int type, typeSize = sizeof(int);
-	getsockopt(pSockId, SOL_SOCKET, SO_TYPE, (char*)&type, (socklen_t*)&typeSize);
-
-	udp = (type == SOCK_DGRAM);
-	blocking = false;
-	sockId = pSockId;
-	memset( (void *)&addr, 0, sizeof(sockaddr_in) );
-}
-
-bool CSocket::connectSock(char* pAddress, int pPort)
-{
-	hostent*  hostEntry;
-	udp = false;
-	if(sockId == 0)
-	{
-		if((sockId = (int)socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == 0)
-		{
-#ifdef _WIN32
-			errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - socket() returned " << toString(h_errno) << ".", true );
-#else
-			errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - socket() returned " << toString(errno) << ": " << strerror(errno), true );
-#endif
-			return false;
-		}
-	}
-
-	if ( addr.sin_family != AF_INET )
-	{
-		if((hostEntry = gethostbyname(pAddress)) == NULL)
-		{
-#ifdef _WIN32
-			errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - gethostbyname() returned " << toString(h_errno) << ".", true );
-#else
-			errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - gethostbyname() returned " << toString(h_errno) << ": " << hstrerror(errno), true );
-#endif
-			closeSock();
-			return false;
-		}
-
-		addr.sin_family = AF_INET;
-		addr.sin_addr = *((in_addr*)*hostEntry->h_addr_list);
-		addr.sin_port = htons((unsigned short)pPort);
-	}
-
-	if (connect(sockId, (sockaddr*)&addr, sizeof(sockaddr_in)) == -1)
-	{
-#ifdef _WIN32
-		errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - connect() failed.  Returned " << toString(h_errno) << ".", true );
-#else
-		errorOut( "errorlog.txt", CBuffer() << "[Error] CSocket::connectSock - connect() failed.  Returned " << toString(errno) << ": " << strerror(errno), true );
-#endif
-		closeSock();
-		return false;
-	}
-	return true;
-}
-
-bool CSocket::listenSock(int pPort, int pMax)
-{
-	sockaddr_in addr;
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = INADDR_ANY;
-	addr.sin_port = htons(pPort);
-	udp = false;
-
-	if(sockId == 0)
-	{
-		if((sockId = (int)socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == 0)
-			return false;
-	}
-
-	int value = 1;
-	setsockopt(sockId,SOL_SOCKET,SO_REUSEADDR,(char*)&value,sizeof(value));
-	if(bind(sockId, (sockaddr*)&addr, sizeof(sockaddr_in)) == -1)
-		return false;
-
-	if(::listen(sockId, pMax) == -1)
-		return false;
-	return true;
-}
-
-CSocket* CSocket::accept()
-{
-	int newSock;
-	if((newSock = (int)::accept(sockId, NULL, NULL)) > 0)
-		return new CSocket(newSock);
-	return NULL;
-}
-
-char* CSocket::tcpIp()
-{
-	sockaddr_in addr;
-	int addr_size = sizeof(sockaddr_in);
-	if(getpeername(sockId, (sockaddr *)&addr, (socklen_t*)&addr_size) == -1)
-		return NULL;
-	return inet_ntoa(addr.sin_addr);
-}
-
-void CSocket::setSync(bool pBlocking)
-{
-	blocking = pBlocking;
-
-	#if defined(WIN32)
-		unsigned long i = !pBlocking;
-		ioctlsocket(sockId, FIONBIO, &i);
-	#elif defined(PSPSDK)
-		unsigned long i = !pBlocking;
-		sceNetInetSetsockopt(sockId, SOL_SOCKET, 0x1009, (const char*)&i, sizeof(u32));
-	#else
-		if (!pBlocking)
-			fcntl(sockId, F_SETFL, O_NONBLOCK);
-	#endif
-}
-
-bool CSocket::udpBind(int pPort)
-{
-	sockaddr_in addr;
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = INADDR_ANY;
-	addr.sin_port = htons(pPort);
-	if (sockId == 0)
-	{
-		if((sockId = (int)socket(AF_INET, SOCK_DGRAM, 0)) == 0)
-			return false;
-	}
-
-	if (bind(sockId,(sockaddr *)&addr, sizeof(sockaddr_in)) == -1)
-		return false;
-	udp = true;
-	return true;
-}
-
-int CSocket::sendBytes(char* pSource, int pLength, char* pIp, int pPort)
-{
-	sockaddr_in addr;
-	int size = 0;
-	if(pLength <= 0)
-		return 0;
-	if(!blocking)
-	{
-		fd_set set;
-		struct timeval tm;
-		tm.tv_sec = 0;
-		tm.tv_usec = 0;
-		FD_ZERO(&set);
-		FD_SET((unsigned int)sockId,&set);
-		select(sockId+1,NULL,&set,NULL,&tm);
-		if (!FD_ISSET(sockId,&set))
-			return 0;
-	}
-	if(udp)
-	{
-		addr.sin_family = AF_INET;
-		addr.sin_port = htons(pPort);
-		addr.sin_addr.s_addr = inet_addr(pIp);
-		size = sendto(sockId, pSource, pLength, 0, (sockaddr *)&addr, sizeof(sockaddr_in));
-		if(size == 0)
-		{
-			closeSock();
-			return -1;
-		}
-		else return size;
-	}
-	size = send(sockId, pSource, pLength, MSG_NOSIGNAL);
-	if(size == 0)
-	{
-		closeSock();
-		return -1;
-	}
-	else return size;
-}
-
-
-int CSocket::sendMessage(CBuffer& pSource, char* pIp, int pPort)
-{
-	if(udp)
-		return sendBuffer(pSource, pIp, pPort);
-	CBuffer sendBuff;
-	sendBuff.writeuShort(pSource.length());
-	sendBuff.writeBuffer(pSource);
-	return sendBuffer(sendBuff);
-}
-
-int CSocket::receiveBytes(CBuffer& pDestination, int pCount, int pMode)
-{
-	char buff[8192];
-	int size = 0;
-	fd_set set;
-	struct timeval tm;
-	pDestination.clear();
-	tm.tv_sec = 0;
-	tm.tv_usec = 0;
-	while(size < pCount)
-	{
-		if(!blocking)
-		{
-			FD_ZERO(&set);
-			FD_SET((unsigned int)sockId,&set);
-			select(sockId+1,&set,NULL,NULL,&tm);
-			if (!FD_ISSET(sockId,&set))
-				return size;
-		}
-		int len = pCount - size;
-		if(len > 8192)
-			len = 8192;
-		if(len < 0)
-			return size;
-
-		int a = recv(sockId, buff, len, MSG_NOSIGNAL);
-		if (a == 0)
-		{
-			closeSock();
-			return -1;
-		}
-
-		if(a < 0)
-		{
-			if (lastError() == EWOULDBLOCK || lastError() == EMSGSIZE)
-				break;
-			else return -lastError();
-		}
-		size+=a;
-		pDestination.writeBytes(buff, a);
-		if(udp)
-			break;
-	}
-	return size;
-}
-
-int CSocket::receiveMessage(CBuffer& pDestination)
-{
-	int retVal = -1;
-
-	if(udp)
-		return receiveBytes(pDestination);
-
-	 if(((retVal = receiveBytes(pDestination, 2))) == 2)
-		return receiveBytes(pDestination, pDestination.readuShort());
-	return retVal;
-}
-
-
-int CSocket::receiveText(CString& pDestination, char* pSep)
-{
-	char buffer[65536];
-	int size;
-
-	if(!udp)
-	{
-		size = recv(sockId, buffer, sizeof(buffer), MSG_PEEK);
-		if(size <= 0)
-			return size;
-		buffer[size] = 0;
-		int length = (int)(strstr(buffer, pSep) - buffer);
-
-		if(length >= 0)
-			return receiveBytes(pDestination, length + (int)strlen(pSep));
-		closeSock();
-		return -1;
-	}
-	return -1;
-}
-
-CSocket::~CSocket()
-{
-	closeSock();
-}
-
-void CSocket::closeSock()
-{
-	if(sockId != 0)
-	{
-		shutdown(sockId, 1);
-		#ifdef WIN32
-			closesocket(sockId);
-		#else
-			close(sockId);
-		#endif
-	}
-	sockId = 0;
-}
-
-int CSocket::sockStart()
-{
-	#ifdef WIN32
-		WSADATA wsaData;
-		if (WSAStartup(MAKEWORD(2, 2),&wsaData) != 0)
-			return -1;
-	#elif PSPSDK
-		if (sceUtilityLoadNetModule(PSP_NET_MODULE_COMMON) < 0)
-			return -1;
-		if (sceUtilityLoadNetModule(PSP_NET_MODULE_INET) < 0)
-			return -1;
-		if (pspSdkInetInit() != 0)
-			return -2; // false
-		if (sceNetApctlConnect(1) != 0)
-			return -3;
-
-		while (true)
-		{
-			int state = 0;
-			if (sceNetApctlGetState(&state) != 0)
-				return -3;
-			if (state == 4)
-				break;
-
-			sceKernelDelayThread(1000 * 50); // 50ms
-		}
-	#endif
-
-	return 0;
-}
-
-void CSocket::sockCleanup()
-{
-	#ifdef WIN32
-		WSACleanup();
-	#endif
-}
-*/
