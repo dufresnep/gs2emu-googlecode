@@ -5,11 +5,13 @@
 #include "CListServer.h"
 #include "main.h"
 
+extern bool serverRunning;
 CSocket listServer;
 bool setSock = false;
 
 void ListServer_Connect()
 {
+	if ( serverRunning == false ) return;
 	if ( setSock == false )
 	{
 		setSock = true;
@@ -328,6 +330,7 @@ void ListServer_Main()
 
 void ListServer_Send(CPacket &pPacket)
 {
+	if ( serverRunning == false ) return;
 	if ( listServerFields[5] == "localhost" ) return;
 
 	if (!lsConnected)

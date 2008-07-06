@@ -56,7 +56,6 @@
 
 #include <memory.h>
 #include <stdio.h>
-#include <stdarg.h>
 
 #include "CSocket.h"
 #include "main.h"
@@ -67,7 +66,7 @@ int CSocket::was_initiated = 0;
 // Class functions
 CSocket::CSocket()
 {
-	if ( CSocket::was_initiated == 0 ) socketSystemInit();
+	if ( CSocket::was_initiated == 0 ) CSocket::socketSystemInit();
 	properties.handle = 0;
 	properties.protocol = 0;
 	properties.type = 0;
@@ -78,7 +77,7 @@ CSocket::CSocket()
 
 CSocket::CSocket( CString& host, CString& port, sock_properties* properties )
 {
-	if ( CSocket::was_initiated == 0 ) socketSystemInit();
+	if ( CSocket::was_initiated == 0 ) CSocket::socketSystemInit();
 	if ( properties != 0 )
 		memcpy( (void*)&this->properties, properties, sizeof( sock_properties ) );
 	else
@@ -182,15 +181,8 @@ int CSocket::connect()
 	// 	Make sure the socket is disconnected.
 	if ( properties.state != SOCKET_STATE_DISCONNECTED )
 	{
-		errorOut( "debuglog.txt", "[CSocket::sock_connect] Socket is already connected." );
+		errorOut( "debuglog.txt", "[CSocket::connect] Socket is already connected." );
 		return SOCKET_ALREADY_CONNECTED;
-	}
-
-	// 	Check if the description exists.
-	if ( properties.description == 0 )
-	{
-		errorOut( "debuglog.txt", "[CSocket::sock_connect] Socket description not found." );
-		return SOCKET_UNKNOWN_DESC;
 	}
 
 	// 	Announce what we are going to do.
@@ -200,7 +192,7 @@ int CSocket::connect()
 	properties.state = SOCKET_STATE_CONNECTING;
 
 	// 	Create socket.
-	if ( properties.protocol == SOCKET_PROTOCOL_TCP )
+	if ( properties.protocol == SOCKET_PROTOCOL_TCP && properties.handle == 0 )
 		properties.handle = (unsigned int)socket( AF_INET, SOCK_STREAM, 0 );
 	else
 		properties.handle = (unsigned int)socket( AF_INET, SOCK_DGRAM, 0 );
@@ -208,7 +200,7 @@ int CSocket::connect()
 	// 	Make sure the socket was created correctly.
 	if ( properties.handle == INVALID_SOCKET )
 	{
-		errorOut( "debuglog.txt", "[CSocket::sock_connect] socket() returned INVALID_SOCKET." );
+		errorOut( "debuglog.txt", "[CSocket::connect] socket() returned INVALID_SOCKET." );
 		properties.state = SOCKET_STATE_DISCONNECTED;
 		return SOCKET_INVALID;
 	}
@@ -220,7 +212,7 @@ int CSocket::connect()
 		if ( ::bind( properties.handle, (struct sockaddr *)&properties.address, sizeof(properties.address) ) == SOCKET_ERROR )
 		{
 			identifyError();
-			errorOut( "debuglog.txt", "[CSocket::sock_connect] bind() returned SOCKET_ERROR." );
+			errorOut( "debuglog.txt", "[CSocket::connect] bind() returned SOCKET_ERROR." );
 			#if defined(_WIN32) || defined(_WIN64)
 				closesocket( properties.handle );
 			#else
@@ -238,7 +230,7 @@ int CSocket::connect()
 		if ( ::connect( properties.handle, (struct sockaddr *)&properties.address, sizeof(properties.address) ) == SOCKET_ERROR )
 		{
 			identifyError();
-			errorOut( "debuglog.txt", "[CSocket::sock_connect] connect() returned SOCKET_ERROR." );
+			errorOut( "debuglog.txt", "[CSocket::connect] connect() returned SOCKET_ERROR." );
 			#if defined(WIN32) || defined(WIN64)
 				closesocket( properties.handle );
 			#else
@@ -265,7 +257,7 @@ int CSocket::connect()
 			errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Setting socket to a listening state..." );
 			if ( ::listen( properties.handle, SOMAXCONN ) == SOCKET_ERROR )
 			{
-				errorOut( "debuglog.txt", "[CSocket::sock_connect] listen() returned SOCKET_ERROR." );
+				errorOut( "debuglog.txt", "[CSocket::connect] listen() returned SOCKET_ERROR." );
 				identifyError();
 				#if defined(WIN32) || defined(WIN64)
 					closesocket( properties.handle );
@@ -351,11 +343,7 @@ CSocket* CSocket::accept()
 	unsigned int handle = 0;
 
 	// Try to accept a new connection.
-#if defined(_WIN32) || defined(_WIN64)
-	handle = (unsigned int)::accept( properties.handle, (struct sockaddr*)&addr, &addrlen );
-#else
 	handle = (unsigned int)::accept( properties.handle, (struct sockaddr*)&addr, (socklen_t*)&addrlen );
-#endif
 	if ( handle == -1 )
 	{
 		identifyError( 1 );
@@ -365,7 +353,9 @@ CSocket* CSocket::accept()
 	// Create the new socket to store the new connection.
 	CSocket* sock = new CSocket();
 	sock_properties props;
-	memcpy( (void*)&props.address, &addr, sizeof( sockaddr_storage ) );
+	memset( (void*)&props, 0, sizeof( sock_properties ) );
+	memset( (struct sockaddr_storage*)&properties.address, 0, sizeof(struct sockaddr_storage) );
+	memcpy( (void*)&props.address, &addr, sizeof( addr ) );
 	props.options = properties.options;
 	props.protocol = properties.protocol;
 	props.type = SOCKET_TYPE_CLIENT;
@@ -373,6 +363,10 @@ CSocket* CSocket::accept()
 	props.handle = handle;
 	sock->setProperties( props );
 	sock->setDescription( sock->tcpIp() );
+
+	// Accept the connection by calling getsockopt.
+	int type, typeSize = sizeof(int);
+	getsockopt( handle, SOL_SOCKET, SO_TYPE, (char*)&type, (socklen_t*)&typeSize );
 
 	return sock;
 }
@@ -399,7 +393,7 @@ int CSocket::sendData( CPacket& data )
 	}
 
 	// 	Send our data, yay!
-	if ( send( properties.handle, data.text(), data.length(), 0 ) == SOCKET_ERROR )
+	if ( ::send( properties.handle, data.text(), data.length(), 0 ) == SOCKET_ERROR )
 	{
 		intError = identifyError();
 		switch ( intError )
@@ -427,7 +421,9 @@ int CSocket::getData()
 {
 	int size = 0;
 	int intError = 0;
-	char buff[ 0x10000 ]; // 65536 bytes, 64KB
+	//char buff[ 0x10000 ]; // 65536 bytes, 64KB
+	char buff[ 0x2000 ]; // 8192 bytes, 8KB
+	int bufflen = 0x2000;
 	CPacket temp;
 
 	// 	Make sure it is connected!
@@ -449,16 +445,16 @@ int CSocket::getData()
 	do
 	{
 		// Allocate buff.
-		memset( (char *)buff, 0, 0x10000 );
+		memset( (void*)buff, 0, bufflen );
 
 		// 	Get our data
 		if ( properties.protocol == SOCKET_PROTOCOL_UDP )
-			size = recvfrom( properties.handle, buff, 0x10000, 0, 0, 0 );
+			size = recvfrom( properties.handle, buff, bufflen, 0, 0, 0 );
 		else
-			size = recv( properties.handle, buff, 0x10000, 0 );
+			size = recv( properties.handle, buff, bufflen, 0 );
 
 		// Add to the buffer.
-		temp << buff;
+		temp.writeBytes( buff, size );
 
 		// 	Check for error!
 		if ( size == SOCKET_ERROR )
@@ -489,18 +485,18 @@ int CSocket::getData()
 		disconnect();
 
 	// Add the data we just got to the buffer.
-	buffer << temp;
+	buffer.writeBytes( temp.text(), temp.length() );
 
 	// 	Return the amount of data obtained.
-	//if ( temp.length() == 0 ) return -1;
 	return temp.length();
 }
 
 char* CSocket::peekData()
 {
-	int recvsize = 0x10000;
+	//int recvsize = 0x10000;
+	int recvsize = 0x2000;
 	int intError;
-	char *buff = NULL;
+	char *buff = 0;
 
 	// 	Make sure it is connected!
 	if ( properties.state == SOCKET_STATE_DISCONNECTED )
@@ -569,7 +565,34 @@ int CSocket::setType( int sock_type )
 
 int CSocket::setOptions( int iOptions )
 {
-	// 	Check if the options are a-0.
+	bool changeBlocking = false;
+	unsigned long i;
+
+	if ( iOptions & SOCKET_OPTION_NONBLOCKING && !(properties.options & SOCKET_OPTION_NONBLOCKING) )
+	{
+		changeBlocking = true;
+		i = 1;
+	}
+	if ( properties.options & SOCKET_OPTION_NONBLOCKING && !(iOptions & SOCKET_OPTION_NONBLOCKING) )
+	{
+		changeBlocking = true;
+		i = 0;
+		errorOut( "debuglog.txt", "Disabling non-blocking" );
+	}
+
+	if ( changeBlocking )
+	{
+#if defined(WIN32)
+		ioctlsocket( properties.handle, FIONBIO, &i );
+#elif defined(PSPSDK)
+		sceNetInetSetsockopt( properties.handle, SOL_SOCKET, 0x1009, (const char*)&i, sizeof(u32) );
+#else
+		if ( i == 1 ) fcntl( properties.handle, F_SETFL, O_NONBLOCK );
+		else fcntl( properties.handle, F_SETFL, ~O_NONBLOCK );
+#endif
+	}
+
+	// Set the options.
 	properties.options = iOptions;
 
 	return 0;
@@ -601,7 +624,7 @@ const char* CSocket::tcpIp()
 	char host[1025];
 	memset( (void*)host, 0, 1025 );
 
-	int error = getnameinfo( (struct sockaddr*)&properties.address, sizeof( struct sockaddr ), host, 1025, 0, 0, NI_NUMERICSERV );
+	int error = getnameinfo( (struct sockaddr*)&properties.address, sizeof( struct sockaddr ), host, 1025, 0, 0, NI_NUMERICHOST );
 	if ( error ) return 0;
 	hostret = host;
 	return hostret;
