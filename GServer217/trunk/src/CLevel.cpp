@@ -444,7 +444,7 @@ void CLevel::loadBaddies(CPacket& levelData)
 			line.writeChar(byte);
 		}
 
-		if(line.length() < 3 || line[0] < 0)
+		if(line.length() < 3 || line[0] < (char)0)
 			break;
 
 		if(baddies.count() > 50)
