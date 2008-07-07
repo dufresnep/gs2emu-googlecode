@@ -259,8 +259,8 @@ int CSocket::connect()
 			//errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Setting socket to a listening state..." );
 			if ( ::listen( properties.handle, SOMAXCONN ) == SOCKET_ERROR )
 			{
-				errorOut( "errorlog.txt", "[CSocket::connect] listen() returned SOCKET_ERROR." );
 				identifyError();
+				errorOut( "errorlog.txt", "[CSocket::connect] listen() returned SOCKET_ERROR." );
 				#if defined(WIN32) || defined(WIN64)
 					closesocket( properties.handle );
 				#else
@@ -348,7 +348,7 @@ CSocket* CSocket::accept()
 	handle = (unsigned int)::accept( properties.handle, (struct sockaddr*)&addr, (socklen_t*)&addrlen );
 	if ( handle == -1 )
 	{
-		identifyError( 1 );
+		identifyError();
 		return 0;
 	}
 
