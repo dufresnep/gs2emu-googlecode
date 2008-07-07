@@ -4,7 +4,7 @@ CPPS = CAccount.cpp CBaddy.cpp CBuffer.cpp CDatabase.cpp CIni.cpp CLevel.cpp CLi
 OBJS = CAccount.o CBaddy.o CBuffer.o CDatabase.o CIni.o CLevel.o CLinkedList.o CList.o CListServer.o CMap.o CNpc.o COther.o CPacket.o CPlayer.o CServerBot.o CSocket.o CStringList.o CWeapon.o CWordFilter.cpp codec.o main.o md5.o
 
 LD = g++
-CLFLAGS = -ggdb3
+CLFLAGS = -ggdb3 -fsigned-char
 SLFLAGS = -lz -ggdb3
 
 all: $(CPPS) gserver
@@ -13,7 +13,7 @@ all: $(CPPS) gserver
 	$(LD) $(CLFLAGS) -c $<
 
 gserver: $(OBJS)
-	$(LD) -o ../bin/GServer217 $(OBJS) $(CPPOFDB) $(SLFLAGS)
+	$(LD) -o ../bin/LGserver $(OBJS) $(CPPOFDB) $(SLFLAGS)
 
 help:
 	@echo "GServer Makefile"
