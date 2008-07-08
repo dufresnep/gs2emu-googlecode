@@ -257,7 +257,7 @@ void CPlayer::main()
 	}
 
 	// Add obtained data to buffer.
-	packetBuffer << playerSock->getBuffer();
+	packetBuffer.writeBytes( playerSock->getBuffer().text(), playerSock->getBuffer().length() );
 	playerSock->getBuffer().clear();
 
 	if (packetBuffer.length() >= 128*1024)
