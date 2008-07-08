@@ -194,7 +194,7 @@ int CSocket::connect()
 	properties.state = SOCKET_STATE_CONNECTING;
 
 	// Create socket.
-	if ( properties.protocol == SOCKET_PROTOCOL_TCP && properties.handle == 0 )
+	if ( properties.protocol == SOCKET_PROTOCOL_TCP )
 		properties.handle = (unsigned int)socket( AF_INET, SOCK_STREAM, 0 );
 	else
 		properties.handle = (unsigned int)socket( AF_INET, SOCK_DGRAM, 0 );
@@ -415,6 +415,7 @@ int CSocket::sendData( CPacket& data )
 				break;
 		}
 		if ( intError == EWOULDBLOCK || intError == EINPROGRESS ) return 0;
+		disconnect();
 		return intError;
 	}
 
