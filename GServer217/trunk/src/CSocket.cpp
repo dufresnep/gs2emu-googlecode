@@ -375,16 +375,17 @@ CSocket* CSocket::accept()
 
 int CSocket::sendData( CPacket& data )
 {
-	int intError;
-	int size;
+	int intError = 0;
+	int size = 0;
 
 	// Make sure the socket is connected!
 	if ( properties.state == SOCKET_STATE_DISCONNECTED )
 		return SOCKET_INVALID;
 
-	// Wait for the socket to be ready for a write if we are blocking.
-	//if ( properties.options & SOCKET_OPTION_NONBLOCKING == 0 )
-	//{
+	do
+	{
+		// See if we can send data.
+		// If we can't, return how many bytes we did send.
 		fd_set set;
 		struct timeval tm;
 		tm.tv_sec = tm.tv_usec = 0;
@@ -392,33 +393,45 @@ int CSocket::sendData( CPacket& data )
 		FD_SET( properties.handle, &set );
 		select( properties.handle + 1, 0, &set, 0, &tm );
 		if ( !FD_ISSET( properties.handle, &set ) )
-			return 0;
-	//}
+			return size;
 
-	// Send our data, yay!
-	if ( (size = ::send( properties.handle, data.text(), data.length(), 0 )) == SOCKET_ERROR )
-	{
-		intError = identifyError();
-		switch ( intError )
+		// Send our data, yay!
+		int sent = 0;
+		if ( (sent = ::send( properties.handle, data.text(), data.length(), 0 )) == SOCKET_ERROR )
 		{
-			case ENETDOWN:
-			case ENETRESET:
-			case ENOTCONN:
-			case EHOSTUNREACH:
-			case ECONNABORTED:
-			case ECONNRESET:
-			case ETIMEDOUT:
-				// Destroy the bad socket and create a new one.
-				errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!" );
-				disconnect();
-				return intError;
-				break;
+			intError = identifyError();
+			switch ( intError )
+			{
+				case ENETDOWN:
+				case ENETRESET:
+				case ENOTCONN:
+				case EHOSTUNREACH:
+				case ECONNABORTED:
+				case ECONNRESET:
+				case ETIMEDOUT:
+					// Destroy the bad socket and create a new one.
+					errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!" );
+					disconnect();
+					return intError;
+					break;
+			}
+			if ( intError == EWOULDBLOCK || intError == EINPROGRESS ) return size;
+			disconnect();
+			return intError;
 		}
-		if ( intError == EWOULDBLOCK || intError == EINPROGRESS ) return 0;
-		disconnect();
-		return intError;
-	}
 
+		// Remove what we sent.
+		// Increase size by how much we sent.
+		if ( sent >= data.length() )
+			data.clear();
+		else if ( sent > 0 )
+			data.remove( 0, sent );
+		size += sent;
+	
+	// Repeat while data is still left.
+	} while ( data.length() > 0 && intError == 0 );
+
+	// Return how much data was ultimately sent.
 	return size;
 }
 
@@ -435,21 +448,23 @@ int CSocket::getData()
 	if ( properties.state == SOCKET_STATE_DISCONNECTED )
 		return SOCKET_ERROR;
 
-	// If we have blocking sockets, let's first check if we can read.
-	//if ( properties.options & SOCKET_OPTION_NONBLOCKING == 0 )
-	//{
-		fd_set set;
-		struct timeval tm;
-		tm.tv_sec = tm.tv_usec = 0;
-		FD_ZERO( &set );
-		FD_SET( properties.handle, &set );
-		select( properties.handle + 1, &set, 0, 0, &tm );
-		if ( !FD_ISSET( properties.handle, &set ) )
-			return 0;
-	//}
-
 	do
 	{
+		// Make sure there is data to be read.
+		// If size == bufflen, that means there may be more data.  Just in case,
+		// call select so blocking sockets don't block.
+		if ( size == 0 || size == bufflen )
+		{
+			fd_set set;
+			struct timeval tm;
+			tm.tv_sec = tm.tv_usec = 0;
+			FD_ZERO( &set );
+			FD_SET( properties.handle, &set );
+			select( properties.handle + 1, &set, 0, 0, &tm );
+			if ( !FD_ISSET( properties.handle, &set ) )
+				return temp.length();
+		}
+
 		// Allocate buff.
 		memset( (void*)buff, 0, bufflen );
 
