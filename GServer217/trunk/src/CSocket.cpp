@@ -356,7 +356,7 @@ CSocket* CSocket::accept()
 	CSocket* sock = new CSocket();
 	sock_properties props;
 	memset( (void*)&props, 0, sizeof( sock_properties ) );
-	memset( (struct sockaddr_storage*)&properties.address, 0, sizeof(struct sockaddr_storage) );
+	memset( (void*)&properties.address, 0, sizeof(struct sockaddr_storage) );
 	memcpy( (void*)&props.address, &addr, sizeof( addr ) );
 	props.options = properties.options;
 	props.protocol = properties.protocol;
@@ -619,7 +619,16 @@ int CSocket::setDescription( const char *strDescription )
 
 int CSocket::setProperties( sock_properties newprop )
 {
-	memcpy( (void *)&this->properties, (void *)&newprop, sizeof( sock_properties ) );
+	// Store the old options.
+	int oldoptions = properties.options;
+
+	// Set the socket properties.
+	memcpy( (void*)&this->properties, (void *)&newprop, sizeof( sock_properties ) );
+
+	// Restore the old options and try to set the new ones.
+	properties.options = oldoptions;
+	setOptions( newprop.options );
+
 	return 0;
 }
 
