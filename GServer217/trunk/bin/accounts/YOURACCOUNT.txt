@@ -39,9 +39,12 @@ FOLDERRIGHT rw logs/*
 FOLDERRIGHT rw npcprops/*
 FOLDERRIGHT rw world/*
 FOLDERRIGHT rw world/bodies/*
+FOLDERRIGHT rw world/ganis/*
 FOLDERRIGHT rw world/global/*
 FOLDERRIGHT rw world/hats/*
 FOLDERRIGHT rw world/heads/*
+FOLDERRIGHT rw world/images/*
 FOLDERRIGHT rw world/shields/*
 FOLDERRIGHT rw world/swords/*
+FOLDERRIGHT rw world/sounds/*
 LASTFOLDER accounts/
