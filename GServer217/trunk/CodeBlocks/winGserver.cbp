@@ -17,8 +17,8 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="wsock32" />
 					<Add library="libzdll" />
+					<Add library="ws2_32" />
 					<Add directory="lib\" />
 				</Linker>
 			</Target>
@@ -66,15 +66,15 @@
 					<Mode after="always" />
 				</ExtraCommands>
 				<Environment>
-					<Variable name="PSP_EBOOT_ICON" value="lib/ICON0.PNG" />
+					<Variable name="PSP_EBOOT_SFO" value="lib\PARAM.SFO" />
+					<Variable name="PSP_EBOOT_PIC1" value="lib\PIC1.PNG" />
 					<Variable name="PSP_EBOOT" value="EBOOT.PBP" />
-					<Variable name="PSP_EBOOT_SFO" value="lib/PARAM.SFO" />
-					<Variable name="PSP_EBOOT_UNKPNG" value="NULL" />
 					<Variable name="PSP_EBOOT_SND0" value="NULL" />
-					<Variable name="PSP_EBOOT_PSAR" value="NULL" />
 					<Variable name="PSP_EBOOT_TITLE" value='&quot;Graal Emulation Server&quot;' />
+					<Variable name="PSP_EBOOT_PSAR" value="NULL" />
+					<Variable name="PSP_EBOOT_ICON" value="lib\ICON0.PNG" />
+					<Variable name="PSP_EBOOT_UNKPNG" value="NULL" />
 					<Variable name="PSP_EBOOT_ICON1" value="NULL" />
-					<Variable name="PSP_EBOOT_PIC1" value="lib/PIC1.PNG" />
 				</Environment>
 			</Target>
 		</Build>

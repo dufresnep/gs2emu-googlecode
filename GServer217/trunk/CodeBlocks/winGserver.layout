@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="PSP" />
+	<ActiveTarget name="Win32" />
 	<File name="..\src\CAccount.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="7380" topLine="141" />
 	</File>
@@ -14,10 +14,10 @@
 		<Cursor position="57" topLine="0" />
 	</File>
 	<File name="..\src\CBuffer.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="12898" topLine="564" />
+		<Cursor position="12898" topLine="60" />
 	</File>
 	<File name="..\src\CBuffer.h" open="0" top="0" tabpos="2">
-		<Cursor position="7018" topLine="309" />
+		<Cursor position="7036" topLine="309" />
 	</File>
 	<File name="..\src\CDatabase.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="2980" topLine="87" />
@@ -74,16 +74,19 @@
 		<Cursor position="112" topLine="0" />
 	</File>
 	<File name="..\src\CPlayer.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="13153" topLine="376" />
+		<Cursor position="7721" topLine="157" />
 	</File>
 	<File name="..\src\CPlayer.h" open="0" top="0" tabpos="1">
-		<Cursor position="8525" topLine="348" />
+		<Cursor position="8430" topLine="330" />
 	</File>
-	<File name="..\src\CSocket.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="4805" topLine="170" />
+	<File name="..\src\CSocket.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="1282" topLine="0" />
 	</File>
 	<File name="..\src\CSocket.h" open="0" top="0" tabpos="3">
 		<Cursor position="336" topLine="0" />
+	</File>
+	<File name="..\src\CString.h" open="0" top="0" tabpos="0">
+		<Cursor position="133" topLine="0" />
 	</File>
 	<File name="..\src\CStringList.cpp" open="0" top="0" tabpos="20">
 		<Cursor position="1192" topLine="34" />

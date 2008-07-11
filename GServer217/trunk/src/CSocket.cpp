@@ -6,6 +6,8 @@
 	#ifndef WIN32_LEAN_AND_MEAN
 		#define WIN32_LEAN_AND_MEAN
 	#endif
+
+	#define WINVER 0x0501
 	#include <windows.h>
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
@@ -427,7 +429,7 @@ int CSocket::sendData( CPacket& data )
 		else if ( sent > 0 )
 			data.remove( 0, sent );
 		size += sent;
-	
+
 	// Repeat while data is still left.
 	} while ( data.length() > 0 && intError == 0 );
 
