@@ -103,9 +103,6 @@ class CSocket
 		static void socketSystemDestroy();
 };
 
-static int identifyError( int source = 0 );
-
-
 inline
 unsigned int CSocket::getHandle()
 {

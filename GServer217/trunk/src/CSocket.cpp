@@ -64,6 +64,7 @@
 #include "COther.h"
 
 int CSocket::was_initiated = 0;
+static int identifyError( int source = 0 );
 
 // Class functions
 CSocket::CSocket()
