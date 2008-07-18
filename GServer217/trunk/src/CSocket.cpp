@@ -54,6 +54,8 @@
 	#include <netinet/in.h>
 	#define SOCKET_ERROR	-1
 	#define INVALID_SOCKET	(unsigned int)-1
+
+	typedef unsigned int SOCKET;
 #endif
 
 #include <memory.h>
