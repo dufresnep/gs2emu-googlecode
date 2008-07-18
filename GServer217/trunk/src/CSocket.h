@@ -42,6 +42,8 @@
  	#include <sys/socket.h>
 	#include <sys/types.h>
 	#include <arpa/inet.h>
+
+	typedef unsigned int SOCKET;
 #endif
 
 //! Properties to pass to the socket.
