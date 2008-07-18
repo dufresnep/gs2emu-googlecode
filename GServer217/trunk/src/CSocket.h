@@ -2,8 +2,8 @@
     $Id$
  (C) GraalReborn 2007 */
 
-#ifndef CSocket_H
-#define CSocket_H
+#ifndef CSOCKET_H
+#define CSOCKET_H
 
 #include "CString.h"
 #include "CPacket.h"
@@ -47,7 +47,7 @@
 //! Properties to pass to the socket.
 struct sock_properties
 {
-	unsigned int handle;
+	SOCKET handle;
 	int protocol;
 	int type;
 	int options;
@@ -83,7 +83,7 @@ class CSocket
 		int getData();
 		char* peekData();
 
-		unsigned int getHandle();
+		SOCKET getHandle();
 		int getProtocol();
 		int getType();
 		int getOptions();
@@ -104,7 +104,7 @@ class CSocket
 };
 
 inline
-unsigned int CSocket::getHandle()
+SOCKET CSocket::getHandle()
 {
 	return properties.handle;
 }

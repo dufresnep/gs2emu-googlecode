@@ -4279,7 +4279,7 @@ void CPlayer::msgDSETRIGHTS(CPacket& pPacket)
 	}
 
 	CBuffer accname = pPacket.readChars(pPacket.readByte1());
-	CPlayer *player = findPlayerId(accname, true);
+	CPlayer *player = findPlayerId(accname);
 	if (player == NULL)
 	{
 		player = new CPlayer(NULL);
@@ -4317,7 +4317,6 @@ void CPlayer::msgDSETRIGHTS(CPacket& pPacket)
 	// Untokenize and load the directories.
 	CString temp(pPacket.readChars(pPacket.readByte2()));
 	temp.untokenize();
-	//myFolders.clear();
 	player->myFolders.load(temp.text(), "\n");
 
 	// Remove any invalid directories.
@@ -4611,8 +4610,17 @@ void CPlayer::msgDFILEFTPDEL(CPacket& pPacket)
 		return;
 	}
 
-	// no security.. oh well
+	// Get the file name.
 	CString fileName = CString() << lastFolder << pPacket.text() + 1;
+
+	// Don't let us delete defaultaccount.
+	if ( fileName == "defaultaccount" )
+	{
+		sendPacket( CPacket() << (char)STEXTFTP << "Server: Not allowed to delete the default account.  If you wish to do this, manually delete the account from the server." );
+		return;
+	}
+
+	// Remove the file.
 	remove(fileName.text());
 	errorOut( "rclog.txt", CString() << accountName << " deleted file " << fileName );
 	sendPacket(CPacket() << (char)STEXTFTP << "Deleted file " << fileName);
@@ -4626,9 +4634,18 @@ void CPlayer::msgDFILEFTPREN(CPacket& pPacket)
 		return;
 	}
 
-	// no security.. oh well
+	// Get the file names.
 	CString f1 = CString() << lastFolder << pPacket.readChars((unsigned char)pPacket.readByte1());
 	CString f2 = CString() << lastFolder << pPacket.readChars((unsigned char)pPacket.readByte1());
+
+	// Don't let us rename defaultaccount.
+	if ( f1 == "defaultaccount" || f2 == "defaultaccount" )
+	{
+		sendPacket( CPacket() << (char)STEXTFTP << "Server: Not allowed to rename the default account." );
+		return;
+	}
+
+	// Do the renaming.
 	rename(f1.text(), f2.text());
 	errorOut( "rclog.txt", CString() << accountName << " renamed file " << f1 << " to " << f2 );
 	sendPacket(CPacket() << (char)STEXTFTP << "Renamed file " << f1 << " to " << f2);

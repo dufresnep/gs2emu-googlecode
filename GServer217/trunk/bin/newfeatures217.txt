@@ -6,12 +6,12 @@ Maintenance:
 - Some constructor reworking.
 - Updated defaultaccount.txt with some default values.
 - Updated foldersconfig.txt with the global directory pre set up.
-- Socket code re-write.
+- Socket code re-write.  Hopefully fixes some of the connection bugs.
 
 Changes:
 - You can no longer delete the defaultaccount account through RC.  If
   you ever wish to do that, you will need to manually delete it through
-  the File Browser or through some other means.
+  FTP or via the server itself.
 - You can no longer remove your own "Change Rights" or "Change Staff
   Account" rights through RC.
 - png, mng, and gif auto detection has now been added for all of the
@@ -25,9 +25,6 @@ Fixes:
   it at (30, 27).
 - If an RC changes their name, the new name should now be visible in
   the RC player list.
-- Potentially solved a problem where the gserver refuses to reconnect
-  to the listserver without restarting the entire program, even when
-  the listserver is up.
 - Fixed some bugs related to level caching.  This fixes a memory leak
   (it would constantly allocate new data when it shouldn't have) and it
   might fix some more evil NPC props stuff.  Also, it now sends a
@@ -36,6 +33,8 @@ Fixes:
 - If you are the only person in the level and you die, npcs won't break
   anymore.  Yay.
 - Fixed a bug that caused png/mng/gif auto detection to fail to work.
+- Altering an RC's rights should now immediately apply.  Previously
+  they would need to log out to get their new rights.
 
 
 --------------------------------------------

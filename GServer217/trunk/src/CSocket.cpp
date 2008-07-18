@@ -64,6 +64,7 @@
 #include "COther.h"
 
 int CSocket::was_initiated = 0;
+static CString errorMessage( int error );
 static int identifyError( int source = 0 );
 
 // Class functions
@@ -107,23 +108,9 @@ int CSocket::init( CString& host, CString& port )
 	struct addrinfo hints;
 	struct addrinfo* res;
 
-	// Type: 6 = TCP, 17 = UDP
-	// PF_INET, SOCK_STREAM, IPPROTO_TCP/IPPROTO_UDP
-
 	// Make sure a TCP socket is disconnected.
 	if ( properties.protocol == SOCKET_PROTOCOL_TCP && properties.state != SOCKET_STATE_DISCONNECTED )
-	{
-		errorOut( "errorlog.txt", "[CSocket::init] TCP socket must be disconnected first." );
 		return SOCKET_ALREADY_CONNECTED;
-	}
-
-	// Announce what we are going to do.
-	/*
-	if ( properties.type == SOCKET_TYPE_CLIENT )
-		errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Pointing socket to " << host << ":" << port << "... " );
-	else
-		errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Setting socket to port " << port );
-	*/
 
 	// Start creating the hints.
 	memset( (struct sockaddr_storage*)&properties.address, 0, sizeof(struct sockaddr_storage) );
@@ -147,7 +134,7 @@ int CSocket::init( CString& host, CString& port )
 	// Check for errors.
 	if ( error )
 	{
-		errorOut( "errorlog.txt", "[CSocket::init] getaddrinfo() returned an error." );
+		errorOut( "errorlog.txt", CString() << "[CSocket::init] getaddrinfo() returned error: " << toString(error) );
 		return SOCKET_HOST_UNKNOWN;
 	}
 	else
@@ -159,10 +146,10 @@ int CSocket::init( CString& host, CString& port )
 void CSocket::destroy()
 {
 	// Shut down the socket.
-	//errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Shutting down socket..." );
 	if ( shutdown( properties.handle, SHUT_WR ) == SOCKET_ERROR )
-		identifyError();
+		errorOut( "errorlog.txt", CString() << "[CSocket::destroy] shutdown returned error: " << errorMessage(identifyError()) );
 
+	// Mark socket as terminating.
 	properties.state = SOCKET_STATE_TERMINATING;
 
 	// Destroy the socket of d00m.
@@ -173,8 +160,7 @@ void CSocket::destroy()
 	if ( close( properties.handle ) == SOCKET_ERROR )
 	{
 #endif
-		errorOut( "errorlog.txt", CString() << "[CSocket::destroy] Error closing socket: " << properties.description );
-		identifyError();
+		errorOut( "errorlog.txt", CString() << "[CSocket::destroy] Error closing socket: " << errorMessage(identifyError()) );
 	}
 
 	// Reset the socket state.
@@ -185,22 +171,16 @@ int CSocket::connect()
 {
 	// Make sure the socket is disconnected.
 	if ( properties.state != SOCKET_STATE_DISCONNECTED )
-	{
-		errorOut( "errorlog.txt", "[CSocket::connect] Socket is already connected." );
 		return SOCKET_ALREADY_CONNECTED;
-	}
-
-	// Announce what we are going to do.
-	//errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Establishing socket..." );
 
 	// Flag the socket as connecting.
 	properties.state = SOCKET_STATE_CONNECTING;
 
 	// Create socket.
 	if ( properties.protocol == SOCKET_PROTOCOL_TCP )
-		properties.handle = (unsigned int)socket( AF_INET, SOCK_STREAM, 0 );
+		properties.handle = socket( AF_INET, SOCK_STREAM, 0 );
 	else
-		properties.handle = (unsigned int)socket( AF_INET, SOCK_DGRAM, 0 );
+		properties.handle = socket( AF_INET, SOCK_DGRAM, 0 );
 
 	// Make sure the socket was created correctly.
 	if ( properties.handle == INVALID_SOCKET )
@@ -216,31 +196,34 @@ int CSocket::connect()
 		//errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Binding socket..." );
 		if ( ::bind( properties.handle, (struct sockaddr *)&properties.address, sizeof(properties.address) ) == SOCKET_ERROR )
 		{
-			identifyError();
-			errorOut( "errorlog.txt", "[CSocket::connect] bind() returned SOCKET_ERROR." );
+			errorOut( "errorlog.txt", CString() << "[CSocket::connect] bind() returned error: " << errorMessage(identifyError()) );
+			destroy();
+			/*
 			#if defined(_WIN32) || defined(_WIN64)
 				closesocket( properties.handle );
 			#else
 				close( properties.handle );
 			#endif
+			*/
 			properties.state = SOCKET_STATE_DISCONNECTED;
 			return SOCKET_BIND_ERROR;
 		}
 	}
 
 	// Connect the socket.
-	//errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Connecting socket..." );
 	if ( properties.type != SOCKET_TYPE_SERVER )
 	{
 		if ( ::connect( properties.handle, (struct sockaddr *)&properties.address, sizeof(properties.address) ) == SOCKET_ERROR )
 		{
-			identifyError();
-			errorOut( "errorlog.txt", "[CSocket::connect] connect() returned SOCKET_ERROR." );
+			errorOut( "errorlog.txt", CString() << "[CSocket::connect] connect() returned error: " << errorMessage(identifyError()) );
+			destroy();
+			/*
 			#if defined(WIN32) || defined(WIN64)
 				closesocket( properties.handle );
 			#else
 				close( properties.handle );
 			#endif
+			*/
 			properties.state = SOCKET_STATE_DISCONNECTED;
 			return SOCKET_CONNECT_ERROR;
 		}
@@ -253,22 +236,20 @@ int CSocket::connect()
 	if ( properties.type == SOCKET_TYPE_SERVER )
 	{
 		if ( properties.protocol == SOCKET_PROTOCOL_UDP )
-		{
-			//errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Socket entering a listening state." );
 			properties.state = SOCKET_STATE_LISTENING;
-		}
 		else if ( properties.protocol == SOCKET_PROTOCOL_TCP )
 		{
-			//errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Setting socket to a listening state..." );
 			if ( ::listen( properties.handle, SOMAXCONN ) == SOCKET_ERROR )
 			{
-				identifyError();
-				errorOut( "errorlog.txt", "[CSocket::connect] listen() returned SOCKET_ERROR." );
+				errorOut( "errorlog.txt", CString() << "[CSocket::connect] listen() returned error: " << errorMessage(identifyError()) );
+				destroy();
+				/*
 				#if defined(WIN32) || defined(WIN64)
 					closesocket( properties.handle );
 				#else
 					close( properties.handle );
 				#endif
+				*/
 				properties.state = SOCKET_STATE_DISCONNECTED;
 				return SOCKET_CONNECT_ERROR;
 			}
@@ -345,13 +326,13 @@ CSocket* CSocket::accept()
 
 	sockaddr_storage addr;
 	int addrlen = sizeof( addr );
-	unsigned int handle = 0;
+	SOCKET handle = 0;
 
 	// Try to accept a new connection.
-	handle = (unsigned int)::accept( properties.handle, (struct sockaddr*)&addr, (socklen_t*)&addrlen );
-	if ( handle == -1 )
+	handle = ::accept( properties.handle, (struct sockaddr*)&addr, (socklen_t*)&addrlen );
+	if ( handle == INVALID_SOCKET )
 	{
-		identifyError();
+		errorOut( "errorlog.txt", CString() << "[CSocket::accept] accept() returned error: " << errorMessage(identifyError()) );
 		return 0;
 	}
 
@@ -413,7 +394,7 @@ int CSocket::sendData( CPacket& data )
 				case ECONNRESET:
 				case ETIMEDOUT:
 					// Destroy the bad socket and create a new one.
-					errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!" );
+					errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!  Reason: " << errorMessage(intError) );
 					disconnect();
 					return intError;
 					break;
@@ -496,7 +477,7 @@ int CSocket::getData()
 				case ETIMEDOUT:
 				case ESHUTDOWN:
 					// Destroy the bad socket and create a new one.
-					errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!" );
+					errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!  Reason: " << errorMessage(intError) );
 					disconnect();
 					break;
 				default:
@@ -556,7 +537,7 @@ char* CSocket::peekData()
 			case ETIMEDOUT:
 			case ESHUTDOWN:
 				// Destroy the bad socket and create a new one.
-				errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!" );
+				errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!  Reason: " << errorMessage(intError) );
 				disconnect();
 				break;
 			default:
@@ -672,7 +653,6 @@ const char* CSocket::tcpIp()
 
 int CSocket::socketSystemInit()
 {
-//	errorOut( "debuglog.txt", ":: Initializing socket system..." );
 #if defined(_WIN32) || defined(_WIN64)
 	WORD wVersionRequested;
 	WSADATA wsaData;
@@ -721,96 +701,95 @@ int CSocket::socketSystemInit()
 
 void CSocket::socketSystemDestroy()
 {
-//	errorOut( "debuglog.txt", ":: Destroying socket system..." );
 #if defined(_WIN32) || defined(_WIN64)
 	int intTimeCheck = 0;
 
 	while ( intTimeCheck++ < 10 )
 	{
 		if ( WSACleanup() == SOCKET_ERROR )
-			identifyError();
+			errorOut( "errorlog.txt", CString() << "[CSocket::socketSystemDestroy] WSACleanup() returned error: " << errorMessage(identifyError()) );
 		wait( 1000 );
 	}
 #endif
 }
 
-int identifyError( int source )
+CString errorMessage( int error )
 {
-#if defined(_WIN32) || defined(_WIN64)
-	int i_error = WSAGetLastError();
-#else
-	int i_error;
-	if ( source != 0 )
-		i_error = h_errno;
-	else
-		i_error = errno;
-#endif
-	// These can happen a lot.  Don't display any errors about them.
-	if ( i_error == EWOULDBLOCK || i_error == EINPROGRESS )
-		return i_error;
+	CString blank;
 
-	errorOut( "errorlog.txt", CString() << "Socket error: [" << toString(i_error) << "]" );
-/*
-	switch ( i_error )
+	// These can happen a lot.  Don't display any errors about them.
+	if ( error == EWOULDBLOCK || error == EINPROGRESS )
+		return blank;
+
+	switch ( error )
 	{
 #if defined(_WIN32) || defined(_WIN64)
 		case WSANOTINITIALISED:
-			errorOut( "errorlog.txt", "WSANOTINITIALISED" ); break;
+			return CString("WSANOTINITIALISED"); break;
 #endif
 		case ENETDOWN:
-			errorOut( "errorlog.txt", "ENETDOWN" ); break;
+			return CString("ENETDOWN"); break;
 		case EADDRINUSE:
-			errorOut( "errorlog.txt", "EADDRINUSE" ); break;
+			return CString("EADDRINUSE"); break;
 		case EINTR:
-			errorOut( "errorlog.txt", "EINTR" ); break;
+			return CString("EINTR"); break;
 		case EINPROGRESS:
-			errorOut( "errorlog.txt", "EINPROGRESS" ); break;
+			return CString("EINPROGRESS"); break;
 		case EALREADY:
-			errorOut( "errorlog.txt", "EALREADY" ); break;
+			return CString("EALREADY"); break;
 		case EADDRNOTAVAIL:
-			errorOut( "errorlog.txt", "EADDRNOTAVAIL" ); break;
+			return CString("EADDRNOTAVAIL"); break;
 		case EAFNOSUPPORT:
-			errorOut( "errorlog.txt", "EAFNOSUPPORT" ); break;
+			return CString("EAFNOSUPPORT"); break;
 		case ECONNREFUSED:
-			errorOut( "errorlog.txt", "ECONNREFUSED" ); break;
+			return CString("ECONNREFUSED"); break;
 		case EFAULT:
-			errorOut( "errorlog.txt", "EFAULT" ); break;
+			return CString("EFAULT"); break;
 		case EINVAL:
-			errorOut( "errorlog.txt", "EINVAL" ); break;
+			return CString("EINVAL"); break;
 		case EISCONN:
-			errorOut( "errorlog.txt", "EISCONN" ); break;
+			return CString("EISCONN"); break;
 		case ENETUNREACH:
-			errorOut( "errorlog.txt", "ENETUNREACH" ); break;
+			return CString("ENETUNREACH"); break;
 		case ENOBUFS:
-			errorOut( "errorlog.txt", "ENOBUFS" ); break;
+			return CString("ENOBUFS"); break;
 		case ENOTSOCK:
-			errorOut( "errorlog.txt", "ENOTSOCK" ); break;
+			return CString("ENOTSOCK"); break;
 		case ETIMEDOUT:
-			errorOut( "errorlog.txt", "ETIMEDOUT" ); break;
+			return CString("ETIMEDOUT"); break;
 		case EWOULDBLOCK:
-			errorOut( "errorlog.txt", "EWOULDBLOCK" ); break;
+			return CString("EWOULDBLOCK"); break;
 		case EACCES:
-			errorOut( "errorlog.txt", "EACCES" ); break;
+			return CString("EACCES"); break;
 		case ENOTCONN:
-			errorOut( "errorlog.txt", "ENOTCONN" ); break;
+			return CString("ENOTCONN"); break;
 		case ENETRESET:
-			errorOut( "errorlog.txt", "ENETRESET" ); break;
+			return CString("ENETRESET"); break;
 		case EOPNOTSUPP:
-			errorOut( "errorlog.txt", "EOPNOTSUPP" ); break;
+			return CString("EOPNOTSUPP"); break;
 		case ESHUTDOWN:
-			errorOut( "errorlog.txt", "ESHUTDOWN" ); break;
+			return CString("ESHUTDOWN"); break;
 		case EMSGSIZE:
-			errorOut( "errorlog.txt", "EMSGSIZE" ); break;
+			return CString("EMSGSIZE"); break;
 		case ECONNABORTED:
-			errorOut( "errorlog.txt", "ECONNABORTED" ); break;
+			return CString("ECONNABORTED"); break;
 		case ECONNRESET:
-			errorOut( "errorlog.txt", "ECONNRESET" ); break;
+			return CString("ECONNRESET"); break;
 		case EHOSTUNREACH:
-			errorOut( "errorlog.txt", "EHOSTUNREACH" ); break;
+			return CString("EHOSTUNREACH"); break;
 		default:
-			break;
-			//g_printf( "\n" ); break;
+			return CString((int)error); break;
 	}
-*/
-	return i_error;
+}
+
+int identifyError( int source )
+{
+#if defined(_WIN32) || defined(_WIN64)
+	return WSAGetLastError();
+#else
+	if ( source != 0 )
+		return h_errno;
+	else
+		return errno;
+#endif
 }
