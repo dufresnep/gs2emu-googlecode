@@ -334,7 +334,9 @@ CSocket* CSocket::accept()
 	handle = ::accept( properties.handle, (struct sockaddr*)&addr, (socklen_t*)&addrlen );
 	if ( handle == INVALID_SOCKET )
 	{
-		errorOut( "errorlog.txt", CString() << "[CSocket::accept] accept() returned error: " << errorMessage(identifyError()) );
+		int error = identifyError();
+		if ( error == EWOULDBLOCK || error == EINPROGRESS ) return 0;
+		errorOut( "errorlog.txt", CString() << "[CSocket::accept] accept() returned error: " << errorMessage(error) );
 		return 0;
 	}
 
