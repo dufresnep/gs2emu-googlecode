@@ -4249,7 +4249,7 @@ void CPlayer::msgDWANTRIGHTS(CPacket& pPacket)
 
 	int rights = 0;
 	CString folders, ip;
-	CPlayer *player = findPlayerId(accname, true);
+	CPlayer *player = findPlayerId(accname);
 	if (player == NULL)
 	{
 		player = new CPlayer(NULL);
