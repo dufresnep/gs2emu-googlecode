@@ -1,5 +1,5 @@
 /* GraalReborn Server
-    $Id$
+	$Id$
  (C) GraalReborn 2007 */
 
 #include "CBaddy.h"
@@ -393,27 +393,27 @@ void CPlayer::processLogin(CPacket& pPacket)
 	//Send a verification request to the server for account name and password
 	if ( listServerFields[5] == "localhost" )
 	{
-        for (int i = 0; i < newPlayers.count(); i++)
-        {
-            CPlayer *player = (CPlayer *)newPlayers[i];
+		for (int i = 0; i < newPlayers.count(); i++)
+		{
+			CPlayer *player = (CPlayer *)newPlayers[i];
 
-            if (player->accountName == accountName)
-            {
-                player->sendAccount();
-            }
-        }
-        errorOut("serverlog.txt", "[DEBUG_LOCALHOSTMODE] Password Check Bypassed.", true);
+			if (player->accountName == accountName)
+			{
+				player->sendAccount();
+			}
+		}
+		errorOut("serverlog.txt", "[DEBUG_LOCALHOSTMODE] Password Check Bypassed.", true);
 	}
 	else
 	{
-        if (lsConnected)
-            ListServer_Send(CPacket() << (char)SLSACCOUNT << (char)accountName.length() << accountName << (char)password.length() << password << "\n");
-        else
-        {
-            errorOut("errorlog.txt", "List server is unavailable");
-            sendPacket(CPacket() << (char)DISMESSAGE << "Unable to contact account server.");
-            deleteMe = true;
-        }
+		if (lsConnected)
+			ListServer_Send(CPacket() << (char)SLSACCOUNT << (char)accountName.length() << accountName << (char)password.length() << password << "\n");
+		else
+		{
+			errorOut("errorlog.txt", "List server is unavailable");
+			sendPacket(CPacket() << (char)DISMESSAGE << "Unable to contact account server.");
+			deleteMe = true;
+		}
 	}
 }
 

@@ -1,5 +1,5 @@
 /* GraalReborn Server
-    $Id$
+	$Id$
  (C) GraalReborn 2007 */
 
 #ifndef COTHERH

@@ -1,5 +1,5 @@
 /* GraalReborn Server
-    $Id$
+	$Id$
  (C) GraalReborn 2007 */
 
 #include "CListServer.h"
@@ -58,7 +58,7 @@ void ListServer_Main()
 	CStringList lines;
 
 	if ( listServerFields[5] == "localhost" ) return;
-    if (!lsConnected) return;
+	if (!lsConnected) return;
 
 	// Read any new data into the socket.
 	if ( listServer.getData() == -1 )
@@ -334,17 +334,17 @@ void ListServer_Send(CPacket &pPacket)
 	if ( listServerFields[5] == "localhost" ) return;
 
 	if (!lsConnected)
-    {
-        ListServer_Connect();
-        if (!lsConnected)
-            return;
-    }
+	{
+		ListServer_Connect();
+		if (!lsConnected)
+			return;
+	}
 
 	// Make sure a newline is sent after the message.
 	if ( pPacket[ pPacket.length() - 1 ] != '\n' )
 		pPacket << "\n";
 
-    if ( listServer.sendData( pPacket ) < 0 )
+	if ( listServer.sendData( pPacket ) < 0 )
 	{
 		errorOut("serverlog.txt", "Disconnected from list server.");
 		lsConnected = false;

@@ -4,11 +4,11 @@
 #include "CServerBot.h"
 
 #ifdef WIN32
-    #include "zlib.h"
+	#include "zlib.h"
 #endif
 
 #ifndef WIN32
-    #include <zlib.h>
+	#include <zlib.h>
 #endif
 
 

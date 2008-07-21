@@ -1,5 +1,5 @@
 /* GraalReborn Server
-    $Id$
+	$Id$
  (C) GraalReborn 2007 */
 
 #include "main.h"
@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
 	errorOut("serverlog.txt", "Server started");
 
 	if ( listServerFields[5] == "localhost" )
-        errorOut("serverlog.txt", "[DEBUG_LOCALHOSTMODE] Localhost mode is activated.\nListserver communication & account authentication are disabled.", true);
+		errorOut("serverlog.txt", "[DEBUG_LOCALHOSTMODE] Localhost mode is activated.\nListserver communication & account authentication are disabled.", true);
 
 	serverRunning = true;
 
@@ -250,8 +250,8 @@ void doTimer()
 {
 	/* Reconnect Listserver if Disconnected */
 	if ( !(listServerFields[5] == "localhost") )
-	    if (!lsConnected)
-	        ListServer_Connect();
+		if (!lsConnected)
+			ListServer_Connect();
 
 	/* Level-Animations */
 	for(int i = 0; i < levelList.count(); i++)
