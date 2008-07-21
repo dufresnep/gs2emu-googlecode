@@ -643,7 +643,6 @@ int CSocket::setState( int iState )
 
 const char* CSocket::tcpIp()
 {
-	int addr_size = sizeof(sockaddr_storage);
 	char* hostret;
 	char host[1025];
 	memset( (void*)host, 0, 1025 );
