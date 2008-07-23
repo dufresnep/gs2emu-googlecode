@@ -13,16 +13,25 @@
 
 #include <cstdlib>
 
+enum
+{
+	ENCRYPT22_UNCOMPRESSED	= 0x02,
+	ENCRYPT22_ZLIB			= 0x04,
+};
+
 class codec {
 public:
 	static const unsigned ITERATOR_START_VAL = 0x4A80B38;
 	void reset(uint8_t key);
 	void apply(uint8_t* buf, size_t len);
+	void limit(uint32_t limit);
+	int limitfromtype(uint8_t type);
  
 private:
 	uint8_t  m_key;
 	uint8_t  m_offset;
 	uint32_t m_iterator;
+	uint32_t m_limit;
 }; 
  
 #endif
