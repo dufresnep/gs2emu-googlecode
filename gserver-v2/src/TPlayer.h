@@ -52,7 +52,7 @@ class TPlayer : public TAccount
 
 		// Prop-Manipulation
 		CString getProp(int pPropId);
-		CString getProps(bool *pProps, int pCount, TPlayer *pPlayer = NULL);
+		CString getProps(bool *pProps, int pCount);
 		void setProps(CString& pPacket, bool pForward = false);
 		void sendProps(bool *pProps, int pCount, TPlayer *pPlayer = NULL);
 
@@ -60,7 +60,7 @@ class TPlayer : public TAccount
 		bool doMain();
 		void decryptPacket(CString& pPacket);
 		void sendCompress();
-		void sendPacket(CString& pPacket);
+		void sendPacket(CString pPacket);
 
 		// Packet-Functions
 		bool parsePacket(CString& pPacket);

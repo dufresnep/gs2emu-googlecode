@@ -12,6 +12,24 @@ extern std::vector<TPlayer *> playerIds, playerList;
 // Enum per Attr
 int __attrPackets[] = { 37, 38, 39, 40, 41, 46, 47, 48, 49, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74 };
 
+// Get on Login
+bool __getLogin[] =
+{
+	true,  false, false, false, false, false, // 0-5
+	false, false, true,  true,  true,  true,  // 6-11
+	true,  true,  false, true,  true,  true,  // 12-17
+	true,  true,  true,  true,  false, false, // 18-23
+	true,  false, false, false, false, false, // 24-29
+	true,  true,  true,  false, true,  true,  // 30-35
+	true,  true,  true,  true,  true,  true,  // 36-41
+	false, false, false, false, false, false, // 42-47
+	false, false, false, false, false, true,  // 48-53
+	false, false, false, false, false, false, // 54-59
+	false, false, false, false, false, false, // 60-65
+	false, false, false, false, false, false, // 66-71
+	false, false, false, false, false, false, // 72-77
+};
+
 // Sent on Login
 bool __sendLogin[] =
 {
@@ -115,6 +133,30 @@ void TPlayer::sendLogin()
 
 	// Send Player-Props
 	sendProps(__sendLogin, sizeof(__sendLogin) / sizeof(bool));
+
+	// Send Other-Player Props
+	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end(); ++i)
+	{
+		TPlayer *player = (TPlayer *)*i;
+		if (player == NULL || player == this)
+			continue;
+
+		if (player->getType() == CLIENTTYPE_CLIENT)
+		{
+			// my properties
+			player->sendPacket(getProps(__getLogin, sizeof(__getLogin) / sizeof(bool)));
+
+			// there properties
+			sendPacket(player->getProps(__getLogin, sizeof(__getLogin) / sizeof(bool)));
+		}
+			else if (player->getType() == CLIENTTYPE_RC)
+		{
+			// rc
+		}
+	}
+
+	// Send My-Props to Others
+	sendPacketToAll(CString() << "asd");
 
 	// Server Signature
 	sendPacket(CString() >> (char)PLO_SIGNATURE >> (char)73);
@@ -274,7 +316,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 	while (pPacket.bytesLeft() > 0)
 	{
 		int propId = pPacket.readGUChar();
-		printf("ID: %i\n", propId);
+
 		switch (propId)
 		{
 			case PLPROP_NICKNAME:
@@ -528,12 +570,8 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 	}
 }
 
-CString TPlayer::getProps(bool *pProps, int pCount, TPlayer *pPlayer)
+CString TPlayer::getProps(bool *pProps, int pCount)
 {
-	// Get Player
-	if (pPlayer == NULL)
-		pPlayer = this;
-
 	// Definition
 	CString propPacket;
 
@@ -541,7 +579,7 @@ CString TPlayer::getProps(bool *pProps, int pCount, TPlayer *pPlayer)
 	for (int i = 0; i < pCount; i++)
 	{
 		if (pProps[i])
-			propPacket >> (char)i << pPlayer->getProp(i);
+			propPacket >> (char)i << getProp(i);
 	}
 
 	// Return Val
@@ -551,11 +589,11 @@ CString TPlayer::getProps(bool *pProps, int pCount, TPlayer *pPlayer)
 void TPlayer::sendProps(bool *pProps, int pCount, TPlayer *pPlayer)
 {
 	// Get Player
-	//if (pPlayer == NULL)
-	//	pPlayer = this;
+	if (pPlayer == NULL)
+		pPlayer = this;
 
 	// Send Packet
-	sendPacket(CString() >> (char)PLO_PLAYERPROPS << getProps(pProps, pCount, pPlayer));
+	pPlayer->sendPacket(CString() >> (char)PLO_PLAYERPROPS << getProps(pProps, pCount));
 }
 
 /*
@@ -656,12 +694,15 @@ void TPlayer::sendCompress()
 	if (sBuffer.isEmpty())
 		return;
 
-	// compress buffer - new
-	out_codec.limit(0x02);
+	// zlib compress
+	sBuffer.zcompressI();
+
+	// encrypt buffer - new
+	out_codec.limit(0x04);
 	out_codec.apply(reinterpret_cast<uint8_t*>(sBuffer.text()), sBuffer.length());
 
 	// send buffer - new
-	playerSock->sendBuffer(CString() << (short)(sBuffer.length()+1) << (char)0x02 << sBuffer);
+	playerSock->sendBuffer(CString() << (short)(sBuffer.length()+1) << (char)0x04 << sBuffer);
 
 	/*
 	// compress buffer - old
@@ -675,7 +716,7 @@ void TPlayer::sendCompress()
 	sBuffer.clear();
 }
 
-void TPlayer::sendPacket(CString& pPacket)
+void TPlayer::sendPacket(CString pPacket)
 {
 	// empty buffer?
 	if (pPacket.isEmpty())
