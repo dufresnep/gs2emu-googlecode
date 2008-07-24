@@ -1,5 +1,5 @@
 --
--- SotSmed premake script
+-- GServer premake script
 -- Heavily leeched from the CEGUI premake script
 --
 
@@ -23,7 +23,7 @@ project.configs =
 --
 local pkg_table =
 {
-    "gserver",
+    "server",
 }
 
 

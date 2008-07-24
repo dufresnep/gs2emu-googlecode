@@ -46,11 +46,10 @@ function project_dynamic(name, lang, kind)
 		"unicode",
 		"no-rtti"
 	}
---	package.includepaths =
---	{
---		rootdir.."include",
---		rootdir.."dependencies/include",
---	}
+	package.includepaths =
+	{
+		rootdir.."dependencies/include",
+	}
 	package.libpaths =
 	{
 		rootdir.."dependencies",
