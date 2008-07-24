@@ -528,20 +528,34 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 	}
 }
 
-void TPlayer::sendProps(bool *pProps, int pCount)
+CString TPlayer::getProps(bool *pProps, int pCount, TPlayer *pPlayer)
 {
+	// Get Player
+	if (pPlayer == NULL)
+		pPlayer = this;
+
 	// Definition
 	CString propPacket;
 
-	// Create Props
-	for (int i = 0; i < pCount; ++i)
+	// Get Props
+	for (int i = 0; i < pCount; i++)
 	{
 		if (pProps[i])
-			propPacket >> (char)i << getProp(i);
+			propPacket >> (char)i << pPlayer->getProp(i);
 	}
 
+	// Return Val
+	return propPacket;
+}
+
+void TPlayer::sendProps(bool *pProps, int pCount, TPlayer *pPlayer)
+{
+	// Get Player
+	//if (pPlayer == NULL)
+	//	pPlayer = this;
+
 	// Send Packet
-	sendPacket(CString() >> (char)PLO_PLAYERPROPS << propPacket);
+	sendPacket(CString() >> (char)PLO_PLAYERPROPS << getProps(pProps, pCount, pPlayer));
 }
 
 /*
