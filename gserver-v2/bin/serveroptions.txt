@@ -1,0 +1,17 @@
+# Private-Server Options (changestaffacct required)
+listport = 14900
+listip = listserver.graal.in
+serverip = AUTO
+serverport = 14899
+
+description = J Server
+language = English
+name = J Server
+url = http://www.graal.in/
+version = GS2Emu
+maxplayers = 128
+sharefolder =
+showconsolepackets = false
+
+# myip = 156.34.245.60
+# serverport = 15337

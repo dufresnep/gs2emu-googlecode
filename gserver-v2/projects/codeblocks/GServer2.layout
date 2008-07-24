@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Windows" />
+	<File name="..\..\src\CString.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="10571" topLine="547" />
+	</File>
+	<File name="..\..\src\CString.h" open="0" top="0" tabpos="0">
+		<Cursor position="4016" topLine="97" />
+	</File>
+	<File name="..\..\src\TAccount.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="390" topLine="0" />
+	</File>
+	<File name="..\..\src\TAccount.h" open="0" top="0" tabpos="0">
+		<Cursor position="2525" topLine="86" />
+	</File>
+	<File name="..\..\src\TLevel.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="2176" topLine="93" />
+	</File>
+	<File name="..\..\src\TLevel.h" open="0" top="0" tabpos="0">
+		<Cursor position="996" topLine="12" />
+	</File>
+	<File name="..\..\src\TPlayer.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="2803" topLine="81" />
+	</File>
+	<File name="..\..\src\TPlayer.h" open="1" top="0" tabpos="3">
+		<Cursor position="1184" topLine="49" />
+	</File>
+	<File name="..\..\src\TServerList.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="1392" topLine="79" />
+	</File>
+	<File name="..\..\src\TServerList.h" open="0" top="0" tabpos="0">
+		<Cursor position="1000" topLine="20" />
+	</File>
+	<File name="..\..\src\main.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="493" topLine="1" />
+	</File>
+	<File name="..\..\src\main.h" open="0" top="0" tabpos="0">
+		<Cursor position="328" topLine="5" />
+	</File>
+</CodeBlocks_layout_file>
