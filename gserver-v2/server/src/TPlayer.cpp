@@ -1029,10 +1029,10 @@ bool TPlayer::msgPLI_PLAYERPROPS(CString& pPacket)
 	return true;
 }
 
-bool TPlayer::PLI_WANTFILE(CString& pPacket)
+bool TPlayer::msgPLI_WANTFILE(CString& pPacket)
 {
 	printf("TODO: TPlayer::msgPLI_WANTFILE\n");
-	return;
+	return true;
 }
 
 bool TPlayer::msgPLI_NPCWEAPONIMG(CString& pPacket)
