@@ -28,7 +28,7 @@ void codec::apply(uint8_t* buf, size_t len) {
 	}
 }
 
-void codec::limit(uint32_t limit)
+void codec::limit(int32_t limit)
 {
 	m_limit = limit;
 }

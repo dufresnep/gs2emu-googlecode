@@ -30,10 +30,10 @@ CString TLevel::getBaddyPacket()
 
 CString TLevel::getBoardPacket()
 {
-	CString _retVal;
-	_retVal.writeGChar(PLO_BOARDPACKET);
-	_retVal.write((char *)levelTiles, 8192/*sizeof(levelTiles)*/);
-	return _retVal;
+	CString retVal;
+	retVal.writeGChar(PLO_BOARDPACKET);
+	retVal.write((char *)levelTiles, sizeof(levelTiles));
+	return retVal;
 }
 
 CString TLevel::getChestPacket(TPlayer *pPlayer)
@@ -152,7 +152,7 @@ bool TLevel::loadNW(const CString& pFileName)
 				}
 			}
 		}
-			else if (curLine[0] == "CHEST")
+		else if (curLine[0] == "CHEST")
 		{
 			if (curLine.size() != 5)
 				continue;
@@ -161,7 +161,7 @@ bool TLevel::loadNW(const CString& pFileName)
 
 			levelChests.push_back(new TLevelChest(curLine));
 		}
-			else if (curLine[0] == "LINK")
+		else if (curLine[0] == "LINK")
 		{
 			if (curLine.size() != 8)
 				continue;

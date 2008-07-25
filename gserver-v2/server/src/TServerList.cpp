@@ -160,7 +160,6 @@ void TServerList::setIp(const CString& pServerIp)
 void TServerList::setName(const CString& pServerName)
 {
 	bool uc = settings->getBool("underconstruction");
-	printf( "Under construction: %s\n", (uc == true ? "true" : "false") );
 	sendPacket(CString() >> (char)SVO_SETNAME << ((uc == true) ? "U " : "") << pServerName);
 }
 

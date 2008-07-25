@@ -57,8 +57,11 @@ CLog::CLog( const CString& _file, bool _enabled )
 
 CLog::~CLog()
 {
-	fflush( file );
-	fclose( file );
+	if ( file )
+	{
+		fflush( file );
+		fclose( file );
+	}
 }
 
 void CLog::out( const CString format, ... )

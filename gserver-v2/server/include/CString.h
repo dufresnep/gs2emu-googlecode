@@ -14,7 +14,7 @@
 #ifndef min
 	#define min(a, b)	((a) < (b) ? (a) : (b))
 #endif
-#define clip(a, b, c) max(min((a), (c)), (b));
+#define clip(a, b, c) max(min((a), (c)), (b))
 #define in(a, b, c) ((a) >= (b) && (a) <= (c))
 
 #define strtofloat(a) atof(a.text())

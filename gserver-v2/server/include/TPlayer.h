@@ -14,7 +14,11 @@
 // purpose is unknown.
 enum
 {
-	PLI_WANTFILE		= 34,
+	PLI_LEVELWARP		= 1,
+	PLI_PLAYERPROPS		= 2,
+	PLI_WANTFILE		= 23,
+	PLI_NPCWEAPONIMG	= 24,
+	PLI_UPDATEFILE		= 34,
 	PLI_LANGUAGE		= 37,
 	PLI_TRIGGERACTION	= 38,
 	PLI_MAPINFO			= 39,
@@ -79,7 +83,11 @@ class TPlayer : public TAccount
 		bool msgPLI_NULL(CString& pPacket);
 		bool msgPLI_LOGIN(CString& pPacket);
 
+		bool msgPLI_LEVELWARP(CString& pPacket);
+		bool msgPLI_PLAYERPROPS(CString& pPacket);
 		bool msgPLI_WANTFILE(CString& pPacket);
+		bool msgPLI_NPCWEAPONIMG(CString& pPacket);
+		bool msgPLI_UPDATEFILE(CString& pPacket);
 		bool msgPLI_LANGUAGE(CString& pPacket);
 		bool msgPLI_TRIGGERACTION(CString& pPacket);
 		bool msgPLI_MAPINFO(CString& pPacket);

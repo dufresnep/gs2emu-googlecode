@@ -12,6 +12,7 @@ extern std::vector<TPlayer *> playerIds, playerList;
 extern CString homepath;
 extern CLog serverlog;
 extern CLog rclog;
+extern CSettings* settings;
 
 /*
 	Global Definitions
@@ -101,7 +102,11 @@ void createPLFunctions()
 		TPLFunc.push_back(&TPlayer::msgPLI_NULL);
 
 	// now set non-nulls
+	TPLFunc[PLI_LEVELWARP] = &TPlayer::msgPLI_LEVELWARP;
+	TPLFunc[PLI_PLAYERPROPS] = &TPlayer::msgPLI_PLAYERPROPS;
 	TPLFunc[PLI_WANTFILE] = &TPlayer::msgPLI_WANTFILE;
+	TPLFunc[PLI_NPCWEAPONIMG] = &TPlayer::msgPLI_NPCWEAPONIMG;
+	TPLFunc[PLI_UPDATEFILE] = &TPlayer::msgPLI_UPDATEFILE;
 	TPLFunc[PLI_LANGUAGE] = &TPlayer::msgPLI_LANGUAGE;
 	TPLFunc[PLI_TRIGGERACTION] = &TPlayer::msgPLI_TRIGGERACTION;
 	TPLFunc[PLI_MAPINFO] = &TPlayer::msgPLI_MAPINFO;
@@ -238,8 +243,10 @@ CString TPlayer::getProp(int pPropId)
 		return CString() >> (char)carrySprite;
 
 		case PLPROP_CURLEVEL:
-			// TODO: RC levels:  >> (char)1 << " "
-		return CString() >> (char)levelName.length() << levelName;
+		if (type == CLIENTTYPE_CLIENT)
+			return CString() >> (char)levelName.length() << levelName;
+		else
+			return CString() >> (char)1 << " ";
 
 		case PLPROP_HORSEGIF:
 		return CString() >> (char)horseImg.length() << horseImg;
@@ -302,6 +309,18 @@ CString TPlayer::getProp(int pPropId)
 			// TODO: statusList.
 		//if ( statusMsg > statusList.count() - 1 )  retVal.writeByte1( 0 );
 		return CString() >> (char)0;
+
+		// OS type.
+		// Windows: wind
+		// TODO: reflect actual os.
+		case PLPROP_OSTYPE:
+		return CString() >> (char)4 << "wind";
+
+		// Text codepage.
+		// Example: 1252
+		// TODO: reflect actual codepage.
+		case PLPROP_TEXTCODEPAGE:
+		return CString().writeGInt(1252);
 	}
 
 	if (inrange(pPropId, 37, 41) || inrange(pPropId, 46, 49) || inrange(pPropId, 54, 74))
@@ -320,53 +339,105 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 {
 	CString globalBuff, levelBuff;
 	int len = 0;
-
+/*
+	printf( "%s\n", pPacket.text() );
+	for ( int i = 0; i < pPacket.length(); ++i )
+		printf( "%02x ", (unsigned char)((pPacket.text())[i]) );
+	printf( "\n" );
+*/
 	while (pPacket.bytesLeft() > 0)
 	{
-		int propId = pPacket.readGUChar();
-		//printf("ID: %i\n", propId);
+		unsigned char propId = pPacket.readGUChar();
+		//printf("ID: %u\n", propId);
 		switch (propId)
 		{
 			case PLPROP_NICKNAME:
-				len = clip(pPacket.readGUChar(), 0, 250);
+				len = pPacket.readGUChar();
+				len = clip(len, 0, 224);
 				setNick(pPacket.readChars(len));
-				levelBuff >> (char)propId << getProp(propId);
+				globalBuff >> (char)propId << getProp(propId);
 			break;
 
 			case PLPROP_MAXPOWER:
-				maxPower = clip(pPacket.readGUChar(), 0, 20);
+				maxPower = pPacket.readGUChar();
+				maxPower = clip(maxPower, 0, 20);
 			break;
 
 			case PLPROP_CURPOWER:
-				power = clip((float)pPacket.readGUChar() / 2, 0, (float)maxPower);
+				power = (float)pPacket.readGUChar() / 2;
+				power = clip(power, 0, (float)maxPower);
 			break;
 
 			case PLPROP_RUPEESCOUNT:
-				gralatc = clip(pPacket.readGUInt(), 0, 9999999);
+				gralatc = pPacket.readGUInt();
+				gralatc = clip(gralatc, 0, 9999999);
 			break;
 
 			case PLPROP_ARROWSCOUNT:
-				arrowc = clip(pPacket.readGUChar(), 0, 99);
+				arrowc = pPacket.readGUChar();
+				arrowc = clip(arrowc, 0, 99);
 			break;
 
 			case PLPROP_BOMBSCOUNT:
-				bombc = clip(pPacket.readGUChar(), 0, 99);
+				bombc = pPacket.readGUChar();
+				bombc = clip(bombc, 0, 99);
 			break;
 
 			case PLPROP_GLOVEPOWER:
-				glovePower = clip(pPacket.readGUChar(), 0, 3);
+				glovePower = pPacket.readGUChar();
+				glovePower = clip(glovePower, 0, 3);
 			break;
 
 			case PLPROP_BOMBPOWER:
-				bombPower = clip(pPacket.readGUChar(), 0, 3);
+				bombPower = pPacket.readGUChar();
+				bombPower = clip(bombPower, 0, 3);
 			break;
 
 			case PLPROP_SWORDPOWER:
-
+			{
+				int sp = pPacket.readGUChar();
+				if (sp <= 4)
+				{
+					swordImg = CString() << "sword";
+					swordImg.writeIntAsString(sp);
+					swordImg << ".png";
+				}
+				else
+				{
+					sp -= 30;
+					len = pPacket.readGUChar();
+					if (len > 0)
+					{
+						// TODO: foldersconfig stuff.
+						swordImg = pPacket.readChars(len);
+					}
+					swordPower = clip(sp, ((settings->getBool("healswords", false) == true) ? -(settings->getInt("swordlimit", 3)) : 0), settings->getInt("swordlimit", 3));
+				}
+			}
 			break;
 
 			case PLPROP_SHIELDPOWER:
-
+			{
+				int sp = pPacket.readGUChar();
+				if (sp <= 3)
+				{
+					swordImg = CString() << "shield";
+					swordImg.writeIntAsString(sp);
+					swordImg << ".png";
+				}
+				else
+				{
+					sp -= 10;
+					if (sp < 0) break;
+					len = pPacket.readGUChar();
+					if (len > 0)
+					{
+						// TODO: foldersconfig stuff.
+						shieldImg = pPacket.readChars(len);
+					}
+					shieldPower = clip(sp, 0, settings->getInt("shieldlimit", 3));
+				}
+			}
 			break;
 
 			case PLPROP_GANI:
@@ -378,11 +449,25 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			break;
 
 			case PLPROP_HEADGIF:
-
+				len = pPacket.readGUChar();
+				if (len < 100)
+				{
+					headImg = CString() << "head";
+					headImg.writeIntAsString(len);
+					headImg << ".png";
+					globalBuff >> (char)propId << getProp(propId);
+				}
+				else if ( len > 100 )
+				{
+					// TODO: Foldersconfig stuff.
+					headImg = pPacket.readChars(len-100);
+					globalBuff >> (char)propId << getProp(propId);
+				}
 			break;
 
 			case PLPROP_CURCHAT:
-				len = clip(pPacket.readGUChar(), 0, 220);
+				len = pPacket.readGUChar();
+				len = clip(len, 0, 220);
 				chatMsg = pPacket.readChars(len);
 				//processChat(chatMsg);
 			break;
@@ -399,16 +484,19 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			case PLPROP_X:
 				x = (float)(pPacket.readGUChar() / 2);
 				status &= (-1-1);
+				// TODO: Movement timeout.
 			break;
 
 			case PLPROP_Y:
 				y = (float)(pPacket.readGUChar() / 2);
 				status &= (-1-1);
+				// TODO: Movement timeout.
 			break;
 
 			case PLPROP_Z:
 				z = (float)(pPacket.readGUChar() / 2);
 				status &= (-1-1);
+				// TODO: Movement timeout.
 			break;
 
 			case PLPROP_SPRITE:
@@ -416,7 +504,37 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			break;
 
 			case PLPROP_STATUS:
+			{
+				int oldStatus = status;
+				status = pPacket.readGUChar();
 
+				if ( id == -1 ) break;
+
+				// When they come back to life, give them hearts.
+				if ( (oldStatus & 8) > 0 && (status & 8) == 0 )
+				{
+					power = clip((ap < 20 ? 3 : (ap < 40 ? 5 : maxPower)), 0.0f, maxPower);
+					// TODO: send level
+					//if ( level->players.count() == 1 )
+						//sendLevel( level->fileName, this->x, this->y, getSysTime() );
+				}
+
+				// When they die, increase deaths and make somebody else level leader.
+				if ( (oldStatus & 8) == 0 && (status & 8) > 0 )
+				{
+					// TODO: all this.
+					/*
+					if(!level->sparZone)
+						deaths++;
+					if (level->players.count() > 1 && level->players[0] == this)
+					{
+						level->players.remove(0);
+						level->players.add(this);
+						((CPlayer*)level->players[0])->sendPacket(CPacket() << (char)ISLEADER);
+					}
+					*/
+				}
+			}
 			break;
 
 			case PLPROP_CARRYSPRITE:
@@ -430,7 +548,14 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			break;
 
 			case PLPROP_HORSEGIF:
-
+				len = pPacket.readGUChar();
+				if (len >= 0)
+				{
+					CString temp( pPacket.readChars(len) );
+					// TODO: foldersconfig
+					//if ( noFoldersConfig || isValidFile( temp, -1 ) )
+						horseImg = temp;
+				}
 			break;
 
 			case PLPROP_HORSEBUSHES:
@@ -452,7 +577,8 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			break;
 
 			case PLPROP_MAGICPOINTS:
-				mp = clip(pPacket.readGUChar(), 0, 100);
+				mp = pPacket.readGUChar();
+				mp = clip(mp, 0, 100);
 			break;
 
 			case PLPROP_KILLSCOUNT:
@@ -473,10 +599,12 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 
 			case PLPROP_UDPPORT:
 				udpport = pPacket.readGInt();
+				// TODO: udp support.
 			break;
 
 			case PLPROP_ALIGNMENT:
-				ap = clip(pPacket.readGUChar(), 0, 100);
+				ap = pPacket.readGUChar();
+				ap = clip(ap, 0, 100);
 			break;
 
 			case PLPROP_ADDITFLAGS:
@@ -493,12 +621,13 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 				len = pPacket.readGUChar();
 				if (len >= 0)
 					bodyImg = pPacket.readChars(len);
+				// TODO: foldersconfig
 			break;
 
 			case PLPROP_RATING:
 				pPacket.readGInt();
 			break;
-
+/*
 			case PLPROP_UNKNOWN42:
 				break;
 
@@ -510,9 +639,10 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 
 			case PLPROP_UNKNOWN50:
 				break;
-
-			case PLPROP_PCONNECTED:
-				break;
+*/
+			//case PLPROP_PCONNECTED:
+				// TODO: what does this do?
+			//	break;
 
 			case PLPROP_PLANGUAGE:
 				len = pPacket.readGUChar();
@@ -559,22 +689,52 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			case PLPROP_GATTRIB29: attrList[28] = pPacket.readChars(pPacket.readGUChar()); break;
 			case PLPROP_GATTRIB30: attrList[29] = pPacket.readChars(pPacket.readGUChar()); break;
 
+			// OS type.
+			// Windows: wind
+			case PLPROP_OSTYPE:
+				len = pPacket.readGUChar();
+				pPacket.readChars(len);
+				break;
+
+			// Text codepage.
+			// Example: 1252
+			case PLPROP_TEXTCODEPAGE:
+				pPacket.readGInt();
+				break;
+
+			// 78 gets sent when moving horizontally
+			// 79 gets sent when moving vertically
+			// Might be gmap related (Beholder mentioned something about this.)
+			// Don't know if this is two separate bytes or one single short.
+			case PLPROP_UNKNOWN78:
+				pPacket.readGShort();
+				break;
+			case PLPROP_UNKNOWN79:
+				pPacket.readGShort();
+				break;
+
 			default:
-				printf("Unidentified Packet: %i\n", propId);
+			{
+				printf("Unidentified Packet: %i, ", propId);
+				CString pack = pPacket.subString(pPacket.readPos());
+				for (int i = 0; i < pack.length(); ++i)
+					printf("%02x ", (unsigned char)pack[i]);
+				printf("\n");
+			}
 			return;
 		}
 
 		if (pForward) // forwardLocal[index] == true
-			globalBuff >> (char)propId << getProp(propId);
+			levelBuff >> (char)propId << getProp(propId);
 	}
 
 	// Send Buffers Out
 	if (isLoggedIn())
 	{
 		if (globalBuff.length() > 0)
-			sendPacketToAll(globalBuff, this);
+			sendPacketToAll(CString() >> (char)PLO_OTHERPLPROPS >> (short)this->id << globalBuff, this);
 		if (levelBuff.length() > 0)
-			sendPacketToLevel(levelBuff, getLevel());
+			sendPacketToLevel(CString() >> (char)PLO_OTHERPLPROPS >> (short)this->id << levelBuff, getLevel(), this);
 	}
 }
 
@@ -587,12 +747,8 @@ void TPlayer::sendProps(bool *pProps, int pCount)
 	for (int i = 0; i < pCount; ++i)
 	{
 		if (pProps[i])
-		{
-			printf( "%d: true, ", i );
 			propPacket >> (char)i << getProp(i);
-		}
 	}
-	printf("\n");
 
 	// Send Packet
 	sendPacket(CString() >> (char)PLO_PLAYERPROPS << propPacket);
@@ -621,20 +777,14 @@ CString TPlayer::getProps(bool *pProps, int pCount)
 bool TPlayer::doMain()
 {
 	if (playerSock == 0)
-	{
-		printf( "playerSock was 0.\n" );
 		return false;
-	}
 
 	// definitions
 	CString unBuffer;
 
 	// receive
 	if ( playerSock->getData() == -1 )
-	{
-		printf( "playerSock->getData() returned -1.\n" );
 		return false;
-	}
 
 	// grab the data now
 	rBuffer.write(playerSock->getBuffer().text(), playerSock->getBuffer().length());
@@ -647,13 +797,11 @@ bool TPlayer::doMain()
 		unsigned int len = (unsigned int)rBuffer.readShort();
 		if (len > (unsigned int)rBuffer.length()-2)
 			break;
-		printf( "len: %u\n", len );
 
 		if (PLE_POST22)
 		{
 			// get the compression type.
 			unsigned char compressType = (unsigned char)rBuffer.readChar();
-			printf( "compressType: %u\n", compressType );
 
 			// pull the packet out and discard the first three bytes:
 			// {SHORT packet_length}{CHAR compression_type}
@@ -683,10 +831,7 @@ bool TPlayer::doMain()
 
 		// well theres your buffer
 		if (!parsePacket(unBuffer))
-		{
-			printf( "parsePacket failed!\n" );
 			return false;
-		}
 	}
 
 	// send out buffer
@@ -698,8 +843,10 @@ void TPlayer::decryptPacket(CString& pPacket)
 {
 	if (type != CLIENTTYPE_CLIENT)
 		return;
-printf( "decrypt 2.171\n");
+
 	// Decrypt
+	// In pre-2.2 era clients, Graal would place an extra, random
+	// byte inside the packet.  This will find and remove that byte.
 	iterator *= 0x8088405;
 	iterator += key;
 	int pos = ((iterator & 0x0FFFF) % pPacket.length());
@@ -713,28 +860,31 @@ void TPlayer::sendCompress()
 		return;
 
 	// compress buffer
-	// For some reason, 2.2+ requires bz2.
-	// It gets a decompression error if we use zlib.
-//	if (PLE_POST22)
-//		sBuffer.bzcompressI();
-//	else
-	if (!PLE_POST22)
-		sBuffer.zcompressI();
-
-	// send buffer
 	if (PLE_POST22)
 	{
-		out_codec.limitfromtype(ENCRYPT22_UNCOMPRESSED);
+		// Choose which compression to use and apply it.
+		int compressionType = ENCRYPT22_UNCOMPRESSED;
+		if ( sBuffer.length() > 8096 )
+		{
+			compressionType = ENCRYPT22_BZ2;
+			sBuffer.bzcompressI();
+		}
+		else if (sBuffer.length() > 50)
+		{
+			compressionType = ENCRYPT22_ZLIB;
+			sBuffer.zcompressI();
+		}
+
+		// Encrypt the packet and send it out.
+		out_codec.limitfromtype(compressionType);
 		out_codec.apply(reinterpret_cast<uint8_t*>(sBuffer.text()), sBuffer.length());
-		playerSock->sendData(CString() << (short)(sBuffer.length()+1) << (char)ENCRYPT22_UNCOMPRESSED << sBuffer);
+		playerSock->sendData(CString() << (short)(sBuffer.length()+1) << (char)compressionType << sBuffer);
 	}
 	else
 	{
-		printf( "2.171 ");
+		sBuffer.zcompressI();
 		playerSock->sendData(CString() << (short)sBuffer.length() << sBuffer);
 	}
-
-	printf( "sent\n" );
 
 	// clear buffer
 	sBuffer.clear();
@@ -751,9 +901,7 @@ void TPlayer::sendPacket(CString& pPacket)
 		pPacket.writeChar('\n');
 
 	// append buffer
-	sBuffer.write(pPacket);
-
-	printf( "packet: %slen: %d\n", pPacket.text(), pPacket.length() );
+	sBuffer.write(pPacket.text(), pPacket.length());
 
 	// Send Data
 	if (sBuffer.length() > 4096)
@@ -773,6 +921,8 @@ bool TPlayer::parsePacket(CString& pPacket)
 	{
 		// grab packet
 		CString curPacket = pPacket.readString("\n");
+		if (curPacket[curPacket.length()-1] == '\n')
+			curPacket.removeI(curPacket.length() - 1, 1);
 
 		// decrypt packet
 		if (!PLE_POST22)
@@ -780,7 +930,6 @@ bool TPlayer::parsePacket(CString& pPacket)
 
 		// read id & packet
 		int id = curPacket.readGUChar();
-		printf( "id: %d\n", id );
 
 		// check lengths
 		if (id >= (unsigned char)TPLFunc.size())
@@ -803,6 +952,9 @@ bool TPlayer::msgPLI_NULL(CString& pPacket)
 
 bool TPlayer::msgPLI_LOGIN(CString& pPacket)
 {
+	if (pPacket[pPacket.length()-1] == '\n')
+		pPacket.removeI(pPacket.length() - 1, 1);
+
 	// Read Player-Ip
 	accountIp = inet_addr(playerSock->tcpIp());
 
@@ -838,25 +990,25 @@ bool TPlayer::msgPLI_LOGIN(CString& pPacket)
 	accountName = pPacket.readChars(pPacket.readGUChar());
 	CString password = pPacket.readChars(pPacket.readGUChar());
 
-	//serverlog.out("Key: %d\n", key);
-	//serverlog.out("Version: %s\n", version.text());
-	//serverlog.out("Account: %s\n", accountName.text());
-	//serverlog.out("Password: %s\n", password.text());
-	printf("Key: %d\n", key);
-	printf("Version: %s\n", version.text());
-	printf("Account: %s\n", accountName.text());
-	printf("Password: %s\n", password.text());
+	serverlog.out("Key: %d\n", key);
+	serverlog.out("Version: %s\n", version.text());
+	serverlog.out("Account: %s\n", accountName.text());
+	serverlog.out("Password: %s\n", password.text());
+	//printf("Key: %d\n", key);
+	//printf("Version: %s\n", version.text());
+	//printf("Account: %s\n", accountName.text());
+	//printf("Password: %s\n", password.text());
 
 	// Check for available slots on the server.
-	//printf("TODO: TPlayer::msgPLI_LOGIN(), Check for available slots.\n");
+	printf("TODO: TPlayer::msgPLI_LOGIN(), Check for available slots.\n");
 
 	// Check if they are ip-banned or not.
-	//printf("TODO: TPlayer::msgPLI_LOGIN(), Check if player is ip-banned.\n");
+	printf("TODO: TPlayer::msgPLI_LOGIN(), Check if player is ip-banned.\n");
 
 	// Verify login details with the serverlist.
 	// TODO: Don't forget localhost mode.  Need to global-ify the serverlist
 	// class to do this.
-	//printf("TODO: TPlayer::msgPLI_LOGIN(), Verify login information.\n");
+	printf("TODO: TPlayer::msgPLI_LOGIN(), Verify login information.\n");
 
 	// Process Login
 	// TODO: This should be sent only when the serverlist verifies the login.
@@ -865,16 +1017,39 @@ bool TPlayer::msgPLI_LOGIN(CString& pPacket)
 	return true;
 }
 
-bool TPlayer::msgPLI_WANTFILE(CString& pPacket)
+bool TPlayer::msgPLI_LEVELWARP(CString& pPacket)
 {
-	printf( "TODO: TPlayer::msgPLI_WANTFILE\n" );
-	pPacket.readString("");
+	printf("TODO: TPlayer::msgPLI_LEVELWARP()\n");
+	return true;
+}
+
+bool TPlayer::msgPLI_PLAYERPROPS(CString& pPacket)
+{
+	this->setProps(pPacket, true);
+	return true;
+}
+
+bool TPlayer::PLI_WANTFILE(CString& pPacket)
+{
+	printf("TODO: TPlayer::msgPLI_WANTFILE\n");
+	return;
+}
+
+bool TPlayer::msgPLI_NPCWEAPONIMG(CString& pPacket)
+{
+	// TODO
+	return true;
+}
+
+bool TPlayer::msgPLI_UPDATEFILE(CString& pPacket)
+{
+	printf("TODO: TPlayer::msgPLI_UPDATEFILE\n");
+	//pPacket.readString("");
 	return true;
 }
 
 bool TPlayer::msgPLI_LANGUAGE(CString& pPacket)
 {
-	printf( "language\n");
 	language = pPacket.readChars(pPacket.readGUChar());
 	return true;
 }
@@ -896,7 +1071,6 @@ bool TPlayer::msgPLI_TRIGGERACTION(CString& pPacket)
 bool TPlayer::msgPLI_MAPINFO(CString& pPacket)
 {
 	// Don't know what this does exactly.  Might be gmap related.
-	printf( "mapinfo\n");
 	pPacket.readString("");
 	return true;
 }

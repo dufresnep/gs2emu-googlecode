@@ -127,10 +127,10 @@ CString CString::readString(const CString& pString)
 	int len;
 	len = (pString.isEmpty() ? -1 : find(pString, readc) - readc);
 	len = (len < 0 ? bytesLeft() : len);
-	len = (len > bytesLeft() ? bytesLeft() : len);
+	len = (len > bytesLeft() ? bytesLeft() : len); //
 	retVal.write(&buffer[readc], len);
 	readc += len + pString.length();
-	readc = (readc > sizec ? sizec : readc);
+	readc = (readc > sizec ? sizec : readc); //
 	return retVal;
 }
 
@@ -215,7 +215,7 @@ CString CString::right(int pLength) const
 CString CString::remove(int pStart, int pLength) const
 {
 	retVal = *this;
-	if (pLength < 1 && pStart < 0)
+	if (pLength < 1 || pStart < 0)
 		return retVal;
 	if (pStart >= sizec)
 		return retVal;
@@ -244,7 +244,6 @@ CString CString::subString(int pStart, int pLength) const
 
 CString CString::toLower() const
 {
-	//CString retVal = *this;
 	retVal = *this;
 	for (int i = 0; i < retVal.length(); i++)
 	{
@@ -516,23 +515,23 @@ CString& CString::writeIntAsString(const int pData)
 
 char CString::readChar()
 {
-	char _retVal;
-	read(&_retVal, 1);
-	return _retVal;
+	char val;
+	read(&val, 1);
+	return val;
 }
 
 short CString::readShort()
 {
-	unsigned char _retVal[2];
-	read((char*)_retVal, 2);
-	return (_retVal[0] << 8) + _retVal[1];
+	unsigned char val[2];
+	read((char*)val, 2);
+	return (val[0] << 8) + val[1];
 }
 
 int CString::readInt()
 {
-	unsigned char _retVal[4];
-	read((char*)_retVal, 4);
-	return (_retVal[0] << 24) + (_retVal[1] << 16) + (_retVal[2] << 8) + _retVal[3];
+	unsigned char val[4];
+	read((char*)val, 4);
+	return (val[0] << 24) + (val[1] << 16) + (val[2] << 8) + val[3];
 }
 
 /*
@@ -559,7 +558,7 @@ CString& CString::writeGInt(const int pData)
 	char val[3];
 	val[0] = ((pData >> 14) & 0x7F)+32;
 	val[1] = ((pData >> 7) & 0x7F)+32;
-	val[2] = (pData & 0x7F);
+	val[2] = (pData & 0x7F)+32;
 	write((char *)&val, 3);
 	return *this;
 }
@@ -570,7 +569,7 @@ CString& CString::writeGInt4(const int pData)
 	val[0] = ((pData >> 21) & 0x7F)+32;
 	val[1] = ((pData >> 14) & 0x7F)+32;
 	val[2] = ((pData >> 7) & 0x7F)+32;
-	val[3] = (pData & 0x7F);
+	val[3] = (pData & 0x7F)+32;
 	write((char *)&val, 4);
 	return *this;
 }
@@ -582,44 +581,44 @@ CString& CString::writeGInt5(const long long pData)
 	val[1] = ((pData >> 21) & 0x7F)+32;
 	val[2] = ((pData >> 14) & 0x7F)+32;
 	val[3] = ((pData >> 7) & 0x7F)+32;
-	val[4] = (pData & 0x7F);
+	val[4] = (pData & 0x7F)+32;
 	write((char *)&val, 5);
 	return *this;
 }
 
 char CString::readGChar()
 {
-	char _retVal;
-	read(&_retVal, 1);
-	return _retVal-32;
+	char val;
+	read(&val, 1);
+	return val-32;
 }
 
 short CString::readGShort()
 {
-	unsigned char _retVal[2];
-	read((char*)_retVal, 2);
-	return ((_retVal[0]-32) << 7) + _retVal[1]-32;
+	unsigned char val[2];
+	read((char*)val, 2);
+	return ((val[0]-32) << 7) + val[1]-32;
 }
 
 int CString::readGInt()
 {
-	unsigned char _retVal[3];
-	read((char*)_retVal, 3);
-	return ((_retVal[0]-32) << 14) + ((_retVal[1]-32) << 7) + _retVal[2]-32;
+	unsigned char val[3];
+	read((char*)val, 3);
+	return ((val[0]-32) << 14) + ((val[1]-32) << 7) + val[2]-32;
 }
 
 int CString::readGInt4()
 {
-	unsigned char _retVal[4];
-	read((char*)_retVal, 4);
-	return ((_retVal[0]-32) << 21) + ((_retVal[1]-32) << 14) + ((_retVal[2]-32) << 7) + _retVal[3]-32;
+	unsigned char val[4];
+	read((char*)val, 4);
+	return ((val[0]-32) << 21) + ((val[1]-32) << 14) + ((val[2]-32) << 7) + val[3]-32;
 }
 
 int CString::readGInt5()
 {
-	unsigned char _retVal[5];
-	read((char*)_retVal, 5);
-	return ((_retVal[0]-32) << 28) + ((_retVal[1]-32) << 21) + ((_retVal[2]-32) << 14) + ((_retVal[3]-32) << 7) + _retVal[4]-32;
+	unsigned char val[5];
+	read((char*)val, 5);
+	return ((val[0]-32) << 28) + ((val[1]-32) << 21) + ((val[2]-32) << 14) + ((val[3]-32) << 7) + val[4]-32;
 }
 
 // 2002-05-07 by Markus Ewald

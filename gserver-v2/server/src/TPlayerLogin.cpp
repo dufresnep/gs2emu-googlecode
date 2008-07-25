@@ -22,25 +22,23 @@ void TPlayer::sendLogin()
 	// TODO: We actually need to check if it fails because accounts can be banned.
 	loadAccount(accountName); // We don't need to check if this fails.. because the defaults have already been loaded :)
 
-	// Send the player his login props.
-	sendProps(__sendLogin, sizeof(__sendLogin) / sizeof(bool));
-
 	// Server Signature
 	// 0x49 (73) is used to tell the client that more than eight
 	// players will be playing.
 	sendPacket(CString() >> (char)PLO_SIGNATURE >> (char)73);
 
 	// Check if the account is already in use.
-	//printf("TODO: TPlayer::sendLogin(), Check if account is in use.\n");
+	printf("TODO: TPlayer::sendLogin(), Check if account is in use.\n");
 
 	// Player's load different than RCs.
 	if (type == CLIENTTYPE_CLIENT) sendLoginClient();
 	else if (type == CLIENTTYPE_RC) sendLoginRC();
-/*
+
 	// Exchange props with everybody on the server.
 	for (std::vector<TPlayer*>::iterator i = playerList.begin(); i != playerList.end(); ++i)
 	{
 		TPlayer* player = (TPlayer*)*i;
+		if ( player == this ) continue;
 
 		// Get the other player's props.
 		if (player->getType() == CLIENTTYPE_CLIENT)
@@ -77,18 +75,21 @@ void TPlayer::sendLogin()
 
 	// Tell the serverlist that the player connected.
 	printf("TODO: TPlayer::sendLogin(), Tell the serverlist the player connected.\n");
-*/
+
 	sendCompress();
 }
 
 void TPlayer::sendLoginClient()
 {
+	// Send the player his login props.
+	sendProps(__sendLogin, sizeof(__sendLogin) / sizeof(bool));
+
 	// Send the level to the player.
 	// setLevel will call sendCompress() for us.
 	// TODO: Send correct level.
-	//printf("TODO: TPlayer::sendLoginClient(), Send correct level to player.\n");
-	setLevel(CString() << /*homepath <<*/ "world/onlinestartlocal.nw");
-/*
+	printf("TODO: TPlayer::sendLoginClient(), Send correct level to player.\n");
+	setLevel(CString() << homepath << "world/onlinestartlocal.nw");
+
 	// Recalculate player spar deviation.
 	printf("TODO: TPlayer::sendLoginClient(), Recalculate sparring deviation.\n");
 
@@ -115,7 +116,7 @@ void TPlayer::sendLoginClient()
 	// Delete the bomb.  It gets automagically added by the client for
 	// God knows which reason.  Bomb must be capitalized.
 	sendPacket(CString() >> (char)PLO_DELNPCWEAPON << "Bomb");
-*/
+
 }
 
 void TPlayer::sendLoginRC()
