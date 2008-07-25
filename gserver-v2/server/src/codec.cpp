@@ -42,7 +42,7 @@ int codec::limitfromtype(uint8_t type)
 		// If we found a valid type, set the limit.
 		if ( limits[i] == type )
 		{
-			m_limit = limits[i+1];
+			m_limit = (int32_t)limits[i+1];
 			return 0;
 		}
 	}

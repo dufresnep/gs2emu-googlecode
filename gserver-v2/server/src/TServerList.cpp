@@ -257,7 +257,7 @@ void TServerList::msgSVI_PROFILE(CString& pPacket)
 
 void TServerList::msgSVI_ERRMSG(CString& pPacket)
 {
-	serverlog.out("%s\n", pPacket.readString(""));
+	serverlog.out("%s\n", pPacket.readString("").text());
 }
 
 void TServerList::msgSVI_PING(CString& pPacket)
