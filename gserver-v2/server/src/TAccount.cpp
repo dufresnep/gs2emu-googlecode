@@ -14,6 +14,7 @@ accountIp(0), adminRights(0), id(0), type(CLIENTTYPE_AWAIT),
 bodyImg("body.png"), headImg("head0.png"), gAni("idle"), language("English"),
 nickName("default"), shieldImg("shield1.png"), swordImg("sword1.png"),
 deviation(350.0f), oldDeviation(350.0f), power(3.0), rating(1500.0f), x(0), y(0), z(0),
+gmapx(0), gmapy(0),
 additionalFlags(0), ap(50), apCounter(0), arrowc(10), bombc(5), bombPower(1), carrySprite(-1),
 deaths(0), glovePower(1), gralatc(0), horsec(0), kills(0), mp(0), maxPower(3),
 onlineTime(0), shieldPower(1), sprite(2), status(20), swordPower(1), udpport(0),
@@ -37,7 +38,7 @@ TAccount::~TAccount()
 bool TAccount::loadAccount(const CString& pAccount)
 {
 	// Load File
-	std::vector<CString> fileData = CString::loadToken(CString() << /*homepath <<*/ "accounts/" << pAccount << ".txt", "\n");
+	std::vector<CString> fileData = CString::loadToken(CString() << homepath << "accounts/" << pAccount << ".txt", "\n");
 	if (fileData.size() < 1 || fileData[0].trim() != "GRACC001")
 		return false;
 
@@ -64,6 +65,9 @@ bool TAccount::loadAccount(const CString& pAccount)
 		else if (section == "LEVEL") levelName = val;
 		else if (section == "X") x = (float)strtofloat(val);
 		else if (section == "Y") y = (float)strtofloat(val);
+		else if (section == "Z") z = (float)strtofloat(val);
+		else if (section == "GMAPX") gmapx = (int)strtoint(val);
+		else if (section == "GMAPY") gmapy = (int)strtoint(val);
 		else if (section == "MAXHP") maxPower = strtoint(val);
 		else if (section == "HP") power = (float)strtofloat(val);
 		else if (section == "RUPEES") gralatc = strtoint(val);
@@ -77,7 +81,7 @@ bool TAccount::loadAccount(const CString& pAccount)
 		else if (section == "BODY") bodyImg = val;
 		else if (section == "SWORD") swordImg = val;
 		else if (section == "SHIELD") shieldImg = val;
-		else if (section == "COLORS") { std::vector<CString> t = val.tokenize(","); for (int i = 0; i < (int)t.size() && i < 5; i++) colors[i] = strtoint(t[i]); }
+		else if (section == "COLORS") { std::vector<CString> t = val.tokenize(","); for (int i = 0; i < (int)t.size() && i < 5; i++) colors[i] = (unsigned char)strtoint(t[i]); }
 		else if (section == "SPRITE") sprite = strtoint(val);
 		else if (section == "STATUS") status = strtoint(val);
 		else if (section == "MP") mp = strtoint(val);
@@ -168,6 +172,9 @@ bool TAccount::saveAccount(bool pOnlyAccount)
 		newFile << "LEVEL " << levelName << "\r\n";
 		newFile << "X " << CString(x) << "\r\n";
 		newFile << "Y " << CString(y) << "\r\n";
+		newFile << "Z " << CString(z) << "\r\n";
+		newFile << "GMAPX " << CString(gmapx) << "\r\n";
+		newFile << "GMAPY " << CString(gmapy) << "\r\n";
 		newFile << "MAXHP " << maxPower << "\r\n";
 		newFile << "HP " << CString(power) << "\r\n";
 		newFile << "RUPEES " << CString(gralatc) << "\r\n";
@@ -228,7 +235,7 @@ bool TAccount::saveAccount(bool pOnlyAccount)
 		newFile << "LOCALRIGHTS " << adminRights << "\r\n";
 		newFile << "IPRANGE " << adminIp << "\r\n";
 		newFile << "LASTFOLDER " << lastFolder << "\r\n";
-		newFile.save(CString() << /*homepath <<*/ "accounts/" << accountName << ".txt");
+		newFile.save(CString() << homepath << "accounts/" << accountName << ".txt");
 	}
 
 	return true;

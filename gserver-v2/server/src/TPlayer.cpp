@@ -36,6 +36,7 @@ bool __sendLogin[propscount] =
 	true,  true,  true,  true,  true,  true,  // 60-65
 	true,  true,  true,  true,  true,  true,  // 66-71
 	true,  true,  true,  false, false, false, // 72-77
+	true,  true, // 78-79
 };
 
 bool __getLogin[propscount] =
@@ -53,6 +54,7 @@ bool __getLogin[propscount] =
 	false, false, false, false, false, false, // 60-65
 	false, false, false, false, false, false, // 66-71
 	false, false, false, false, false, false, // 72-77
+	true,  true, // 78-79
 };
 
 bool __getLoginRC[propscount] =
@@ -63,7 +65,7 @@ bool __getLoginRC[propscount] =
 	false, false, false, false, false, false, // 12-17
 	false, false, true,  false, false, false, // 18-23
 	false, false, false, false, false, false, // 24-29
-	false, false, false, false, true,  true, // 30-35
+	false, false, false, false, true,  true,  // 30-35
 	false, false, false, false, false, false, // 36-41
 	false, false, false, false, false, false, // 42-47
 	false, false, false, false, false, false, // 48-53
@@ -71,6 +73,7 @@ bool __getLoginRC[propscount] =
 	false, false, false, false, false, false, // 60-65
 	false, false, false, false, false, false, // 66-71
 	false, false, false, false, false, false, // 72-77
+	false, false, // 78-79
 };
 
 bool __sendLocal[propscount] =
@@ -88,6 +91,7 @@ bool __sendLocal[propscount] =
 	true,  true,  true,  true,  true,  true,  // 60-65
 	true,  true,  true,  true,  true,  true,  // 66-71
 	true,  true,  true,  false, false, false, // 72-77
+	true,  true, // 78-79
 };
 
 /*
@@ -321,6 +325,22 @@ CString TPlayer::getProp(int pPropId)
 		// TODO: reflect actual codepage.
 		case PLPROP_TEXTCODEPAGE:
 		return CString().writeGInt(1252);
+
+		case PLPROP_GMAPX:
+		{
+			unsigned short val = (gmapx < 0 ? -gmapx : gmapx);
+			val <<= 1;
+			if (gmapx < 0) val |= 0x0001;
+			return CString().writeGShort(val);
+		}
+
+		case PLPROP_GMAPY:
+		{
+			unsigned short val = (gmapy < 0 ? -gmapy : gmapy);
+			val <<= 1;
+			if (gmapy < 0) val |= 0x0001;
+			return CString().writeGShort((short)val);
+		}
 	}
 
 	if (inrange(pPropId, 37, 41) || inrange(pPropId, 46, 49) || inrange(pPropId, 54, 74))
@@ -473,7 +493,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			break;
 
 			case PLPROP_COLORS:
-				for (unsigned int i = 0; i < sizeof(colors) / sizeof(char); ++i)
+				for (unsigned int i = 0; i < sizeof(colors) / sizeof(unsigned char); ++i)
 					colors[i] = pPacket.readGUChar();
 			break;
 
@@ -702,15 +722,31 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 				pPacket.readGInt();
 				break;
 
-			// 78 gets sent when moving horizontally
-			// 79 gets sent when moving vertically
-			// Might be gmap related (Beholder mentioned something about this.)
-			// Don't know if this is two separate bytes or one single short.
-			case PLPROP_UNKNOWN78:
-				pPacket.readGShort();
+			// Location, in pixels, of the player on the GMap.
+			// Bit 0x0001 controls if it is negative or not.
+			// Bits 0xFFFE are the actual value.
+			case PLPROP_GMAPX:
+				gmapx = pPacket.readGUShort();
+
+				// If the first bit is 1, our position is negative.
+				if ( (short)gmapx & 0x0001 )
+				{
+					gmapx >>= 1;
+					gmapx = -gmapx;
+				}
+				else gmapx >>= 1;
 				break;
-			case PLPROP_UNKNOWN79:
-				pPacket.readGShort();
+
+			case PLPROP_GMAPY:
+				gmapy = pPacket.readGUShort();
+
+				// If the first bit is 1, our position is negative.
+				if ( (short)gmapy & 0x0001 )
+				{
+					gmapy >>= 1;
+					gmapy = -gmapy;
+				}
+				else gmapy >>= 1;
 				break;
 
 			default:

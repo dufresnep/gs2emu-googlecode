@@ -91,6 +91,8 @@ bool TServerList::main()
 			parsePacket(lines[i]);
 	}
 
+	// TODO: ping keepalive packets.
+
 	// send out buffer
 	sendCompress();
 	return getConnected();
