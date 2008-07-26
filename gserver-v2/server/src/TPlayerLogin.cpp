@@ -38,7 +38,7 @@ void TPlayer::sendLogin()
 	for (std::vector<TPlayer*>::iterator i = playerList.begin(); i != playerList.end(); ++i)
 	{
 		TPlayer* player = (TPlayer*)*i;
-		if ( player == this ) continue;
+		if (player == this) continue;
 
 		// Get the other player's props.
 		if (player->getType() == CLIENTTYPE_CLIENT)
@@ -122,7 +122,7 @@ void TPlayer::sendLoginClient()
 void TPlayer::sendLoginRC()
 {
 	// If no nickname was specified, set the nickname to the account name.
-	if ( nickName.length() == 0 )
+	if (nickName.length() == 0)
 		nickName = accountName;
 
 	// Set the head to the server's set staff head.

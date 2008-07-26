@@ -18,7 +18,7 @@ extern CSettings* settings;
 	Global Definitions
 */
 // Enum per Attr
-int __attrPackets[] = { 37, 38, 39, 40, 41, 46, 47, 48, 49, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74 };
+int __attrPackets[] = {37, 38, 39, 40, 41, 46, 47, 48, 49, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74};
 
 // Sent on Login
 bool __sendLogin[propscount] =
@@ -477,7 +477,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 					headImg << ".png";
 					globalBuff >> (char)propId << getProp(propId);
 				}
-				else if ( len > 100 )
+				else if (len > 100)
 				{
 					// TODO: Foldersconfig stuff.
 					headImg = pPacket.readChars(len-100);
@@ -528,14 +528,14 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 				int oldStatus = status;
 				status = pPacket.readGUChar();
 
-				if ( id == -1 ) break;
+				if (id == -1 ) break;
 
 				// When they come back to life, give them hearts.
-				if ( (oldStatus & 8) > 0 && (status & 8) == 0 )
+				if ((oldStatus & 8) > 0 && (status & 8) == 0 )
 				{
 					power = clip((ap < 20 ? 3 : (ap < 40 ? 5 : maxPower)), 0.0f, maxPower);
 					// TODO: send level
-					//if ( level->players.count() == 1 )
+					//if (level->players.count() == 1)
 						//sendLevel( level->fileName, this->x, this->y, getSysTime() );
 				}
 
