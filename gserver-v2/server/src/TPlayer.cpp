@@ -912,7 +912,7 @@ void TPlayer::sendCompress()
 		*/
 		// Choose which compression to use and apply it.
 		int compressionType = ENCRYPT22_UNCOMPRESSED;
-		if (sBuffer.length() > 0x8000)	// 32KB
+		if (sBuffer.length() > 0x2000)	// 8KB
 		{
 			compressionType = ENCRYPT22_BZ2;
 			sBuffer.bzcompressI();
