@@ -855,37 +855,13 @@ bool TPlayer::doMain()
 		if (len > (unsigned int)rBuffer.length()-2)
 			break;
 
-		if (PLE_POST22)
-		{
-			// get the compression type.
-			unsigned char compressType = (unsigned char)rBuffer.readChar();
-
-			// pull the packet out and discard the first three bytes:
-			// {SHORT packet_length}{CHAR compression_type}
-			unBuffer = rBuffer.subString(0, len + 2);
-			unBuffer.removeI(0, 3);
-			//unBuffer = rBuffer.subString(2, len).removeI(0, 1);
-
-			// decrypt
-			in_codec.limitfromtype(compressType);
-			in_codec.apply(reinterpret_cast<uint8_t*>(unBuffer.text()), unBuffer.length());
-
-			// uncompress if compressed
-			if (compressType == ENCRYPT22_ZLIB) unBuffer.zuncompressI();
-			else if (compressType == ENCRYPT22_BZ2) unBuffer.bzuncompressI();
-			if (unBuffer.length() < 1)
-				break;
-		}
-		else
-		{
-			// uncompress
-			unBuffer = rBuffer.subString(2, len).zuncompress();
-			if (unBuffer.length() < 1)
-				break;
-		}
-
-		// remove read-data
+		// get packet
+		unBuffer = rBuffer.readChars(len);
 		rBuffer.removeI(0, len+2);
+
+		// decrypt packet
+		if (PLE_POST22 || type == CLIENTTYPE_AWAIT)
+			decryptPacket(unBuffer);
 
 		// well theres your buffer
 		if (!parsePacket(unBuffer))
@@ -899,16 +875,39 @@ bool TPlayer::doMain()
 
 void TPlayer::decryptPacket(CString& pPacket)
 {
-	if (type != CLIENTTYPE_CLIENT)
+	// No Version.. zuncompress!
+	if (type == CLIENTTYPE_AWAIT)
+	{
+		pPacket.zuncompressI();
 		return;
+	}
 
-	// Decrypt
-	// In pre-2.2 era clients, Graal would place an extra, random
-	// byte inside the packet.  This will find and remove that byte.
-	iterator *= 0x8088405;
-	iterator += key;
-	int pos = ((iterator & 0x0FFFF) % pPacket.length());
-	pPacket.removeI(pos, 1);
+	// Version 2.01 - 2.18 Encryption
+	if (!PLE_POST22)
+	{
+		if (type != CLIENTTYPE_CLIENT)
+			return;
+
+		iterator *= 0x8088405;
+		iterator += key;
+		int pos  = ((iterator & 0x0FFFF) % pPacket.length());
+		pPacket.removeI(pos, 1);
+		return;
+	}
+
+	// Version 2.19 - 2.31 Encryption
+	int pType = pPacket.readChar();
+	pPacket.removeI(0, 1);
+
+	// Decrypt Packet
+	in_codec.limitfromtype(pType);
+	in_codec.apply(reinterpret_cast<uint8_t*>(pPacket.text()), pPacket.length());
+
+	// Uncompress Packet
+	if (pType == ENCRYPT22_ZLIB)
+		pPacket.zuncompressI();
+	else if (pType == ENCRYPT22_BZ2)
+		pPacket.bzuncompressI();
 }
 
 void TPlayer::sendCompress()
@@ -983,7 +982,7 @@ bool TPlayer::parsePacket(CString& pPacket)
 
 	while (pPacket.bytesLeft() > 0)
 	{
-		// grab packet
+		// grab packet -- are you sure that \n is really still there.. kinda wierd that it is -- i've done some tests and it never stayed... - Joey
 		CString curPacket = pPacket.readString("\n");
 		if (curPacket[curPacket.length()-1] == '\n')
 			curPacket.removeI(curPacket.length() - 1, 1);
@@ -1016,9 +1015,6 @@ bool TPlayer::msgPLI_NULL(CString& pPacket)
 
 bool TPlayer::msgPLI_LOGIN(CString& pPacket)
 {
-	//if (pPacket[pPacket.length()-1] == '\n')
-	//	pPacket.removeI(pPacket.length() - 1, 1);
-
 	// Read Player-Ip
 	accountIp = inet_addr(playerSock->tcpIp());
 
@@ -1038,6 +1034,8 @@ bool TPlayer::msgPLI_LOGIN(CString& pPacket)
 			serverlog.out("RC logging in.\n");
 			break;
 	}
+
+	printf("Test: %i\n", PLE_POST22);
 
 	// Get Iterator-Key
 	if (type == CLIENTTYPE_CLIENT)
