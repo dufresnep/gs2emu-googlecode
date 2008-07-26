@@ -44,9 +44,11 @@ void sendPacketToAll(CString pPacket);
 void sendPacketToAll(CString pPacket, TPlayer *pPlayer);
 void sendPacketToLevel(CString pPacket, TLevel *pLevel);
 void sendPacketToLevel(CString pPacket, TLevel *pLevel, TPlayer *pPlayer);
+void sendPacketTo(int who, CString pPacket);
+void sendPacketTo(int who, CString pPacket, TPlayer* pPlayer);
 void sendPacketToRC(CString pPacket);
 
-void shutdownServer( int signal );
+void shutdownServer(int signal);
 
 /*
 	Vector-Functions
@@ -64,7 +66,7 @@ int vecSearch(std::vector<T> a, T b)
 }
 
 template <class T>
-void vecRemove(std::vector<T> a, T b)
+void vecRemove(std::vector<T>& a, T b)
 {
 	typename std::vector<T>::iterator i;
 	for (i = a.begin(); i != a.end(); ++i)

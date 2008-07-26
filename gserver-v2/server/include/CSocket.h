@@ -65,18 +65,18 @@ class CSocket
 
 	public:
 		CSocket();
-		CSocket( const CString& host, const CString& port, sock_properties* properties = 0 );
+		CSocket(const CString& host, const CString& port, sock_properties* properties = 0);
 		~CSocket();
 
-		int init( const CString& host, const CString& port );
+		int init(const CString& host, const CString& port);
 		void destroy();
 
 		int connect();
 		int disconnect();
-		int reconnect( long delay = 0, int tries = 1 );
+		int reconnect(long delay = 0, int tries = 1);
 		CSocket* accept();
 
-		int sendData( CString& data );
+		int sendData(CString& data);
 		int getData();
 		char* peekData();
 
@@ -88,12 +88,12 @@ class CSocket
 		int getState();
 		CString& getBuffer();
 
-		int setProtocol( int sock_proto );
-		int setType( int sock_type );
-		int setOptions( int iOptions );
-		int setDescription( const char *strDescription );
-		int setProperties( sock_properties newprop );
-		int setState( int iState );
+		int setProtocol(int sock_proto);
+		int setType(int sock_type);
+		int setOptions(int iOptions);
+		int setDescription(const char *strDescription);
+		int setProperties(sock_properties newprop);
+		int setState(int iState);
 
 		const char* tcpIp();
 

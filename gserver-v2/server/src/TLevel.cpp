@@ -106,9 +106,12 @@ bool TLevel::loadNW(const CString& pFileName)
 {
 	// Path-To-File
 	fileName = getDataFile(pFileName);
+	/* TODO: Fix all this code.
 	int l[2] = {pFileName.findl('/')+1, pFileName.findl('\\')+1};
 	int ll = max(l[0], l[1]);
 	levelName = pFileName.subString(ll);
+	*/
+	levelName = pFileName;
 
 	// Load File
 	std::vector<CString> fileData = CString::loadToken(fileName);

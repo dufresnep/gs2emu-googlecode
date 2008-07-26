@@ -14,7 +14,8 @@
 // purpose is unknown.
 enum
 {
-	PLI_LEVELWARP		= 1,
+	PLI_LEVELWARP		= 0,
+	PLI_BOARDMODIFY		= 1,
 	PLI_PLAYERPROPS		= 2,
 	PLI_WANTFILE		= 23,
 	PLI_NPCWEAPONIMG	= 24,
@@ -42,6 +43,7 @@ enum
 	PLO_LEVELMODTIME = 39,
 	PLO_TRIGGERACTION = 48,
 	PLO_ADDPLAYER = 55,
+	PLO_DELPLAYER = 56,
 	PLO_RCMESSAGE = 74,
 	PLO_BOARDPACKETSIZE = 100,
 	PLO_BOARDPACKET = 101,
@@ -84,6 +86,7 @@ class TPlayer : public TAccount
 		bool msgPLI_LOGIN(CString& pPacket);
 
 		bool msgPLI_LEVELWARP(CString& pPacket);
+		bool msgPLI_BOARDMODIFY(CString& pPacket);
 		bool msgPLI_PLAYERPROPS(CString& pPacket);
 		bool msgPLI_WANTFILE(CString& pPacket);
 		bool msgPLI_NPCWEAPONIMG(CString& pPacket);

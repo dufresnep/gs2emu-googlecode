@@ -22,7 +22,7 @@ lastSparTime(0),
 statusMsg(0)
 {
 	// Other Defaults
-	memset( (void*)&colors, 0, 5 );
+	memset((void*)&colors, 0, 5);
 
 	// Load Account Defaults
 	loadAccount(pAccount);
@@ -68,7 +68,7 @@ bool TAccount::loadAccount(const CString& pAccount)
 		else if (section == "Z") z = (float)strtofloat(val);
 		else if (section == "GMAPX") gmapx = (int)strtoint(val);
 		else if (section == "GMAPY") gmapy = (int)strtoint(val);
-		else if (section == "MAXHP") maxPower = strtoint(val);
+		else if (section == "MAXHP") maxPower = (int)strtoint(val);
 		else if (section == "HP") power = (float)strtofloat(val);
 		else if (section == "RUPEES") gralatc = strtoint(val);
 		else if (section == "ANI") gAni = val;
@@ -175,7 +175,7 @@ bool TAccount::saveAccount(bool pOnlyAccount)
 		newFile << "Z " << CString(z) << "\r\n";
 		newFile << "GMAPX " << CString(gmapx) << "\r\n";
 		newFile << "GMAPY " << CString(gmapy) << "\r\n";
-		newFile << "MAXHP " << maxPower << "\r\n";
+		newFile << "MAXHP " << CString(maxPower) << "\r\n";
 		newFile << "HP " << CString(power) << "\r\n";
 		newFile << "RUPEES " << CString(gralatc) << "\r\n";
 		newFile << "ANI " << gAni << "\r\n";

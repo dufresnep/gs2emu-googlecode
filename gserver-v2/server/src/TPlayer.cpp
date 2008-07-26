@@ -18,7 +18,7 @@ extern CSettings* settings;
 	Global Definitions
 */
 // Enum per Attr
-int __attrPackets[] = {37, 38, 39, 40, 41, 46, 47, 48, 49, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74};
+int __attrPackets[] = { 37, 38, 39, 40, 41, 46, 47, 48, 49, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74 };
 
 // Sent on Login
 bool __sendLogin[propscount] =
@@ -49,7 +49,7 @@ bool __getLogin[propscount] =
 	true,  true,  true,  false, true,  true,  // 30-35
 	true,  true,  true,  true,  true,  true,  // 36-41
 	false, false, false, false, false, false, // 42-47
-	false, false, false, false, false, true,  // 48-53
+	false, false, true,  false, false, true,  // 48-53
 	false, false, false, false, false, false, // 54-59
 	false, false, false, false, false, false, // 60-65
 	false, false, false, false, false, false, // 66-71
@@ -86,7 +86,7 @@ bool __sendLocal[propscount] =
 	true,  false, true,  false, true,  true,  // 30-35
 	true,  true,  true,  true,  true,  true,  // 36-41
 	false, false, false, false, false, false, // 42-47
-	false, false, false, false, false, false, // 48-53
+	false, false, true,  false, false, false, // 48-53
 	true,  true,  true,  true,  true,  true,  // 54-59
 	true,  true,  true,  true,  true,  true,  // 60-65
 	true,  true,  true,  true,  true,  true,  // 66-71
@@ -107,6 +107,7 @@ void createPLFunctions()
 
 	// now set non-nulls
 	TPLFunc[PLI_LEVELWARP] = &TPlayer::msgPLI_LEVELWARP;
+	TPLFunc[PLI_BOARDMODIFY] = &TPlayer::msgPLI_BOARDMODIFY;
 	TPLFunc[PLI_PLAYERPROPS] = &TPlayer::msgPLI_PLAYERPROPS;
 	TPLFunc[PLI_WANTFILE] = &TPlayer::msgPLI_WANTFILE;
 	TPLFunc[PLI_NPCWEAPONIMG] = &TPlayer::msgPLI_NPCWEAPONIMG;
@@ -132,9 +133,16 @@ TPlayer::~TPlayer()
 {
 	if (id >= 0)
 	{
-		playerIds[id] = NULL;
-		vecRemove(playerList, this);
+		playerIds[id] = 0;
+		//vecRemove<TPlayer*>(playerList, this);
+		//vecRemove(playerList, this);
+
+		// TODO: save pending weapons.
 		saveAccount();
+
+		// Announce our departure to other clients.
+		sendPacketTo(CLIENTTYPE_CLIENT, CString() >> (char)PLO_OTHERPLPROPS >> (short)id >> (char)PLPROP_PCONNECTED, this);
+		sendPacketTo(CLIENTTYPE_RC, CString() >> (char)PLO_DELPLAYER >> (short)id, this);
 	}
 
 	printf("Destroyed for: %s\n", playerSock->tcpIp());
@@ -155,6 +163,7 @@ TLevel* TPlayer::getLevel()
 void TPlayer::setLevel(const CString& pLevelName)
 {
 	// Open Level
+	// TODO: Work out the entire levelname/directories problem.
 	level = TLevel::findLevel(pLevelName);
 	if (level == 0)
 	{
@@ -193,7 +202,7 @@ CString TPlayer::getProp(int pPropId)
 		return CString() >> (char)(power * 2);
 
 		case PLPROP_RUPEESCOUNT:
-		return CString() >> (int)(gralatc + 1);
+		return CString() >> (int)gralatc;
 
 		case PLPROP_ARROWSCOUNT:
 		return CString() >> (char)arrowc;
@@ -303,6 +312,12 @@ CString TPlayer::getProp(int pPropId)
 			return CString() >> (int)temp;
 		}
 
+		// Simplifies login.
+		// Manually send prop if you are leaving the level.
+		// 1 = join level, 0 = leave level.
+		case PLPROP_JOINLEAVELVL:
+		return CString() >> (char)1;
+
 		case PLPROP_PCONNECTED:
 		return CString();
 
@@ -360,6 +375,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 	CString globalBuff, levelBuff;
 	int len = 0;
 /*
+	printf("\n");
 	printf("%s\n", pPacket.text());
 	for (int i = 0; i < pPacket.length(); ++i)
 		printf("%02x ", (unsigned char)((pPacket.text())[i]));
@@ -751,16 +767,15 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 
 			default:
 			{
-				printf("Unidentified Packet: %i, ", propId);
-				CString pack = pPacket.subString(pPacket.readPos());
-				for (int i = 0; i < pack.length(); ++i)
-					printf("%02x ", (unsigned char)pack[i]);
+				printf("Unidentified PLPROP: %i, readPos: %d\n", propId, pPacket.readPos());
+				for (int i = 0; i < pPacket.length(); ++i)
+					printf("%02x ", (unsigned char)pPacket[i]);
 				printf("\n");
 			}
 			return;
 		}
 
-		if (pForward) // forwardLocal[index] == true
+		if (pForward && __sendLocal[propId] == true)
 			levelBuff >> (char)propId << getProp(propId);
 	}
 
@@ -771,6 +786,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			sendPacketToAll(CString() >> (char)PLO_OTHERPLPROPS >> (short)this->id << globalBuff, this);
 		if (levelBuff.length() > 0)
 			sendPacketToLevel(CString() >> (char)PLO_OTHERPLPROPS >> (short)this->id << levelBuff, getLevel(), this);
+		sendCompress();
 	}
 }
 
@@ -797,9 +813,14 @@ CString TPlayer::getProps(bool *pProps, int pCount)
 	// Start the prop packet.
 	propPacket >> (char)PLO_OTHERPLPROPS >> (short)this->id;
 
+	// Check if PLPROP_JOINLEAVELVL is set.
+	if (pProps[PLPROP_JOINLEAVELVL])
+		propPacket >> (char)PLPROP_JOINLEAVELVL >> (char)1;
+
 	// Create Props
 	for (int i = 0; i < pCount; ++i)
 	{
+		if (i == PLPROP_JOINLEAVELVL) continue;
 		if (pProps[i])
 			propPacket >> (char)i << getProp(i);
 	}
@@ -843,6 +864,7 @@ bool TPlayer::doMain()
 			// {SHORT packet_length}{CHAR compression_type}
 			unBuffer = rBuffer.subString(0, len + 2);
 			unBuffer.removeI(0, 3);
+			//unBuffer = rBuffer.subString(2, len).removeI(0, 1);
 
 			// decrypt
 			in_codec.limitfromtype(compressType);
@@ -898,6 +920,12 @@ void TPlayer::sendCompress()
 	// compress buffer
 	if (PLE_POST22)
 	{
+		/*
+		FILE* f = fopen("test2.out", "wb");
+		fwrite(sBuffer.text(), 1, sBuffer.length(), f);
+		fclose(f);
+		exit(0);
+		*/
 		// Choose which compression to use and apply it.
 		int compressionType = ENCRYPT22_UNCOMPRESSED;
 		if (sBuffer.length() > 8096)
@@ -988,8 +1016,8 @@ bool TPlayer::msgPLI_NULL(CString& pPacket)
 
 bool TPlayer::msgPLI_LOGIN(CString& pPacket)
 {
-	if (pPacket[pPacket.length()-1] == '\n')
-		pPacket.removeI(pPacket.length() - 1, 1);
+	//if (pPacket[pPacket.length()-1] == '\n')
+	//	pPacket.removeI(pPacket.length() - 1, 1);
 
 	// Read Player-Ip
 	accountIp = inet_addr(playerSock->tcpIp());
@@ -1055,7 +1083,13 @@ bool TPlayer::msgPLI_LOGIN(CString& pPacket)
 
 bool TPlayer::msgPLI_LEVELWARP(CString& pPacket)
 {
-	printf("TODO: TPlayer::msgPLI_LEVELWARP()\n");
+	printf("TODO: TPlayer::msgPLI_LEVELWARP\n");
+	return true;
+}
+
+bool TPlayer::msgPLI_BOARDMODIFY(CString& pPacket)
+{
+	printf("TODO: TPlayer::msgPLI_BOARDMODIFY\n");
 	return true;
 }
 
@@ -1086,7 +1120,8 @@ bool TPlayer::msgPLI_UPDATEFILE(CString& pPacket)
 
 bool TPlayer::msgPLI_LANGUAGE(CString& pPacket)
 {
-	language = pPacket.readChars(pPacket.readGUChar());
+	//language = pPacket.readChars(pPacket.readGUChar());
+	language = pPacket.readString("");
 	return true;
 }
 

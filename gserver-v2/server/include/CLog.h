@@ -13,7 +13,7 @@ class CLog
 		//! Creates a new CLog that outputs to the specific file.
 		//! \param file The file to log to.
 		//! \param enabled If the class logs by default to the file or not.
-		CLog( const CString& _file, bool _enabled = true );
+		CLog(const CString& _file, bool _enabled = true);
 
 		//! Cleans up and closes files.
 		virtual ~CLog();
@@ -23,7 +23,7 @@ class CLog
 			Outputs text to a file.  Use like a standard printf() command.
 			\param format Format string.
 		*/
-		void out( const CString format, ... );
+		void out(const CString format, ...);
 
 		//! Clears the output file.
 		void clear();
@@ -38,7 +38,7 @@ class CLog
 			If /a enabled is set to false, it will no longer log to a file.
 			\param enabled If true, log to file.  If false, don't log to file.
 		*/
-		void setEnabled( bool enabled );
+		void setEnabled(bool enabled);
 
 		//! Gets the name of the log file.
 		//! \return Name of the log file.
@@ -46,7 +46,7 @@ class CLog
 
 		//! Sets the name of the file to write to.
 		//! \param filename Name of the file to write to.
-		void setFilename( const CString& filename );
+		void setFilename(const CString& filename);
 
 	private:
 		//! If the class is enabled or not.
@@ -75,13 +75,13 @@ const CString& CLog::getFilename()
 }
 
 inline
-void CLog::setEnabled( bool enabled )
+void CLog::setEnabled(bool enabled)
 {
 	this->enabled = enabled;
 }
 
 inline
-void CLog::setFilename( const CString& filename )
+void CLog::setFilename(const CString& filename)
 {
 	this->filename = filename;
 	this->clear();

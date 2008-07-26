@@ -130,7 +130,7 @@ CString CString::readString(const CString& pString)
 	len = (len > bytesLeft() ? bytesLeft() : len); //
 	retVal.write(&buffer[readc], len);
 	readc += len + pString.length();
-	readc = (readc > sizec ? sizec : readc); //
+	//readc = (readc > sizec ? sizec : readc); // GO
 	return retVal;
 }
 
@@ -220,7 +220,8 @@ CString CString::remove(int pStart, int pLength) const
 	if (pStart >= sizec)
 		return retVal;
 
-	pLength = clip(pLength+pStart, 0, retVal.length()-pStart);
+//	pLength = clip(pLength+pStart, 0, retVal.length()-pStart);
+	pLength = clip(pLength, 0, retVal.length()-pStart);
 	memmove(retVal.text() + pStart, retVal.text() + pStart + pLength, retVal.length() - pStart - pLength);
 	retVal.setSize(retVal.length() - pLength);
 	retVal[retVal.length()] = 0;
@@ -508,8 +509,8 @@ CString& CString::writeInt(const int pData)
 CString& CString::writeIntAsString(const int pData)
 {
 	char numbuf[11];
-	snprintf( numbuf, 11, "%d\n", pData );
-	write( numbuf, strlen(numbuf) );
+	snprintf(numbuf, 11, "%d\n", pData);
+	write(numbuf, strlen(numbuf));
 	return *this;
 }
 

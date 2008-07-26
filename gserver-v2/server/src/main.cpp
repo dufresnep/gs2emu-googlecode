@@ -16,8 +16,8 @@ std::vector<TPlayer *> playerIds, playerList;
 bool running = true;
 
 // Logging files.
-CLog serverlog( "logs/serverlog.txt" );
-CLog rclog( "logs/rclog.txt" );
+CLog serverlog("logs/serverlog.txt");
+CLog rclog("logs/rclog.txt");
 
 // Home path of the gserver.
 CString homepath;
@@ -36,13 +36,13 @@ int main(int argc, char* argv[])
 	// Don't allow a player to have one of those ids.
 	playerIds.resize(2);
 
-	serverlog.out( "Starting server\n" );
+	serverlog.out("Starting server\n");
 
 	// Load Settings
 	settings = new CSettings(CString() << homepath << "config/serveroptions.txt");
 	if (!settings->isOpened())
 	{
-		serverlog.out( "[Error] Could not open config/serveroptions.txt\n" );
+		serverlog.out("[Error] Could not open config/serveroptions.txt\n");
 		return ERR_SETTINGS;
 	}
 
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 	sock.connectServer();
 
 	// Main Loop
-	serverlog.out( "Main loop\n" );
+	serverlog.out("Main loop\n");
 	while (running)
 	{
 		// Serverlist-Main -- Reconnect if Disconnected
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
 			acceptSock(playerSock);
 
 		// Iterate Players
-		for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end(); )
+		for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end();)
 		{
 			TPlayer *player = (TPlayer*)*i;
 			if (player == 0)
@@ -173,9 +173,7 @@ void sendPacketToAll(CString pPacket, TPlayer *pPlayer)
 {
 	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end(); ++i)
 	{
-		if ((*i) == pPlayer)
-			continue;
-
+		if ((*i) == pPlayer) continue;
 		(*i)->sendPacket(pPacket);
 	}
 }
@@ -184,6 +182,7 @@ void sendPacketToLevel(CString pPacket, TLevel *pLevel)
 {
 	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end(); ++i)
 	{
+		if ((*i)->getType() != CLIENTTYPE_CLIENT) continue;
 		if ((*i)->getLevel() == pLevel)
 			(*i)->sendPacket(pPacket);
 	}
@@ -193,10 +192,27 @@ void sendPacketToLevel(CString pPacket, TLevel *pLevel, TPlayer *pPlayer)
 {
 	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end(); ++i)
 	{
-		if ((*i) == pPlayer)
-			continue;
-
+		if ((*i) == pPlayer || (*i)->getType() != CLIENTTYPE_CLIENT) continue;
 		if ((*i)->getLevel() == pLevel)
+			(*i)->sendPacket(pPacket);
+	}
+}
+
+void sendPacketTo(int who, CString pPacket)
+{
+	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end(); ++i)
+	{
+		if ((*i)->getType() == who)
+			(*i)->sendPacket(pPacket);
+	}
+}
+
+void sendPacketTo(int who, CString pPacket, TPlayer* pPlayer)
+{
+	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end(); ++i)
+	{
+		if ((*i) == pPlayer) continue;
+		if ((*i)->getType() == who)
 			(*i)->sendPacket(pPacket);
 	}
 }
@@ -215,34 +231,34 @@ void getBasePath()
 	#if defined(_WIN32) || defined(_WIN64)
 	// Get the path.
 	char path[ MAX_PATH ];
-	GetModuleFileNameA( 0, path, MAX_PATH );
+	GetModuleFileNameA(0, path, MAX_PATH);
 
 	// Find the program exe and remove it from the path.
 	// Assign the path to homepath.
 	homepath = path;
-	int pos = homepath.findl( '\\' );
-	if ( pos == -1 ) homepath.clear();
-	else if ( pos != (homepath.length() - 1) )
-		homepath.removeI( ++pos, homepath.length() );
+	int pos = homepath.findl('\\');
+	if (pos == -1) homepath.clear();
+	else if (pos != (homepath.length() - 1))
+		homepath.removeI(++pos, homepath.length());
 #else
 	// Get the path to the program.
-	char path[ 260 ];
-	memset( (void*)path, 0, 260 );
-	readlink( "/proc/self/exe", path, sizeof(path) );
+	char path[260];
+	memset((void*)path, 0, 260);
+	readlink("/proc/self/exe", path, sizeof(path));
 
 	// Assign the path to homepath.
-	char* end = strrchr( path, '/' );
-	if ( end != 0 )
+	char* end = strrchr(path, '/');
+	if (end != 0)
 	{
 		end++;
-		if ( end != 0 ) *end = '\0';
+		if (end != 0) *end = '\0';
 		homepath = path;
 	}
 #endif
 }
 
-void shutdownServer( int signal )
+void shutdownServer(int signal)
 {
-	serverlog.out( "Server is now shutting down...\n" );
+	serverlog.out("Server is now shutting down...\n");
 	running = false;
 }
