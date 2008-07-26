@@ -860,8 +860,10 @@ bool TPlayer::doMain()
 		rBuffer.removeI(0, len+2);
 
 		// decrypt packet
-		if (PLE_POST22 || type == CLIENTTYPE_AWAIT)
+		if (PLE_POST22)
 			decryptPacket(unBuffer);
+		else
+			unBuffer.zuncompressI();
 
 		// well theres your buffer
 		if (!parsePacket(unBuffer))
@@ -875,13 +877,6 @@ bool TPlayer::doMain()
 
 void TPlayer::decryptPacket(CString& pPacket)
 {
-	// No Version.. zuncompress!
-	if (type == CLIENTTYPE_AWAIT)
-	{
-		pPacket.zuncompressI();
-		return;
-	}
-
 	// Version 2.01 - 2.18 Encryption
 	if (!PLE_POST22)
 	{
@@ -892,6 +887,7 @@ void TPlayer::decryptPacket(CString& pPacket)
 		iterator += key;
 		int pos  = ((iterator & 0x0FFFF) % pPacket.length());
 		pPacket.removeI(pos, 1);
+	//	pPacket.zuncompressI();
 		return;
 	}
 
