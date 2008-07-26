@@ -35,12 +35,12 @@ void createSLFunctions()
 	Constructor - Deconstructor
 */
 TServerList::TServerList()
-: isConnected( false )
+: isConnected(false)
 {
-	sock.setProtocol( SOCKET_PROTOCOL_TCP );
-	sock.setType( SOCKET_TYPE_CLIENT );
-	sock.setOptions( SOCKET_OPTION_NONBLOCKING );
-	sock.setDescription( "listserver" );
+	sock.setProtocol(SOCKET_PROTOCOL_TCP);
+	sock.setType(SOCKET_TYPE_CLIENT);
+	sock.setOptions(SOCKET_OPTION_NONBLOCKING);
+	sock.setDescription("listserver");
 }
 
 TServerList::~TServerList()
@@ -117,7 +117,7 @@ bool TServerList::connectServer()
 	else
 		return false;
 
-	printf( "%s - Connected.\n", sock.getDescription() );
+	printf("%s - Connected.\n", sock.getDescription());
 
 	// Set Some Stuff
 	setName(settings->getStr("name"));
@@ -217,27 +217,27 @@ void TServerList::msgSVI_NULL(CString& pPacket)
 
 void TServerList::msgSVI_VERIACC(CString& pPacket)
 {
-	printf( "TODO: TServerList::msgSVI_VERIACC\n" );
+	printf("TODO: TServerList::msgSVI_VERIACC\n");
 }
 
 void TServerList::msgSVI_VERIGUILD(CString& pPacket)
 {
-	printf( "TODO: TServerList::msgSVI_VERIGUILD\n" );
+	printf("TODO: TServerList::msgSVI_VERIGUILD\n");
 }
 
 void TServerList::msgSVI_FILESTART(CString& pPacket)
 {
-	printf( "TODO: TServerList::msgSVI_FILESTART\n" );
+	printf("TODO: TServerList::msgSVI_FILESTART\n");
 }
 
 void TServerList::msgSVI_FILEDATA(CString& pPacket)
 {
-	printf( "TODO: TServerList::msgSVI_FILEDATA\n" );
+	printf("TODO: TServerList::msgSVI_FILEDATA\n");
 }
 
 void TServerList::msgSVI_FILEEND(CString& pPacket)
 {
-	printf( "TODO: TServerList::msgSVI_FILEEND\n" );
+	printf("TODO: TServerList::msgSVI_FILEEND\n");
 }
 
 void TServerList::msgSVI_VERSIONOLD(CString& pPacket)

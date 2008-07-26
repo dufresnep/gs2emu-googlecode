@@ -158,7 +158,7 @@ void TPlayer::setLevel(const CString& pLevelName)
 	level = TLevel::findLevel(pLevelName);
 	if (level == 0)
 	{
-		printf( "TODO: TLevel::findLevel returned 0.\n" );
+		printf("TODO: TLevel::findLevel returned 0.\n");
 		return;
 	}
 
@@ -311,7 +311,7 @@ CString TPlayer::getProp(int pPropId)
 
 		case PLPROP_PSTATUSMSG:
 			// TODO: statusList.
-		//if ( statusMsg > statusList.count() - 1 )  retVal.writeByte1( 0 );
+		//if (statusMsg > statusList.count() - 1)  retVal.writeByte1(0);
 		return CString() >> (char)0;
 
 		// OS type.
@@ -360,10 +360,10 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 	CString globalBuff, levelBuff;
 	int len = 0;
 /*
-	printf( "%s\n", pPacket.text() );
-	for ( int i = 0; i < pPacket.length(); ++i )
-		printf( "%02x ", (unsigned char)((pPacket.text())[i]) );
-	printf( "\n" );
+	printf("%s\n", pPacket.text());
+	for (int i = 0; i < pPacket.length(); ++i)
+		printf("%02x ", (unsigned char)((pPacket.text())[i]));
+	printf("\n");
 */
 	while (pPacket.bytesLeft() > 0)
 	{
@@ -528,19 +528,19 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 				int oldStatus = status;
 				status = pPacket.readGUChar();
 
-				if (id == -1 ) break;
+				if (id == -1) break;
 
 				// When they come back to life, give them hearts.
-				if ((oldStatus & 8) > 0 && (status & 8) == 0 )
+				if ((oldStatus & 8) > 0 && (status & 8) == 0)
 				{
 					power = clip((ap < 20 ? 3 : (ap < 40 ? 5 : maxPower)), 0.0f, maxPower);
 					// TODO: send level
 					//if (level->players.count() == 1)
-						//sendLevel( level->fileName, this->x, this->y, getSysTime() );
+						//sendLevel(level->fileName, this->x, this->y, getSysTime());
 				}
 
 				// When they die, increase deaths and make somebody else level leader.
-				if ( (oldStatus & 8) == 0 && (status & 8) > 0 )
+				if ((oldStatus & 8) == 0 && (status & 8) > 0)
 				{
 					// TODO: all this.
 					/*
@@ -571,9 +571,9 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 				len = pPacket.readGUChar();
 				if (len >= 0)
 				{
-					CString temp( pPacket.readChars(len) );
+					CString temp(pPacket.readChars(len));
 					// TODO: foldersconfig
-					//if ( noFoldersConfig || isValidFile( temp, -1 ) )
+					//if (noFoldersConfig || isValidFile(temp, -1))
 						horseImg = temp;
 				}
 			break;
@@ -729,7 +729,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 				gmapx = pPacket.readGUShort();
 
 				// If the first bit is 1, our position is negative.
-				if ( (short)gmapx & 0x0001 )
+				if ((short)gmapx & 0x0001)
 				{
 					gmapx >>= 1;
 					gmapx = -gmapx;
@@ -741,7 +741,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 				gmapy = pPacket.readGUShort();
 
 				// If the first bit is 1, our position is negative.
-				if ( (short)gmapy & 0x0001 )
+				if ((short)gmapy & 0x0001)
 				{
 					gmapy >>= 1;
 					gmapy = -gmapy;
@@ -819,7 +819,7 @@ bool TPlayer::doMain()
 	CString unBuffer;
 
 	// receive
-	if ( playerSock->getData() == -1 )
+	if (playerSock->getData() == -1)
 		return false;
 
 	// grab the data now
@@ -900,7 +900,7 @@ void TPlayer::sendCompress()
 	{
 		// Choose which compression to use and apply it.
 		int compressionType = ENCRYPT22_UNCOMPRESSED;
-		if ( sBuffer.length() > 8096 )
+		if (sBuffer.length() > 8096)
 		{
 			compressionType = ENCRYPT22_BZ2;
 			sBuffer.bzcompressI();
@@ -1113,7 +1113,7 @@ bool TPlayer::msgPLI_MAPINFO(CString& pPacket)
 
 bool TPlayer::msgPLI_UNKNOWN46(CString& pPacket)
 {
-	printf( "TODO: TPlayer::msgPLI_UNKNOWN46\n" );
+	printf("TODO: TPlayer::msgPLI_UNKNOWN46\n");
 	pPacket.readString("");
 	return true;
 }
