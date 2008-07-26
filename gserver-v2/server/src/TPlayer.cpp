@@ -887,7 +887,6 @@ void TPlayer::decryptPacket(CString& pPacket)
 		iterator += key;
 		int pos  = ((iterator & 0x0FFFF) % pPacket.length());
 		pPacket.removeI(pos, 1);
-	//	pPacket.zuncompressI();
 		return;
 	}
 
@@ -913,7 +912,7 @@ void TPlayer::sendCompress()
 		return;
 
 	// compress buffer
-	if (PLE_POST22)
+	if (PLE_POST22) // anyway we can better this -- less instructions = better :p
 	{
 		/*
 		FILE* f = fopen("test2.out", "wb");
