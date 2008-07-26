@@ -78,7 +78,7 @@ class TPlayer : public TAccount
 		bool doMain();
 		void decryptPacket(CString& pPacket);
 		void sendCompress();
-		void sendPacket(CString& pPacket);
+		void sendPacket(CString pPacket);
 
 		// Packet-Functions
 		bool parsePacket(CString& pPacket);

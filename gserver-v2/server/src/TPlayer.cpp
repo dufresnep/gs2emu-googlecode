@@ -954,7 +954,7 @@ void TPlayer::sendCompress()
 	sBuffer.clear();
 }
 
-void TPlayer::sendPacket(CString& pPacket)
+void TPlayer::sendPacket(CString pPacket)
 {
 	// empty buffer?
 	if (pPacket.isEmpty())
