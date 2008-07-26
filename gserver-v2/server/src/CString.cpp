@@ -1,6 +1,7 @@
 #include "CString.h"
 
 #ifdef _WIN32
+	#define strncasecmp _strnicmp
 	#define snprintf _snprintf
 #endif
 
@@ -352,24 +353,26 @@ CString CString::zuncompress() const
 
 int CString::find(const CString& pString, int pStart) const
 {
-	for (int i = pStart; i < length() - pString.length(); ++i)
+	char* loc = strstr(buffer, pString.text());
+	if (loc == 0) return -1;
+	return (int)(loc - buffer);
+}
+
+int CString::findi(const CString& pString, int pStart) const
+{
+	for (int i = pStart; i <= length() - pString.length(); ++i)
 	{
-		if (strncmp(&buffer[i], pString.text(), pString.length()) == 0)
+		if (strncasecmp(&buffer[i], pString.text(), pString.length()) == 0)
 			return i;
 	}
-
 	return -1;
 }
 
 int CString::findl(char pChar) const
 {
-	for (int i = length(); i > 0; i--)
-	{
-		if (buffer[i] == pChar)
-			return i;
-	}
-
-	return -1;
+	char* loc = strrchr(buffer, (int)pChar);
+	if (loc == 0) return -1;
+	return (int)(loc - buffer);
 }
 
 std::vector<CString> CString::tokenize(const CString& pString) const
@@ -503,14 +506,6 @@ CString& CString::writeInt(const int pData)
 	val[2] = ((pData >> 8) & 0xFF);
 	val[3] = (pData & 0xFF);
 	write((char *)&val, 4);
-	return *this;
-}
-
-CString& CString::writeIntAsString(const int pData)
-{
-	char numbuf[11];
-	snprintf(numbuf, 11, "%d\n", pData);
-	write(numbuf, strlen(numbuf));
 	return *this;
 }
 

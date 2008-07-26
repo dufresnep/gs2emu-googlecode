@@ -433,11 +433,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			{
 				int sp = pPacket.readGUChar();
 				if (sp <= 4)
-				{
-					swordImg = CString() << "sword";
-					swordImg.writeIntAsString(sp);
-					swordImg << ".png";
-				}
+					swordImg = CString() << "sword" << CString(sp) << ".png";
 				else
 				{
 					sp -= 30;
@@ -456,11 +452,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			{
 				int sp = pPacket.readGUChar();
 				if (sp <= 3)
-				{
-					swordImg = CString() << "shield";
-					swordImg.writeIntAsString(sp);
-					swordImg << ".png";
-				}
+					swordImg = CString() << "shield" << CString(sp) << ".png";
 				else
 				{
 					sp -= 10;
@@ -488,9 +480,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 				len = pPacket.readGUChar();
 				if (len < 100)
 				{
-					headImg = CString() << "head";
-					headImg.writeIntAsString(len);
-					headImg << ".png";
+					headImg = CString() << "head" << CString(len) << ".png";
 					globalBuff >> (char)propId << getProp(propId);
 				}
 				else if (len > 100)
@@ -922,12 +912,12 @@ void TPlayer::sendCompress()
 		*/
 		// Choose which compression to use and apply it.
 		int compressionType = ENCRYPT22_UNCOMPRESSED;
-		if (sBuffer.length() > 8096)
+		if (sBuffer.length() > 0x8000)	// 32KB
 		{
 			compressionType = ENCRYPT22_BZ2;
 			sBuffer.bzcompressI();
 		}
-		else if (sBuffer.length() > 50)
+		else if (sBuffer.length() > 40)
 		{
 			compressionType = ENCRYPT22_ZLIB;
 			sBuffer.zcompressI();

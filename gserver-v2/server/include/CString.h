@@ -73,6 +73,7 @@ class CString
 		CString zcompress() const;
 		CString zuncompress() const;
 		int find(const CString& pString, int pStart = 0) const;
+		int findi(const CString& pString, int pStart = 0) const;
 		int findl(char pChar) const;
 		std::vector<CString> tokenize(const CString& pString = " ") const;
 		static std::vector<CString> loadToken(const CString& pFile, const CString& pToken = "\n");
@@ -115,7 +116,6 @@ class CString
 		CString& writeChar(const char pData);
 		CString& writeShort(const short pData);
 		CString& writeInt(const int pData);
-		CString& writeIntAsString(const int pData);
 		char readChar();
 		short readShort();
 		int readInt();
