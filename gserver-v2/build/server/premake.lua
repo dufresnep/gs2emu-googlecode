@@ -13,6 +13,6 @@ package.files =
 include(pkgdir.."include")
 include(rootdir.."dependencies/include")
 
-library("libz")
-library("libbz2")
+library("z")
+library("bz2")
 if (windows) then library("ws2_32") end
