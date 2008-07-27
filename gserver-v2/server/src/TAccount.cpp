@@ -25,7 +25,7 @@ statusMsg(0)
 	memset((void*)&colors, 0, 5);
 
 	// Load Account Defaults
-	loadAccount(pAccount);
+	// loadAccount(pAccount); // not needed -- see above :p
 }
 
 TAccount::~TAccount()
@@ -40,7 +40,14 @@ bool TAccount::loadAccount(const CString& pAccount)
 	// Load File
 	std::vector<CString> fileData = CString::loadToken(CString() << homepath << "accounts/" << pAccount << ".txt", "\n");
 	if (fileData.size() < 1 || fileData[0].trim() != "GRACC001")
+	{
+		if (pAccount != "defaultaccount")
+			return loadAccount("defaultaccount");
 		return false;
+	}
+	
+	// Clear Lists
+	
 
 	// Save Account
 	accountName = pAccount;
