@@ -6,6 +6,7 @@
 
 extern CSettings *settings;
 extern CLog serverlog;
+extern std::vector<TPlayer *> playerList;
 
 /*
 	Pointer-Functions for Packets
@@ -41,6 +42,8 @@ TServerList::TServerList()
 	sock.setType(SOCKET_TYPE_CLIENT);
 	sock.setOptions(SOCKET_OPTION_NONBLOCKING);
 	sock.setDescription("listserver");
+
+	lastData = lastPing = time(NULL);
 }
 
 TServerList::~TServerList()
@@ -89,9 +92,17 @@ bool TServerList::main()
 		std::vector<CString> lines = line.tokenize("\n");
 		for (unsigned int i = 0; i < lines.size(); i++)
 			parsePacket(lines[i]);
+
+		// update last data
+		lastData = time(NULL);
 	}
 
-	// TODO: ping keepalive packets.
+	// Send a ping every 30 seconds.
+	if ((int)difftime(time(NULL), lastPing) >= 30)
+	{
+		lastPing = time(NULL);
+		sendPacket(CString() >> (char)SVO_SVRPING);
+	}
 
 	// send out buffer
 	sendCompress();
@@ -109,7 +120,8 @@ bool TServerList::init(const CString& pServerIp, const CString& pServerPort)
 
 bool TServerList::connectServer()
 {
-	if (isConnected == true) return true;
+	if (isConnected == true)
+		return true;
 
 	// Connect to Server
 	if (sock.connect() == 0)
@@ -127,6 +139,9 @@ bool TServerList::connectServer()
 	setIp(settings->getStr("serverip", "AUTO"));
 	setPort(settings->getStr("serverport", "14900"));
 	sendCompress();
+
+	// Send Players
+	sendPlayers();
 
 	// Return Connection-Status
 	return getConnected();
@@ -147,6 +162,55 @@ void TServerList::sendPacket(CString& pPacket)
 }
 
 /*
+	Altering Player Information
+*/
+void TServerList::addPlayer(TPlayer *pPlayer)
+{
+	sendPacket(CString() >> (char)SVO_PLYRADD
+		<< pPlayer->getProp(PLPROP_ACCOUNTNAME)
+		<< pPlayer->getProp(PLPROP_NICKNAME)
+		<< pPlayer->getProp(PLPROP_CURLEVEL)
+		<< pPlayer->getProp(PLPROP_X)
+		<< pPlayer->getProp(PLPROP_Y)
+		<< pPlayer->getProp(PLPROP_ALIGNMENT)
+		>> (char)pPlayer->getType());
+}
+
+void TServerList::remPlayer(const CString& pAccountName, int pType)
+{
+	sendPacket(CString() >> (char)SVO_PLYRREM >> (char)pType << pAccountName);
+}
+
+void TServerList::sendPlayers()
+{
+	// Definition
+	CString playerPacket;
+	int playerCount;
+
+	// Iterate Playerlist
+	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end();)
+	{
+		TPlayer *pPlayer = (TPlayer*)*i;
+		if (pPlayer == NULL)
+			continue;
+
+		// Add to Count
+		playerCount++;
+
+		// Write Player-Packet
+		playerPacket.write(pPlayer->getProp(PLPROP_ACCOUNTNAME)
+		<< pPlayer->getProp(PLPROP_NICKNAME)
+		<< pPlayer->getProp(PLPROP_CURLEVEL)
+		<< pPlayer->getProp(PLPROP_X)
+		<< pPlayer->getProp(PLPROP_Y)
+		<< pPlayer->getProp(PLPROP_ALIGNMENT));
+	}
+
+	// Write Playercount
+	sendPacket(CString() >> (char)SVO_SETPLYR >> (char)playerCount << playerPacket);
+}
+
+/*
 	Altering Server-Information
 */
 void TServerList::setDesc(const CString& pServerDesc)
@@ -161,8 +225,8 @@ void TServerList::setIp(const CString& pServerIp)
 
 void TServerList::setName(const CString& pServerName)
 {
-	bool uc = settings->getBool("underconstruction");
-	sendPacket(CString() >> (char)SVO_SETNAME << ((uc == true) ? "U " : "") << pServerName);
+	bool uc = settings->getBool("underconstruction", false);
+	sendPacket(CString() >> (char)SVO_SETNAME << (uc ? "U " : "") << pServerName);
 }
 
 void TServerList::setPort(const CString& pServerPort)

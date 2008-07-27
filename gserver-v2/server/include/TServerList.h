@@ -1,8 +1,10 @@
 #ifndef TSERVERLIST_H
 #define TSERVERLIST_H
 
+#include <time.h>
 #include "CString.h"
 #include "CSocket.h"
+#include "TPlayer.h"
 
 /*
 	Enumerators
@@ -58,6 +60,11 @@ class TServerList
 		bool connectServer();
 		void sendPacket(CString& pPacket);
 
+		// Altering Player Information
+		void addPlayer(TPlayer *pPlayer);
+		void remPlayer(const CString& pAccountName, int pType = CLIENTTYPE_CLIENT);
+		void sendPlayers();
+
 		// Send New Server-Info
 		void setDesc(const CString& pServerDesc);
 		void setIp(const CString& pServerIp);
@@ -86,9 +93,11 @@ class TServerList
 		void parsePacket(CString& pPacket);
 		void sendCompress();
 
+		// Socket Variables
 		bool isConnected;
 		CString rBuffer, sBuffer;
 		CSocket sock;
+		time_t lastData, lastPing;
 };
 
 // Packet-Functions
