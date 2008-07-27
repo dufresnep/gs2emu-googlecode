@@ -47,7 +47,11 @@ bool TAccount::loadAccount(const CString& pAccount)
 	}
 	
 	// Clear Lists
-	
+	attrList.clear();
+	chestList.clear();
+	flagList.clear();
+	folderList.clear();
+	weaponList.clear();
 
 	// Save Account
 	accountName = pAccount;
