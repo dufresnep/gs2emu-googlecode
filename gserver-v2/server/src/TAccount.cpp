@@ -10,7 +10,7 @@ extern CString homepath;
 TAccount::TAccount(const CString& pAccount)
 : isBanned(false), isFtp(false), isLoadOnly(false),
 adminIp("0.0.0.0"),
-accountIp(0), adminRights(0), id(0), type(CLIENTTYPE_AWAIT),
+accountIp(0), adminRights(0),
 bodyImg("body.png"), headImg("head0.png"), gAni("idle"), language("English"),
 nickName("default"), shieldImg("shield1.png"), swordImg("sword1.png"),
 deviation(350.0f), oldDeviation(350.0f), power(3.0), rating(1500.0f), x(0), y(0), z(0),
@@ -47,7 +47,7 @@ bool TAccount::loadAccount(const CString& pAccount)
 	}
 	
 	// Clear Lists
-	attrList.clear();
+	for (int i = 0; i < 30; ++i) attrList[i].clear();
 	chestList.clear();
 	flagList.clear();
 	folderList.clear();
@@ -155,12 +155,12 @@ bool TAccount::loadAccount(const CString& pAccount)
 bool TAccount::saveAccount(bool pOnlyAccount)
 {
 	// Don't save 'Load Only' or RC Accounts
-	if (isLoadOnly || type != CLIENTTYPE_CLIENT)
+	if (isLoadOnly)
 		return false;
 
 	// If the player is on, why just save their account information..?
-	if (pOnlyAccount && id >= 0)
-		pOnlyAccount = false;
+	//if (pOnlyAccount && id >= 0)
+	//	pOnlyAccount = false;
 
 	// Only-Account Saves
 	if (pOnlyAccount)
@@ -280,25 +280,4 @@ bool TAccount::hasWeapon(const CString& pWeapon)
 	}
 
 	return false;
-}
-
-/*
-	TAccount: Get Properties
-*/
-int TAccount::getId()
-{
-	return id;
-}
-
-int TAccount::getType()
-{
-	return type;
-}
-
-/*
-	TAccount: Set Properties
-*/
-void TAccount::setId(int pId)
-{
-	id = pId;
 }

@@ -1,6 +1,7 @@
 #ifndef TPLAYER_H
 #define TPLAYER_H
 
+#include <time.h>
 #include "CString.h"
 #include "TAccount.h"
 #include "TLevel.h"
@@ -50,6 +51,14 @@ enum
 	PLO_RPGWINDOW = 179,
 };
 
+enum
+{
+	CLIENTTYPE_CLIENT,
+	CLIENTTYPE_RC,
+	CLIENTTYPE_AWAIT,
+	CLIENTTYPE_CLIENT22 = 5,
+};
+
 class TPlayer : public TAccount
 {
 	public:
@@ -59,14 +68,16 @@ class TPlayer : public TAccount
 
 		// Manage Account
 		inline bool isLoggedIn();
-		void sendLogin();
 
 		// Get Properties
 		TLevel* getLevel();
+		int getId();
+		int getType();
 
 		// Set Properties
 		void setLevel(const CString& pLevelName);
 		void setNick(const CString& pNickName);
+		void setId(int pId);
 
 		// Prop-Manipulation
 		CString getProp(int pPropId);
@@ -76,12 +87,10 @@ class TPlayer : public TAccount
 
 		// Socket-Functions
 		bool doMain();
-		void decryptPacket(CString& pPacket);
 		void sendCompress();
 		void sendPacket(CString pPacket);
 
 		// Packet-Functions
-		bool parsePacket(CString& pPacket);
 		bool msgPLI_NULL(CString& pPacket);
 		bool msgPLI_LOGIN(CString& pPacket);
 
@@ -97,9 +106,17 @@ class TPlayer : public TAccount
 		bool msgPLI_UNKNOWN46(CString& pPacket);
 
 	private:
-		// Functions
+		// Login functions.
+		void sendLogin();
 		void sendLoginClient();
 		void sendLoginRC();
+
+		// Packet functions.
+		bool parsePacket(CString& pPacket);
+		void decryptPacket(CString& pPacket);
+
+		// Misc functions.
+		bool doTimedEvents();
 
 		// Socket Variables
 		CSocket *playerSock;
@@ -117,11 +134,29 @@ class TPlayer : public TAccount
 		// Variables
 		CString version;
 		TLevel *level;
+		int id, type;
+		time_t lastData, lastMovement, lastChat, lastMessage;
+		time_t lastTimer;
 };
 
 inline bool TPlayer::isLoggedIn()
 {
 	return (type != CLIENTTYPE_AWAIT && id > 0);
+}
+
+inline int TPlayer::getId()
+{
+	return id;
+}
+
+inline int TPlayer::getType()
+{
+	return type;
+}
+
+inline void TPlayer::setId(int pId)
+{
+	id = pId;
 }
 
 // Packet-Functions

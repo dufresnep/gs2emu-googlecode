@@ -5,17 +5,6 @@
 #include "TLevel.h"
 #include "TLevelChest.h"
 
-/*
-	Enumerators
-*/
-enum
-{
-	CLIENTTYPE_CLIENT,
-	CLIENTTYPE_RC,
-	CLIENTTYPE_AWAIT,
-	CLIENTTYPE_CLIENT22 = 5,
-};
-
 enum
 {
 	PLPROP_NICKNAME			= 0,
@@ -116,15 +105,11 @@ class TAccount
 		bool hasChest(const TLevelChest *pChest, const CString& pLevel = "");
 		bool hasWeapon(const CString& pWeapon);
 
-		int getId();
-		int getType();
-		void setId(int pId);
-
 	protected:
 		// Player-Account
 		bool isBanned, isFtp, isLoadOnly;
 		CString adminIp, accountComments, accountName, banReason, lastFolder;
-		int accountIp, adminRights, id, type;
+		int accountIp, adminRights;
 
 		// Player-Attributes
 		CString attrList[30], bodyImg, chatMsg, headImg, horseImg, gAni, language;
