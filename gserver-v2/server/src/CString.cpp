@@ -91,8 +91,8 @@ CString::~CString()
 bool CString::load(const CString& pString)
 {
 	char buff[65535];
-	FILE *file = NULL;
-	if ((file = fopen(pString.text(), "rb")) == NULL)
+	FILE *file = 0;
+	if ((file = fopen(pString.text(), "rb")) == 0)
 		return false;
 
 	int size = 0;
@@ -105,8 +105,8 @@ bool CString::load(const CString& pString)
 
 bool CString::save(const CString& pString) const
 {
-	FILE *file = NULL;
-	if ((file = fopen(pString.text(), "wb")) == NULL)
+	FILE *file = 0;
+	if ((file = fopen(pString.text(), "wb")) == 0)
 		return false;
 	fwrite(buffer, 1, sizec, file);
 	fclose(file);
@@ -381,10 +381,10 @@ std::vector<CString> CString::tokenize(const CString& pString) const
 	std::vector<CString> strList;
 	char *tok = strtok(retVal.text(), pString.text());
 
-	while (tok != NULL)
+	while (tok != 0)
 	{
 		strList.push_back(tok);
-		tok = strtok(NULL, pString.text());
+		tok = strtok(0, pString.text());
 	}
 
 	return strList;

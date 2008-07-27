@@ -38,7 +38,7 @@ CString TLevel::getBoardPacket()
 
 CString TLevel::getChestPacket(TPlayer *pPlayer)
 {
-	if (pPlayer == NULL)
+	if (pPlayer == 0)
 		return CString();
 
 	CString retVal;
@@ -186,7 +186,7 @@ TLevel * TLevel::findLevel(const CString& pLevelName)
 	// Find Appropriate Level by Name
 	for (std::vector<TLevel *>::iterator i = levelList.begin(); i != levelList.end(); ++i)
 	{
-		if ((*i) == NULL)
+		if ((*i) == 0)
 		{
 			i = levelList.erase(i);
 			continue;
@@ -201,7 +201,7 @@ TLevel * TLevel::findLevel(const CString& pLevelName)
 	if (!level->loadLevel(pLevelName))
 	{
 		delete level;
-		return NULL;
+		return 0;
 	}
 
 	// Return Level

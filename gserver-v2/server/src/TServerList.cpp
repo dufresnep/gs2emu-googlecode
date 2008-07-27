@@ -43,7 +43,7 @@ TServerList::TServerList()
 	sock.setOptions(SOCKET_OPTION_NONBLOCKING);
 	sock.setDescription("listserver");
 
-	lastData = lastPing = time(NULL);
+	lastData = lastPing = time(0);
 }
 
 TServerList::~TServerList()
@@ -94,13 +94,13 @@ bool TServerList::main()
 			parsePacket(lines[i]);
 
 		// update last data
-		lastData = time(NULL);
+		lastData = time(0);
 	}
 
 	// Send a ping every 30 seconds.
-	if ((int)difftime(time(NULL), lastPing) >= 30)
+	if ((int)difftime(time(0), lastPing) >= 30)
 	{
-		lastPing = time(NULL);
+		lastPing = time(0);
 		sendPacket(CString() >> (char)SVO_SVRPING);
 	}
 
@@ -185,13 +185,13 @@ void TServerList::sendPlayers()
 {
 	// Definition
 	CString playerPacket;
-	int playerCount;
+	int playerCount = 0;
 
 	// Iterate Playerlist
 	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end();)
 	{
 		TPlayer *pPlayer = (TPlayer*)*i;
-		if (pPlayer == NULL)
+		if (pPlayer == 0)
 			continue;
 
 		// Add to Count

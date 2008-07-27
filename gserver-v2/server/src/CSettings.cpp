@@ -47,7 +47,7 @@ bool CSettings::loadFile(const CString& pStr)
 		keys.push_back(new CKey(line[0], line[1]));
 		/*
 		CKey *key;
-		if ((key = getKey(line[0])) == NULL)
+		if ((key = getKey(line[0])) == 0)
 			keys.push_back(new CKey(line[0], line[1]));
 		else
 			key->value << "," << line[1];
@@ -81,31 +81,31 @@ CKey * CSettings::getKey(CString pStr)
 	}
 
 	// None :(
-	return NULL;
+	return 0;
 }
 
 bool CSettings::getBool(const CString& pStr, bool pDefault)
 {
 	CKey *key = getKey(pStr);
-	return (key == NULL ? pDefault : (key->value == "true" || key->value == "1"));
+	return (key == 0 ? pDefault : (key->value == "true" || key->value == "1"));
 }
 
 float CSettings::getFloat(const CString& pStr, float pDefault)
 {
 	CKey *key = getKey(pStr);
-	return (key == NULL ? pDefault : (float)strtofloat(key->value));
+	return (key == 0 ? pDefault : (float)strtofloat(key->value));
 }
 
 int CSettings::getInt(const CString& pStr, int pDefault)
 {
 	CKey *key = getKey(pStr);
-	return (key == NULL ? pDefault : strtoint(key->value));
+	return (key == 0 ? pDefault : strtoint(key->value));
 }
 
 const CString& CSettings::getStr(const CString& pStr, const CString& pDefault)
 {
 	CKey *key = getKey(pStr);
-	return (key == NULL ? pDefault : key->value);
+	return (key == 0 ? pDefault : key->value);
 }
 
 const CString& CSettings::operator[](int pIndex)

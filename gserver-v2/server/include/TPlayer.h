@@ -54,7 +54,7 @@ class TPlayer : public TAccount
 {
 	public:
 		// Constructor - Deconstructor
-		TPlayer(CSocket *pSocket = NULL);
+		TPlayer(CSocket *pSocket = 0);
 		~TPlayer();
 
 		// Manage Account

@@ -528,7 +528,7 @@ char* CSocket::peekData()
 
 	// Get our data
 	if (properties.protocol == SOCKET_PROTOCOL_UDP)
-		intError = recvfrom(properties.handle, buff, recvsize, MSG_PEEK, NULL, NULL);
+		intError = recvfrom(properties.handle, buff, recvsize, MSG_PEEK, 0, 0);
 	else
 		intError = recv(properties.handle, buff, recvsize, MSG_PEEK);
 
