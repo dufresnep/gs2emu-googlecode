@@ -19,8 +19,8 @@ enum
 	SVO_SETIP,
 	SVO_SETPORT,
 	SVO_SETPLYR,
-	SVO_VERIACC,
-	SVO_VERIGLD,
+	SVO_VERIACC,	// deprecated
+	SVO_VERIGUILD,
 	SVO_GETFILE,
 	SVO_NICKNAME,
 	SVO_GETPROF,
@@ -28,6 +28,7 @@ enum
 	SVO_PLYRADD,
 	SVO_PLYRREM,
 	SVO_SVRPING,
+	SVO_VERIACC2,
 };
 
 enum
@@ -93,11 +94,13 @@ class TServerList
 		void parsePacket(CString& pPacket);
 		void sendCompress();
 
+		bool doTimedEvents();
+
 		// Socket Variables
 		bool isConnected;
 		CString rBuffer, sBuffer;
 		CSocket sock;
-		time_t lastData, lastPing;
+		time_t lastData, lastPing, lastTimer;
 };
 
 // Packet-Functions

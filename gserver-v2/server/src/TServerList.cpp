@@ -43,7 +43,7 @@ TServerList::TServerList()
 	sock.setOptions(SOCKET_OPTION_NONBLOCKING);
 	sock.setDescription("listserver");
 
-	lastData = lastPing = time(0);
+	lastData = lastPing = lastTimer = time(0);
 }
 
 TServerList::~TServerList()
@@ -97,16 +97,26 @@ bool TServerList::main()
 		lastData = time(0);
 	}
 
-	// Send a ping every 30 seconds.
-	if ((int)difftime(time(0), lastPing) >= 30)
-	{
-		lastPing = time(0);
-		sendPacket(CString() >> (char)SVO_SVRPING);
-	}
+	// Every second, do some events.
+	if (time(0) != lastTimer) doTimedEvents();
 
 	// send out buffer
 	sendCompress();
 	return getConnected();
+}
+
+bool TServerList::doTimedEvents()
+{
+	lastTimer = time(0);
+
+	// Send a ping every 30 seconds.
+	if ((int)difftime(lastTimer, lastPing) >= 30)
+	{
+		lastPing = lastTimer;
+		sendPacket(CString() >> (char)SVO_SVRPING);
+	}
+
+	return true;
 }
 
 bool TServerList::init(const CString& pServerIp, const CString& pServerPort)

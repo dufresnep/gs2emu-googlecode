@@ -4,6 +4,7 @@
 #include "TAccount.h"
 #include "CLog.h"
 #include "CSocket.h"
+#include "TServerList.h"
 
 extern std::vector<TPlayer *> playerIds, playerList;
 extern CString homepath;
@@ -12,6 +13,7 @@ extern CLog rclog;
 extern bool __sendLogin[propscount];
 extern bool __getLogin[propscount];
 extern bool __getLoginRC[propscount];
+extern TServerList serverlist;
 
 /*
 	TPlayer: Manage Account
@@ -28,7 +30,7 @@ void TPlayer::sendLogin()
 	sendPacket(CString() >> (char)PLO_SIGNATURE >> (char)73);
 
 	// Check if the account is already in use.
-	printf("TODO: TPlayer::sendLogin(), Check if account is in use.\n");
+	printf("TODO: TPlayer::sendLogin, Check if account is in use.\n");
 
 	// Player's load different than RCs.
 	if (type == CLIENTTYPE_CLIENT) sendLoginClient();
@@ -66,15 +68,8 @@ void TPlayer::sendLogin()
 		}
 	}
 
-	// If we are an RC, announce it to all other RCs.
-	if (type == CLIENTTYPE_RC)
-	{
-		sendPacketToRC(CString() >> (char)PLO_RCMESSAGE << "New RC: " << this->nickName << " (" << this->accountName << ")");
-		this->sendPacket(CString() >> (char)PLO_RCMESSAGE << "Welcome to RC.");
-	}
-
 	// Tell the serverlist that the player connected.
-	printf("TODO: TPlayer::sendLogin(), Tell the serverlist the player connected.\n");
+	serverlist.addPlayer(this);
 
 	sendCompress();
 }
@@ -87,31 +82,31 @@ void TPlayer::sendLoginClient()
 	// Send the level to the player.
 	// setLevel will call sendCompress() for us.
 	// TODO: Send correct level.
-	printf("TODO: TPlayer::sendLoginClient(), Send correct level to player.\n");
+	printf("TODO: TPlayer::sendLoginClient, Send correct level to player.\n");
 	setLevel(CString() << /*homepath <<*/ "world/onlinestartlocal.nw");
 
 	// Recalculate player spar deviation.
-	printf("TODO: TPlayer::sendLoginClient(), Recalculate sparring deviation.\n");
+	printf("TODO: TPlayer::sendLoginClient, Recalculate sparring deviation.\n");
 
 	// Send out what guilds should be placed in the Staff section of the playerlist.
-	printf("TODO: TPlayer::sendLoginClient(), Send staff guilds.\n");
+	printf("TODO: TPlayer::sendLoginClient, Send staff guilds.\n");
 
 	// Send out the server's available status list options.
-	printf("TODO: TPlayer::sendLoginClient(), Send status list values.\n");
+	printf("TODO: TPlayer::sendLoginClient, Send status list values.\n");
 
 	// TODO: Send out RPG Window greeting?
 
 	// Send the start message to the player.
-	printf("TODO: TPlayer::sendLoginClient(), Send the start message to the player.\n");
+	printf("TODO: TPlayer::sendLoginClient, Send the start message to the player.\n");
 
 	// Send the player's weapons.
-	printf("TODO: TPlayer::sendLoginClient(), Send weapons to player.\n");
+	printf("TODO: TPlayer::sendLoginClient, Send weapons to player.\n");
 
 	// Send the player's flags.
-	printf("TODO: TPlayer::sendLoginClient(), Send flags to the player.\n");
+	printf("TODO: TPlayer::sendLoginClient, Send flags to the player.\n");
 
 	// Send the server's flags to the player.
-	printf("TODO: TPlayer::sendLoginClient(), Send the server's flags to the player.\n");
+	printf("TODO: TPlayer::sendLoginClient, Send the server's flags to the player.\n");
 
 	// Delete the bomb.  It gets automagically added by the client for
 	// God knows which reason.  Bomb must be capitalized.
@@ -126,8 +121,9 @@ void TPlayer::sendLoginRC()
 		nickName = accountName;
 
 	// Set the head to the server's set staff head.
-	printf("TODO: TPlayer::sendLoginRC(), Set the RC head to the staff head.\n");
+	printf("TODO: TPlayer::sendLoginRC, Set the RC head to the staff head.\n");
 
 	// Send the RC join message to the RC.
-	printf("TODO: TPlayer::sendLoginRC(), Send the RC join message to the RC.\n");
+	sendPacketToRC(CString() >> (char)PLO_RCMESSAGE << "New RC: " << this->nickName << " (" << this->accountName << ")");
+	this->sendPacket(CString() >> (char)PLO_RCMESSAGE << "Welcome to RC.");
 }

@@ -14,6 +14,7 @@ const char *__itemList[] = {"greenrupee", "bluerupee", "redrupee", "bombs", "dar
 CSettings *settings = 0;
 std::vector<TPlayer *> playerIds, playerList;
 bool running = true;
+TServerList serverlist;
 
 // Logging files.
 CLog serverlog("logs/serverlog.txt");
@@ -70,25 +71,23 @@ int main(int argc, char* argv[])
 	}
 
 	// Connect to the serverlist.
-	TServerList sock;
-	if (!sock.init(settings->getStr("listip"), settings->getStr("listport")))
+	if (!serverlist.init(settings->getStr("listip"), settings->getStr("listport")))
 	{
 		serverlog.out("[Error] Cound not initialize serverlist socket.\n");
 		return ERR_LISTEN;
 	}
-	sock.connectServer();
+	serverlist.connectServer();
 
 	// Main Loop
 	serverlog.out("Main loop\n");
 	while (running)
 	{
 		// Serverlist-Main -- Reconnect if Disconnected
-		if (!sock.main())
-			sock.connectServer();
+		if (!serverlist.main())
+			serverlist.connectServer();
 
 		// Serverlist Connection -> Connected
-		//if (sock.getConnected())
-			acceptSock(playerSock);
+		acceptSock(playerSock);
 
 		// Iterate Players
 		for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end();)
@@ -99,6 +98,9 @@ int main(int argc, char* argv[])
 
 			if (!player->doMain())
 			{
+				// Remove the player from the serverlist.
+				serverlist.remPlayer(player->getProp(PLPROP_ACCOUNTNAME).removeI(0,1), player->getType());
+
 				delete player;
 				i = playerList.erase(i);
 			}

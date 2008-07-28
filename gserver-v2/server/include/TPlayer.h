@@ -132,7 +132,8 @@ class TPlayer : public TAccount
 		codec out_codec;
 
 		// Variables
-		CString version;
+		CString version, os;
+		int codepage;
 		TLevel *level;
 		int id, type;
 		time_t lastData, lastMovement, lastChat, lastMessage;

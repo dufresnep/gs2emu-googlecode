@@ -126,7 +126,7 @@ void createPLFunctions()
 TPlayer::TPlayer(CSocket *pSocket)
 : TAccount(),
 playerSock(pSocket), iterator(0x04A80B38), key(0),
-PLE_POST22(false), level(0),
+PLE_POST22(false), os("wind"), codepage(1252), level(0),
 id(0), type(CLIENTTYPE_AWAIT)
 {
 	// TODO: lastChat and lastMessage
@@ -223,7 +223,7 @@ bool TPlayer::doTimedEvents()
 	// Disconnect if players are inactive.
 	if (settings->getBool("disconnectifnotmoved"))
 	{
-		if (difftime(lastTimer, lastMovement) > settings->getInt("maxnomovement", 1200))
+		if ((int)difftime(lastTimer, lastMovement) > settings->getInt("maxnomovement", 1200))
 		{
 			serverlog.out("Client %s has been disconnected due to inactivity.\n", accountName.text());
 			sendPacket(CString() >> (char)PLO_DISCMESSAGE << "You have been disconnected due to inactivity.");
@@ -232,7 +232,7 @@ bool TPlayer::doTimedEvents()
 	}
 
 	// Disconnect if no data has been received in 5 minutes.
-	if (difftime(lastTimer, lastData) > 300)
+	if ((int)difftime(lastTimer, lastData) > 300)
 	{
 		serverlog.out("Client %s has timed out.\n", accountName.text());
 		return false;

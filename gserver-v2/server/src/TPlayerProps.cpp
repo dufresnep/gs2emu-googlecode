@@ -160,15 +160,13 @@ CString TPlayer::getProp(int pPropId)
 
 		// OS type.
 		// Windows: wind
-		// TODO: reflect actual os.
 		case PLPROP_OSTYPE:
-		return CString() >> (char)4 << "wind";
+		return CString() >> (char)os.length() << os;
 
 		// Text codepage.
 		// Example: 1252
-		// TODO: reflect actual codepage.
 		case PLPROP_TEXTCODEPAGE:
-		return CString().writeGInt(1252);
+		return CString().writeGInt(codepage);
 
 		case PLPROP_GMAPX:
 		{
@@ -548,13 +546,13 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			// Windows: wind
 			case PLPROP_OSTYPE:
 				len = pPacket.readGUChar();
-				pPacket.readChars(len);
+				os = pPacket.readChars(len);
 				break;
 
 			// Text codepage.
 			// Example: 1252
 			case PLPROP_TEXTCODEPAGE:
-				pPacket.readGInt();
+				codepage = pPacket.readGInt();
 				break;
 
 			// Location, in pixels, of the player on the GMap.
