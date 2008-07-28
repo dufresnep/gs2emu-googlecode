@@ -13,6 +13,12 @@ package.files =
 include(pkgdir.."include")
 include(rootdir.."dependencies/include")
 
-library("z")
-library("bz2")
+if (linux or target == "cb-gcc" or target == "gnu")
+then
+	library("z")
+	library("bz2")
+else
+	library("libz")
+	library("libbz2")
+end
 if (windows) then library("ws2_32") end
