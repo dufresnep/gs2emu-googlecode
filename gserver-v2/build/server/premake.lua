@@ -10,7 +10,7 @@ package.files =
     matchfiles(rootdir.."server/include/*.h"),
 }
 
-if (!linux)
+if (windows)
 then
 	include(pkgdir.."include")
 	include(rootdir.."dependencies/include")
