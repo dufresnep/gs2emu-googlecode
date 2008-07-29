@@ -48,11 +48,10 @@ function project_dynamic(name, lang, kind)
 	}
 	package.includepaths =
 	{
-		rootdir.."dependencies/include",
+		pkgdir.."include",
 	}
 	package.libpaths =
 	{
-		rootdir.."dependencies",
 	}
 	package.defines =
 	{
