@@ -1,3 +1,5 @@
+#include <bzlib.h>
+#include <zlib.h>
 #include "CString.h"
 
 #ifdef _WIN32

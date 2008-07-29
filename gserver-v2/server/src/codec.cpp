@@ -1,5 +1,5 @@
-// GraalReborn Server - Revision 38
-// (C) GraalReborn 2007
+// GraalReborn Server
+// (C) GraalReborn 2008
 
 #include "codec.h"
 
