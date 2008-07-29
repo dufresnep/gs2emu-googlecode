@@ -10,8 +10,11 @@ package.files =
     matchfiles(rootdir.."server/include/*.h"),
 }
 
-include(pkgdir.."include")
-include(rootdir.."dependencies/include")
+if (!linux)
+then
+	include(pkgdir.."include")
+	include(rootdir.."dependencies/include")
+end
 
 if (linux or target == "cb-gcc" or target == "gnu")
 then
