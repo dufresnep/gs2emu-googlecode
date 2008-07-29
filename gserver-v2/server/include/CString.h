@@ -5,8 +5,8 @@
 #include <cstdio>
 #include <cstring>
 #include <vector>
-#include <bzlib.h>
-#include <zlib.h>
+#include "bzlib.h"
+#include "zlib.h"
 
 #ifndef max
 	#define max(a, b)	((a) > (b) ? (a) : (b))
