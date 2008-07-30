@@ -20,12 +20,14 @@ class CSettings
 {
 	public:
 		// Constructor-Destructor
-		CSettings(const CString& pStr, const CString& pSeperator = '=');
+		CSettings();
+		CSettings(const CString& pStr, const CString& pSeparator = "=");
 		~CSettings();
 
 		// File-Loading Functions
-		inline bool isOpened();
+		bool isOpened();
 		bool loadFile(const CString& pStr);
+		void setSeparator(const CString& pSeparator);
 		void clear();
 
 		// Get Type
@@ -48,6 +50,11 @@ class CSettings
 inline bool CSettings::isOpened()
 {
 	return opened;
+}
+
+inline void CSettings::setSeparator(const CString& pSeparator)
+{
+	strSep = pSeparator;
 }
 
 #endif // CSETTINGS_H

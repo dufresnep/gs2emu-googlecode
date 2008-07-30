@@ -1,6 +1,8 @@
 #ifndef TLEVELLINK_H
 #define TLEVELLINK_H
 
+#include <vector>
+#include "ICommon.h"
 #include "CString.h"
 
 class TLevelLink

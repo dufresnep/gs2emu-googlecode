@@ -1,16 +1,12 @@
 #include <vector>
+#include "ICommon.h"
 #include "main.h"
 #include "TPlayer.h"
 #include "TAccount.h"
 #include "TLevel.h"
-#include "CLog.h"
-#include "CSettings.h"
 
-extern std::vector<TPlayer *> playerIds, playerList;
-extern CString homepath;
-extern CLog serverlog;
-extern CLog rclog;
-extern CSettings *settings;
+#define serverlog	server->getServerLog()
+#define rclog		server->getRCLog()
 extern bool __sendLocal[propscount];
 extern int __attrPackets[30];
 
@@ -19,6 +15,7 @@ extern int __attrPackets[30];
 */
 CString TPlayer::getProp(int pPropId)
 {
+	CSettings* settings = &(server->getSettings());
 	switch (pPropId)
 	{
 		case PLPROP_NICKNAME:
@@ -199,6 +196,7 @@ CString TPlayer::getProp(int pPropId)
 
 void TPlayer::setProps(CString& pPacket, bool pForward)
 {
+	CSettings* settings = &(server->getSettings());
 	CString globalBuff, levelBuff;
 	int len = 0;
 /*
@@ -493,9 +491,8 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			case PLPROP_UNKNOWN50:
 				break;
 */
-			//case PLPROP_PCONNECTED:
-				// TODO: what does this do?
-			//	break;
+			case PLPROP_PCONNECTED:
+			break;
 
 			case PLPROP_PLANGUAGE:
 				len = pPacket.readGUChar();
@@ -508,7 +505,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 				if (id == -1)
 					break;
 
-				sendPacketToAll(CString() >> (char)PLO_OTHERPLPROPS >> (short)id >> (char)PLPROP_PSTATUSMSG >> (char)statusMsg, this);
+				server->sendPacketToAll(CString() >> (char)PLO_OTHERPLPROPS >> (short)id >> (char)PLPROP_PSTATUSMSG >> (char)statusMsg, this);
 			break;
 
 			case PLPROP_GATTRIB1:  attrList[0]  = pPacket.readChars(pPacket.readGUChar()); break;
@@ -559,29 +556,23 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			// Bit 0x0001 controls if it is negative or not.
 			// Bits 0xFFFE are the actual value.
 			case PLPROP_GMAPX:
-				gmapx = pPacket.readGUShort();
+				gmapx = len = pPacket.readGUShort();
 				lastMovement = time(0);
 
 				// If the first bit is 1, our position is negative.
-				if ((short)gmapx & 0x0001)
-				{
-					gmapx >>= 1;
+				gmapx >>= 1;
+				if ((short)len & 0x0001)
 					gmapx = -gmapx;
-				}
-				else gmapx >>= 1;
 				break;
 
 			case PLPROP_GMAPY:
-				gmapy = pPacket.readGUShort();
+				gmapy = len = pPacket.readGUShort();
 				lastMovement = time(0);
 
 				// If the first bit is 1, our position is negative.
-				if ((short)gmapy & 0x0001)
-				{
-					gmapy >>= 1;
+				gmapy >>= 1;
+				if ((short)len & 0x0001)
 					gmapy = -gmapy;
-				}
-				else gmapy >>= 1;
 				break;
 
 			default:
@@ -602,9 +593,9 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 	if (isLoggedIn())
 	{
 		if (globalBuff.length() > 0)
-			sendPacketToAll(CString() >> (char)PLO_OTHERPLPROPS >> (short)this->id << globalBuff, this);
+			server->sendPacketToAll(CString() >> (char)PLO_OTHERPLPROPS >> (short)this->id << globalBuff, this);
 		if (levelBuff.length() > 0)
-			sendPacketToLevel(CString() >> (char)PLO_OTHERPLPROPS >> (short)this->id << levelBuff, getLevel(), this);
+			server->sendPacketToLevel(CString() >> (char)PLO_OTHERPLPROPS >> (short)this->id << levelBuff, getLevel(), this);
 		sendCompress();
 	}
 }

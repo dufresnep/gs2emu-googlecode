@@ -6,47 +6,23 @@
 #include <unistd.h>
 #endif
 
-#ifdef _WIN32
-	#ifndef WIN32_LEAN_AND_MEAN
-		#define WIN32_LEAN_AND_MEAN
-	#endif
-	#include <windows.h>
-#endif
-
-#include "CString.h"
 #include "CLog.h"
+#include "CString.h"
 
+static CString getBasePath();
+
+CLog::CLog()
+: enabled(false), file(0)
+{
+	// Get base path.
+	homepath = getBasePath();
+}
 
 CLog::CLog(const CString& _file, bool _enabled)
 : enabled(_enabled), filename(_file), file(0)
 {
-#if defined(_WIN32) || defined(_WIN64)
-	// Get the path.
-	char path[MAX_PATH];
-	GetModuleFileNameA(0, path, MAX_PATH);
-
-	// Find the program exe and remove it from the path.
-	// Assign the path to homepath.
-	homepath = path;
-	int pos = homepath.findl('\\');
-	if (pos == -1) homepath.clear();
-	else if (pos != (homepath.length() - 1))
-		homepath.removeI(++pos, homepath.length());
-#else
-	// Get the path to the program.
-	char path[ 260 ];
-	memset((void*)path, 0, 260);
-	readlink("/proc/self/exe", path, sizeof(path));
-
-	// Assign the path to homepath.
-	char* end = strrchr(path, '/');
-	if (end != 0)
-	{
-		end++;
-		if (end != 0) *end = '\0';
-		homepath = path;
-	}
-#endif
+	// Get base path.
+	homepath = getBasePath();
 
 	// Open the file now.
 	if (enabled)
@@ -89,4 +65,39 @@ void CLog::clear()
 	file = fopen((homepath + filename).text(), "w");
 	if (0 == file)
 		enabled = false;
+}
+
+CString getBasePath()
+{
+	CString homepath;
+
+#if defined(_WIN32) || defined(_WIN64)
+	// Get the path.
+	char path[MAX_PATH];
+	GetModuleFileNameA(0, path, MAX_PATH);
+
+	// Find the program exe and remove it from the path.
+	// Assign the path to homepath.
+	homepath = path;
+	int pos = homepath.findl('\\');
+	if (pos == -1) homepath.clear();
+	else if (pos != (homepath.length() - 1))
+		homepath.removeI(++pos, homepath.length());
+#else
+	// Get the path to the program.
+	char path[ 260 ];
+	memset((void*)path, 0, 260);
+	readlink("/proc/self/exe", path, sizeof(path));
+
+	// Assign the path to homepath.
+	char* end = strrchr(path, '/');
+	if (end != 0)
+	{
+		end++;
+		if (end != 0) *end = '\0';
+		homepath = path;
+	}
+#endif
+
+	return homepath;
 }

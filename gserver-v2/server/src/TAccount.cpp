@@ -1,14 +1,14 @@
 #include <memory.h>
+#include "TServer.h"
 #include "TAccount.h"
-#include "CString.h"
-
-extern CString homepath;
+#include "ICommon.h"
 
 /*
 	TAccount: Constructor - Deconstructor
 */
-TAccount::TAccount(const CString& pAccount)
-: isBanned(false), isFtp(false), isLoadOnly(false),
+TAccount::TAccount(TServer* pServer, const CString& pAccount)
+: server(pServer),
+isBanned(false), isFtp(false), isLoadOnly(false),
 adminIp("0.0.0.0"),
 accountIp(0), adminRights(0),
 bodyImg("body.png"), headImg("head0.png"), gAni("idle"), language("English"),
@@ -38,7 +38,7 @@ TAccount::~TAccount()
 bool TAccount::loadAccount(const CString& pAccount)
 {
 	// Load File
-	std::vector<CString> fileData = CString::loadToken(CString() << homepath << "accounts/" << pAccount << ".txt", "\n");
+	std::vector<CString> fileData = CString::loadToken(CString() << server->getServerPath() << "accounts/" << pAccount << ".txt", "\n");
 	if (fileData.size() < 1 || fileData[0].trim() != "GRACC001")
 	{
 		if (pAccount != "defaultaccount")
@@ -165,7 +165,7 @@ bool TAccount::saveAccount(bool pOnlyAccount)
 	// Only-Account Saves
 	if (pOnlyAccount)
 	{
-		TAccount newAccount(accountName);
+		TAccount newAccount(server, accountName);
 			newAccount.isBanned = isBanned;
 			newAccount.banReason = banReason;
 			newAccount.accountComments = accountComments;
@@ -246,7 +246,7 @@ bool TAccount::saveAccount(bool pOnlyAccount)
 		newFile << "LOCALRIGHTS " << adminRights << "\r\n";
 		newFile << "IPRANGE " << adminIp << "\r\n";
 		newFile << "LASTFOLDER " << lastFolder << "\r\n";
-		newFile.save(CString() << homepath << "accounts/" << accountName << ".txt");
+		newFile.save(CString() << server->getServerPath() << "accounts/" << accountName << ".txt");
 	}
 
 	return true;

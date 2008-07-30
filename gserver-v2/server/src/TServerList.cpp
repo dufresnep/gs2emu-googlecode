@@ -1,12 +1,12 @@
-#include "main.h"
-#include "TServerList.h"
+#include "ICommon.h"
+#include "IUtil.h"
 #include "CSocket.h"
 #include "CSettings.h"
 #include "CLog.h"
+#include "TServerList.h"
+#include "TPlayer.h"
 
-extern CSettings *settings;
 extern CLog serverlog;
-extern std::vector<TPlayer *> playerList;
 
 /*
 	Pointer-Functions for Packets
@@ -130,6 +130,8 @@ bool TServerList::init(const CString& pServerIp, const CString& pServerPort)
 
 bool TServerList::connectServer()
 {
+	CSettings* settings = &(server->getSettings());
+
 	if (isConnected == true)
 		return true;
 
@@ -198,7 +200,7 @@ void TServerList::sendPlayers()
 	int playerCount = 0;
 
 	// Iterate Playerlist
-	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end();)
+	for (std::vector<TPlayer *>::iterator i = server->getPlayerList().begin(); i != server->getPlayerList().end();)
 	{
 		TPlayer *pPlayer = (TPlayer*)*i;
 		if (pPlayer == 0)
@@ -235,7 +237,7 @@ void TServerList::setIp(const CString& pServerIp)
 
 void TServerList::setName(const CString& pServerName)
 {
-	bool uc = settings->getBool("underconstruction", false);
+	bool uc = server->getSettings().getBool("underconstruction", false);
 	sendPacket(CString() >> (char)SVO_SETNAME << (uc ? "U " : "") << pServerName);
 }
 

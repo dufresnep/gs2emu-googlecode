@@ -1,6 +1,8 @@
 #ifndef TLEVELCHEST_H
 #define TLEVELCHEST_H
 
+#include <vector>
+#include "ICommon.h"
 #include "CString.h"
 
 class TLevelChest

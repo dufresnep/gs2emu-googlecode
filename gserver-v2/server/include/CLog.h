@@ -13,6 +13,7 @@ class CLog
 		//! Creates a new CLog that outputs to the specific file.
 		//! \param file The file to log to.
 		//! \param enabled If the class logs by default to the file or not.
+		CLog();
 		CLog(const CString& _file, bool _enabled = true);
 
 		//! Cleans up and closes files.

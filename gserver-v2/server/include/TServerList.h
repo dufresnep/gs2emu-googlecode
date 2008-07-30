@@ -2,9 +2,12 @@
 #define TSERVERLIST_H
 
 #include <time.h>
+#include "ICommon.h"
+#include "IUtil.h"
 #include "CString.h"
 #include "CSocket.h"
-#include "TPlayer.h"
+//#include "TPlayer.h"		// FOR THE LOVE OF GOD DON'T UNCOMMENT!
+//#include "TServer.h"
 
 /*
 	Enumerators
@@ -47,12 +50,15 @@ enum
 	SVI_PING = 99
 };
 
+class TPlayer;
+class TServer;
 class TServerList
 {
 	public:
 		// Constructor - Deconstructor
 		TServerList();
 		~TServerList();
+		void setServer(TServer* pServer) { server = pServer; }
 
 		// Socket-Control Functions
 		bool getConnected();
@@ -101,6 +107,7 @@ class TServerList
 		CString rBuffer, sBuffer;
 		CSocket sock;
 		time_t lastData, lastPing, lastTimer;
+		TServer* server;
 };
 
 // Packet-Functions

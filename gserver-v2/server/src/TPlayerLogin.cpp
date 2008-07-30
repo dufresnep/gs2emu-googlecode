@@ -1,19 +1,15 @@
 #include <vector>
-#include "main.h"
+#include "ICommon.h"
 #include "TPlayer.h"
 #include "TAccount.h"
-#include "CLog.h"
 #include "CSocket.h"
 #include "TServerList.h"
 
-extern std::vector<TPlayer *> playerIds, playerList;
-extern CString homepath;
-extern CLog serverlog;
-extern CLog rclog;
+#define serverlog	server->getServerLog()
+#define rclog		server->getRCLog()
 extern bool __sendLogin[propscount];
 extern bool __getLogin[propscount];
 extern bool __getLoginRC[propscount];
-extern TServerList serverlist;
 
 /*
 	TPlayer: Manage Account
@@ -37,6 +33,7 @@ void TPlayer::sendLogin()
 	else if (type == CLIENTTYPE_RC) sendLoginRC();
 
 	// Exchange props with everybody on the server.
+	std::vector<TPlayer*> playerList = server->getPlayerList();
 	for (std::vector<TPlayer*>::iterator i = playerList.begin(); i != playerList.end(); ++i)
 	{
 		TPlayer* player = (TPlayer*)*i;
@@ -69,7 +66,7 @@ void TPlayer::sendLogin()
 	}
 
 	// Tell the serverlist that the player connected.
-	serverlist.addPlayer(this);
+	server->getServerList().addPlayer(this);
 
 	sendCompress();
 }
@@ -111,7 +108,6 @@ void TPlayer::sendLoginClient()
 	// Delete the bomb.  It gets automagically added by the client for
 	// God knows which reason.  Bomb must be capitalized.
 	sendPacket(CString() >> (char)PLO_DELNPCWEAPON << "Bomb");
-
 }
 
 void TPlayer::sendLoginRC()
@@ -124,6 +120,6 @@ void TPlayer::sendLoginRC()
 	printf("TODO: TPlayer::sendLoginRC, Set the RC head to the staff head.\n");
 
 	// Send the RC join message to the RC.
-	sendPacketToRC(CString() >> (char)PLO_RCMESSAGE << "New RC: " << this->nickName << " (" << this->accountName << ")");
+	server->sendPacketTo(CLIENTTYPE_RC, CString() >> (char)PLO_RCMESSAGE << "New RC: " << this->nickName << " (" << this->accountName << ")");
 	this->sendPacket(CString() >> (char)PLO_RCMESSAGE << "Welcome to RC.");
 }

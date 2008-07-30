@@ -4,9 +4,9 @@
 	#endif
 
 	#define WINVER 0x0501
-	#include <windows.h>
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
+	#include <windows.h>
 
 #ifndef __GNUC__ // rain
 	#pragma comment(lib, "ws2_32.lib")
@@ -57,10 +57,10 @@
 #include <memory.h>
 #include <stdio.h>
 
-#include "main.h"
-#include "CSocket.h"
 #include "CString.h"
+#include "CSocket.h"
 #include "CLog.h"
+#include "main.h"
 
 // From main.cpp
 extern CLog serverlog;

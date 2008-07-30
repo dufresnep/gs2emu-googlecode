@@ -353,9 +353,9 @@ CString CString::zuncompress() const
 
 int CString::find(const CString& pString, int pStart) const
 {
-	char* loc = strstr(buffer, pString.text());
+	char* loc = strstr(buffer + pStart, pString.text());
 	if (loc == 0) return -1;
-	return (int)(loc - buffer);
+	return (int)(loc - (buffer - pStart));
 }
 
 int CString::findi(const CString& pString, int pStart) const

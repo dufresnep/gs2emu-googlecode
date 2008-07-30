@@ -1,11 +1,16 @@
+#include "ICommon.h"
 #include "CSettings.h"
 
 /*
 	Constructor - Deconstructor
 */
-CSettings::CSettings(const CString& pStr, const CString& pSeperator)
+CSettings::CSettings()
 {
-	strSep = pSeperator;
+}
+
+CSettings::CSettings(const CString& pStr, const CString& pSeparator)
+{
+	strSep = pSeparator;
 	opened = loadFile(pStr);
 }
 

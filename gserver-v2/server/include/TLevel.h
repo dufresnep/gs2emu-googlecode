@@ -2,7 +2,7 @@
 #define TLEVEL_H
 
 #include <vector>
-#include "CString.h"
+#include "ICommon.h"
 #include "TLevelBaddy.h"
 #include "TLevelChest.h"
 #include "TLevelHorse.h"
@@ -40,6 +40,9 @@ class TLevel
 		// find level
 		static TLevel * findLevel(const CString& pLevelName);
 
+		// get functions
+		short* getTiles();
+
 	private:
 		bool levelSpar;
 		short levelTiles[4096];
@@ -57,5 +60,9 @@ inline CString TLevel::getLevelName()
 	return levelName;
 }
 
+inline short* TLevel::getTiles()
+{
+	return levelTiles;
+}
 
 #endif // TLEVEL_H

@@ -1,24 +1,22 @@
 #include <signal.h>
 #include <stdlib.h>
+#include <map>
 #include "main.h"
-#include "TLevel.h"
+#include "ICommon.h"
+#include "IUtil.h"
+#include "CLog.h"
+#include "CSocket.h"
+#include "TServer.h"
 #include "TPlayer.h"
 #include "TServerList.h"
-#include "CSocket.h"
-#include "CLog.h"
 
 // Function pointer for signal handling.
 typedef void (*sighandler_t)(int);
 
 const char *__itemList[] = {"greenrupee", "bluerupee", "redrupee", "bombs", "darts", "heart", "glove1", "bow", "bomb", "shield", "sword", "fullheart", "superbomb", "battleaxe", "goldensword", "mirrorshield", "glove2", "lizardshield", "lizardsword", "goldrupee", "fireball", "fireblast", "nukeshot", "joltbomb", "spinattack"};
-CSettings *settings = 0;
-std::vector<TPlayer *> playerIds, playerList;
 bool running = true;
-TServerList serverlist;
-
-// Logging files.
+std::map<CString, TServer *> serverList;
 CLog serverlog("logs/serverlog.txt");
-CLog rclog("logs/rclog.txt");
 
 // Home path of the gserver.
 CString homepath;
@@ -30,81 +28,60 @@ int main(int argc, char* argv[])
 	signal(SIGINT, (sighandler_t) shutdownServer);
 	signal(SIGTERM, (sighandler_t) shutdownServer);
 
-	// Fill homepath with the home directory of the server
-	getBasePath();
-
-	// Player ids 0 and 1 break things.
-	// Don't allow a player to have one of those ids.
-	playerIds.resize(2);
-
 	serverlog.out("Starting server\n");
 
-	// Load Settings
-	settings = new CSettings(CString() << homepath << "config/serveroptions.txt");
-	if (!settings->isOpened())
+	// Load Server Settings
+	CSettings serversettings(CString() << homepath << "servers.txt");
+	if (!serversettings.isOpened())
 	{
-		serverlog.out("[Error] Could not open config/serveroptions.txt\n");
+		serverlog.out("[Error] Could not open settings.txt.\n");
 		return ERR_SETTINGS;
+	}
+
+	// Make sure we actually have a server.
+	if (serversettings.getInt("servercount", 0) == 0)
+	{
+		serverlog.out("[Error] Incorrect settings.txt file.\n");
+		return ERR_SETTINGS;
+	}
+
+	// Load servers.
+	for (int i = 0; i < serversettings.getInt("servercount"); ++i)
+	{
+		CString name = serversettings.getStr(CString() << "server_" << CString(i), "default");
+		TServer* server = new TServer(name);
+
+		// Make sure doubles don't exist.
+		if (serverList.find(name) != serverList.end())
+			delete serverList[name];
+
+		// Initialize the server.
+		if (server->init() != 0)
+		{
+			delete server;
+			continue;
+		}
+		serverList[name] = server;
 	}
 
 	// Create Packet-Functions
 	createPLFunctions();
 	createSLFunctions();
 
-	// Initialize the player socket.
-	CSocket playerSock;
-	playerSock.setType(SOCKET_TYPE_SERVER);
-	playerSock.setProtocol(SOCKET_PROTOCOL_TCP);
-	playerSock.setOptions(SOCKET_OPTION_NONBLOCKING);
-	playerSock.setDescription("playerSock");
-
-	// Start listening on the player socket.
-	if (playerSock.init("", settings->getStr("serverport")))
-	{
-		serverlog.out("[Error] Could not initialize listening socket.\n");
-		return ERR_LISTEN;
-	}
-	if (playerSock.connect())
-	{
-		serverlog.out("[Error] Could not connect listening socket.\n");
-		return ERR_LISTEN;
-	}
-
-	// Connect to the serverlist.
-	if (!serverlist.init(settings->getStr("listip"), settings->getStr("listport")))
-	{
-		serverlog.out("[Error] Cound not initialize serverlist socket.\n");
-		return ERR_LISTEN;
-	}
-	serverlist.connectServer();
-
 	// Main Loop
 	serverlog.out("Main loop\n");
 	while (running)
 	{
-		// Serverlist-Main -- Reconnect if Disconnected
-		if (!serverlist.main())
-			serverlist.connectServer();
-
-		// Serverlist Connection -> Connected
-		acceptSock(playerSock);
-
-		// Iterate Players
-		for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end();)
+		// Run each server.
+		// TODO: If the server fails, try to restart it instead of deleting it.
+		for (std::map<CString, TServer*>::iterator i = serverList.begin(); i != serverList.end(); )
 		{
-			TPlayer *player = (TPlayer*)*i;
-			if (player == 0)
-				continue;
-
-			if (!player->doMain())
+			TServer* server = (TServer*)i->second;
+			if (server->doMain() == false)
 			{
-				// Remove the player from the serverlist.
-				serverlist.remPlayer(player->getProp(PLPROP_ACCOUNTNAME).removeI(0,1), player->getType());
-
-				delete player;
-				i = playerList.erase(i);
+				delete server;
+				serverList.erase(i);
 			}
-			else ++i;
 		}
 
 		// Wait
@@ -115,32 +92,6 @@ int main(int argc, char* argv[])
 	//CSocket::socketSystemDestroy();
 
 	return ERR_SUCCESS;
-}
-
-void acceptSock(CSocket& pSocket)
-{
-	// Create Sock
-	CSocket *newSock = pSocket.accept();
-	if (newSock == 0)
-		return;
-
-	// New Player
-	TPlayer *newPlayer = new TPlayer(newSock);
-	playerList.push_back(newPlayer);
-
-	// Assign Player Id
-	for (unsigned int i = 2; i < playerIds.size(); ++i)
-	{
-		if (playerIds[i] == 0)
-		{
-			playerIds[i] = newPlayer;
-			newPlayer->setId(i);
-			return;
-		}
-	}
-
-	newPlayer->setId(playerIds.size());
-	playerIds.push_back(newPlayer);
 }
 
 /*
@@ -162,71 +113,12 @@ int findItemId(const CString& pItemName)
 	return -1;
 }
 
-/*
-	Packet-Sending Functions
-*/
-void sendPacketToAll(CString pPacket)
+void shutdownServer(int signal)
 {
-	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end(); ++i)
-		(*i)->sendPacket(pPacket);
+	serverlog.out("Server is now shutting down...\n");
+	running = false;
 }
 
-void sendPacketToAll(CString pPacket, TPlayer *pPlayer)
-{
-	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end(); ++i)
-	{
-		if ((*i) == pPlayer) continue;
-		(*i)->sendPacket(pPacket);
-	}
-}
-
-void sendPacketToLevel(CString pPacket, TLevel *pLevel)
-{
-	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end(); ++i)
-	{
-		if ((*i)->getType() != CLIENTTYPE_CLIENT) continue;
-		if ((*i)->getLevel() == pLevel)
-			(*i)->sendPacket(pPacket);
-	}
-}
-
-void sendPacketToLevel(CString pPacket, TLevel *pLevel, TPlayer *pPlayer)
-{
-	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end(); ++i)
-	{
-		if ((*i) == pPlayer || (*i)->getType() != CLIENTTYPE_CLIENT) continue;
-		if ((*i)->getLevel() == pLevel)
-			(*i)->sendPacket(pPacket);
-	}
-}
-
-void sendPacketTo(int who, CString pPacket)
-{
-	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end(); ++i)
-	{
-		if ((*i)->getType() == who)
-			(*i)->sendPacket(pPacket);
-	}
-}
-
-void sendPacketTo(int who, CString pPacket, TPlayer* pPlayer)
-{
-	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end(); ++i)
-	{
-		if ((*i) == pPlayer) continue;
-		if ((*i)->getType() == who)
-			(*i)->sendPacket(pPacket);
-	}
-}
-
-void sendPacketToRC(CString pPacket)
-{
-	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end(); ++i)
-	{
-		if ((*i)->getType() == CLIENTTYPE_RC)
-			(*i)->sendPacket(pPacket);
-	}
-}
 
 void getBasePath()
 {
@@ -257,10 +149,4 @@ void getBasePath()
 		homepath = path;
 	}
 #endif
-}
-
-void shutdownServer(int signal)
-{
-	serverlog.out("Server is now shutting down...\n");
-	running = false;
 }

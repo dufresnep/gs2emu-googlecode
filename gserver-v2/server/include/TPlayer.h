@@ -2,10 +2,12 @@
 #define TPLAYER_H
 
 #include <time.h>
-#include "CString.h"
+#include "ICommon.h"
+#include "IUtil.h"
+#include "CSocket.h"
+#include "TServer.h"
 #include "TAccount.h"
 #include "TLevel.h"
-#include "CSocket.h"
 #include "codec.h"
 
 /*
@@ -20,6 +22,7 @@ enum
 	PLI_PLAYERPROPS		= 2,
 	PLI_WANTFILE		= 23,
 	PLI_NPCWEAPONIMG	= 24,
+	PLI_FORCELEVELWARP	= 30,
 	PLI_UPDATEFILE		= 34,
 	PLI_LANGUAGE		= 37,
 	PLI_TRIGGERACTION	= 38,
@@ -34,6 +37,7 @@ enum
 	PLO_LEVELNAME = 6,
 	PLO_OTHERPLPROPS = 8,
 	PLO_PLAYERPROPS = 9,
+	PLO_ADDITEM = 12,
 	PLO_PLAYERWARP = 14,
 	PLO_WARPFAILED = 15,
 	PLO_DISCMESSAGE = 16,
@@ -51,19 +55,11 @@ enum
 	PLO_RPGWINDOW = 179,
 };
 
-enum
-{
-	CLIENTTYPE_CLIENT,
-	CLIENTTYPE_RC,
-	CLIENTTYPE_AWAIT,
-	CLIENTTYPE_CLIENT22 = 5,
-};
-
 class TPlayer : public TAccount
 {
 	public:
 		// Constructor - Deconstructor
-		TPlayer(CSocket *pSocket = 0);
+		TPlayer(TServer* pServer, CSocket *pSocket = 0);
 		~TPlayer();
 
 		// Manage Account
@@ -71,8 +67,8 @@ class TPlayer : public TAccount
 
 		// Get Properties
 		TLevel* getLevel();
-		int getId();
-		int getType();
+		int getId() const;
+		int getType() const;
 
 		// Set Properties
 		void setLevel(const CString& pLevelName);
@@ -138,6 +134,7 @@ class TPlayer : public TAccount
 		int id, type;
 		time_t lastData, lastMovement, lastChat, lastMessage;
 		time_t lastTimer;
+		TServer* server;
 };
 
 inline bool TPlayer::isLoggedIn()
@@ -145,12 +142,12 @@ inline bool TPlayer::isLoggedIn()
 	return (type != CLIENTTYPE_AWAIT && id > 0);
 }
 
-inline int TPlayer::getId()
+inline int TPlayer::getId() const
 {
 	return id;
 }
 
-inline int TPlayer::getType()
+inline int TPlayer::getType() const
 {
 	return type;
 }

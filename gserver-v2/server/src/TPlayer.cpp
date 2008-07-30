@@ -1,19 +1,16 @@
 #include <time.h>
-#include "main.h"
+#include "ICommon.h"
+#include "CSocket.h"
+#include "TServer.h"
 #include "TPlayer.h"
 #include "TAccount.h"
-#include "CSocket.h"
-#include "CLog.h"
 #include "codec.h"
 
 /*
-	External
+	Logs
 */
-extern std::vector<TPlayer *> playerIds, playerList;
-extern CString homepath;
-extern CLog serverlog;
-extern CLog rclog;
-extern CSettings* settings;
+#define serverlog	server->getServerLog()
+#define rclog		server->getRCLog()
 
 /*
 	Global Definitions
@@ -112,6 +109,7 @@ void createPLFunctions()
 	TPLFunc[PLI_PLAYERPROPS] = &TPlayer::msgPLI_PLAYERPROPS;
 	TPLFunc[PLI_WANTFILE] = &TPlayer::msgPLI_WANTFILE;
 	TPLFunc[PLI_NPCWEAPONIMG] = &TPlayer::msgPLI_NPCWEAPONIMG;
+	TPLFunc[PLI_FORCELEVELWARP] = &TPlayer::msgPLI_LEVELWARP;	// Only need one func.
 	TPLFunc[PLI_UPDATEFILE] = &TPlayer::msgPLI_UPDATEFILE;
 	TPLFunc[PLI_LANGUAGE] = &TPlayer::msgPLI_LANGUAGE;
 	TPLFunc[PLI_TRIGGERACTION] = &TPlayer::msgPLI_TRIGGERACTION;
@@ -123,11 +121,11 @@ void createPLFunctions()
 /*
 	Constructor - Deconstructor
 */
-TPlayer::TPlayer(CSocket *pSocket)
-: TAccount(),
+TPlayer::TPlayer(TServer* pServer, CSocket *pSocket)
+: TAccount(pServer),
 playerSock(pSocket), iterator(0x04A80B38), key(0),
 PLE_POST22(false), os("wind"), codepage(1252), level(0),
-id(0), type(CLIENTTYPE_AWAIT)
+id(0), type(CLIENTTYPE_AWAIT), server(pServer)
 {
 	// TODO: lastChat and lastMessage
 	lastData = lastMovement = lastChat = lastMessage = time(0);
@@ -139,7 +137,8 @@ TPlayer::~TPlayer()
 {
 	if (id >= 0)
 	{
-		playerIds[id] = 0;
+		// TODO: Fix playerIds.
+		//playerIds[id] = 0;
 		//vecRemove<TPlayer*>(playerList, this);
 		//vecRemove(playerList, this);
 
@@ -148,8 +147,8 @@ TPlayer::~TPlayer()
 			saveAccount();
 
 		// Announce our departure to other clients.
-		sendPacketTo(CLIENTTYPE_CLIENT, CString() >> (char)PLO_OTHERPLPROPS >> (short)id >> (char)PLPROP_PCONNECTED, this);
-		sendPacketTo(CLIENTTYPE_RC, CString() >> (char)PLO_DELPLAYER >> (short)id, this);
+		server->sendPacketTo(CLIENTTYPE_CLIENT, CString() >> (char)PLO_OTHERPLPROPS >> (short)id >> (char)PLPROP_PCONNECTED, this);
+		server->sendPacketTo(CLIENTTYPE_RC, CString() >> (char)PLO_DELPLAYER >> (short)id, this);
 	}
 
 	printf("Destroyed for: %s\n", playerSock->tcpIp());
@@ -221,6 +220,7 @@ bool TPlayer::doTimedEvents()
 	onlineTime++;
 
 	// Disconnect if players are inactive.
+	CSettings* settings = &(server->getSettings());
 	if (settings->getBool("disconnectifnotmoved"))
 	{
 		if ((int)difftime(lastTimer, lastMovement) > settings->getInt("maxnomovement", 1200))
@@ -501,13 +501,64 @@ bool TPlayer::msgPLI_LOGIN(CString& pPacket)
 
 bool TPlayer::msgPLI_LEVELWARP(CString& pPacket)
 {
-	printf("TODO: TPlayer::msgPLI_LEVELWARP\n");
+	unsigned int modTime = 0;
+
+	if (pPacket[0] - 32 == PLI_FORCELEVELWARP)
+		modTime = (unsigned int)pPacket.readGUInt5();
+
+	float loc[2] = {(float)(pPacket.readGChar() / 2), (float)(pPacket.readGChar() / 2)};
+	CString newLevel = pPacket.readString("");
+	//warp(newLevel, loc[0], loc[1], modTime);
+
 	return true;
 }
 
 bool TPlayer::msgPLI_BOARDMODIFY(CString& pPacket)
 {
-	printf("TODO: TPlayer::msgPLI_BOARDMODIFY\n");
+	CSettings* settings = &(server->getSettings());
+	signed char loc[2] = {pPacket.readGChar(), pPacket.readGChar()};
+	signed char dim[2] = {pPacket.readGChar(), pPacket.readGChar()};
+	CString tiles = pPacket.subString(5);
+
+	// TODO: Alter level data.
+
+	if (loc[0] < 0 || loc[0] > 63 || loc[1] < 0 || loc[1] > 63) return true;
+
+	// Lay items when you destroy objects.
+	short oldTile = (getLevel()->getTiles())[loc[0] + (loc[1] * 64)];
+	int dropItem = -1;
+	bool bushitems = settings->getBool("bushitems", true);
+	bool vasesdrop = settings->getBool("vasesdrop", true);
+	int tiledroprate = settings->getInt("tiledroprate", 50);
+
+	// Bushes, grass, swamp.
+	// Bushes, grass, swamp
+	if ((oldTile == 2 || oldTile == 0x1a4 || oldTile == 0x1ff ||
+		oldTile == 0x3ff) && bushitems)
+	{
+		if ( tiledroprate > 0 )
+		{
+			if ( (rand() % 100) < tiledroprate )
+			{
+				int index = rand() % 6;
+				dropItem = index;
+			}
+		}
+	}
+	// Vase.
+	else if (oldTile == 0x2ac && vasesdrop)
+		dropItem = 5;
+
+	// Send the item now.
+	// TODO: Make this a more generic function.
+	if (dropItem >= 0)
+	{
+		CString packet;
+		packet >> (char)PLO_ADDITEM >> (char)(loc[0] * 2) >> (char)(loc[1] * 2) >> (char)dropItem;
+		server->sendPacketToLevel( packet, getLevel() );
+		//level->items.add(new CItem((float)loc[0], (float)loc[1], dropItem));
+	}
+
 	return true;
 }
 
@@ -553,7 +604,7 @@ bool TPlayer::msgPLI_TRIGGERACTION(CString& pPacket)
 	// We don't have an NPCserver, so, for now, just pass it along.
 	CString packet;
 	packet >> (char)PLO_TRIGGERACTION >> (short)this->id << pPacket.text()+1;
-	sendPacketToLevel(packet, this->level, this);
+	server->sendPacketToLevel(packet, this->level, this);
 	return true;
 }
 

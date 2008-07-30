@@ -2,6 +2,7 @@
 #define TACCOUNT_H
 
 #include "CString.h"
+#include "TServer.h"
 #include "TLevel.h"
 #include "TLevelChest.h"
 
@@ -90,11 +91,13 @@ enum
 };
 #define propscount	80
 
+class TServer;
+
 class TAccount
 {
 	public:
 		// Constructor - Deconstructor
-		TAccount(const CString& pAccount = "defaultaccount");
+		TAccount(TServer* pServer, const CString& pAccount = "defaultaccount");
 		~TAccount();
 
 		// Load/Save Account
@@ -106,6 +109,8 @@ class TAccount
 		bool hasWeapon(const CString& pWeapon);
 
 	protected:
+		TServer* server;
+
 		// Player-Account
 		bool isBanned, isFtp, isLoadOnly;
 		CString adminIp, accountComments, accountName, banReason, lastFolder;

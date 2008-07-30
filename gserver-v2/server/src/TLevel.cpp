@@ -1,3 +1,4 @@
+#include "ICommon.h"
 #include "main.h"
 #include "TLevel.h"
 #include "TPlayer.h"
@@ -13,7 +14,7 @@ std::vector<TLevel *> levelList;
 */
 TLevel::TLevel()
 {
-	memset(levelTiles, 0, 8192/*sizeof(levelTiles)*/);
+	memset(levelTiles, 0, sizeof(levelTiles));
 }
 
 TLevel::~TLevel()
