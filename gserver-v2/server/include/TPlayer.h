@@ -33,6 +33,7 @@ enum
 	PLI_THROWCARRIED	= 11,
 	PLI_ITEMADD			= 12,
 	PLI_ITEMDEL			= 13,
+	PLI_CLAIMPKER		= 14,
 
 	PLI_OPENCHEST		= 20,
 	PLI_WANTFILE		= 23,
@@ -168,6 +169,7 @@ class TPlayer : public TAccount
 		bool msgPLI_THROWCARRIED(CString& pPacket);
 		bool msgPLI_ITEMADD(CString& pPacket);
 		bool msgPLI_ITEMDEL(CString& pPacket);
+		bool msgPLI_CLAIMPKER(CString& pPacket);
 
 		bool msgPLI_OPENCHEST(CString& pPacket);
 

@@ -480,7 +480,9 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 			break;
 
 			case PLPROP_RATING:
-				pPacket.readGInt();
+				len = pPacket.readGInt();
+				//rating = (float)((len >> 9) & 0xFFF);
+				//oldDeviation = deviation = (float)(len & 0x1FF);
 			break;
 /*
 			case PLPROP_UNKNOWN42:

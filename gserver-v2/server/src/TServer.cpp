@@ -165,6 +165,18 @@ TWeapon* TServer::getWeapon(const CString& name)
 	return 0;
 }
 
+TPlayer* TServer::getPlayer(const unsigned int id)
+{
+	if (id >= playerIds.size()) return 0;
+	return playerIds[id];
+}
+
+TNPC* TServer::getNPC(const unsigned int id)
+{
+	if (id >= npcIds.size()) return 0;
+	return npcIds[id];
+}
+
 TNPC* TServer::addNewNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC)
 {
 	// New Npc

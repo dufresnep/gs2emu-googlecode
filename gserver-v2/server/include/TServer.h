@@ -32,6 +32,7 @@ class TServer
 		// Get functions.
 		CSettings& getSettings()				{ return settings; }
 		std::vector<TPlayer*>& getPlayerList()	{ return playerList; }
+		std::vector<TPlayer*>& getPlayerIdList(){ return playerIds; }
 		std::vector<TNPC*>& getNPCList()		{ return npcList; }
 		std::vector<TNPC*>& getNPCIdList()		{ return npcIds; }
 		std::vector<TLevel*>& getLevelList()	{ return levelList; }
@@ -43,6 +44,8 @@ class TServer
 		CLog& getRCLog()						{ return rclog; }
 		
 		TWeapon* getWeapon(const CString& name);
+		TPlayer* getPlayer(const unsigned int id);
+		TNPC* getNPC(const unsigned int id);
 
 		TNPC* addNewNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC = true);
 

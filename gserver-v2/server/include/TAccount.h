@@ -108,6 +108,12 @@ class TAccount
 		bool hasChest(const TLevelChest *pChest, const CString& pLevel = "");
 		bool hasWeapon(const CString& pWeapon);
 
+		// set functions
+		void setLastSparTime(time_t newTime)		{ lastSparTime = newTime; }
+		void setApCounter(int newTime)				{ apCounter = newTime; }
+		void setKills(int newKills)					{ kills = newKills; }
+		void setRating(int newRate, int newDeviate)	{ rating = (float)newRate; deviation = (float)newDeviate; }
+
 	protected:
 		TServer* server;
 

@@ -1,4 +1,5 @@
 #include <time.h>
+#include <math.h>
 #include "ICommon.h"
 #include "CSocket.h"
 #include "TServer.h"
@@ -118,6 +119,7 @@ void createPLFunctions()
 	TPLFunc[PLI_THROWCARRIED] = &TPlayer::msgPLI_THROWCARRIED;
 	TPLFunc[PLI_ITEMADD] = &TPlayer::msgPLI_ITEMADD;
 	TPLFunc[PLI_ITEMDEL] = &TPlayer::msgPLI_ITEMDEL;
+	TPLFunc[PLI_CLAIMPKER] = &TPlayer::msgPLI_CLAIMPKER;
 
 	TPLFunc[PLI_OPENCHEST] = &TPlayer::msgPLI_OPENCHEST;
 
@@ -687,7 +689,7 @@ bool TPlayer::msgPLI_NPCPROPS(CString& pPacket)
 	//for (int i = 0; i < pPacket.length(); ++i) printf( "%02x ", (unsigned char)pPacket[i] );
 	//printf( "\n" );
 
-	TNPC* npc = (TNPC*)(server->getNPCIdList())[npcId];
+	TNPC* npc = server->getNPC(npcId);
 	if (npc == 0)
 		return true;
 
@@ -799,6 +801,89 @@ bool TPlayer::msgPLI_ITEMDEL(CString& pPacket)
 	// If this is a PLI_ITEMTAKE packet, give the item to the player.
 	if (pPacket[0] - 32 == PLI_ITEMTAKE)
 		this->setProps(TLevelItem::getItemPlayerProp(item, this), true, true);
+
+	return true;
+}
+
+bool TPlayer::msgPLI_CLAIMPKER(CString& pPacket)
+{
+	// Get the player who killed us.
+	int pId = pPacket.readGShort();
+	TPlayer* player = server->getPlayer(pId);
+	if (player == 0 || player == this) return true;
+
+	// Sparring zone rating code.
+	// Uses the glicko rating system.
+	if ( level->getSparringZone() )
+	{
+		// Get some stats we are going to use.
+		// Need to parse the other player's PLPROP_RATING.
+		int otherRating = player->getProp(PLPROP_RATING).readGInt();
+		float oldStats[4] = { rating, deviation, (float)((otherRating >> 9) & 0xFFF), (float)(otherRating & 0x1FF) };
+
+		// If the IPs are the same, don't update the rating to prevent cheating.
+		if (this->getProp(PLPROP_LASTIP).readGInt5() == player->getProp(PLPROP_LASTIP).readGInt5()) return true;
+
+		float gSpar[2] = {1.0f / pow((1.0f+3.0f*pow(0.0057565f,2)*(pow(oldStats[3],2))/pow(3.14159265f,2)),0.5f),	//Winner
+					  	  1.0f / pow((1.0f+3.0f*pow(0.0057565f,2)*(pow(oldStats[1],2))/pow(3.14159265f,2)),0.5f)};	//Loser
+		float ESpar[2] = {1.0f / (1.0f + pow(10.0f,(-gSpar[1]*(oldStats[2]-oldStats[0])/400.0f))),					//Winner
+						  1.0f / (1.0f + pow(10.0f,(-gSpar[0]*(oldStats[0]-oldStats[2])/400.0f)))};					//Loser
+		float dSpar[2] = {1.0f / (pow(0.0057565f,2)*pow(gSpar[0],2)*ESpar[0]*(1.0f-ESpar[0])),						//Winner
+						  1.0f / (pow(0.0057565f,2)*pow(gSpar[1],2)*ESpar[1]*(1.0f-ESpar[1]))};						//Loser
+
+		float tWinRating = oldStats[2] + (0.0057565f / ( 1.0f / pow(oldStats[3],2) + 1.0f/dSpar[0])) * (gSpar[0] * (1.0f - ESpar[0]));
+		float tLoseRating = oldStats[0] + (0.0057565f / ( 1.0f / pow(oldStats[1],2) + 1.0f/dSpar[1])) * (gSpar[1] * (0.0f - ESpar[1]));
+  		float tWinDeviation = pow((1.0f/(1.0f/pow(oldStats[3],2)+1/dSpar[0])),0.5f);
+  		float tLoseDeviation = pow((1.0f/(1.0f/pow(oldStats[1],2)+1/dSpar[1])),0.5f);
+
+		// Cap the rating.
+		tWinRating = clip( tWinRating, 0.0f, 4000.0f );
+		tLoseRating = clip( tLoseRating, 0.0f, 4000.0f );
+		tWinDeviation = clip( tWinDeviation, 50.0f, 350.0f );
+		tLoseDeviation = clip( tLoseDeviation, 50.0f, 350.0f );
+
+		// Update the Ratings.
+		// setProps will cause it to grab the new rating and send it to everybody in the level.
+		// Therefore, just pass a dummy value.  setProps doesn't alter your rating for packet hacking reasons.
+		if ( oldStats[0] != tLoseRating || oldStats[1] != tLoseDeviation )
+		{
+			setRating((int)tLoseRating, (int)tLoseDeviation);
+			this->setProps(CString() >> (char)PLPROP_RATING >> (int)0, true);
+		}
+		if ( oldStats[2] != tWinRating || oldStats[3] != tWinDeviation )
+		{
+			player->setRating((int)tWinRating, (int)tWinDeviation);
+			player->setProps(CString() >> (char)PLPROP_RATING >> (int)0, true);
+		}
+		this->setLastSparTime(time(0));
+		player->setLastSparTime(time(0));
+	}
+	else
+	{
+		CSettings* settings = &(server->getSettings());
+
+		// Give a kill to the player who killed me.
+		if (settings->getBool("dontchangekills", false) == false)
+			player->setKills(player->getProp(PLPROP_KILLSCOUNT).readGInt() + 1);
+
+		// Now, adjust their AP if allowed.
+		if (settings->getBool("apsystem", true))
+		{
+			char oAp = player->getProp(PLPROP_ALIGNMENT).readGChar();
+
+			// If I have 20 or more AP, they lose AP.
+			if (oAp > 0 && ap > 19)
+			{
+				int aptime[] = {settings->getInt("aptime0", 30), settings->getInt("aptime1", 90),
+					settings->getInt("aptime2", 300), settings->getInt("aptime3", 600),
+					settings->getInt("aptime4", 1200)};
+				oAp -= (((oAp / 20) + 1) * (ap / 20));
+				if (oAp < 0) oAp = 0;
+				player->setApCounter((oAp < 20 ? aptime[0] : (oAp < 40 ? aptime[1] : (oAp < 60 ? aptime[2] : (oAp < 80 ? aptime[3] : aptime[4])))));
+				player->setProps(CString() >> (char)PLPROP_ALIGNMENT >> (char)ap, true, true);
+			}
+		}
+	}
 
 	return true;
 }
