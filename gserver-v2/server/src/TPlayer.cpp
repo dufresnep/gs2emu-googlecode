@@ -715,7 +715,7 @@ bool TPlayer::msgPLI_WANTFILE(CString& pPacket)
 
 bool TPlayer::msgPLI_NPCWEAPONIMG(CString& pPacket)
 {
-	// TODO
+	server->sendPacketToLevel(CString() >> (char)PLO_NPCWEAPONIMG >> (short)id << pPacket.text() + 1, level, this);
 	return true;
 }
 
