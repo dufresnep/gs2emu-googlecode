@@ -125,11 +125,19 @@ CString CString::readChars(int pLength)
 CString CString::readString(const CString& pString)
 {
 	retVal.clear();
+	if (readc > sizec) return retVal;
+
 	int len;
 	len = (pString.isEmpty() ? -1 : find(pString, readc) - readc);
 	len = (len < 0 ? bytesLeft() : len);
 	len = (len > bytesLeft() ? bytesLeft() : len); //
 	retVal.write(&buffer[readc], len);
+
+	// If len was set to bytesLeft(), it MIGHT have pString.
+	int len2;
+	if ((len2 = retVal.find(pString)) != -1)
+		retVal.removeI(len2, pString.length());
+
 	readc += len + pString.length();
 	//readc = (readc > sizec ? sizec : readc); // GO
 	return retVal;
@@ -221,9 +229,8 @@ CString CString::remove(int pStart, int pLength) const
 	if (pStart >= sizec)
 		return retVal;
 
-//	pLength = clip(pLength+pStart, 0, retVal.length()-pStart);
 	pLength = clip(pLength, 0, retVal.length()-pStart);
-	memmove(retVal.text() + pStart, retVal.text() + pStart + pLength, retVal.length() - pStart - pLength);
+	memmove(retVal.text() + pStart, retVal.text() + pStart + pLength, retVal.length() - pStart - (pLength - 1));
 	retVal.setSize(retVal.length() - pLength);
 	retVal[retVal.length()] = 0;
 	return retVal;
@@ -355,7 +362,7 @@ int CString::find(const CString& pString, int pStart) const
 {
 	char* loc = strstr(buffer + pStart, pString.text());
 	if (loc == 0) return -1;
-	return (int)(loc - (buffer - pStart));
+	return (int)(loc - buffer);
 }
 
 int CString::findi(const CString& pString, int pStart) const

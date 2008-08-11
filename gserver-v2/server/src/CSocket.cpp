@@ -650,7 +650,7 @@ int CSocket::setState(int iState)
 const char* CSocket::tcpIp()
 {
 	char* hostret;
-	char host[1025];
+	static char host[1025];
 	memset((void*)host, 0, 1025);
 
 	// Grab the IP address.

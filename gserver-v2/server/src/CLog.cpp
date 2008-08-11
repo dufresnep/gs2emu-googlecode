@@ -60,7 +60,7 @@ void CLog::out(const CString format, ...)
 
 void CLog::clear()
 {
-	fclose(file);
+	if (file) fclose(file);
 
 	file = fopen((homepath + filename).text(), "w");
 	if (0 == file)

@@ -80,7 +80,7 @@ void TPlayer::sendLoginClient()
 	// setLevel will call sendCompress() for us.
 	// TODO: Send correct level.
 	printf("TODO: TPlayer::sendLoginClient, Send correct level to player.\n");
-	setLevel(CString() << /*homepath <<*/ "world/onlinestartlocal.nw");
+	setLevel(CString() << server->getServerPath() << "world/onlinestartlocal.nw");
 
 	// Recalculate player spar deviation.
 	printf("TODO: TPlayer::sendLoginClient, Recalculate sparring deviation.\n");

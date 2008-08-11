@@ -28,6 +28,7 @@ int main(int argc, char* argv[])
 	signal(SIGINT, (sighandler_t) shutdownServer);
 	signal(SIGTERM, (sighandler_t) shutdownServer);
 
+	getBasePath();
 	serverlog.out("Starting server\n");
 
 	// Load Server Settings
@@ -80,8 +81,9 @@ int main(int argc, char* argv[])
 			if (server->doMain() == false)
 			{
 				delete server;
-				serverList.erase(i);
+				i = serverList.erase(i);
 			}
+			else ++i;
 		}
 
 		// Wait
