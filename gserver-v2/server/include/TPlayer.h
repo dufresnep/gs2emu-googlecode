@@ -52,7 +52,7 @@ enum
 	PLO_LEVELCHEST		= 4,
 	PLO_LEVELSIGN		= 5,
 	PLO_LEVELNAME		= 6,
-
+	PLO_BOARDMODIFY		= 7,
 	PLO_OTHERPLPROPS	= 8,
 	PLO_PLAYERPROPS		= 9,
 	PLO_ISLEADER		= 10,
@@ -131,6 +131,9 @@ class TPlayer : public TAccount
 		void sendCompress();
 		void sendPacket(CString pPacket);
 
+		// Misc functions.
+		bool doTimedEvents();
+
 		// Packet-Functions
 		bool msgPLI_NULL(CString& pPacket);
 		bool msgPLI_LOGIN(CString& pPacket);
@@ -166,9 +169,6 @@ class TPlayer : public TAccount
 		bool parsePacket(CString& pPacket);
 		void decryptPacket(CString& pPacket);
 
-		// Misc functions.
-		bool doTimedEvents();
-
 		// Socket Variables
 		CSocket *playerSock;
 		CString rBuffer, sBuffer;
@@ -188,7 +188,6 @@ class TPlayer : public TAccount
 		TLevel *level;
 		int id, type;
 		time_t lastData, lastMovement, lastChat, lastMessage;
-		time_t lastTimer;
 		TServer* server;
 		std::vector<SCachedLevel*> cachedLevels;
 };

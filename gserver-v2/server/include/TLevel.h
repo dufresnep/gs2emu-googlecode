@@ -6,6 +6,7 @@
 #include "ICommon.h"
 #include "TServer.h"
 #include "TLevelBaddy.h"
+#include "TLevelBoardChange.h"
 #include "TLevelChest.h"
 #include "TLevelHorse.h"
 #include "TLevelItem.h"
@@ -21,11 +22,6 @@ class TLevel
 		TLevel();
 		~TLevel();
 
-/*
-		CString getEntityPacket(); // baddy-horse-items
-		CString getLevelPacket();  // chests-links-tiles
-		CString getNpcsPacket();   // npcs
-*/
 		// get crafted packets
 		CString getBaddyPacket();
 		CString getBoardPacket();
@@ -48,12 +44,17 @@ class TLevel
 		short* getTiles();
 		time_t getModTime()		{ return modTime; }
 
+		// other functions
+		bool alterBoard(CString& pTileData, int pX, int pY, int pWidth, int pHeight, TPlayer* player, TServer* server);
+		bool doTimedEvents();
+
 	private:
 		time_t modTime;
 		bool levelSpar;
 		short levelTiles[4096];
 		CString fileName, fileVersion, levelName;
 		std::vector<TLevelBaddy *> levelBaddys;
+		std::vector<TLevelBoardChange *> levelBoardChanges;
 		std::vector<TLevelChest *> levelChests;
 		std::vector<TLevelHorse *> levelHorses;
 		std::vector<TLevelItem *> levelItems;

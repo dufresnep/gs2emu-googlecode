@@ -139,7 +139,6 @@ id(0), type(CLIENTTYPE_AWAIT), server(pServer)
 {
 	// TODO: lastChat and lastMessage
 	lastData = lastMovement = lastChat = lastMessage = time(0);
-	lastTimer = time(0);
 	printf("Created for: %s\n", playerSock->tcpIp());
 }
 
@@ -219,9 +218,6 @@ bool TPlayer::doMain()
 			return false;
 	}
 
-	// Every second, do some events.
-	if (time(0) != lastTimer) doTimedEvents();
-
 	// send out buffer
 	sendCompress();
 	return true;
@@ -229,7 +225,7 @@ bool TPlayer::doMain()
 
 bool TPlayer::doTimedEvents()
 {
-	lastTimer = time(0);
+	time_t currTime = time(0);
 
 	// Only run for clients.
 	if (type != CLIENTTYPE_CLIENT) return true;
@@ -241,7 +237,7 @@ bool TPlayer::doTimedEvents()
 	CSettings* settings = &(server->getSettings());
 	if (settings->getBool("disconnectifnotmoved"))
 	{
-		if ((int)difftime(lastTimer, lastMovement) > settings->getInt("maxnomovement", 1200))
+		if ((int)difftime(currTime, lastMovement) > settings->getInt("maxnomovement", 1200))
 		{
 			serverlog.out("Client %s has been disconnected due to inactivity.\n", accountName.text());
 			sendPacket(CString() >> (char)PLO_DISCMESSAGE << "You have been disconnected due to inactivity.");
@@ -250,7 +246,7 @@ bool TPlayer::doTimedEvents()
 	}
 
 	// Disconnect if no data has been received in 5 minutes.
-	if ((int)difftime(lastTimer, lastData) > 300)
+	if ((int)difftime(currTime, lastData) > 300)
 	{
 		serverlog.out("Client %s has timed out.\n", accountName.text());
 		return false;
@@ -266,7 +262,7 @@ bool TPlayer::doTimedEvents()
 			if (ap < 100)
 			{
 				ap++;
-				// TODO: updateProp
+				setProps(CString() >> (char)PLPROP_ALIGNMENT >> (char)ap, true);
 			}
 			if (ap < 20) apCounter = settings->getInt("aptime0", 30);
 			else if (ap < 40) apCounter = settings->getInt("aptime1", 90);
@@ -620,9 +616,11 @@ bool TPlayer::msgPLI_BOARDMODIFY(CString& pPacket)
 	CSettings* settings = &(server->getSettings());
 	signed char loc[2] = {pPacket.readGChar(), pPacket.readGChar()};
 	signed char dim[2] = {pPacket.readGChar(), pPacket.readGChar()};
-	CString tiles = pPacket.subString(5);
+	CString tiles = pPacket.readString("");
 
-	// TODO: Alter level data.
+	// Alter level data.
+	if (level->alterBoard(tiles, loc[0], loc[1], dim[0], dim[1], this, server))
+		server->sendPacketToLevel(CString() >> (char)PLO_BOARDMODIFY << pPacket.text() + 1, level);
 
 	if (loc[0] < 0 || loc[0] > 63 || loc[1] < 0 || loc[1] > 63) return true;
 

@@ -10,7 +10,6 @@
 	Global Variables
 */
 CString base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-std::vector<TLevel *> levelList;
 
 /*
 	TLevel: Constructor - Deconstructor
@@ -255,6 +254,8 @@ bool TLevel::loadNW(const CString& pLevelName, TServer* server)
 */
 TLevel * TLevel::findLevel(const CString& pLevelName, TServer* server)
 {
+	std::vector<TLevel*> levelList = server->getLevelList();
+
 	// Find Appropriate Level by Name
 	for (std::vector<TLevel *>::iterator i = levelList.begin(); i != levelList.end(); )
 	{
@@ -281,4 +282,139 @@ TLevel * TLevel::findLevel(const CString& pLevelName, TServer* server)
 	// Return Level
 	levelList.push_back(level);
 	return level;
+}
+
+short respawningTiles[10] = {
+	0x01ff, 0x03ff, 0x02ac, 0x0002, 0x0200,
+	0x0022, 0x03de, 0x01a4, 0x014a, 0x0674,
+};
+
+bool TLevel::alterBoard(CString& pTileData, int pX, int pY, int pWidth, int pHeight, TPlayer* player, TServer* server)
+{
+	if( pX < 0 || pY < 0 || pX > 63 || pY > 63 ||
+		pWidth < 1 || pHeight < 1 ||
+		pX + pWidth > 64 || pY + pHeight > 64 )
+		return false;
+
+	CSettings* settings = &(server->getSettings());
+
+	// Do the check for the push-pull block.
+	if (pWidth == 4 && pHeight == 4 && settings->getBool("clientsidepushpull", true))
+	{
+		// Try to find the top-left corner tile.
+		int i;
+		for (i = 0; i < 16; ++i)
+		{
+			short stoneCheck = pTileData.readGShort();
+			if (stoneCheck == 0x06E4 || stoneCheck == 0x07CE)
+				break;
+		}
+
+		// Check if we found a possible push-pull block.
+		if (i != 16 && i < 11)
+		{
+			// Go back one full short so the first readByte2() returns the top-left corner.
+			pTileData.setRead(i * 2);
+
+			int foundCount = 0;
+			for (int j = 0; j < 6; ++j)
+			{
+				// Read a piece.
+				short stoneCheck = pTileData.readGShort();
+
+				// A valid stone will have pieces at the following j locations.
+				if (j == 0 || j == 1 || j == 4 || j == 5)
+				{
+					switch (stoneCheck)
+					{
+						// red
+						case 0x6E4:
+						case 0x6E5:
+						case 0x6F4:
+						case 0x6F5:
+						// blue
+						case 0x7CE:
+						case 0x7CF:
+						case 0x7DE:
+						case 0x7DF:
+							foundCount++;
+							break;
+					}
+				}
+			}
+			pTileData.setRead(0);
+
+			// Check if we found a full tile.  If so, don't accept the change.
+			if (foundCount == 4)
+			{
+				player->sendPacket(CString() >> (char)PLO_BOARDMODIFY >> (char)pX >> (char)pY >> (char)pWidth >> (char)pHeight << pTileData);
+				return false;
+			}
+		}
+	}
+
+	// Delete any existing changes within the same region.
+	for (std::vector<TLevelBoardChange*>::iterator i = levelBoardChanges.begin(); i != levelBoardChanges.end(); )
+	{
+		TLevelBoardChange* change = *i;
+		if ((change->getX() >= pX && change->getX() + change->getWidth() <= pX + pWidth) &&
+			(change->getY() >= pY && change->getY() + change->getHeight() <= pY + pHeight))
+		{
+			delete change;
+			i = levelBoardChanges.erase(i);
+		} else ++i;
+	}
+
+	// Check if the tiles should be respawned.
+	// Only tiles in the respawningTiles array are allowed to respawn.
+	// These are things like signs, bushes, pots, etc.
+	pTileData.setRead(0);
+	int respawnTime = settings->getInt("respawntime", 15);
+	bool doRespawn = false;
+	short testTile = pTileData.readGShort();
+	for (int i = 0; i < 10; ++i)
+		if (testTile == respawningTiles[i])
+			doRespawn = true;
+
+	// Grab old tiles for the respawn.
+	CString oldTiles;
+	if (doRespawn)
+	{
+		for (int i = pX; i < pX + pWidth; ++i)
+		{
+			for (int j = pY; j < pY + pHeight; ++j)
+				oldTiles.writeGShort(levelTiles[i + (j * 64)]);
+		}
+	}
+
+	// TODO: old gserver didn't save the board change if oldTiles.length() == 0.
+	// Should we do it that way still?
+	levelBoardChanges.push_back(new TLevelBoardChange(pX, pY, pWidth, pHeight, pTileData, oldTiles, (oldTiles.length() != 0 ? respawnTime : -1)));
+	return true;
+}
+
+bool TLevel::doTimedEvents()
+{
+	for (std::vector<TLevelBoardChange*>::iterator i = levelBoardChanges.begin(); i != levelBoardChanges.end(); ++i)
+	{
+		TLevelBoardChange* change = *i;
+		if (change->getRespawn() == 0)
+		{
+			// Put the old data back in.  DON'T DELETE THE CHANGE.
+			// The client remembers board changes and if we delete the
+			// change, the client won't get the new data.
+			change->swapTiles();
+			change->setModTime(time(0));
+			change->setRespawn(-1);
+		}
+		else change->setRespawn(change->getRespawn() - 1);
+	}
+
+	// TODO: item timeout.
+
+	// TODO: horse timeout.
+
+	// TODO: baddy respawn.
+
+	return true;
 }

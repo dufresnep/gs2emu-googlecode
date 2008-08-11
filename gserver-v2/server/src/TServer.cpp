@@ -7,7 +7,7 @@
 extern CString homepath;
 
 TServer::TServer(CString pName)
-: name(pName)
+: name(pName), lastTimer(time(0))
 {
 	// Player ids 0 and 1 break things.  NPC id 0 breaks things.
 	// Don't allow anything to have one of those ids.
@@ -93,6 +93,36 @@ bool TServer::doMain()
 			i = playerList.erase(i);
 		}
 		else ++i;
+	}
+
+	// Every second, do some events.
+	if (time(0) != lastTimer) doTimedEvents();
+
+	return true;
+}
+
+bool TServer::doTimedEvents()
+{
+	lastTimer = time(0);
+
+	// Do player events.
+	for (std::vector<TPlayer *>::iterator i = playerList.begin(); i != playerList.end(); ++i)
+	{
+		TPlayer *player = (TPlayer*)*i;
+		if (player == 0)
+			continue;
+
+		player->doTimedEvents();
+	}
+
+	// Do level events.
+	for (std::vector<TLevel *>::iterator i = levelList.begin(); i != levelList.end(); ++i)
+	{
+		TLevel* level = *i;
+		if (level == 0)
+			continue;
+
+		level->doTimedEvents();
 	}
 
 	return true;

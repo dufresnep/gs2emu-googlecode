@@ -33,6 +33,7 @@ class TServer
 		std::vector<TPlayer*>& getPlayerList()	{ return playerList; }
 		std::vector<TNPC*>& getNPCList()		{ return npcList; }
 		std::vector<TNPC*>& getNPCIdList()		{ return npcIds; }
+		std::vector<TLevel*>& getLevelList()	{ return levelList; }
 		TServerList& getServerList()			{ return serverlist; }
 		CFileSystem& getFileSystem()			{ return filesystem; }
 		CString getServerPath()					{ return serverpath; }
@@ -51,11 +52,13 @@ class TServer
 
 
 	private:
+		bool doTimedEvents();
 		void acceptSock(CSocket& pSocket);
 
 		CSettings settings;
 		std::vector<TPlayer*> playerIds, playerList;
 		std::vector<TNPC*> npcIds, npcList;
+		std::vector<TLevel*> levelList;
 		CSocket playerSock, serverSock;
 		TServerList serverlist;
 		CFileSystem filesystem;
@@ -64,6 +67,8 @@ class TServer
 
 		CLog serverlog;//("logs/serverlog.txt");
 		CLog rclog;//("logs/rclog.txt");
+
+		time_t lastTimer;
 };
 
 #endif
