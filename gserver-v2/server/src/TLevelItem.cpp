@@ -19,6 +19,12 @@ int TLevelItem::getItemId(const CString& pItemName)
 	return -1;
 }
 
+CString TLevelItem::getItemName(const unsigned char id)
+{
+	if (id >= sizeof(__itemList) / sizeof(char*)) return CString();
+	return CString(__itemList[id]);
+}
+
 CString TLevelItem::getItemPlayerProp(const char pItemId, TPlayer* player)
 {
 	return TLevelItem::getItemPlayerProp(__itemList[pItemId], player);

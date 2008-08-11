@@ -561,7 +561,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 				gmapx >>= 1;
 				if ((short)len & 0x0001)
 					gmapx = -gmapx;
-				printf( "gmap x: %d\n", gmapx );
+				//printf( "gmap x: %d\n", gmapx );
 				break;
 
 			case PLPROP_GMAPY:
@@ -572,7 +572,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 				gmapy >>= 1;
 				if ((short)len & 0x0001)
 					gmapy = -gmapy;
-				printf( "gmap y: %d\n", gmapy );
+				//printf( "gmap y: %d\n", gmapy );
 				break;
 
 			case PLPROP_GMAPLEVELX:

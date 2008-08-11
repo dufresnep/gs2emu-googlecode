@@ -131,7 +131,22 @@ bool TPlayer::sendLoginClient()
 	printf("TODO: TPlayer::sendLoginClient, Send the start message to the player.\n");
 
 	// Send the player's weapons.
-	printf("TODO: TPlayer::sendLoginClient, Send weapons to player.\n");
+	for (std::vector<CString>::iterator i = weaponList.begin(); i != weaponList.end(); ++i)
+	{
+		TWeapon* weapon = server->getWeapon(*i);
+		if (weapon == 0)
+		{
+			// Let's check to see if it is a default weapon.  If so, we can add it to the server now.
+			int wId = TLevelItem::getItemId(*i);
+			if (wId != -1)
+			{
+				CString defWeapPacket = CString() >> (char)0 >> (char)wId;
+				msgPLI_WEAPONADD(defWeapPacket);
+				continue;
+			}
+		}
+		sendPacket(weapon->getWeaponPacket());
+	}
 
 	// Send the player's flags.
 	printf("TODO: TPlayer::sendLoginClient, Send flags to the player.\n");

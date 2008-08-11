@@ -120,7 +120,6 @@ CString TNPC::getProp(int pId) const
 		return CString() >> (char)chatMsg.subString(0, 200).length() << chatMsg.subString(0, 200);
 
 		case NPCPROP_HURTDXDY:
-		// TODO: These might be formatted the same way the player GMAPX/Y props are.  Check.
 		return CString() >> (char)(hurtX*32)+32 >> (char)(hurtY*32)+32;
 
 		case NPCPROP_ID:
@@ -481,6 +480,7 @@ std::vector<CString> removeComments(const CString& code)
 					outLine.clear();
 				}
 				line.removeI(slc_start, line.length());
+				doLoop = false;
 				continue;
 			}
 

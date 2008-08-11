@@ -696,7 +696,7 @@ bool TPlayer::msgPLI_NPCPROPS(CString& pPacket)
 
 	CString packet = CString() >> (char)PLO_NPCPROPS << pPacket.text() + 1;
 	server->sendPacketToLevel(packet, level, this);
-	npc->setProps(pPacket.readString(""));
+	npc->setProps(npcProps);
 
 	return true;
 }
@@ -787,7 +787,6 @@ bool TPlayer::msgPLI_ITEMADD(CString& pPacket)
 
 bool TPlayer::msgPLI_ITEMDEL(CString& pPacket)
 {
-	for (int i = 0; i < pPacket.length(); ++i) printf("%02x ", (unsigned char)pPacket[i]); printf("\n");
 	server->sendPacketToLevel(CString() >> (char)PLO_ITEMDEL << pPacket.text() + 1, level, this);
 
 	float iX = (float)pPacket.readGUChar() / 2.0f;
@@ -861,10 +860,9 @@ bool TPlayer::msgPLI_NPCWEAPONIMG(CString& pPacket)
 bool TPlayer::msgPLI_NPCWEAPONDEL(CString& pPacket)
 {
 	CString weapon = pPacket.readString("");
-	for (std::vector<TWeapon*>::iterator i = weaponList.begin(); i != weaponList.end(); )
+	for (std::vector<CString>::iterator i = weaponList.begin(); i != weaponList.end(); )
 	{
-		TWeapon* weap = *i;
-		if (weap->getName() == weapon)
+		if (*i == weapon)
 			i = weaponList.erase(i);
 		else ++i;
 	}
@@ -879,6 +877,8 @@ bool TPlayer::msgPLI_WEAPONADD(CString& pPacket)
 	// Type 0 means it is a default weapon.
 	if (type == 0)
 	{
+		std::vector<TWeapon*>* weaponList = &(server->getWeaponList());
+
 		if (settings->getBool("defaultweapons", true) == false)
 			return true;
 
@@ -888,6 +888,14 @@ bool TPlayer::msgPLI_WEAPONADD(CString& pPacket)
 			allowBomb = true;
 			return true;
 		}
+
+		TWeapon* weapon = server->getWeapon(TLevelItem::getItemName(item));
+		if (weapon == 0)
+		{
+			weapon = new TWeapon(item);
+			weaponList->push_back(weapon);
+		}
+		sendPacket(CString() << weapon->getWeaponPacket());
 	}
 	// NPC weapons.
 	else
@@ -907,16 +915,7 @@ bool TPlayer::msgPLI_WEAPONADD(CString& pPacket)
 			return true;
 
 		// See if we can find the weapon in the server weapon list.
-		TWeapon* weapon = 0;
-		for (std::vector<TWeapon*>::iterator i = weaponList->begin(); i != weaponList->end(); ++i)
-		{
-			TWeapon* search = *i;
-			if (search->getName() == name)
-			{
-				weapon = search;
-				break;
-			}
-		}
+		TWeapon* weapon = server->getWeapon(name);
 
 		// If weapon is 0, that means the NPC was not found.  Add the NPC to the list.
 		if (weapon == 0)
@@ -934,15 +933,11 @@ bool TPlayer::msgPLI_WEAPONADD(CString& pPacket)
 			for (std::vector<TPlayer*>::iterator i = playerList.begin(); i != playerList.end(); ++i)
 			{
 				TPlayer* player = *i;
-				for (std::vector<TWeapon*>::iterator j = player->getWeaponList().begin(); j != player->getWeaponList().end(); ++j)
+				if (player->hasWeapon(weapon->getName()))
 				{
-					TWeapon* pWeapon = *j;
-					if (weapon == pWeapon)
-					{
-						if (player == this) foundThis = true;
-						player->sendPacket(CString() >> (char)PLO_NPCWEAPONDEL << weapon->getName());
-						player->sendPacket(CString() << weapon->getWeaponPacket());
-					}
+					if (player == this) foundThis = true;
+					player->sendPacket(CString() >> (char)PLO_NPCWEAPONDEL << weapon->getName());
+					player->sendPacket(CString() << weapon->getWeaponPacket());
 				}
 			}
 		}
@@ -976,7 +971,6 @@ bool TPlayer::msgPLI_UPDATEFILE(CString& pPacket)
 
 bool TPlayer::msgPLI_ADJACENTLEVEL(CString& pPacket)
 {
-	return true;
 	time_t modTime = pPacket.readGUInt5();
 	CString levelName = pPacket.readString("");
 	CString packet;
@@ -1007,7 +1001,7 @@ bool TPlayer::msgPLI_ADJACENTLEVEL(CString& pPacket)
 		// Send links, board changes, chests, and modification time.
 		sendPacket(CString() >> (char)PLO_LEVELMODTIME >> (long long)adjacentLevel->getModTime());
 		sendPacket(CString() << adjacentLevel->getLinksPacket());
-		sendPacket(CString() << adjacentLevel->getBoardPacket());
+		sendPacket(CString() << adjacentLevel->getBoardChangesPacket());
 		sendPacket(CString() << adjacentLevel->getChestPacket(this));
 	}
 

@@ -154,6 +154,17 @@ void TServer::acceptSock(CSocket& pSocket)
 	playerIds.push_back(newPlayer);
 }
 
+TWeapon* TServer::getWeapon(const CString& name)
+{
+	for (std::vector<TWeapon*>::iterator i = weaponList.begin(); i != weaponList.end(); ++i)
+	{
+		TWeapon* weapon = *i;
+		if (weapon->getName() == name)
+			return weapon;
+	}
+	return 0;
+}
+
 TNPC* TServer::addNewNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC)
 {
 	// New Npc

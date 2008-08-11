@@ -82,6 +82,7 @@ enum
 	PLO_NPCWEAPONADD	= 33,
 	PLO_NPCWEAPONDEL	= 34,
 	PLO_LEVELMODTIME	= 39,
+	PLO_DEFAULTWEAPON	= 43,
 	PLO_STAFFGUILDS		= 47,
 	PLO_TRIGGERACTION	= 48,
 	PLO_EMPTY49			= 49,	// Causes level to freeze with "Loading" for some reason.  Might be server-side setlevel.
@@ -140,9 +141,6 @@ class TPlayer : public TAccount
 		void setProps(CString& pPacket, bool pForward = false, bool pForwardToSelf = false);
 		void sendProps(bool *pProps, int pCount);
 		CString getProps(bool *pProps, int pCount);
-
-		// Weapons
-		std::vector<TWeapon*>& getWeaponList()		{ return weaponList; }
 
 		// Socket-Functions
 		bool doMain();
@@ -215,7 +213,6 @@ class TPlayer : public TAccount
 		time_t lastData, lastMovement, lastChat, lastMessage;
 		TServer* server;
 		std::vector<SCachedLevel*> cachedLevels;
-		std::vector<TWeapon*> weaponList;
 		bool allowBomb;
 		bool hadBomb;
 };

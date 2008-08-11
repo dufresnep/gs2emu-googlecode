@@ -17,6 +17,7 @@ class TLevelItem
 
 		// Static functions.
 		static int getItemId(const CString& pItemName);
+		static CString getItemName(const unsigned char id);
 		static CString getItemPlayerProp(const char pItemId, TPlayer* player);
 		static CString getItemPlayerProp(const CString& pItemName, TPlayer* player);
 

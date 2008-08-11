@@ -273,7 +273,7 @@ bool TAccount::hasChest(const TLevelChest *pChest, const CString& pLevel)
 bool TAccount::hasWeapon(const CString& pWeapon)
 {
 	// Iterate Weapon List
-	for (std::vector<CString>::iterator i = chestList.begin(); i != chestList.end(); ++i)
+	for (std::vector<CString>::iterator i = weaponList.begin(); i != weaponList.end(); ++i)
 	{
 		if (*i == pWeapon)
 			return true;

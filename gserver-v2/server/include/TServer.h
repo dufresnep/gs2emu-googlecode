@@ -41,6 +41,8 @@ class TServer
 		CString getServerPath()					{ return serverpath; }
 		CLog& getServerLog()					{ return serverlog; }
 		CLog& getRCLog()						{ return rclog; }
+		
+		TWeapon* getWeapon(const CString& name);
 
 		TNPC* addNewNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC = true);
 
