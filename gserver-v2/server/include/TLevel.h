@@ -19,12 +19,13 @@ class TNPC;
 class TLevel
 {
 	public:
-		TLevel();
+		TLevel(TServer* pServer);
 		~TLevel();
 
 		// get crafted packets
 		CString getBaddyPacket();
 		CString getBoardPacket();
+		CString getBoardChangesPacket();
 		CString getChestPacket(TPlayer *pPlayer);
 		CString getHorsePacket();
 		CString getLinksPacket();
@@ -33,9 +34,9 @@ class TLevel
 		inline CString getLevelName();
 
 		// level-loading functions
-		bool loadLevel(const CString& pLevelName, TServer* server);
-		bool loadGraal(const CString& pLevelName, TServer* server);
-		bool loadNW(const CString& pLevelName, TServer* server);
+		bool loadLevel(const CString& pLevelName);
+		bool loadGraal(const CString& pLevelName);
+		bool loadNW(const CString& pLevelName);
 
 		// find level
 		static TLevel * findLevel(const CString& pLevelName, TServer* server);
@@ -45,10 +46,11 @@ class TLevel
 		time_t getModTime()		{ return modTime; }
 
 		// other functions
-		bool alterBoard(CString& pTileData, int pX, int pY, int pWidth, int pHeight, TPlayer* player, TServer* server);
+		bool alterBoard(CString& pTileData, int pX, int pY, int pWidth, int pHeight, TPlayer* player);
 		bool doTimedEvents();
 
 	private:
+		TServer* server;
 		time_t modTime;
 		bool levelSpar;
 		short levelTiles[4096];

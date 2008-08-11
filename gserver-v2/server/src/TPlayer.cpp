@@ -466,7 +466,7 @@ bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTi
 	}
 
 	// Send board changes, chests, horses, and baddies.
-	sendPacket(CString() << level->getBoardPacket());
+	sendPacket(CString() << level->getBoardChangesPacket());
 	sendPacket(CString() << level->getChestPacket(this));
 	sendPacket(CString() << level->getHorsePacket());
 	sendPacket(CString() << level->getBaddyPacket());
@@ -619,7 +619,7 @@ bool TPlayer::msgPLI_BOARDMODIFY(CString& pPacket)
 	CString tiles = pPacket.readString("");
 
 	// Alter level data.
-	if (level->alterBoard(tiles, loc[0], loc[1], dim[0], dim[1], this, server))
+	if (level->alterBoard(tiles, loc[0], loc[1], dim[0], dim[1], this))
 		server->sendPacketToLevel(CString() >> (char)PLO_BOARDMODIFY << pPacket.text() + 1, level);
 
 	if (loc[0] < 0 || loc[0] > 63 || loc[1] < 0 || loc[1] > 63) return true;

@@ -14,9 +14,9 @@ CString base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
 /*
 	TLevel: Constructor - Deconstructor
 */
-TLevel::TLevel()
+TLevel::TLevel(TServer* pServer)
 :
-modTime(0), levelSpar(false)
+server(pServer), modTime(0), levelSpar(false)
 {
 	memset(levelTiles, 0, sizeof(levelTiles));
 }
@@ -38,6 +38,17 @@ CString TLevel::getBoardPacket()
 	CString retVal;
 	retVal.writeGChar(PLO_BOARDPACKET);
 	retVal.write((char *)levelTiles, sizeof(levelTiles));
+	return retVal;
+}
+
+CString TLevel::getBoardChangesPacket()
+{
+	CString retVal;
+	for (std::vector<TLevelBoardChange*>::const_iterator i = levelBoardChanges.begin(); i != levelBoardChanges.end(); ++i)
+	{
+		TLevelBoardChange* change = *i;
+		retVal << change->getBoardStr() << "\n";
+	}
 	return retVal;
 }
 
@@ -112,17 +123,17 @@ CString TLevel::getSignsPacket()
 /*
 	TLevel: Level-Loading Functions
 */
-bool TLevel::loadLevel(const CString& pLevelName, TServer* server)
+bool TLevel::loadLevel(const CString& pLevelName)
 {
-	return (getExtension(pLevelName) == ".nw" ? loadNW(pLevelName, server) : loadGraal(pLevelName, server));
+	return (getExtension(pLevelName) == ".nw" ? loadNW(pLevelName) : loadGraal(pLevelName));
 }
 
-bool TLevel::loadGraal(const CString& pLevelName, TServer* server)
+bool TLevel::loadGraal(const CString& pLevelName)
 {
 	return true;
 }
 
-bool TLevel::loadNW(const CString& pLevelName, TServer* server)
+bool TLevel::loadNW(const CString& pLevelName)
 {
 	CFileSystem fileSystem = server->getFileSystem();
 
@@ -254,14 +265,14 @@ bool TLevel::loadNW(const CString& pLevelName, TServer* server)
 */
 TLevel * TLevel::findLevel(const CString& pLevelName, TServer* server)
 {
-	std::vector<TLevel*> levelList = server->getLevelList();
+	std::vector<TLevel*>* levelList = &(server->getLevelList());
 
 	// Find Appropriate Level by Name
-	for (std::vector<TLevel *>::iterator i = levelList.begin(); i != levelList.end(); )
+	for (std::vector<TLevel *>::iterator i = levelList->begin(); i != levelList->end(); )
 	{
 		if ((*i) == 0)
 		{
-			i = levelList.erase(i);
+			i = levelList->erase(i);
 			continue;
 		}
 
@@ -272,24 +283,24 @@ TLevel * TLevel::findLevel(const CString& pLevelName, TServer* server)
 	}
 
 	// Load New Level
-	TLevel *level = new TLevel();
-	if (!level->loadLevel(pLevelName, server))
+	TLevel *level = new TLevel(server);
+	if (!level->loadLevel(pLevelName))
 	{
 		delete level;
 		return 0;
 	}
 
 	// Return Level
-	levelList.push_back(level);
+	levelList->push_back(level);
 	return level;
 }
 
 short respawningTiles[10] = {
-	0x01ff, 0x03ff, 0x02ac, 0x0002, 0x0200,
-	0x0022, 0x03de, 0x01a4, 0x014a, 0x0674,
+	0x1ff, 0x3ff, 0x2ac, 0x002, 0x200,
+	0x022, 0x3de, 0x1a4, 0x14a, 0x674
 };
 
-bool TLevel::alterBoard(CString& pTileData, int pX, int pY, int pWidth, int pHeight, TPlayer* player, TServer* server)
+bool TLevel::alterBoard(CString& pTileData, int pX, int pY, int pWidth, int pHeight, TPlayer* player)
 {
 	if( pX < 0 || pY < 0 || pX > 63 || pY > 63 ||
 		pWidth < 1 || pHeight < 1 ||
@@ -368,28 +379,26 @@ bool TLevel::alterBoard(CString& pTileData, int pX, int pY, int pWidth, int pHei
 	// Check if the tiles should be respawned.
 	// Only tiles in the respawningTiles array are allowed to respawn.
 	// These are things like signs, bushes, pots, etc.
-	pTileData.setRead(0);
 	int respawnTime = settings->getInt("respawntime", 15);
 	bool doRespawn = false;
-	short testTile = pTileData.readGShort();
+	short testTile = levelTiles[pX + (pY * 64)];
 	for (int i = 0; i < 10; ++i)
-		if (testTile == respawningTiles[i])
-			doRespawn = true;
+		if (testTile == respawningTiles[i]) doRespawn = true;
 
 	// Grab old tiles for the respawn.
 	CString oldTiles;
 	if (doRespawn)
 	{
-		for (int i = pX; i < pX + pWidth; ++i)
+		for (int j = pY; j < pY + pHeight; ++j)
 		{
-			for (int j = pY; j < pY + pHeight; ++j)
+			for (int i = pX; i < pX + pWidth; ++i)
 				oldTiles.writeGShort(levelTiles[i + (j * 64)]);
 		}
 	}
 
 	// TODO: old gserver didn't save the board change if oldTiles.length() == 0.
 	// Should we do it that way still?
-	levelBoardChanges.push_back(new TLevelBoardChange(pX, pY, pWidth, pHeight, pTileData, oldTiles, (oldTiles.length() != 0 ? respawnTime : -1)));
+	levelBoardChanges.push_back(new TLevelBoardChange(pX, pY, pWidth, pHeight, pTileData, oldTiles, (doRespawn ? respawnTime : -1)));
 	return true;
 }
 
@@ -398,7 +407,8 @@ bool TLevel::doTimedEvents()
 	for (std::vector<TLevelBoardChange*>::iterator i = levelBoardChanges.begin(); i != levelBoardChanges.end(); ++i)
 	{
 		TLevelBoardChange* change = *i;
-		if (change->getRespawn() == 0)
+		int respawnTime = change->getRespawn();
+		if (respawnTime == 0)
 		{
 			// Put the old data back in.  DON'T DELETE THE CHANGE.
 			// The client remembers board changes and if we delete the
@@ -406,8 +416,12 @@ bool TLevel::doTimedEvents()
 			change->swapTiles();
 			change->setModTime(time(0));
 			change->setRespawn(-1);
+			server->sendPacketToLevel(change->getBoardStr(), this);
 		}
-		else change->setRespawn(change->getRespawn() - 1);
+		else if (respawnTime > 0)
+		{
+			change->setRespawn(change->getRespawn() - 1);
+		}
 	}
 
 	// TODO: item timeout.
