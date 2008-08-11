@@ -363,6 +363,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 			{
 				int oldStatus = status;
 				status = pPacket.readGUChar();
+				printf("%s: status: %d, oldStatus: %d\n", accountName.text(), status, oldStatus );
 
 				if (id == -1) break;
 
@@ -370,24 +371,26 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 				if ((oldStatus & PLSTATUS_DEAD) > 0 && (status & PLSTATUS_DEAD) == 0)
 				{
 					power = clip((ap < 20 ? 3 : (ap < 40 ? 5 : maxPower)), 0.0f, maxPower);
-					// TODO: send level
-					//if (level->players.count() == 1)
-						//sendLevel(level->fileName, this->x, this->y, getSysTime());
+
+					// If we are the leader of the level, call setLevel().  This will fix NPCs not
+					// working again after we respawn.
+					if (level->getPlayer(0) == this)
+						setLevel(levelName, x, y, time(0));
 				}
 
 				// When they die, increase deaths and make somebody else level leader.
 				if ((oldStatus & PLSTATUS_DEAD) == 0 && (status & PLSTATUS_DEAD) > 0)
 				{
 					if (level->getSparringZone() == false) deaths++;
-					// TODO: all this.
-					/*
-					if (level->players.count() > 1 && level->players[0] == this)
+
+					// If we are the leader and there are more players on the level, we want to remove
+					// ourself from the leader position and tell the new leader that they are the leader.
+					if (level->getPlayer(0) == this && level->getPlayer(1) != 0)
 					{
-						level->players.remove(0);
-						level->players.add(this);
-						((CPlayer*)level->players[0])->sendPacket(CPacket() << (char)ISLEADER);
+						level->removePlayer(this);
+						level->addPlayer(this);
+						level->getPlayer(0)->sendPacket(CString() >> (char)PLO_ISLEADER);
 					}
-					*/
 				}
 			}
 			break;

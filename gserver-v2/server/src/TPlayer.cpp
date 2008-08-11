@@ -273,8 +273,8 @@ bool TPlayer::doTimedEvents()
 	// Increase player AP.
 	if (settings->getBool("apsystem"))
 	{
-		if (!(status & 1) /* TODO: sparzone check */)
-			apCounter++;
+		if (!(status & PLSTATUS_PAUSED) && level->getSparringZone() == false)
+			apCounter--;
 		if (apCounter <= 0)
 		{
 			if (ap < 100)
@@ -465,6 +465,7 @@ bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTi
 
 	// Add myself to the level playerlist.
 	level->addPlayer(this);
+	levelName = level->getLevelName();
 
 	// Set x/y location.
 	this->x = x;
@@ -508,7 +509,7 @@ bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTi
 	{
 		ap = 99;
 		apCounter = 1;
-		setProps(CString() >> (char)PLPROP_ALIGNMENT >> ap, true);
+		setProps(CString() >> (char)PLPROP_ALIGNMENT >> (char)ap, true, true);
 	}
 
 	// Inform everybody as to the client's new location.  This will update the minimap.

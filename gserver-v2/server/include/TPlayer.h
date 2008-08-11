@@ -109,7 +109,9 @@ enum
 
 enum
 {
+	PLSTATUS_PAUSED		= 0x01,
 	PLSTATUS_DEAD		= 0x08,
+	PLSTATUS_HASSPIN	= 0x40,
 };
 
 struct SCachedLevel
