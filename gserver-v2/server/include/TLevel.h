@@ -82,6 +82,18 @@ class TLevel
 		//! \return The type of item removed.  Use TLevelItem::getItemId() to get the item type from an item name.
 		char removeItem(float pX, float pY);
 
+		//! Adds a new horse to the level.
+		//! \param pX X location of the horse.
+		//! \param pY Y location of the horse.
+		//! \param pImage The image of the horse.
+		//! \return Returns true if it succeeds.
+		bool addHorse(float pX, float pY, CString& pImage);
+
+		//! Removes a horse from the level.
+		//! \param pX X location of the horse to remove.
+		//! \param pY Y location of the horse to remove.
+		void removeHorse(float pX, float pY);
+
 		//! Adds a baddy to the level.
 		//! \param pX X location of the baddy to add.
 		//! \param pY Y location of the baddy to add.

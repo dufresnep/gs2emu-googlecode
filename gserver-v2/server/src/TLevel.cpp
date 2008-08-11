@@ -95,7 +95,7 @@ CString TLevel::getHorsePacket()
 	for (std::vector<TLevelHorse *>::iterator i = levelHorses.begin(); i != levelHorses.end(); ++i)
 	{
 		TLevelHorse *horse = *i;
-		retVal >> (char)PLO_HORSEADD >> (char)horse->getX() >> (char)horse->getY() << horse->getImage() << "\n";
+		retVal >> (char)PLO_HORSEADD << horse->getHorseStr() << "\n";
 	}
 
 	return retVal;
@@ -463,6 +463,25 @@ char TLevel::removeItem(float pX, float pY)
 	return -1;
 }
 
+bool TLevel::addHorse(float pX, float pY, CString& pImage)
+{
+	levelHorses.push_back(new TLevelHorse(pImage, pX, pY));
+	return true;
+}
+
+void TLevel::removeHorse(float pX, float pY)
+{
+	for (std::vector<TLevelHorse *>::iterator i = levelHorses.begin(); i != levelHorses.end(); ++i)
+	{
+		TLevelHorse* horse = *i;
+		if (horse->getX() == pX && horse->getY() == pY)
+		{
+			levelHorses.erase(i);
+			return;
+		}
+	}
+}
+
 TLevelBaddy* TLevel::addBaddy(float pX, float pY, char pType)
 {
 	// Limit of 50 baddies per level.
@@ -561,7 +580,19 @@ bool TLevel::doTimedEvents()
 		} else ++i;
 	}
 
-	// TODO: horse timeout.
+	// Check if any horses need to be deleted.
+	for (std::vector<TLevelHorse *>::iterator i = levelHorses.begin(); i != levelHorses.end(); )
+	{
+		TLevelHorse* horse = *i;
+		int deleteTimer = horse->timeout.doTimeout();
+		if (deleteTimer == 0)
+		{
+			server->sendPacketToLevel(CString() >> (char)PLO_HORSEDEL >> (char)(horse->getX() * 2) >> (char)(horse->getY() * 2), this);
+			delete horse;
+			i = levelHorses.erase(i);
+		}
+		else ++i;
+	}
 
 	// Check if any baddies need to be respawned.
 	for (std::vector<TLevelBaddy *>::iterator i = levelBaddies.begin(); i != levelBaddies.end(); ++i)

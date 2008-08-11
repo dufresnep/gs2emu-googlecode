@@ -91,7 +91,8 @@ int main(int argc, char* argv[])
 		}
 
 		// Wait
-		wait(100);
+		//wait(100);
+		wait(1);
 	}
 
 	// Destroy the sockets.

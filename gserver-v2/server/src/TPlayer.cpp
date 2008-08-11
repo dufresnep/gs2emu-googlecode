@@ -763,7 +763,8 @@ bool TPlayer::msgPLI_HORSEADD(CString& pPacket)
 	float hx = (float)pPacket.readGUChar() / 2.0f;
 	float hy = (float)pPacket.readGUChar() / 2.0f;
 	CString image = pPacket.readChars(pPacket.readGUChar());
-	// TODO: add horse to level
+
+	level->addHorse(hx, hy, image);
 	return true;
 }
 
@@ -773,8 +774,8 @@ bool TPlayer::msgPLI_HORSEDEL(CString& pPacket)
 
 	float hx = (float)pPacket.readGUChar() / 2.0f;
 	float hy = (float)pPacket.readGUChar() / 2.0f;
-	CString image = pPacket.readChars(pPacket.readGUChar());
-	// TODO: remove horse from level
+
+	level->removeHorse(hx, hy);
 	return true;
 }
 
