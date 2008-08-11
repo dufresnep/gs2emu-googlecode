@@ -107,10 +107,12 @@ void createPLFunctions()
 	TPLFunc[PLI_LEVELWARP] = &TPlayer::msgPLI_LEVELWARP;
 	TPLFunc[PLI_BOARDMODIFY] = &TPlayer::msgPLI_BOARDMODIFY;
 	TPLFunc[PLI_PLAYERPROPS] = &TPlayer::msgPLI_PLAYERPROPS;
+	TPLFunc[PLI_NPCPROPS] = &TPlayer::msgPLI_NPCPROPS;
 	TPLFunc[PLI_WANTFILE] = &TPlayer::msgPLI_WANTFILE;
 	TPLFunc[PLI_NPCWEAPONIMG] = &TPlayer::msgPLI_NPCWEAPONIMG;
 	TPLFunc[PLI_FORCELEVELWARP] = &TPlayer::msgPLI_LEVELWARP;	// Only need one func.
 	TPLFunc[PLI_UPDATEFILE] = &TPlayer::msgPLI_UPDATEFILE;
+	TPLFunc[PLI_ADJACENTLEVEL] = &TPlayer::msgPLI_ADJACENTLEVEL;
 	TPLFunc[PLI_LANGUAGE] = &TPlayer::msgPLI_LANGUAGE;
 	TPLFunc[PLI_TRIGGERACTION] = &TPlayer::msgPLI_TRIGGERACTION;
 	TPLFunc[PLI_MAPINFO] = &TPlayer::msgPLI_MAPINFO;
@@ -149,6 +151,14 @@ TPlayer::~TPlayer()
 		// Announce our departure to other clients.
 		server->sendPacketTo(CLIENTTYPE_CLIENT, CString() >> (char)PLO_OTHERPLPROPS >> (short)id >> (char)PLPROP_PCONNECTED, this);
 		server->sendPacketTo(CLIENTTYPE_RC, CString() >> (char)PLO_DELPLAYER >> (short)id, this);
+	}
+
+	// Clean up.
+	for (std::vector<SCachedLevel*>::iterator i = cachedLevels.begin(); i != cachedLevels.end(); )
+	{
+		SCachedLevel* cl = *i;
+		delete cl;
+		i = cachedLevels.erase(i);
 	}
 
 	printf("Destroyed for: %s\n", playerSock->tcpIp());
@@ -387,31 +397,118 @@ void TPlayer::sendCompress()
 
 
 /*
-	TPlayer: Get Properties
-*/
-TLevel* TPlayer::getLevel()
-{
-	return level;
-}
-
-
-/*
 	TPlayer: Set Properties
 */
-bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTime, bool warp)
+bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTime)
 {
+	std::vector<TPlayer*> playerList = server->getPlayerList();
+
+	if (level != 0)
+	{
+		// Save the time we left the level for the client-side caching.
+		bool found = false;
+		for (std::vector<SCachedLevel*>::iterator i = cachedLevels.begin(); i != cachedLevels.end(); ++i)
+		{
+			SCachedLevel* cl = *i;
+			if (cl->level == level)
+			{
+				cl->modTime = time(0);
+				found = true;
+			}
+		}
+		if (found == false) cachedLevels.push_back(new SCachedLevel(level, time(0)));
+
+		// TODO: Remove self from list of players in level.
+		// TODO: Send PLO_ISLEADER to new level leader.
+
+		// Tell everyone I left.
+		server->sendPacketToLevel(this->getProps(0, 0) >> (char)PLPROP_JOINLEAVELVL >> (char)0, level, this);
+		for (std::vector<TPlayer*>::iterator i = playerList.begin(); i != playerList.end(); ++i)
+		{
+			TPlayer* player = (TPlayer*)*i;
+			if (player == this) continue;
+			if (player->getLevel() != level) continue;
+			this->sendPacket(player->getProps(0, 0) >> (char)PLPROP_JOINLEAVELVL >> (char)0);
+		}
+	}
+
 	// Open Level
-	level = TLevel::findLevel(pLevelName, server->getFileSystem());
+	level = TLevel::findLevel(pLevelName, server);
 	if (level == 0)
 		return false;
 
-	// Send Level
-	if (warp) sendPacket(CString() >> (char)PLO_PLAYERWARP >> (char)(x * 2) >> (char)(y * 2) << level->getLevelName());
+	this->x = x;
+	this->y = y;
+
+	// Tell the client their new level.
+	if (modTime == 0) sendPacket(CString() >> (char)PLO_PLAYERWARP >> (char)(x * 2) >> (char)(y * 2) << level->getLevelName());
 	sendPacket(CString() >> (char)PLO_LEVELNAME << level->getLevelName());
-	sendPacket(CString() >> (char)PLO_BOARDPACKETSIZE >> (int)(1+(64*64*2)+1));
+
+	// Send Level
+	time_t l_time = getCachedLevelModTime(level);
+	if (l_time == 0)
+	{
+		if (modTime != level->getModTime())
+		{
+			sendPacket(CString() >> (char)PLO_BOARDPACKETSIZE >> (int)(1+(64*64*2)+1));
+			sendPacket(CString() << level->getBoardPacket());
+		}
+		sendCompress();
+
+		// Send links, signs, and mod time.
+		sendPacket(CString() << level->getLinksPacket());
+		sendPacket(CString() << level->getSignsPacket());
+		sendPacket(CString() >> (char)PLO_LEVELMODTIME >> (long long)level->getModTime());
+	}
+
+	// Send board changes, chests, horses, and baddies.
 	sendPacket(CString() << level->getBoardPacket());
+	sendPacket(CString() << level->getChestPacket(this));
+	sendPacket(CString() << level->getHorsePacket());
+	sendPacket(CString() << level->getBaddyPacket());
+
+	// Send leader status and NPCs.
+	// TODO: only send PLO_ISLEADER if they are actually the leader.
+	sendPacket(CString() >> (char)PLO_ISLEADER);
+	sendPacket(CString() << level->getNpcsPacket(0));
+	//sendPacket(CString() << level->getNpcsPacket(l_time));
+
+	// If the level is a sparring zone and you have 100 AP, change AP to 99 and
+	// the apcounter to 1.
+	// TODO: sparring zone levels.
+	if ( false /*level->sparZone == true && ap == 100*/ )
+	{
+		ap = 99;
+		apCounter = 1;
+		setProps(CString() >> (char)PLPROP_ALIGNMENT >> ap, true);
+	}
+
+	// Inform everybody as to the client's new location.  This will update the minimap.
+	server->sendPacketToAll(this->getProps(0,0) >> (char)PLPROP_CURLEVEL << this->getProp(PLPROP_CURLEVEL) >> (char)PLPROP_X << this->getProp(PLPROP_X) >> (char)PLPROP_Y << this->getProp(PLPROP_Y), this);
+
+	// Do props stuff.
+	server->sendPacketToLevel(this->getProps(__getLogin, sizeof(__getLogin)/sizeof(bool)), this->level, this);
+	for (std::vector<TPlayer*>::iterator i = playerList.begin(); i != playerList.end(); ++i)
+	{
+		TPlayer* player = (TPlayer*)*i;
+		if (player == this) continue;
+		this->sendPacket(player->getProps(__getLogin, sizeof(__getLogin)/sizeof(bool)));
+	}
+
 	sendCompress();
+
 	return true;
+}
+
+time_t TPlayer::getCachedLevelModTime(const TLevel* level) const
+{
+	for (std::vector<SCachedLevel*>::const_iterator i = cachedLevels.begin(); i != cachedLevels.end(); ++i)
+	{
+		SCachedLevel* cl = *i;
+		if (cl->level == level)
+			return cl->modTime;
+	}
+	return 0;
 }
 
 void TPlayer::setNick(const CString& pNickName)
@@ -496,14 +593,16 @@ bool TPlayer::msgPLI_LOGIN(CString& pPacket)
 
 bool TPlayer::msgPLI_LEVELWARP(CString& pPacket)
 {
-	unsigned int modTime = 0;
+	printf( "msgPLI_LEVELWARP\n" );
+	time_t modTime = 0;
 
 	if (pPacket[0] - 32 == PLI_FORCELEVELWARP)
-		modTime = (unsigned int)pPacket.readGUInt5();
+		modTime = (time_t)pPacket.readGUInt5();
 
 	float loc[2] = {(float)(pPacket.readGChar() / 2), (float)(pPacket.readGChar() / 2)};
 	CString newLevel = pPacket.readString("");
-	//warp(newLevel, loc[0], loc[1], modTime);
+	setLevel(newLevel, loc[0], loc[1], modTime);
+	// TODO: Correct warp function.
 
 	return true;
 }
@@ -563,9 +662,35 @@ bool TPlayer::msgPLI_PLAYERPROPS(CString& pPacket)
 	return true;
 }
 
+bool TPlayer::msgPLI_NPCPROPS(CString& pPacket)
+{
+	int npcId = pPacket.readGUInt();
+	CString npcProps = pPacket.readString("");
+
+	//printf( "npcId: %d\n", npcId );
+	//printf( "pPacket: %s\n", npcProps.text());
+	//for (int i = 0; i < pPacket.length(); ++i) printf( "%02x ", (unsigned char)pPacket[i] );
+	//printf( "\n" );
+
+	TNPC* npc = (TNPC*)(server->getNPCIdList())[npcId];
+	if (npc == 0)
+		return true;
+
+	if (npc->getLevel() != level)
+		return true;
+
+	CString packet = CString() >> (char)PLO_NPCPROPS << pPacket.text() + 1;
+	server->sendPacketToLevel(packet, level, this);
+	npc->setProps(pPacket.readString(""));
+
+	return true;
+}
+
 bool TPlayer::msgPLI_WANTFILE(CString& pPacket)
 {
-	printf("TODO: TPlayer::msgPLI_WANTFILE\n");
+	CString file = pPacket.readString("");
+	printf("TODO: TPlayer::msgPLI_WANTFILE, file: %s\n", file.text());
+	sendPacket(CString() >> (char)PLO_FILESENDFAILED << file);
 	return true;
 }
 
@@ -577,8 +702,55 @@ bool TPlayer::msgPLI_NPCWEAPONIMG(CString& pPacket)
 
 bool TPlayer::msgPLI_UPDATEFILE(CString& pPacket)
 {
-	printf("TODO: TPlayer::msgPLI_UPDATEFILE\n");
-	//pPacket.readString("");
+	time_t modTime = pPacket.readGUInt5();
+	CString file = pPacket.readString("");
+	printf("TODO: TPlayer::msgPLI_UPDATEFILE, modTime: %ld, file: %s\n", (long)modTime, file.text());
+	sendPacket(CString() >> (char)PLO_FILESENDFAILED << file);
+	return true;
+}
+
+bool TPlayer::msgPLI_ADJACENTLEVEL(CString& pPacket)
+{
+	return true;
+	time_t modTime = pPacket.readGUInt5();
+	CString levelName = pPacket.readString("");
+	CString packet;
+	TLevel* adjacentLevel = TLevel::findLevel(levelName, server);
+
+	if (adjacentLevel == 0)
+		return true;
+
+	bool alreadyVisited = false;
+	for (std::vector<SCachedLevel*>::const_iterator i = cachedLevels.begin(); i != cachedLevels.end(); ++i)
+	{
+		SCachedLevel* cl = *i;
+		if (cl->level == adjacentLevel)
+		{
+			alreadyVisited = true;
+			break;
+		}
+	}
+
+	// Send the new level.
+	if ((modTime != adjacentLevel->getModTime()) || alreadyVisited == false)
+	{
+		sendPacket(CString() >> (char)PLO_LEVELNAME << adjacentLevel->getLevelName());
+		sendPacket(CString() >> (char)PLO_BOARDPACKETSIZE >> (int)(1+(64*64*2)+1));
+		sendPacket(CString() << adjacentLevel->getBoardPacket());
+		sendCompress();
+
+		// Send links, board changes, chests, and modification time.
+		sendPacket(CString() >> (char)PLO_LEVELMODTIME >> (long long)adjacentLevel->getModTime());
+		sendPacket(CString() << adjacentLevel->getLinksPacket());
+		sendPacket(CString() << adjacentLevel->getBoardPacket());
+		sendPacket(CString() << adjacentLevel->getChestPacket(this));
+	}
+
+	// Set our old level back to normal.
+	sendPacket(CString() >> (char)PLO_LEVELNAME << this->level->getLevelName());
+//	if (level->players.count() == 1)
+		sendPacket(CString() >> (char)PLO_ISLEADER);
+
 	return true;
 }
 
@@ -613,6 +785,9 @@ bool TPlayer::msgPLI_MAPINFO(CString& pPacket)
 bool TPlayer::msgPLI_UNKNOWN46(CString& pPacket)
 {
 	printf("TODO: TPlayer::msgPLI_UNKNOWN46\n");
-	pPacket.readString("");
+	CString packet = pPacket.readString("");
+	printf( "%s\n", packet.text() );
+	for (int i = 0; i < packet.length(); ++i) printf( "%02x ", (unsigned char)packet[i] );
+	printf( "\n" );
 	return true;
 }

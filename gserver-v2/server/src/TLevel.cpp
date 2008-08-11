@@ -1,8 +1,10 @@
 #include "ICommon.h"
 #include "main.h"
 #include "CFileSystem.h"
+#include "TServer.h"
 #include "TLevel.h"
 #include "TPlayer.h"
+#include "TNPC.h"
 
 /*
 	Global Variables
@@ -14,6 +16,8 @@ std::vector<TLevel *> levelList;
 	TLevel: Constructor - Deconstructor
 */
 TLevel::TLevel()
+:
+modTime(0), levelSpar(false)
 {
 	memset(levelTiles, 0, sizeof(levelTiles));
 }
@@ -50,9 +54,11 @@ CString TLevel::getChestPacket(TPlayer *pPlayer)
 		TLevelChest *chest = *i;
 		bool hasChest = pPlayer->hasChest(chest);
 
-		retVal >> (char)PLO_LEVELCHEST >> (char)hasChest >> (char)chest->getX() >> (char)chest->getY();
-		if (hasChest)
-			retVal >> (char)chest->getItemIndex() >> (char)chest->getSignIndex();
+		retVal >> (char)PLO_LEVELCHEST >> (char)(hasChest ? 1 : 0) >> (char)chest->getX() >> (char)chest->getY();
+		if (!hasChest)
+			retVal >> (char)chest->getItemIndex() >> (char)chest->getSignIndex() << "\n";
+		else
+			retVal << "\n";
 	}
 
 	return retVal;
@@ -64,7 +70,7 @@ CString TLevel::getHorsePacket()
 	for (std::vector<TLevelHorse *>::iterator i = levelHorses.begin(); i != levelHorses.end(); ++i)
 	{
 		TLevelHorse *horse = *i;
-		retVal >> (char)PLO_HORSEADD >> (char)horse->getX() >> (char)horse->getY() << horse->getImage();
+		retVal >> (char)PLO_HORSEADD >> (char)horse->getX() >> (char)horse->getY() << horse->getImage() << "\n";
 	}
 
 	return retVal;
@@ -76,15 +82,21 @@ CString TLevel::getLinksPacket()
 	for (std::vector<TLevelLink *>::iterator i = levelLinks.begin(); i != levelLinks.end(); ++i)
 	{
 		TLevelLink *link = *i;
-		retVal >> (char)PLO_LEVELLINK << link->getLinkStr();
+		retVal >> (char)PLO_LEVELLINK << link->getLinkStr() << "\n";
 	}
 
 	return retVal;
 }
 
-CString TLevel::getNpcsPacket()
+CString TLevel::getNpcsPacket(time_t time)
 {
-	return CString();
+	CString retVal;
+	for (std::vector<TNPC *>::iterator i = levelNPCs.begin(); i != levelNPCs.end(); ++i)
+	{
+		TNPC* npc = *i;
+		retVal >> (char)PLO_NPCPROPS >> (int)npc->getId() << npc->getProps(time) << "\n";
+	}
+	return retVal;
 }
 
 CString TLevel::getSignsPacket()
@@ -94,21 +106,24 @@ CString TLevel::getSignsPacket()
 /*
 	TLevel: Level-Loading Functions
 */
-bool TLevel::loadLevel(const CString& pLevelName, CFileSystem& fileSystem)
+bool TLevel::loadLevel(const CString& pLevelName, TServer* server)
 {
-	return (getExtension(pLevelName) == ".nw" ? loadNW(pLevelName, fileSystem) : loadGraal(pLevelName, fileSystem));
+	return (getExtension(pLevelName) == ".nw" ? loadNW(pLevelName, server) : loadGraal(pLevelName, server));
 }
 
-bool TLevel::loadGraal(const CString& pLevelName, CFileSystem& fileSystem)
+bool TLevel::loadGraal(const CString& pLevelName, TServer* server)
 {
 	return true;
 }
 
-bool TLevel::loadNW(const CString& pLevelName, CFileSystem& fileSystem)
+bool TLevel::loadNW(const CString& pLevelName, TServer* server)
 {
+	CFileSystem fileSystem = server->getFileSystem();
+
 	// Path-To-File
 	levelName = pLevelName;
 	fileName = fileSystem.find(pLevelName);
+	modTime = fileSystem.getModTime(pLevelName);
 
 	// Load File
 	std::vector<CString> fileData = CString::loadToken(fileName);
@@ -125,6 +140,10 @@ bool TLevel::loadNW(const CString& pLevelName, CFileSystem& fileSystem)
 		std::vector<CString> curLine = i->tokenize();
 		if (curLine.size() < 1)
 			continue;
+
+		// Get rid of \r
+		if (curLine[curLine.size() - 1][curLine[curLine.size() - 1].length() - 1] == '\r')
+			curLine[curLine.size() - 1].removeI(curLine[curLine.size() - 1].length() - 1, 1);
 
 		// Parse Each Type
 		if (curLine[0] == "BOARD")
@@ -156,7 +175,7 @@ bool TLevel::loadNW(const CString& pLevelName, CFileSystem& fileSystem)
 		{
 			if (curLine.size() != 5)
 				continue;
-			if ((curLine[3] = findItemId(curLine[3])) == -1)
+			if ((curLine[3] = CString(findItemId(curLine[3]))) == "-1")
 				continue;
 
 			levelChests.push_back(new TLevelChest(curLine));
@@ -170,6 +189,32 @@ bool TLevel::loadNW(const CString& pLevelName, CFileSystem& fileSystem)
 
 			levelLinks.push_back(new TLevelLink(curLine));
 		}
+		else if (curLine[0] == "NPC")
+		{
+			if (curLine.size() != 4)
+				continue;
+
+			// Grab the image properties.
+			CString image = curLine[1];
+			float x = (float)strtofloat(curLine[2]);
+			float y = (float)strtofloat(curLine[3]);
+
+			// Grab the NPC code.
+			CString code;
+			++i;
+			while (i != fileData.end())
+			{
+				CString line = *i;
+				if (line[line.length() - 1] == '\r') line.removeI(line.length() - 1, 1);
+				if (line == "NPCEND") break;
+				code << line << "\xa7";
+				++i;
+			}
+			//printf( "image: %s, x: %.2f, y: %.2f, code: %s\n", image.text(), x, y, code.text() );
+			// Add the new NPC.
+			TNPC* npc = server->addNewNPC(image, code, x, y, this, true);
+			levelNPCs.push_back(npc);
+		}
 	}
 
 	return true;
@@ -178,10 +223,10 @@ bool TLevel::loadNW(const CString& pLevelName, CFileSystem& fileSystem)
 /*
 	TLevel: Find Level
 */
-TLevel * TLevel::findLevel(const CString& pLevelName, CFileSystem& fileSystem)
+TLevel * TLevel::findLevel(const CString& pLevelName, TServer* server)
 {
 	// Find Appropriate Level by Name
-	for (std::vector<TLevel *>::iterator i = levelList.begin(); i != levelList.end(); ++i)
+	for (std::vector<TLevel *>::iterator i = levelList.begin(); i != levelList.end(); )
 	{
 		if ((*i) == 0)
 		{
@@ -191,11 +236,13 @@ TLevel * TLevel::findLevel(const CString& pLevelName, CFileSystem& fileSystem)
 
 		if ((*i)->getLevelName() == pLevelName)
 			return (*i);
+
+		++i;
 	}
 
 	// Load New Level
 	TLevel *level = new TLevel();
-	if (!level->loadLevel(pLevelName, fileSystem))
+	if (!level->loadLevel(pLevelName, server))
 	{
 		delete level;
 		return 0;

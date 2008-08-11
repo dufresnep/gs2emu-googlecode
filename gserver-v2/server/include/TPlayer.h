@@ -2,6 +2,7 @@
 #define TPLAYER_H
 
 #include <time.h>
+#include <vector>
 #include "ICommon.h"
 #include "IUtil.h"
 #include "CSocket.h"
@@ -20,10 +21,12 @@ enum
 	PLI_LEVELWARP		= 0,
 	PLI_BOARDMODIFY		= 1,
 	PLI_PLAYERPROPS		= 2,
+	PLI_NPCPROPS		= 3,
 	PLI_WANTFILE		= 23,
 	PLI_NPCWEAPONIMG	= 24,
 	PLI_FORCELEVELWARP	= 30,
 	PLI_UPDATEFILE		= 34,
+	PLI_ADJACENTLEVEL	= 35,
 	PLI_LANGUAGE		= 37,
 	PLI_TRIGGERACTION	= 38,
 	PLI_MAPINFO			= 39,
@@ -33,10 +36,12 @@ enum
 enum
 {
 	PLO_LEVELLINK = 1,
+	PLO_NPCPROPS = 3,
 	PLO_LEVELCHEST = 4,
 	PLO_LEVELNAME = 6,
 	PLO_OTHERPLPROPS = 8,
 	PLO_PLAYERPROPS = 9,
+	PLO_ISLEADER = 10,
 	PLO_ADDITEM = 12,
 	PLO_PLAYERWARP = 14,
 	PLO_WARPFAILED = 15,
@@ -44,6 +49,7 @@ enum
 	PLO_HORSEADD = 17,
 	PLO_HORSEDEL = 18,
 	PLO_SIGNATURE = 25,
+	PLO_FILESENDFAILED = 30,
 	PLO_DELNPCWEAPON = 34,
 	PLO_LEVELMODTIME = 39,
 	PLO_TRIGGERACTION = 48,
@@ -53,6 +59,13 @@ enum
 	PLO_BOARDPACKETSIZE = 100,
 	PLO_BOARDPACKET = 101,
 	PLO_RPGWINDOW = 179,
+};
+
+struct SCachedLevel
+{
+	SCachedLevel(TLevel* pLevel, time_t pModTime) : level(pLevel), modTime(pModTime) { }
+	TLevel* level;
+	time_t modTime;
 };
 
 class TPlayer : public TAccount
@@ -66,14 +79,17 @@ class TPlayer : public TAccount
 		inline bool isLoggedIn();
 
 		// Get Properties
-		TLevel* getLevel();
+		TLevel* getLevel()		{ return level; }
 		int getId() const;
 		int getType() const;
 
 		// Set Properties
-		bool setLevel(const CString& pLevelName, float x, float y, time_t modTime = 0, bool warp = false);
 		void setNick(const CString& pNickName);
 		void setId(int pId);
+
+		// Level manipulation
+		bool setLevel(const CString& pLevelName, float x, float y, time_t modTime = 0);
+		time_t getCachedLevelModTime(const TLevel* level) const;
 
 		// Prop-Manipulation
 		CString getProp(int pPropId);
@@ -93,9 +109,11 @@ class TPlayer : public TAccount
 		bool msgPLI_LEVELWARP(CString& pPacket);
 		bool msgPLI_BOARDMODIFY(CString& pPacket);
 		bool msgPLI_PLAYERPROPS(CString& pPacket);
+		bool msgPLI_NPCPROPS(CString& pPacket);
 		bool msgPLI_WANTFILE(CString& pPacket);
 		bool msgPLI_NPCWEAPONIMG(CString& pPacket);
 		bool msgPLI_UPDATEFILE(CString& pPacket);
+		bool msgPLI_ADJACENTLEVEL(CString& pPacket);
 		bool msgPLI_LANGUAGE(CString& pPacket);
 		bool msgPLI_TRIGGERACTION(CString& pPacket);
 		bool msgPLI_MAPINFO(CString& pPacket);
@@ -135,6 +153,7 @@ class TPlayer : public TAccount
 		time_t lastData, lastMovement, lastChat, lastMessage;
 		time_t lastTimer;
 		TServer* server;
+		std::vector<SCachedLevel*> cachedLevels;
 };
 
 inline bool TPlayer::isLoggedIn()

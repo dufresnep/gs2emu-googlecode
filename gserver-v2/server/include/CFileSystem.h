@@ -13,9 +13,12 @@ class CFileSystem
 		CFileSystem(TServer* pServer);
 
 		void setServer(TServer* pServer) { server = pServer; }
-		void load();
+		void init();
 
 		CString find(const CString& file) const;
+		CString load(const CString& file) const;
+		time_t getModTime(const CString& file) const;
+		int getFileSize(const CString& file) const;
 
 	private:
 		TServer* server;

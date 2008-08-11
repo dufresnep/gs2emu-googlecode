@@ -51,8 +51,8 @@ enum
 	PLPROP_GATTRIB4			= 40,
 	PLPROP_GATTRIB5			= 41,
 	PLPROP_UNKNOWN42		= 42,
-	PLPROP_UNKNOWN43		= 43,
-	PLPROP_UNKNOWN44		= 44,
+	PLPROP_GMAPLEVELX		= 43,
+	PLPROP_GMAPLEVELY		= 44,
 	PLPROP_Z				= 45,
 	PLPROP_GATTRIB6			= 46,
 	PLPROP_GATTRIB7			= 47,
@@ -120,7 +120,7 @@ class TAccount
 		CString attrList[30], bodyImg, chatMsg, headImg, horseImg, gAni, language;
 		CString levelName, nickName, shieldImg, swordImg;
 		float deviation, oldDeviation, power, rating, x, y, z;
-		int gmapx, gmapy;
+		int gmapx, gmapy, gmaplevelx, gmaplevely;
 		int additionalFlags, ap, apCounter, arrowc, bombc, bombPower, carrySprite;
 		unsigned char colors[5];
 		int deaths, glovePower, gralatc, horsec, kills, mp, maxPower;

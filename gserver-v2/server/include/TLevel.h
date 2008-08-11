@@ -4,7 +4,7 @@
 #include <vector>
 #include <map>
 #include "ICommon.h"
-#include "CFileSystem.h"
+#include "TServer.h"
 #include "TLevelBaddy.h"
 #include "TLevelChest.h"
 #include "TLevelHorse.h"
@@ -12,6 +12,7 @@
 #include "TLevelLink.h"
 
 class TPlayer;
+class TNPC;
 
 class TLevel
 {
@@ -30,22 +31,24 @@ class TLevel
 		CString getChestPacket(TPlayer *pPlayer);
 		CString getHorsePacket();
 		CString getLinksPacket();
-		CString getNpcsPacket();
+		CString getNpcsPacket(time_t time);
 		CString getSignsPacket();
 		inline CString getLevelName();
 
 		// level-loading functions
-		bool loadLevel(const CString& pLevelName, CFileSystem& fileSystem);
-		bool loadGraal(const CString& pLevelName, CFileSystem& fileSystem);
-		bool loadNW(const CString& pLevelName, CFileSystem& fileSystem);
+		bool loadLevel(const CString& pLevelName, TServer* server);
+		bool loadGraal(const CString& pLevelName, TServer* server);
+		bool loadNW(const CString& pLevelName, TServer* server);
 
 		// find level
-		static TLevel * findLevel(const CString& pLevelName, CFileSystem& fileSystem);
+		static TLevel * findLevel(const CString& pLevelName, TServer* server);
 
 		// get functions
 		short* getTiles();
+		time_t getModTime()		{ return modTime; }
 
 	private:
+		time_t modTime;
 		bool levelSpar;
 		short levelTiles[4096];
 		CString fileName, fileVersion, levelName;
@@ -54,6 +57,7 @@ class TLevel
 		std::vector<TLevelHorse *> levelHorses;
 		std::vector<TLevelItem *> levelItems;
 		std::vector<TLevelLink *> levelLinks;
+		std::vector<TNPC *> levelNPCs;
 };
 
 

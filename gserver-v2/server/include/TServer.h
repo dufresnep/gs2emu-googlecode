@@ -10,6 +10,7 @@
 #include "TPlayer.h"
 #include "TServerList.h"
 #include "TLevel.h"
+#include "TNPC.h"
 
 enum // Socket Type
 {
@@ -30,11 +31,15 @@ class TServer
 		// Get functions.
 		CSettings& getSettings()				{ return settings; }
 		std::vector<TPlayer*>& getPlayerList()	{ return playerList; }
+		std::vector<TNPC*>& getNPCList()		{ return npcList; }
+		std::vector<TNPC*>& getNPCIdList()		{ return npcIds; }
 		TServerList& getServerList()			{ return serverlist; }
 		CFileSystem& getFileSystem()			{ return filesystem; }
 		CString getServerPath()					{ return serverpath; }
 		CLog& getServerLog()					{ return serverlog; }
 		CLog& getRCLog()						{ return rclog; }
+
+		TNPC* addNewNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC = true);
 
 		// Packet sending.
 		void sendPacketToAll(CString pPacket) const;
@@ -49,7 +54,8 @@ class TServer
 		void acceptSock(CSocket& pSocket);
 
 		CSettings settings;
-		std::vector<TPlayer *> playerIds, playerList;
+		std::vector<TPlayer*> playerIds, playerList;
+		std::vector<TNPC*> npcIds, npcList;
 		CSocket playerSock, serverSock;
 		TServerList serverlist;
 		CFileSystem filesystem;

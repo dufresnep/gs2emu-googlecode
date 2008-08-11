@@ -180,6 +180,12 @@ CString TPlayer::getProp(int pPropId)
 			if (gmapy < 0) val |= 0x0001;
 			return CString().writeGShort((short)val);
 		}
+
+		case PLPROP_GMAPLEVELX:
+		return CString() >> (char)gmaplevelx;
+
+		case PLPROP_GMAPLEVELY:
+		return CString() >> (char)gmaplevely;
 	}
 
 	if (inrange(pPropId, 37, 41) || inrange(pPropId, 46, 49) || inrange(pPropId, 54, 74))
@@ -268,8 +274,9 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 						// TODO: foldersconfig stuff.
 						swordImg = pPacket.readChars(len);
 					}
-					swordPower = clip(sp, ((settings->getBool("healswords", false) == true) ? -(settings->getInt("swordlimit", 3)) : 0), settings->getInt("swordlimit", 3));
+					else swordImg = "";
 				}
+				swordPower = clip(sp, ((settings->getBool("healswords", false) == true) ? -(settings->getInt("swordlimit", 3)) : 0), settings->getInt("swordlimit", 3));
 			}
 			break;
 
@@ -277,7 +284,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			{
 				int sp = pPacket.readGUChar();
 				if (sp <= 3)
-					swordImg = CString() << "shield" << CString(sp) << ".png";
+					shieldImg = CString() << "shield" << CString(sp) << ".png";
 				else
 				{
 					sp -= 10;
@@ -288,17 +295,14 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 						// TODO: foldersconfig stuff.
 						shieldImg = pPacket.readChars(len);
 					}
-					shieldPower = clip(sp, 0, settings->getInt("shieldlimit", 3));
+					else shieldImg = "";
 				}
+				shieldPower = clip(sp, 0, settings->getInt("shieldlimit", 3));
 			}
 			break;
 
 			case PLPROP_GANI:
-				len = pPacket.readGUChar();
-				if (len < 0)
-					len = 0;
-
-				gAni = pPacket.readChars(len);
+				gAni = pPacket.readChars(pPacket.readGUChar());
 			break;
 
 			case PLPROP_HEADGIF:
@@ -482,12 +486,6 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			case PLPROP_UNKNOWN42:
 				break;
 
-			case PLPROP_UNKNOWN43:
-				break;
-
-			case PLPROP_UNKNOWN44:
-				break;
-
 			case PLPROP_UNKNOWN50:
 				break;
 */
@@ -563,6 +561,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 				gmapx >>= 1;
 				if ((short)len & 0x0001)
 					gmapx = -gmapx;
+				printf( "gmap x: %d\n", gmapx );
 				break;
 
 			case PLPROP_GMAPY:
@@ -573,6 +572,17 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 				gmapy >>= 1;
 				if ((short)len & 0x0001)
 					gmapy = -gmapy;
+				printf( "gmap y: %d\n", gmapy );
+				break;
+
+			case PLPROP_GMAPLEVELX:
+				gmaplevelx = pPacket.readGUChar();
+				printf( "gmap level x: %d\n", gmaplevelx );
+				break;
+
+			case PLPROP_GMAPLEVELY:
+				gmaplevely = pPacket.readGUChar();
+				printf( "gmap level y: %d\n", gmaplevely );
 				break;
 
 			default:
@@ -623,16 +633,19 @@ CString TPlayer::getProps(bool *pProps, int pCount)
 	// Start the prop packet.
 	propPacket >> (char)PLO_OTHERPLPROPS >> (short)this->id;
 
-	// Check if PLPROP_JOINLEAVELVL is set.
-	if (pProps[PLPROP_JOINLEAVELVL])
-		propPacket >> (char)PLPROP_JOINLEAVELVL >> (char)1;
-
-	// Create Props
-	for (int i = 0; i < pCount; ++i)
+	if (pCount > 0)
 	{
-		if (i == PLPROP_JOINLEAVELVL) continue;
-		if (pProps[i])
-			propPacket >> (char)i << getProp(i);
+		// Check if PLPROP_JOINLEAVELVL is set.
+		if (pProps[PLPROP_JOINLEAVELVL])
+			propPacket >> (char)PLPROP_JOINLEAVELVL >> (char)1;
+
+		// Create Props
+		for (int i = 0; i < pCount; ++i)
+		{
+			if (i == PLPROP_JOINLEAVELVL) continue;
+			if (pProps[i])
+				propPacket >> (char)i << getProp(i);
+		}
 	}
 
 	return propPacket;

@@ -84,10 +84,10 @@ bool TPlayer::sendLoginClient()
 	// Send the level to the player.
 	// setLevel will call sendCompress() for us.
 	printf("TODO: TPlayer::sendLoginClient, Send correct level to player.\n");
-	if (!setLevel(this->levelName, this->x, this->y, 0, true))
+	if (!setLevel(this->levelName, this->x, this->y, 0))
 	{
 		sendPacket(CString() >> (char)PLO_WARPFAILED);
-		if (!setLevel(settings->getStr("unstickmelevel"), settings->getFloat("unstickmex"), settings->getFloat("unstickmey"), 0, true))
+		if (!setLevel(settings->getStr("unstickmelevel"), settings->getFloat("unstickmex"), settings->getFloat("unstickmey"), 0))
 		{
 			sendPacket(CString() >> (char)PLO_DISCMESSAGE << "No level available.");
 			serverlog.out(CString() << "Cannot find level for " << accountName << "\n");

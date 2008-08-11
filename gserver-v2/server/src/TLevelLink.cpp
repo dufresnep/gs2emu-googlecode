@@ -5,6 +5,7 @@
 */
 TLevelLink::TLevelLink(const std::vector<CString>& pLink)
 {
+	parseLinkStr(pLink);
 }
 
 /*

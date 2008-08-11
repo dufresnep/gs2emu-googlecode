@@ -1,3 +1,4 @@
+#include <sys/stat.h>
 #include <map>
 #include "ICommon.h"
 #include "CString.h"
@@ -17,10 +18,10 @@ static void loadAllDirectories(std::map<CString, CString>& fileList, const CStri
 CFileSystem::CFileSystem(TServer* pServer)
 : server(pServer)
 {
-	load();
+	init();
 }
 
-void CFileSystem::load()
+void CFileSystem::init()
 {
 	if (server == 0) return;
 	CSettings* settings = &(server->getSettings());
@@ -81,7 +82,7 @@ void loadAllDirectories(std::map<CString, CString>& fileList, const CString& dir
 				//if (pos == -1) pos = file.findl('\\');
 				//if (pos != -1) file.removeI(pos, file.length());
 				fileList[file] = CString() << directory << filedata.cFileName;
-				printf( "file: %s, fullpath: %s\n", file.text(), fileList[file].text() );
+				//printf( "file: %s, fullpath: %s\n", file.text(), fileList[file].text() );
 			}
 		} while (FindNextFileA(hFind, &filedata));
 	}
@@ -119,3 +120,40 @@ void loadAllDirectories(std::map<CString, CString>& fileList, const CString& dir
 	closedir(dir);
 }
 #endif
+
+CString CFileSystem::load(const CString& file) const
+{
+	// Get the full path to the file.
+	CString fileName = find(file);
+	if (fileName.length() == 0) return CString();
+
+	// Load the file.
+	CString fileData;
+	fileData.load(fileName);
+
+	return fileData;
+}
+
+time_t CFileSystem::getModTime(const CString& file) const
+{
+	// Get the full path to the file.
+	CString fileName = find(file);
+	if (fileName.length() == 0) return 0;
+
+	struct stat fileStat;
+	if (stat(fileName.text(), &fileStat) != -1)
+		return (time_t)fileStat.st_mtime;
+	return 0;
+}
+
+int CFileSystem::getFileSize(const CString& file) const
+{
+	// Get the full path to the file.
+	CString fileName = find(file);
+	if (fileName.length() == 0) return 0;
+
+	struct stat fileStat;
+	if (stat(fileName.text(), &fileStat) != -1)
+		return fileStat.st_size;
+	return 0;
+}

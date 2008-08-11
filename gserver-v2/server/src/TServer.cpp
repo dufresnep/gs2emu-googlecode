@@ -9,9 +9,10 @@ extern CString homepath;
 TServer::TServer(CString pName)
 : name(pName)
 {
-	// Player ids 0 and 1 break things.
-	// Don't allow a player to have one of those ids.
+	// Player ids 0 and 1 break things.  NPC id 0 breaks things.
+	// Don't allow anything to have one of those ids.
 	playerIds.resize(2);
+	npcIds.resize(1);
 
 	// This has the full path to the server directory.
 	serverpath = CString() << homepath << "servers/" << name << "/";
@@ -36,7 +37,7 @@ int TServer::init()
 	}
 
 	// Load file system.
-	filesystem.load();
+	filesystem.init();
 
 	// Initialize the player socket.
 	playerSock.setType(SOCKET_TYPE_SERVER);
@@ -123,6 +124,28 @@ void TServer::acceptSock(CSocket& pSocket)
 	playerIds.push_back(newPlayer);
 }
 
+TNPC* TServer::addNewNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC)
+{
+	// New Npc
+	TNPC* newNPC = new TNPC(pImage, pScript, pX, pY, pLevel, pLevelNPC);
+	npcList.push_back(newNPC);
+
+	// Assign NPC Id
+	for (unsigned int i = 1; i < npcIds.size(); ++i)
+	{
+		if (npcIds[i] == 0)
+		{
+			npcIds[i] = newNPC;
+			newNPC->setId(i);
+			return newNPC;
+		}
+	}
+
+	newNPC->setId(npcIds.size());
+	npcIds.push_back(newNPC);
+
+	return newNPC;
+}
 
 /*
 	Packet-Sending Functions
