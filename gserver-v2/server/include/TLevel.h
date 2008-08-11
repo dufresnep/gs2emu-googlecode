@@ -2,7 +2,9 @@
 #define TLEVEL_H
 
 #include <vector>
+#include <map>
 #include "ICommon.h"
+#include "CFileSystem.h"
 #include "TLevelBaddy.h"
 #include "TLevelChest.h"
 #include "TLevelHorse.h"
@@ -33,12 +35,12 @@ class TLevel
 		inline CString getLevelName();
 
 		// level-loading functions
-		bool loadLevel(const CString& pFileName);
-		bool loadGraal(const CString& pFileName);
-		bool loadNW(const CString& pFileName);
+		bool loadLevel(const CString& pLevelName, CFileSystem& fileSystem);
+		bool loadGraal(const CString& pLevelName, CFileSystem& fileSystem);
+		bool loadNW(const CString& pLevelName, CFileSystem& fileSystem);
 
 		// find level
-		static TLevel * findLevel(const CString& pLevelName);
+		static TLevel * findLevel(const CString& pLevelName, CFileSystem& fileSystem);
 
 		// get functions
 		short* getTiles();

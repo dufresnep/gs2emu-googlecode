@@ -54,7 +54,7 @@ bool TAccount::loadAccount(const CString& pAccount)
 	weaponList.clear();
 
 	// Save Account
-	accountName = pAccount;
+	//accountName = pAccount;
 
 	// Parse File
 	for (unsigned int i = 0; i < fileData.size(); i++)

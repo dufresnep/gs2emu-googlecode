@@ -99,11 +99,6 @@ int main(int argc, char* argv[])
 /*
 	Extra-Cool Functions :D
 */
-CString getDataFile(const CString& pFile)
-{
-	return pFile;
-}
-
 int findItemId(const CString& pItemName)
 {
 	for (unsigned int i = 0; i < sizeof(__itemList) / sizeof(const char *); ++i)

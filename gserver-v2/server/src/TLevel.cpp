@@ -1,5 +1,6 @@
 #include "ICommon.h"
 #include "main.h"
+#include "CFileSystem.h"
 #include "TLevel.h"
 #include "TPlayer.h"
 
@@ -93,26 +94,21 @@ CString TLevel::getSignsPacket()
 /*
 	TLevel: Level-Loading Functions
 */
-bool TLevel::loadLevel(const CString& pFileName)
+bool TLevel::loadLevel(const CString& pLevelName, CFileSystem& fileSystem)
 {
-	return (getExtension(pFileName) == ".nw" ? loadNW(pFileName) : loadGraal(pFileName));
+	return (getExtension(pLevelName) == ".nw" ? loadNW(pLevelName, fileSystem) : loadGraal(pLevelName, fileSystem));
 }
 
-bool TLevel::loadGraal(const CString& pFileName)
+bool TLevel::loadGraal(const CString& pLevelName, CFileSystem& fileSystem)
 {
 	return true;
 }
 
-bool TLevel::loadNW(const CString& pFileName)
+bool TLevel::loadNW(const CString& pLevelName, CFileSystem& fileSystem)
 {
 	// Path-To-File
-	fileName = getDataFile(pFileName);
-	/* TODO: Fix all this code.
-	int l[2] = {pFileName.findl('/')+1, pFileName.findl('\\')+1};
-	int ll = max(l[0], l[1]);
-	levelName = pFileName.subString(ll);
-	*/
-	levelName = pFileName;
+	levelName = pLevelName;
+	fileName = fileSystem.find(pLevelName);
 
 	// Load File
 	std::vector<CString> fileData = CString::loadToken(fileName);
@@ -169,7 +165,7 @@ bool TLevel::loadNW(const CString& pFileName)
 		{
 			if (curLine.size() != 8)
 				continue;
-			if (getDataFile(curLine[1]).length() < 1)
+			if (fileSystem.find(curLine[1]).length() < 1)
 				continue;
 
 			levelLinks.push_back(new TLevelLink(curLine));
@@ -182,7 +178,7 @@ bool TLevel::loadNW(const CString& pFileName)
 /*
 	TLevel: Find Level
 */
-TLevel * TLevel::findLevel(const CString& pLevelName)
+TLevel * TLevel::findLevel(const CString& pLevelName, CFileSystem& fileSystem)
 {
 	// Find Appropriate Level by Name
 	for (std::vector<TLevel *>::iterator i = levelList.begin(); i != levelList.end(); ++i)
@@ -199,7 +195,7 @@ TLevel * TLevel::findLevel(const CString& pLevelName)
 
 	// Load New Level
 	TLevel *level = new TLevel();
-	if (!level->loadLevel(pLevelName))
+	if (!level->loadLevel(pLevelName, fileSystem))
 	{
 		delete level;
 		return 0;

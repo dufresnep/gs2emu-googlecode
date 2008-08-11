@@ -45,6 +45,12 @@ bool CSettings::loadFile(const CString& pStr)
 		// Tokenize Line && Trim && Lowercase Key Name
 		std::vector<CString> line = strList[i].tokenize(strSep);
 		line[0].toLowerI();
+		if (line.size() == 1) continue;
+
+		// Remove \r
+		if (line[1][line[1].length() - 1] == '\r') line[1].removeI(line[1].length() - 1, 1);
+
+		// Trim
 		for (unsigned int j = 0; j < line.size(); j++)
 			line[j].trimI();
 

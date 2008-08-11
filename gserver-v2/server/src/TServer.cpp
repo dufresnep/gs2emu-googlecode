@@ -1,5 +1,7 @@
 #include "ICommon.h"
 #include "CSocket.h"
+#include "CSettings.h"
+#include "CFileSystem.h"
 #include "TServer.h"
 
 extern CString homepath;
@@ -19,6 +21,7 @@ TServer::TServer(CString pName)
 	rclog.setFilename(CString() << serverpath << "logs/rclog.txt");
 
 	serverlist.setServer(this);
+	filesystem.setServer(this);
 }
 
 int TServer::init()
@@ -31,6 +34,9 @@ int TServer::init()
 		serverlog.out("[Error] Could not open config/serveroptions.txt\n");
 		return ERR_SETTINGS;
 	}
+
+	// Load file system.
+	filesystem.load();
 
 	// Initialize the player socket.
 	playerSock.setType(SOCKET_TYPE_SERVER);

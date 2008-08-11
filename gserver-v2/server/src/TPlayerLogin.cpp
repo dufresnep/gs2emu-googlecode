@@ -14,7 +14,7 @@ extern bool __getLoginRC[propscount];
 /*
 	TPlayer: Manage Account
 */
-void TPlayer::sendLogin()
+bool TPlayer::sendLogin()
 {
 	// Load Player-Account
 	// TODO: We actually need to check if it fails because accounts can be banned.
@@ -29,8 +29,10 @@ void TPlayer::sendLogin()
 	printf("TODO: TPlayer::sendLogin, Check if account is in use.\n");
 
 	// Player's load different than RCs.
-	if (type == CLIENTTYPE_CLIENT) sendLoginClient();
-	else if (type == CLIENTTYPE_RC) sendLoginRC();
+	bool failed = false;
+	if (type == CLIENTTYPE_CLIENT) failed = sendLoginClient();
+	else if (type == CLIENTTYPE_RC) failed = sendLoginRC();
+	if (failed) return false;
 
 	// Exchange props with everybody on the server.
 	std::vector<TPlayer*> playerList = server->getPlayerList();
@@ -69,18 +71,29 @@ void TPlayer::sendLogin()
 	server->getServerList().addPlayer(this);
 
 	sendCompress();
+	return true;
 }
 
-void TPlayer::sendLoginClient()
+bool TPlayer::sendLoginClient()
 {
+	CSettings* settings = &(server->getSettings());
+
 	// Send the player his login props.
 	sendProps(__sendLogin, sizeof(__sendLogin) / sizeof(bool));
 
 	// Send the level to the player.
 	// setLevel will call sendCompress() for us.
-	// TODO: Send correct level.
 	printf("TODO: TPlayer::sendLoginClient, Send correct level to player.\n");
-	setLevel(CString() << server->getServerPath() << "world/onlinestartlocal.nw");
+	if (!setLevel(this->levelName, this->x, this->y, 0, true))
+	{
+		sendPacket(CString() >> (char)PLO_WARPFAILED);
+		if (!setLevel(settings->getStr("unstickmelevel"), settings->getFloat("unstickmex"), settings->getFloat("unstickmey"), 0, true))
+		{
+			sendPacket(CString() >> (char)PLO_DISCMESSAGE << "No level available.");
+			serverlog.out(CString() << "Cannot find level for " << accountName << "\n");
+			return false;
+		}
+	}
 
 	// Recalculate player spar deviation.
 	printf("TODO: TPlayer::sendLoginClient, Recalculate sparring deviation.\n");
@@ -108,9 +121,11 @@ void TPlayer::sendLoginClient()
 	// Delete the bomb.  It gets automagically added by the client for
 	// God knows which reason.  Bomb must be capitalized.
 	sendPacket(CString() >> (char)PLO_DELNPCWEAPON << "Bomb");
+
+	return true;
 }
 
-void TPlayer::sendLoginRC()
+bool TPlayer::sendLoginRC()
 {
 	// If no nickname was specified, set the nickname to the account name.
 	if (nickName.length() == 0)
@@ -122,4 +137,6 @@ void TPlayer::sendLoginRC()
 	// Send the RC join message to the RC.
 	server->sendPacketTo(CLIENTTYPE_RC, CString() >> (char)PLO_RCMESSAGE << "New RC: " << this->nickName << " (" << this->accountName << ")");
 	this->sendPacket(CString() >> (char)PLO_RCMESSAGE << "Welcome to RC.");
+
+	return true;
 }

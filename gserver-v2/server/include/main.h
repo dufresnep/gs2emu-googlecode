@@ -16,7 +16,6 @@
 /*
 	Define Functions
 */
-CString getDataFile(const CString& pFile);
 int findItemId(const CString& pItemName);
 void shutdownServer(int signal);
 

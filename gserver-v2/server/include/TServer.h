@@ -6,6 +6,7 @@
 #include "CSettings.h"
 #include "CSocket.h"
 #include "CLog.h"
+#include "CFileSystem.h"
 #include "TPlayer.h"
 #include "TServerList.h"
 #include "TLevel.h"
@@ -30,6 +31,7 @@ class TServer
 		CSettings& getSettings()				{ return settings; }
 		std::vector<TPlayer*>& getPlayerList()	{ return playerList; }
 		TServerList& getServerList()			{ return serverlist; }
+		CFileSystem& getFileSystem()			{ return filesystem; }
 		CString getServerPath()					{ return serverpath; }
 		CLog& getServerLog()					{ return serverlog; }
 		CLog& getRCLog()						{ return rclog; }
@@ -50,6 +52,7 @@ class TServer
 		std::vector<TPlayer *> playerIds, playerList;
 		CSocket playerSock, serverSock;
 		TServerList serverlist;
+		CFileSystem filesystem;
 		CString name;
 		CString serverpath;
 

@@ -48,7 +48,7 @@ CString::CString(float pFloat)
 	buffer = 0;
 
 	char tempBuff[32];
-	sprintf(tempBuff, "%f", pFloat);
+	sprintf(tempBuff, "%.2f", pFloat);
 	*this = tempBuff;
 }
 
@@ -288,7 +288,8 @@ CString CString::trimLeft() const
 			return subString(i, length() - i);
 	}
 
-	return CString(*this);
+	return CString();
+	//return CString(*this);
 }
 
 CString CString::trimRight() const

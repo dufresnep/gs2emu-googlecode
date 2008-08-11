@@ -398,23 +398,20 @@ TLevel* TPlayer::getLevel()
 /*
 	TPlayer: Set Properties
 */
-void TPlayer::setLevel(const CString& pLevelName)
+bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTime, bool warp)
 {
 	// Open Level
-	// TODO: Work out the entire levelname/directories problem.
-	level = TLevel::findLevel(pLevelName);
+	level = TLevel::findLevel(pLevelName, server->getFileSystem());
 	if (level == 0)
-	{
-		printf("TODO: TLevel::findLevel returned 0.\n");
-		return;
-	}
+		return false;
 
 	// Send Level
-	sendPacket(CString() >> (char)PLO_PLAYERWARP << getProp(PLPROP_X) << getProp(PLPROP_Y) << level->getLevelName());
+	if (warp) sendPacket(CString() >> (char)PLO_PLAYERWARP >> (char)(x * 2) >> (char)(y * 2) << level->getLevelName());
 	sendPacket(CString() >> (char)PLO_LEVELNAME << level->getLevelName());
 	sendPacket(CString() >> (char)PLO_BOARDPACKETSIZE >> (int)(1+(64*64*2)+1));
 	sendPacket(CString() << level->getBoardPacket());
 	sendCompress();
+	return true;
 }
 
 void TPlayer::setNick(const CString& pNickName)
@@ -494,9 +491,7 @@ bool TPlayer::msgPLI_LOGIN(CString& pPacket)
 
 	// Process Login
 	// TODO: This should be sent only when the serverlist verifies the login.
-	sendLogin();
-
-	return true;
+	return sendLogin();
 }
 
 bool TPlayer::msgPLI_LEVELWARP(CString& pPacket)

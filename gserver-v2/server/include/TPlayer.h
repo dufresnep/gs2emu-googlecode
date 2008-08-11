@@ -71,7 +71,7 @@ class TPlayer : public TAccount
 		int getType() const;
 
 		// Set Properties
-		void setLevel(const CString& pLevelName);
+		bool setLevel(const CString& pLevelName, float x, float y, time_t modTime = 0, bool warp = false);
 		void setNick(const CString& pNickName);
 		void setId(int pId);
 
@@ -103,9 +103,9 @@ class TPlayer : public TAccount
 
 	private:
 		// Login functions.
-		void sendLogin();
-		void sendLoginClient();
-		void sendLoginRC();
+		bool sendLogin();
+		bool sendLoginClient();
+		bool sendLoginRC();
 
 		// Packet functions.
 		bool parsePacket(CString& pPacket);
