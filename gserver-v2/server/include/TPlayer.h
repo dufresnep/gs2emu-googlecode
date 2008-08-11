@@ -82,6 +82,7 @@ enum
 	PLO_NPCWEAPONADD	= 33,
 	PLO_NPCWEAPONDEL	= 34,
 	PLO_LEVELMODTIME	= 39,
+	PLO_STAFFGUILDS		= 47,
 	PLO_TRIGGERACTION	= 48,
 	PLO_EMPTY49			= 49,	// Causes level to freeze with "Loading" for some reason.  Might be server-side setlevel.
 	PLO_ADDPLAYER		= 55,
@@ -91,11 +92,17 @@ enum
 	PLO_BOARDPACKET		= 101,
 	PLO_FILE			= 102,
 	PLO_RPGWINDOW		= 179,
+	PLO_STATUSLIST		= 180,
 };
 
 enum
 {
 	PLFLAG_NOTOALL		= 0x04,
+};
+
+enum
+{
+	PLSTATUS_DEAD		= 0x08,
 };
 
 struct SCachedLevel

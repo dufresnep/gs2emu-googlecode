@@ -4,6 +4,7 @@
 #include <vector>
 #include <time.h>
 #include "ICommon.h"
+#include "CTimeout.h"
 #include "CString.h"
 
 class TLevelBoardChange
@@ -13,28 +14,27 @@ class TLevelBoardChange
 		TLevelBoardChange(const int pX, const int pY, const int pWidth, const int pHeight,
 			const CString& pTiles, const CString& pOldTiles, const int respawn = 15)
 			: x(pX), y(pY), width(pWidth), height(pHeight),
-			tiles(pTiles), oldTiles(pOldTiles), counter(respawn), modTime(time(0)) { }
+			tiles(pTiles), oldTiles(pOldTiles), modTime(time(0)) { timeout.setTimeout(respawn); }
 
 		// functions
 		CString getBoardStr(const CString ignore = "") const;
 		void swapTiles();
 
 		// get private variables
-		int getX()					{ return x; }
-		int getY()					{ return y; }
-		int getWidth()				{ return width; }
-		int getHeight()				{ return height; }
-		CString getTiles()			{ return tiles; }
-		int getRespawn()			{ return counter; }
+		int getX() const				{ return x; }
+		int getY() const				{ return y; }
+		int getWidth() const			{ return width; }
+		int getHeight() const			{ return height; }
+		CString getTiles() const		{ return tiles; }
 
 		// set private variables
-		void setRespawn(int respawn)	{ counter = respawn; }
 		void setModTime(time_t ntime)	{ modTime = ntime; }
+
+		CTimeout timeout;
 
 	private:
 		int x, y, width, height;
 		CString tiles, oldTiles;
-		int counter;
 		time_t modTime;
 };
 

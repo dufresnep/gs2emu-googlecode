@@ -41,13 +41,14 @@ class TLevel
 		static TLevel * findLevel(const CString& pLevelName, TServer* server);
 
 		// get functions
-		CString getLevelName()					{ return levelName; }
-		short* getTiles()						{ return levelTiles; }
-		time_t getModTime()						{ return modTime; }
+		CString getLevelName() const					{ return levelName; }
+		short* getTiles()								{ return levelTiles; }
+		time_t getModTime() const						{ return modTime; }
 		std::vector<TLevelChest *>& getLevelChests()	{ return levelChests; }
+		bool getSparringZone() const					{ return levelSpar; }
 
 		// set functions
-		void setSparringZone(bool pLevelSpar)	{ levelSpar = pLevelSpar; }
+		void setSparringZone(bool pLevelSpar)			{ levelSpar = pLevelSpar; }
 
 		// other functions
 		bool alterBoard(CString& pTileData, int pX, int pY, int pWidth, int pHeight, TPlayer* player);

@@ -662,9 +662,10 @@ bool TPlayer::msgPLI_BOARDMODIFY(CString& pPacket)
 	if (dropItem >= 0)
 	{
 		CString packet;
-		packet >> (char)PLO_ITEMADD >> (char)(loc[0] * 2) >> (char)(loc[1] * 2) >> (char)dropItem;
-		server->sendPacketToLevel( packet, getLevel() );
-		//level->items.add(new CItem((float)loc[0], (float)loc[1], dropItem));
+		packet >> (char)(loc[0] * 2) >> (char)(loc[1] * 2) >> (char)dropItem;
+
+		msgPLI_ITEMADD(CString() << packet);
+		sendPacket(CString() >> (char)PLO_ITEMADD << packet);
 	}
 
 	return true;
@@ -786,6 +787,7 @@ bool TPlayer::msgPLI_ITEMADD(CString& pPacket)
 
 bool TPlayer::msgPLI_ITEMDEL(CString& pPacket)
 {
+	for (int i = 0; i < pPacket.length(); ++i) printf("%02x ", (unsigned char)pPacket[i]); printf("\n");
 	server->sendPacketToLevel(CString() >> (char)PLO_ITEMDEL << pPacket.text() + 1, level, this);
 
 	float iX = (float)pPacket.readGUChar() / 2.0f;
@@ -829,6 +831,8 @@ bool TPlayer::msgPLI_WANTFILE(CString& pPacket)
 	CString file = pPacket.readString("");
 	CString fileData = fileSystem->load(file);
 	time_t modTime = fileSystem->getModTime(file);
+
+	printf( "msgPLI_WANTFILE: %s\n", file.text() );
 
 	// See if we have enough room in the packet for the file.
 	// 1 (PLO_FILE) + 5 (modTime) + 1 (file.length()) + file.length() + 1 (\n)
@@ -1025,8 +1029,8 @@ bool TPlayer::msgPLI_LANGUAGE(CString& pPacket)
 bool TPlayer::msgPLI_TRIGGERACTION(CString& pPacket)
 {
 	int npcId = pPacket.readGInt();
-	float x = (float)pPacket.readGChar() / 2;
-	float y = (float)pPacket.readGChar() / 2;
+	float x = (float)pPacket.readGChar() / 2.0f;
+	float y = (float)pPacket.readGChar() / 2.0f;
 	CString action = pPacket.readString("");
 
 	// We don't have an NPCserver, so, for now, just pass it along.

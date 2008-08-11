@@ -1,4 +1,5 @@
 #include <vector>
+#include <math.h>
 #include "ICommon.h"
 #include "TPlayer.h"
 #include "TAccount.h"
@@ -96,15 +97,35 @@ bool TPlayer::sendLoginClient()
 	}
 
 	// Recalculate player spar deviation.
-	printf("TODO: TPlayer::sendLoginClient, Recalculate sparring deviation.\n");
+	{
+		// c = sqrt( (350*350 - 50*50) / t )
+		// where t = 60 for number of rating periods for deviation to go from 50 to 350
+		const float c = 44.721f;
+		float t = (float)(time(0) - lastSparTime)/86400.0f; // Convert seconds to days: 60/60/24
+
+		// Find the new deviation.
+		float deviate = min( sqrt((oldDeviation*oldDeviation) + (c*c) * t), 350.0f );
+
+		// Save the old rating and set the new one.
+		deviation = deviate;
+	}
 
 	// Send out what guilds should be placed in the Staff section of the playerlist.
-	printf("TODO: TPlayer::sendLoginClient, Send staff guilds.\n");
+	std::vector<CString> guilds = settings->getStr("staffguilds").tokenize(",");
+	CString guildPacket = CString() >> (char)PLO_STAFFGUILDS;
+	for (std::vector<CString>::iterator i = guilds.begin(); i != guilds.end(); ++i)
+		guildPacket << "\"" << ((CString)(*i)).trim() << "\",";
+	sendPacket(guildPacket);
 
 	// Send out the server's available status list options.
-	printf("TODO: TPlayer::sendLoginClient, Send status list values.\n");
+	std::vector<CString> plicons = settings->getStr("playerlisticons").tokenize(",");
+	CString pliconPacket = CString() >> (char)PLO_STATUSLIST;
+	for (std::vector<CString>::iterator i = plicons.begin(); i != plicons.end(); ++i)
+		pliconPacket << "\"" << ((CString)(*i)).trim() << "\",";
+	sendPacket(pliconPacket);
 
-	// TODO: Send out RPG Window greeting?
+	// Send out RPG Window greeting.
+	sendPacket(CString() >> (char)PLO_RPGWINDOW << "\"Welcome to " << settings->getStr("name") << ".\",\"Graal Reborn GServer programmed by Joey and Nalin.\"" );
 
 	// Send the start message to the player.
 	printf("TODO: TPlayer::sendLoginClient, Send the start message to the player.\n");

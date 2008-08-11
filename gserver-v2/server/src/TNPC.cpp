@@ -47,6 +47,8 @@ level(pLevel)
 		for (unsigned int i = 1; i < parsedCode.size(); ++i)
 			clientCode << parsedCode[i];
 	}
+	//if (serverCode.length() > 0) printf("serverCode: %s\n", serverCode.text());
+	//if (clientCode.length() > 0) printf("clientCode: %s\n", clientCode.text());
 
 	// Search for toweapons in the clientside code and extract the name of the weapon.
 	weaponName = toWeaponName(clientCode);
@@ -461,7 +463,10 @@ std::vector<CString> removeComments(const CString& code)
 					doLoop = false;
 				}
 				else
+				{
+					multiLine = false;
 					line.removeI(mlc_start, (mlc_end + 2) - mlc_start);
+				}
 				continue;
 			}
 

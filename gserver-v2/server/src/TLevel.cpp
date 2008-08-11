@@ -10,6 +10,10 @@
 	Global Variables
 */
 CString base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+short respawningTiles[10] = {
+	0x1ff, 0x3ff, 0x2ac, 0x002, 0x200,
+	0x022, 0x3de, 0x1a4, 0x14a, 0x674
+};
 
 /*
 	TLevel: Constructor - Deconstructor
@@ -295,11 +299,6 @@ TLevel * TLevel::findLevel(const CString& pLevelName, TServer* server)
 	return level;
 }
 
-short respawningTiles[10] = {
-	0x1ff, 0x3ff, 0x2ac, 0x002, 0x200,
-	0x022, 0x3de, 0x1a4, 0x14a, 0x674
-};
-
 bool TLevel::alterBoard(CString& pTileData, int pX, int pY, int pWidth, int pHeight, TPlayer* player)
 {
 	if( pX < 0 || pY < 0 || pX > 63 || pY > 63 ||
@@ -425,27 +424,35 @@ char TLevel::removeItem(float pX, float pY)
 
 bool TLevel::doTimedEvents()
 {
+	// Check if we should revert any board changes.
 	for (std::vector<TLevelBoardChange*>::iterator i = levelBoardChanges.begin(); i != levelBoardChanges.end(); ++i)
 	{
 		TLevelBoardChange* change = *i;
-		int respawnTime = change->getRespawn();
-		if (respawnTime == 0)
+		int respawnTimer = change->timeout.doTimeout();
+		if (respawnTimer == 0)
 		{
 			// Put the old data back in.  DON'T DELETE THE CHANGE.
 			// The client remembers board changes and if we delete the
 			// change, the client won't get the new data.
 			change->swapTiles();
 			change->setModTime(time(0));
-			change->setRespawn(-1);
 			server->sendPacketToLevel(change->getBoardStr(), this);
-		}
-		else if (respawnTime > 0)
-		{
-			change->setRespawn(change->getRespawn() - 1);
 		}
 	}
 
-	// TODO: item timeout.
+	// Check if any items have timed out.
+	// This allows us to delete items that have disappeared if nobody is in the level to send
+	// the PLI_ITEMDEL packet.
+	for (std::vector<TLevelItem*>::iterator i = levelItems.begin(); i != levelItems.end(); )
+	{
+		TLevelItem* item = *i;
+		int deleteTimer = item->timeout.doTimeout();
+		if (deleteTimer == 0)
+		{
+			delete item;
+			i = levelItems.erase(i);
+		} else ++i;
+	}
 
 	// TODO: horse timeout.
 

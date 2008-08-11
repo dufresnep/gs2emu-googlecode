@@ -67,7 +67,7 @@ CString TLevelItem::getItemPlayerProp(const CString& pItemName, TPlayer* player)
 			CString playerProp = player->getProp(PLPROP_CURPOWER);
 			char heartCount = playerProp.readGChar() + (1 * 2);
 			playerProp = player->getProp(PLPROP_MAXPOWER);
-			char heartMax = playerProp.readGChar();
+			char heartMax = playerProp.readGChar() * 2;
 			heartCount = clip(heartCount, 0, heartMax);
 			return CString() >> (char)PLPROP_CURPOWER >> (char)heartCount;
 		}
@@ -85,7 +85,7 @@ CString TLevelItem::getItemPlayerProp(const CString& pItemName, TPlayer* player)
 		case 7:		// bow
 		case 8:		// bomb
 
-		case 9:	// shield
+		case 9:		// shield
 		case 15:	// mirrorshield
 		case 17:	// lizardshield
 		{

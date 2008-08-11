@@ -232,7 +232,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 			break;
 
 			case PLPROP_CURPOWER:
-				power = (float)pPacket.readGUChar() / 2;
+				power = (float)pPacket.readGUChar() / 2.0f;
 				power = clip(power, 0, (float)maxPower);
 			break;
 
@@ -338,20 +338,20 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 			break;
 
 			case PLPROP_X:
-				x = (float)(pPacket.readGUChar() / 2);
-				status &= (-1-1);
+				x = (float)(pPacket.readGUChar() / 2.0f);
+				status &= (~0 - 1);
 				lastMovement = time(0);
 			break;
 
 			case PLPROP_Y:
-				y = (float)(pPacket.readGUChar() / 2);
-				status &= (-1-1);
+				y = (float)(pPacket.readGUChar() / 2.0f);
+				status &= (~0 - 1);
 				lastMovement = time(0);
 			break;
 
 			case PLPROP_Z:
-				z = (float)(pPacket.readGUChar() / 2);
-				status &= (-1-1);
+				z = (float)(pPacket.readGUChar() / 2.0f);
+				status &= (~0 - 1);
 				lastMovement = time(0);
 			break;
 
@@ -367,7 +367,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 				if (id == -1) break;
 
 				// When they come back to life, give them hearts.
-				if ((oldStatus & 8) > 0 && (status & 8) == 0)
+				if ((oldStatus & PLSTATUS_DEAD) > 0 && (status & PLSTATUS_DEAD) == 0)
 				{
 					power = clip((ap < 20 ? 3 : (ap < 40 ? 5 : maxPower)), 0.0f, maxPower);
 					// TODO: send level
@@ -376,12 +376,11 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 				}
 
 				// When they die, increase deaths and make somebody else level leader.
-				if ((oldStatus & 8) == 0 && (status & 8) > 0)
+				if ((oldStatus & PLSTATUS_DEAD) == 0 && (status & PLSTATUS_DEAD) > 0)
 				{
+					if (level->getSparringZone() == false) deaths++;
 					// TODO: all this.
 					/*
-					if(!level->sparZone)
-						deaths++;
 					if (level->players.count() > 1 && level->players[0] == this)
 					{
 						level->players.remove(0);
@@ -611,7 +610,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 		if (levelBuff.length() > 0)
 			server->sendPacketToLevel(CString() >> (char)PLO_OTHERPLPROPS >> (short)this->id << levelBuff, getLevel(), this);
 		if (selfBuff.length() > 0)
-			sendPacket(CString() >> (char)PLO_PLAYERPROPS << selfBuff);
+			this->sendPacket(CString() >> (char)PLO_PLAYERPROPS << selfBuff);
 		sendCompress();
 	}
 }
