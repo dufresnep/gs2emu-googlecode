@@ -151,7 +151,7 @@ PLE_POST22(false), os("wind"), codepage(1252), level(0),
 id(0), type(CLIENTTYPE_AWAIT), server(pServer), allowBomb(false), hadBomb(false)
 {
 	// TODO: lastChat and lastMessage
-	lastData = lastMovement = lastChat = lastMessage = time(0);
+	lastData = lastMovement = lastChat = lastMessage = lastSave = time(0);
 	printf("Created for: %s\n", playerSock->tcpIp());
 }
 
@@ -290,7 +290,13 @@ bool TPlayer::doTimedEvents()
 		}
 	}
 
-	// TODO: save player account every now and then.
+	// Save player account every 5 minutes.
+	if ((int)difftime(currTime, lastSave) > 300)
+	{
+		lastSave = currTime;
+		saveAccount();
+	}
+
 	return true;
 }
 
@@ -499,8 +505,7 @@ bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTi
 	sendPacket(CString() << level->getBaddyPacket());
 
 	// Send leader status and NPCs.
-	TPlayer* leader = level->getPlayer(0);
-	if (leader == this) sendPacket(CString() >> (char)PLO_ISLEADER);
+	if (level->getPlayer(0) == this) sendPacket(CString() >> (char)PLO_ISLEADER);
 	sendPacket(CString() << level->getNpcsPacket(l_time));
 
 	// If the level is a sparring zone and you have 100 AP, change AP to 99 and

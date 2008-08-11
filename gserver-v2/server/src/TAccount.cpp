@@ -14,7 +14,7 @@ accountIp(0), adminRights(0),
 bodyImg("body.png"), headImg("head0.png"), gAni("idle"), language("English"),
 nickName("default"), shieldImg("shield1.png"), swordImg("sword1.png"),
 deviation(350.0f), oldDeviation(350.0f), power(3.0), rating(1500.0f), x(0), y(0), z(0),
-gmapx(0), gmapy(0), gmaplevelx(0), gmaplevely(0),
+x2(0), y2(0), gmaplevelx(0), gmaplevely(0),
 additionalFlags(0), ap(50), apCounter(0), arrowc(10), bombc(5), bombPower(1), carrySprite(-1),
 deaths(0), glovePower(1), gralatc(0), horsec(0), kills(0), mp(0), maxPower(3),
 onlineTime(0), shieldPower(1), sprite(2), status(20), swordPower(1), udpport(0),
@@ -74,11 +74,9 @@ bool TAccount::loadAccount(const CString& pAccount)
 		if (section == "NAME") continue;
 		else if (section == "NICK") continue;
 		else if (section == "LEVEL") levelName = val;
-		else if (section == "X") x = (float)strtofloat(val);
-		else if (section == "Y") y = (float)strtofloat(val);
+		else if (section == "X") { x = (float)strtofloat(val); x2 = (int)(x * 16); }
+		else if (section == "Y") { y = (float)strtofloat(val); y2 = (int)(y * 16); }
 		else if (section == "Z") z = (float)strtofloat(val);
-		else if (section == "GMAPX") gmapx = (int)strtoint(val);
-		else if (section == "GMAPY") gmapy = (int)strtoint(val);
 		else if (section == "MAXHP") maxPower = (int)strtoint(val);
 		else if (section == "HP") power = (float)strtofloat(val);
 		else if (section == "RUPEES") gralatc = strtoint(val);
@@ -184,8 +182,6 @@ bool TAccount::saveAccount(bool pOnlyAccount)
 		newFile << "X " << CString(x) << "\r\n";
 		newFile << "Y " << CString(y) << "\r\n";
 		newFile << "Z " << CString(z) << "\r\n";
-		newFile << "GMAPX " << CString(gmapx) << "\r\n";
-		newFile << "GMAPY " << CString(gmapy) << "\r\n";
 		newFile << "MAXHP " << CString(maxPower) << "\r\n";
 		newFile << "HP " << CString(power) << "\r\n";
 		newFile << "RUPEES " << CString(gralatc) << "\r\n";

@@ -86,8 +86,8 @@ enum
 	PLPROP_OSTYPE			= 75,	// 2.2+
 	PLPROP_TEXTCODEPAGE		= 76,	// 2.2+
 	PLPROP_UNKNOWN77		= 77,
-	PLPROP_GMAPX			= 78,
-	PLPROP_GMAPY			= 79,
+	PLPROP_X2				= 78,
+	PLPROP_Y2				= 79,
 };
 #define propscount	80
 
@@ -126,7 +126,7 @@ class TAccount
 		CString attrList[30], bodyImg, chatMsg, headImg, horseImg, gAni, language;
 		CString levelName, nickName, shieldImg, swordImg;
 		float deviation, oldDeviation, power, rating, x, y, z;
-		int gmapx, gmapy, gmaplevelx, gmaplevely;
+		int x2, y2, gmaplevelx, gmaplevely;
 		int additionalFlags, ap, apCounter, arrowc, bombc, bombPower, carrySprite;
 		unsigned char colors[5];
 		int deaths, glovePower, gralatc, horsec, kills, mp, maxPower;

@@ -110,6 +110,7 @@ enum
 enum
 {
 	PLSTATUS_PAUSED		= 0x01,
+	PLSTATUS_MALE		= 0x04,
 	PLSTATUS_DEAD		= 0x08,
 	PLSTATUS_HASSPIN	= 0x40,
 };
@@ -222,7 +223,7 @@ class TPlayer : public TAccount
 		int codepage;
 		TLevel *level;
 		int id, type;
-		time_t lastData, lastMovement, lastChat, lastMessage;
+		time_t lastData, lastMovement, lastChat, lastMessage, lastSave;
 		TServer* server;
 		std::vector<SCachedLevel*> cachedLevels;
 		bool allowBomb;

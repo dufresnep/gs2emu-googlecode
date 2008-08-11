@@ -27,7 +27,12 @@ int main(int argc, char* argv[])
 	signal(SIGINT, (sighandler_t) shutdownServer);
 	signal(SIGTERM, (sighandler_t) shutdownServer);
 
+	// Seed the random number generator with the current time.
+	srand((unsigned int)time(0));
+
+	// Grab the base path to the server executable.
 	getBasePath();
+
 	serverlog.out("Starting server\n");
 
 	// Load Server Settings
