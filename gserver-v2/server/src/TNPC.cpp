@@ -53,6 +53,10 @@ level(pLevel)
 	// Search for toweapons in the clientside code and extract the name of the weapon.
 	weaponName = toWeaponName(clientCode);
 
+	// Just a little warning for people who don't know.
+	if (clientCode.length() > 0x3FFF)
+		printf("WARNING: Clientside script of NPC (%s) exceeds the limit of 16383 bytes.\n", (weaponName.length() != 0 ? weaponName.text() : image.text()));
+
 	// TODO: Create plugin hook so NPCServer can acquire/format code.
 }
 
@@ -489,7 +493,7 @@ std::vector<CString> removeComments(const CString& code)
 
 		// If line has any data left in it, add it to the retVal;
 		if (line.length() != 0)
-			outLine << line << "\xa7";
+			outLine << line.trimI() << "\xa7";
 	}
 
 	// Add our code to the vector.  If serverside code was added, the size should now be 2.
