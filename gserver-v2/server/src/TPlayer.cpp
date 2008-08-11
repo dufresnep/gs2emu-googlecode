@@ -983,21 +983,34 @@ bool TPlayer::msgPLI_WANTFILE(CString& pPacket)
 	CString fileData = fileSystem->load(file);
 	time_t modTime = fileSystem->getModTime(file);
 
+	if (fileData.length() == 0) return true;
+
 	printf( "msgPLI_WANTFILE: %s\n", file.text() );
 
 	// See if we have enough room in the packet for the file.
+	// If not, we need to send it as a big file.
 	// 1 (PLO_FILE) + 5 (modTime) + 1 (file.length()) + file.length() + 1 (\n)
+	bool isBigFile = false;
 	int packetLength = 1 + 5 + 1 + file.length() + 1;
-	if (fileData.length() == 0 || fileData.length() > (0xFFFF - 0x20 - packetLength))
+	if (fileData.length() > (0xFFFF - 0x20 - packetLength))
+		isBigFile = true;
+
+	// If we are sending a big file, let the client know now.
+	if (isBigFile) sendPacket(CString() >> (char)PLO_LARGEFILESTART << file);
+
+	// Send the file now.
+	while (fileData.length() != 0)
 	{
-		sendPacket(CString() >> (char)PLO_FILESENDFAILED << file);
-		return true;
+		int sendSize = 0xFFFF - 0x20 - packetLength;
+		sendSize = clip(sendSize, 0, fileData.length());
+		sendPacket(CString() >> (char)PLO_RAWDATA >> (int)(packetLength + sendSize));
+		sendPacket(CString() >> (char)PLO_FILE >> (int)modTime >> (char)file.length() << file << fileData.subString(0, sendSize));
+		fileData.removeI(0, sendSize);
 	}
 
-	// Increase packetLength by the size of the file and send the PLO_RAWDATA packet.
-	packetLength += fileData.length();
-	sendPacket(CString() >> (char)PLO_RAWDATA >> (int)packetLength);
-	sendPacket(CString() >> (char)PLO_FILE >> (int)modTime >> (char)file.length() << file << fileData);
+	// If we had sent a large file, let the client know we finished sending it.
+	if (isBigFile) sendPacket(CString() >> (char)PLO_LARGEFILEEND << file);
+
 	sendCompress();
 
 	return true;

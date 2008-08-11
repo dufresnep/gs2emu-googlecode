@@ -94,6 +94,8 @@ enum
 	PLO_EMPTY49			= 49,	// Causes level to freeze with "Loading" for some reason.  Might be server-side setlevel.
 	PLO_ADDPLAYER		= 55,
 	PLO_DELPLAYER		= 56,
+	PLO_LARGEFILESTART	= 68,
+	PLO_LARGEFILEEND	= 69,
 	PLO_RCMESSAGE		= 74,
 	PLO_RAWDATA			= 100,
 	PLO_BOARDPACKET		= 101,
