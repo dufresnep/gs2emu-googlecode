@@ -94,8 +94,8 @@ enum {
 	SFOLDERFTP,	 // 65  show ftp folder (ftp ordner anzeigen)
 	SSENDFTP,	 // 66  Found by Twizted =o send FTP shit to rc
 	STEXTFTP,	 // 67  bottom ftp box (ftp feld unten)
-	SEMPTY68,	 // 68
-	SEMPTY69,	 // 69
+	SLARGEFILESTART,	 // 68
+	SLARGEFILEEND,	 // 69
 	DACCLIST,	 // 70
 	DPLPROPS,	 // 71
 	DACCPLPROPS,  // 72
