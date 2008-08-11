@@ -115,10 +115,14 @@ void createPLFunctions()
 	TPLFunc[PLI_HORSEDEL] = &TPlayer::msgPLI_HORSEDEL;
 	TPLFunc[PLI_ARROWADD] = &TPlayer::msgPLI_ARROWADD;
 	TPLFunc[PLI_FIRESPY] = &TPlayer::msgPLI_FIRESPY;
+	TPLFunc[PLI_THROWCARRIED] = &TPlayer::msgPLI_THROWCARRIED;
+	TPLFunc[PLI_ITEMADD] = &TPlayer::msgPLI_ITEMADD;
+	TPLFunc[PLI_ITEMDEL] = &TPlayer::msgPLI_ITEMDEL;
 
 	TPLFunc[PLI_WANTFILE] = &TPlayer::msgPLI_WANTFILE;
 	TPLFunc[PLI_NPCWEAPONIMG] = &TPlayer::msgPLI_NPCWEAPONIMG;
-	TPLFunc[PLI_FORCELEVELWARP] = &TPlayer::msgPLI_LEVELWARP;	// Only need one func.
+	TPLFunc[PLI_FORCELEVELWARP] = &TPlayer::msgPLI_LEVELWARP;	// Shared with PLI_LEVELWARP
+	TPLFunc[PLI_ITEMTAKE] = &TPlayer::msgPLI_ITEMDEL;			// Shared with PLI_ITEMDEL
 	TPLFunc[PLI_UPDATEFILE] = &TPlayer::msgPLI_UPDATEFILE;
 	TPLFunc[PLI_ADJACENTLEVEL] = &TPlayer::msgPLI_ADJACENTLEVEL;
 	TPLFunc[PLI_LANGUAGE] = &TPlayer::msgPLI_LANGUAGE;
@@ -758,6 +762,44 @@ bool TPlayer::msgPLI_FIRESPY(CString& pPacket)
 	server->sendPacketToLevel(CString() >> (char)PLO_FIRESPY >> (short)id << pPacket.text() + 1, level, this);
 	return true;
 }
+
+bool TPlayer::msgPLI_THROWCARRIED(CString& pPacket)
+{
+	server->sendPacketToLevel(CString() >> (char)PLO_THROWCARRIED >> (short)id << pPacket.text() + 1, level, this);
+	return true;
+}
+
+bool TPlayer::msgPLI_ITEMADD(CString& pPacket)
+{
+	float iX = (float)pPacket.readGUChar() / 2.0f;
+	float iY = (float)pPacket.readGUChar() / 2.0f;
+	unsigned char item = pPacket.readGUChar();
+
+	// TODO: add item to level item list so it can be removed after it expires.
+
+	server->sendPacketToLevel(CString() >> (char)PLO_ITEMADD << pPacket.text() + 1, level, this);
+	return true;
+}
+
+bool TPlayer::msgPLI_ITEMDEL(CString& pPacket)
+{
+	server->sendPacketToLevel(CString() >> (char)PLO_ITEMDEL << pPacket.text() + 1, level, this);
+
+	float iX = (float)pPacket.readGUChar() / 2.0f;
+	float iY = (float)pPacket.readGUChar() / 2.0f;
+
+	// TODO: find the item in the x/y spot in the level item list.
+
+	// If this is a PLI_ITEMTAKE packet, give the item to the player.
+	if (pPacket[0] - 32 == PLI_ITEMTAKE)
+	{
+		// TODO: give the item to the player.
+	}
+	// TODO: remove item from the level item list.
+
+	return true;
+}
+
 
 bool TPlayer::msgPLI_WANTFILE(CString& pPacket)
 {

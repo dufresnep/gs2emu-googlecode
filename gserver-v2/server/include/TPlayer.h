@@ -37,6 +37,9 @@ enum
 	PLI_WANTFILE		= 23,
 	PLI_NPCWEAPONIMG	= 24,
 	PLI_FORCELEVELWARP	= 30,
+
+	PLI_ITEMTAKE		= 32,
+
 	PLI_UPDATEFILE		= 34,
 	PLI_ADJACENTLEVEL	= 35,
 	PLI_LANGUAGE		= 37,
@@ -66,8 +69,9 @@ enum
 	PLO_HORSEDEL		= 18,
 	PLO_ARROWADD		= 19,
 	PLO_FIRESPY			= 20,
-
+	PLO_THROWCARRIED	= 21,
 	PLO_ITEMADD			= 22,
+	PLO_ITEMDEL			= 23,
 
 	PLO_SIGNATURE		= 25,
 	PLO_FILESENDFAILED	= 30,
@@ -149,6 +153,9 @@ class TPlayer : public TAccount
 		bool msgPLI_HORSEDEL(CString& pPacket);
 		bool msgPLI_ARROWADD(CString& pPacket);
 		bool msgPLI_FIRESPY(CString& pPacket);
+		bool msgPLI_THROWCARRIED(CString& pPacket);
+		bool msgPLI_ITEMADD(CString& pPacket);
+		bool msgPLI_ITEMDEL(CString& pPacket);
 
 		bool msgPLI_WANTFILE(CString& pPacket);
 		bool msgPLI_NPCWEAPONIMG(CString& pPacket);
