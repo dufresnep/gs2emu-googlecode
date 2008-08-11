@@ -30,7 +30,7 @@ enum
 	PLI_LANGUAGE		= 37,
 	PLI_TRIGGERACTION	= 38,
 	PLI_MAPINFO			= 39,
-	PLI_UNKNOWN46		= 46,
+	PLI_UNKNOWN46		= 46,		// Always is 1.  Might be a player count for the gmap level.
 };
 
 enum
@@ -53,11 +53,13 @@ enum
 	PLO_DELNPCWEAPON = 34,
 	PLO_LEVELMODTIME = 39,
 	PLO_TRIGGERACTION = 48,
+	PLO_EMPTY49 = 49,			// Causes level to freeze with "Loading" for some reason.  Might be server-side setlevel.
 	PLO_ADDPLAYER = 55,
 	PLO_DELPLAYER = 56,
 	PLO_RCMESSAGE = 74,
-	PLO_BOARDPACKETSIZE = 100,
+	PLO_RAWDATA = 100,
 	PLO_BOARDPACKET = 101,
+	PLO_FILE = 102,
 	PLO_RPGWINDOW = 179,
 };
 

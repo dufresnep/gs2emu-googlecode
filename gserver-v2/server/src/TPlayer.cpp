@@ -450,7 +450,7 @@ bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTi
 	{
 		if (modTime != level->getModTime())
 		{
-			sendPacket(CString() >> (char)PLO_BOARDPACKETSIZE >> (int)(1+(64*64*2)+1));
+			sendPacket(CString() >> (char)PLO_RAWDATA >> (int)(1+(64*64*2)+1));
 			sendPacket(CString() << level->getBoardPacket());
 		}
 		sendCompress();
@@ -688,9 +688,28 @@ bool TPlayer::msgPLI_NPCPROPS(CString& pPacket)
 
 bool TPlayer::msgPLI_WANTFILE(CString& pPacket)
 {
+	CFileSystem* fileSystem = &(server->getFileSystem());
+
+	// Load file.
 	CString file = pPacket.readString("");
-	printf("TODO: TPlayer::msgPLI_WANTFILE, file: %s\n", file.text());
-	sendPacket(CString() >> (char)PLO_FILESENDFAILED << file);
+	CString fileData = fileSystem->load(file);
+	time_t modTime = fileSystem->getModTime(file);
+
+	// See if we have enough room in the packet for the file.
+	// 1 (PLO_FILE) + 5 (modTime) + 1 (file.length()) + file.length() + 1 (\n)
+	int packetLength = 1 + 5 + 1 + file.length() + 1;
+	if (fileData.length() == 0 || fileData.length() > (0xFFFF - 0x20 - packetLength))
+	{
+		sendPacket(CString() >> (char)PLO_FILESENDFAILED << file);
+		return true;
+	}
+
+	// Increase packetLength by the size of the file and send the PLO_RAWDATA packet.
+	packetLength += fileData.length();
+	sendPacket(CString() >> (char)PLO_RAWDATA >> (int)packetLength);
+	sendPacket(CString() >> (char)PLO_FILE >> (int)modTime >> (char)file.length() << file << fileData);
+	sendCompress();
+
 	return true;
 }
 
@@ -702,9 +721,17 @@ bool TPlayer::msgPLI_NPCWEAPONIMG(CString& pPacket)
 
 bool TPlayer::msgPLI_UPDATEFILE(CString& pPacket)
 {
+	CFileSystem* fileSystem = &(server->getFileSystem());
+
+	// Get the packet data and file mod time.
 	time_t modTime = pPacket.readGUInt5();
 	CString file = pPacket.readString("");
-	printf("TODO: TPlayer::msgPLI_UPDATEFILE, modTime: %ld, file: %s\n", (long)modTime, file.text());
+	time_t fModTime = fileSystem->getModTime(file);
+
+	// If the file on disk is different, send it to the player.
+	if (fModTime != modTime)
+		return msgPLI_WANTFILE(file);
+
 	sendPacket(CString() >> (char)PLO_FILESENDFAILED << file);
 	return true;
 }
@@ -735,7 +762,7 @@ bool TPlayer::msgPLI_ADJACENTLEVEL(CString& pPacket)
 	if ((modTime != adjacentLevel->getModTime()) || alreadyVisited == false)
 	{
 		sendPacket(CString() >> (char)PLO_LEVELNAME << adjacentLevel->getLevelName());
-		sendPacket(CString() >> (char)PLO_BOARDPACKETSIZE >> (int)(1+(64*64*2)+1));
+		sendPacket(CString() >> (char)PLO_RAWDATA >> (int)(1+(64*64*2)+1));
 		sendPacket(CString() << adjacentLevel->getBoardPacket());
 		sendCompress();
 
