@@ -775,8 +775,7 @@ bool TPlayer::msgPLI_ITEMADD(CString& pPacket)
 	float iY = (float)pPacket.readGUChar() / 2.0f;
 	unsigned char item = pPacket.readGUChar();
 
-	// TODO: add item to level item list so it can be removed after it expires.
-
+	level->addItem(iX, iY, item);
 	server->sendPacketToLevel(CString() >> (char)PLO_ITEMADD << pPacket.text() + 1, level, this);
 	return true;
 }
@@ -788,14 +787,13 @@ bool TPlayer::msgPLI_ITEMDEL(CString& pPacket)
 	float iX = (float)pPacket.readGUChar() / 2.0f;
 	float iY = (float)pPacket.readGUChar() / 2.0f;
 
-	// TODO: find the item in the x/y spot in the level item list.
+	// Remove the item from the level, getting the type of the item in the process.
+	char item = level->removeItem(iX, iY);
+	if (item == -1) return true;
 
 	// If this is a PLI_ITEMTAKE packet, give the item to the player.
 	if (pPacket[0] - 32 == PLI_ITEMTAKE)
-	{
-		// TODO: give the item to the player.
-	}
-	// TODO: remove item from the level item list.
+		this->setProps(TLevelItem::getItemPlayerProp(item, this), true);
 
 	return true;
 }

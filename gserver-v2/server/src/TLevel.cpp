@@ -192,7 +192,7 @@ bool TLevel::loadNW(const CString& pLevelName)
 		{
 			if (curLine.size() != 5)
 				continue;
-			if ((curLine[3] = CString(findItemId(curLine[3]))) == "-1")
+			if ((curLine[3] = CString(TLevelItem::getItemId(curLine[3]))) == "-1")
 				continue;
 
 			levelChests.push_back(new TLevelChest(curLine));
@@ -400,6 +400,27 @@ bool TLevel::alterBoard(CString& pTileData, int pX, int pY, int pWidth, int pHei
 	// Should we do it that way still?
 	levelBoardChanges.push_back(new TLevelBoardChange(pX, pY, pWidth, pHeight, pTileData, oldTiles, (doRespawn ? respawnTime : -1)));
 	return true;
+}
+
+bool TLevel::addItem(float pX, float pY, char pItem)
+{
+	levelItems.push_back(new TLevelItem(pX, pY, pItem));
+	return true;
+}
+
+char TLevel::removeItem(float pX, float pY)
+{
+	for (std::vector<TLevelItem*>::iterator i = levelItems.begin(); i != levelItems.end(); ++i)
+	{
+		TLevelItem* item = *i;
+		if (item->getX() == pX && item->getY() == pY)
+		{
+			char itemType = item->getItem();
+			levelItems.erase(i);
+			return itemType;
+		}
+	}
+	return -1;
 }
 
 bool TLevel::doTimedEvents()

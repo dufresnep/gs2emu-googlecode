@@ -13,7 +13,6 @@
 // Function pointer for signal handling.
 typedef void (*sighandler_t)(int);
 
-const char *__itemList[] = {"greenrupee", "bluerupee", "redrupee", "bombs", "darts", "heart", "glove1", "bow", "bomb", "shield", "sword", "fullheart", "superbomb", "battleaxe", "goldensword", "mirrorshield", "glove2", "lizardshield", "lizardsword", "goldrupee", "fireball", "fireblast", "nukeshot", "joltbomb", "spinattack"};
 bool running = true;
 std::map<CString, TServer *> serverList;
 CLog serverlog("logs/serverlog.txt");
@@ -99,16 +98,6 @@ int main(int argc, char* argv[])
 /*
 	Extra-Cool Functions :D
 */
-int findItemId(const CString& pItemName)
-{
-	for (unsigned int i = 0; i < sizeof(__itemList) / sizeof(const char *); ++i)
-	{
-		if (__itemList[i] == pItemName)
-			return i;
-	}
-
-	return -1;
-}
 
 void shutdownServer(int signal)
 {

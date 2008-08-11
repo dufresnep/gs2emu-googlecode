@@ -47,6 +47,8 @@ class TLevel
 
 		// other functions
 		bool alterBoard(CString& pTileData, int pX, int pY, int pWidth, int pHeight, TPlayer* player);
+		bool addItem(float pX, float pY, char pItem);
+		char removeItem(float pX, float pY);	// TODO: Does the PLI_ITEMDEL packet specify an item?
 		bool doTimedEvents();
 
 	private:

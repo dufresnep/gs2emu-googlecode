@@ -227,6 +227,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 
 			case PLPROP_MAXPOWER:
 				maxPower = pPacket.readGUChar();
+				maxPower = clip(maxPower, 0, settings->getInt("heartlimit", 20));
 				maxPower = clip(maxPower, 0, 20);
 			break;
 

@@ -16,7 +16,6 @@
 /*
 	Define Functions
 */
-int findItemId(const CString& pItemName);
 void shutdownServer(int signal);
 
 #endif // MAIN_H
