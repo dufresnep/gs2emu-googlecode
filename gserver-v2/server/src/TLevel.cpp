@@ -101,8 +101,15 @@ CString TLevel::getNpcsPacket(time_t time)
 
 CString TLevel::getSignsPacket()
 {
-	return CString();
+	CString retVal;
+	for (std::vector<TLevelSign*>::const_iterator i = levelSigns.begin(); i != levelSigns.end(); ++i)
+	{
+		TLevelSign* sign = *i;
+		retVal >> (char)PLO_LEVELSIGN << sign->getSignStr() << "\n";
+	}
+	return retVal;
 }
+
 /*
 	TLevel: Level-Loading Functions
 */
@@ -214,6 +221,29 @@ bool TLevel::loadNW(const CString& pLevelName, TServer* server)
 			// Add the new NPC.
 			TNPC* npc = server->addNewNPC(image, code, x, y, this, true);
 			levelNPCs.push_back(npc);
+		}
+		else if (curLine[0] == "SIGN")
+		{
+			if (curLine.size() != 3)
+				continue;
+
+			int x = strtoint(curLine[1]);
+			int y = strtoint(curLine[2]);
+
+			// Grab the NPC code.
+			CString text;
+			++i;
+			while (i != fileData.end())
+			{
+				CString line = *i;
+				if (line[line.length() - 1] == '\r') line.removeI(line.length() - 1, 1);
+				if (line == "SIGNEND") break;
+				text << line << "\n";
+				++i;
+			}
+
+			// Add the new sign.
+			levelSigns.push_back(new TLevelSign(x, y, text));
 		}
 	}
 

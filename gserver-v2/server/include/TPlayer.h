@@ -22,6 +22,18 @@ enum
 	PLI_BOARDMODIFY		= 1,
 	PLI_PLAYERPROPS		= 2,
 	PLI_NPCPROPS		= 3,
+	PLI_BOMBADD			= 4,
+	PLI_BOMBDEL			= 5,
+	PLI_TOALL			= 6,
+	PLI_HORSEADD		= 7,
+	PLI_HORSEDEL		= 8,
+	PLI_ARROWADD		= 9,
+	PLI_FIRESPY			= 10,
+
+	PLI_THROWCARRIED	= 11,
+	PLI_ITEMADD			= 12,
+	PLI_ITEMDEL			= 13,
+
 	PLI_WANTFILE		= 23,
 	PLI_NPCWEAPONIMG	= 24,
 	PLI_FORCELEVELWARP	= 30,
@@ -35,33 +47,47 @@ enum
 
 enum
 {
-	PLO_LEVELLINK = 1,
-	PLO_NPCPROPS = 3,
-	PLO_LEVELCHEST = 4,
-	PLO_LEVELNAME = 6,
-	PLO_OTHERPLPROPS = 8,
-	PLO_PLAYERPROPS = 9,
-	PLO_ISLEADER = 10,
-	PLO_ADDITEM = 12,
-	PLO_PLAYERWARP = 14,
-	PLO_WARPFAILED = 15,
-	PLO_DISCMESSAGE = 16,
-	PLO_HORSEADD = 17,
-	PLO_HORSEDEL = 18,
-	PLO_SIGNATURE = 25,
-	PLO_FILESENDFAILED = 30,
-	PLO_NPCWEAPONIMG = 32,
-	PLO_DELNPCWEAPON = 34,
-	PLO_LEVELMODTIME = 39,
-	PLO_TRIGGERACTION = 48,
-	PLO_EMPTY49 = 49,			// Causes level to freeze with "Loading" for some reason.  Might be server-side setlevel.
-	PLO_ADDPLAYER = 55,
-	PLO_DELPLAYER = 56,
-	PLO_RCMESSAGE = 74,
-	PLO_RAWDATA = 100,
-	PLO_BOARDPACKET = 101,
-	PLO_FILE = 102,
-	PLO_RPGWINDOW = 179,
+	PLO_LEVELLINK		= 1,
+	PLO_NPCPROPS		= 3,
+	PLO_LEVELCHEST		= 4,
+	PLO_LEVELSIGN		= 5,
+	PLO_LEVELNAME		= 6,
+
+	PLO_OTHERPLPROPS	= 8,
+	PLO_PLAYERPROPS		= 9,
+	PLO_ISLEADER		= 10,
+	PLO_BOMBADD			= 11,
+	PLO_BOMBDEL			= 12,
+	PLO_TOALL			= 13,
+	PLO_PLAYERWARP		= 14,
+	PLO_WARPFAILED		= 15,
+	PLO_DISCMESSAGE		= 16,
+	PLO_HORSEADD		= 17,
+	PLO_HORSEDEL		= 18,
+	PLO_ARROWADD		= 19,
+	PLO_FIRESPY			= 20,
+
+	PLO_ITEMADD			= 22,
+
+	PLO_SIGNATURE		= 25,
+	PLO_FILESENDFAILED	= 30,
+	PLO_NPCWEAPONIMG	= 32,
+	PLO_DELNPCWEAPON	= 34,
+	PLO_LEVELMODTIME	= 39,
+	PLO_TRIGGERACTION	= 48,
+	PLO_EMPTY49			= 49,	// Causes level to freeze with "Loading" for some reason.  Might be server-side setlevel.
+	PLO_ADDPLAYER		= 55,
+	PLO_DELPLAYER		= 56,
+	PLO_RCMESSAGE		= 74,
+	PLO_RAWDATA			= 100,
+	PLO_BOARDPACKET		= 101,
+	PLO_FILE			= 102,
+	PLO_RPGWINDOW		= 179,
+};
+
+enum
+{
+	PLFLAG_NOTOALL		= 0x04,
 };
 
 struct SCachedLevel
@@ -113,6 +139,14 @@ class TPlayer : public TAccount
 		bool msgPLI_BOARDMODIFY(CString& pPacket);
 		bool msgPLI_PLAYERPROPS(CString& pPacket);
 		bool msgPLI_NPCPROPS(CString& pPacket);
+		bool msgPLI_BOMBADD(CString& pPacket);
+		bool msgPLI_BOMBDEL(CString& pPacket);
+		bool msgPLI_TOALL(CString& pPacket);
+		bool msgPLI_HORSEADD(CString& pPacket);
+		bool msgPLI_HORSEDEL(CString& pPacket);
+		bool msgPLI_ARROWADD(CString& pPacket);
+		bool msgPLI_FIRESPY(CString& pPacket);
+
 		bool msgPLI_WANTFILE(CString& pPacket);
 		bool msgPLI_NPCWEAPONIMG(CString& pPacket);
 		bool msgPLI_UPDATEFILE(CString& pPacket);

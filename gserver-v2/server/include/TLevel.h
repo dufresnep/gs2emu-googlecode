@@ -10,6 +10,7 @@
 #include "TLevelHorse.h"
 #include "TLevelItem.h"
 #include "TLevelLink.h"
+#include "TLevelSign.h"
 
 class TPlayer;
 class TNPC;
@@ -57,6 +58,7 @@ class TLevel
 		std::vector<TLevelHorse *> levelHorses;
 		std::vector<TLevelItem *> levelItems;
 		std::vector<TLevelLink *> levelLinks;
+		std::vector<TLevelSign *> levelSigns;
 		std::vector<TNPC *> levelNPCs;
 };
 

@@ -108,6 +108,14 @@ void createPLFunctions()
 	TPLFunc[PLI_BOARDMODIFY] = &TPlayer::msgPLI_BOARDMODIFY;
 	TPLFunc[PLI_PLAYERPROPS] = &TPlayer::msgPLI_PLAYERPROPS;
 	TPLFunc[PLI_NPCPROPS] = &TPlayer::msgPLI_NPCPROPS;
+	TPLFunc[PLI_BOMBADD] = &TPlayer::msgPLI_BOMBADD;
+	TPLFunc[PLI_BOMBDEL] = &TPlayer::msgPLI_BOMBDEL;
+	TPLFunc[PLI_TOALL] = &TPlayer::msgPLI_TOALL;
+	TPLFunc[PLI_HORSEADD] = &TPlayer::msgPLI_HORSEADD;
+	TPLFunc[PLI_HORSEDEL] = &TPlayer::msgPLI_HORSEDEL;
+	TPLFunc[PLI_ARROWADD] = &TPlayer::msgPLI_ARROWADD;
+	TPLFunc[PLI_FIRESPY] = &TPlayer::msgPLI_FIRESPY;
+
 	TPLFunc[PLI_WANTFILE] = &TPlayer::msgPLI_WANTFILE;
 	TPLFunc[PLI_NPCWEAPONIMG] = &TPlayer::msgPLI_NPCWEAPONIMG;
 	TPLFunc[PLI_FORCELEVELWARP] = &TPlayer::msgPLI_LEVELWARP;	// Only need one func.
@@ -648,7 +656,7 @@ bool TPlayer::msgPLI_BOARDMODIFY(CString& pPacket)
 	if (dropItem >= 0)
 	{
 		CString packet;
-		packet >> (char)PLO_ADDITEM >> (char)(loc[0] * 2) >> (char)(loc[1] * 2) >> (char)dropItem;
+		packet >> (char)PLO_ITEMADD >> (char)(loc[0] * 2) >> (char)(loc[1] * 2) >> (char)dropItem;
 		server->sendPacketToLevel( packet, getLevel() );
 		//level->items.add(new CItem((float)loc[0], (float)loc[1], dropItem));
 	}
@@ -683,6 +691,73 @@ bool TPlayer::msgPLI_NPCPROPS(CString& pPacket)
 	server->sendPacketToLevel(packet, level, this);
 	npc->setProps(pPacket.readString(""));
 
+	return true;
+}
+
+bool TPlayer::msgPLI_BOMBADD(CString& pPacket)
+{
+	server->sendPacketToLevel(CString() >> (char)PLO_BOMBADD >> (short)id << pPacket.text() + 1, level, this);
+	return true;
+}
+
+bool TPlayer::msgPLI_BOMBDEL(CString& pPacket)
+{
+	server->sendPacketToLevel(CString() >> (char)PLO_BOMBDEL << pPacket.text() + 1, level, this);
+	return true;
+}
+
+bool TPlayer::msgPLI_TOALL(CString& pPacket)
+{
+	// TODO: jail levels.
+	CString message = pPacket.readString("");
+	// TODO: word filter.
+
+	std::vector<TPlayer*> playerList = server->getPlayerList();
+	for (std::vector<TPlayer*>::iterator i = playerList.begin(); i != playerList.end(); ++i)
+	{
+		TPlayer* player = *i;
+		if (player == this) continue;
+
+		// See if the player is allowing toalls.
+		unsigned char flags = strtoint(player->getProp(PLPROP_ADDITFLAGS));
+		if (flags & PLFLAG_NOTOALL) continue;
+
+		player->sendPacket(CString() >> (char)PLO_TOALL << message);
+	}
+	return true;
+}
+
+bool TPlayer::msgPLI_HORSEADD(CString& pPacket)
+{
+	server->sendPacketToLevel(CString() >> (char)PLO_HORSEADD << pPacket.text() + 1, level, this);
+
+	float hx = (float)pPacket.readGUChar() / 2.0f;
+	float hy = (float)pPacket.readGUChar() / 2.0f;
+	CString image = pPacket.readChars(pPacket.readGUChar());
+	// TODO: add horse to level
+	return true;
+}
+
+bool TPlayer::msgPLI_HORSEDEL(CString& pPacket)
+{
+	server->sendPacketToLevel(CString() >> (char)PLO_HORSEDEL << pPacket.text() + 1, level, this);
+
+	float hx = (float)pPacket.readGUChar() / 2.0f;
+	float hy = (float)pPacket.readGUChar() / 2.0f;
+	CString image = pPacket.readChars(pPacket.readGUChar());
+	// TODO: remove horse from level
+	return true;
+}
+
+bool TPlayer::msgPLI_ARROWADD(CString& pPacket)
+{
+	server->sendPacketToLevel(CString() >> (char)PLO_ARROWADD >> (short)id << pPacket.text() + 1, level, this);
+	return true;
+}
+
+bool TPlayer::msgPLI_FIRESPY(CString& pPacket)
+{
+	server->sendPacketToLevel(CString() >> (char)PLO_FIRESPY >> (short)id << pPacket.text() + 1, level, this);
 	return true;
 }
 
