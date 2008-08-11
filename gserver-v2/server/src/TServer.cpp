@@ -89,6 +89,8 @@ bool TServer::doMain()
 			// Remove the player from the serverlist.
 			serverlist.remPlayer(player->getProp(PLPROP_ACCOUNTNAME).removeI(0,1), player->getType());
 
+			// Get rid of the player now.
+			playerIds[player->getId()] = 0;
 			delete player;
 			i = playerList.erase(i);
 		}

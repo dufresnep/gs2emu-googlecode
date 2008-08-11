@@ -34,6 +34,9 @@ enum
 	PLI_ITEMADD			= 12,
 	PLI_ITEMDEL			= 13,
 	PLI_CLAIMPKER		= 14,
+	PLI_BADDYPROPS		= 15,
+	PLI_BADDYHURT		= 16,
+	PLI_BADDYADD		= 17,
 
 	PLI_OPENCHEST		= 20,
 	PLI_WANTFILE		= 23,
@@ -55,6 +58,7 @@ enum
 enum
 {
 	PLO_LEVELLINK		= 1,
+	PLO_BADDYPROPS		= 2,
 	PLO_NPCPROPS		= 3,
 	PLO_LEVELCHEST		= 4,
 	PLO_LEVELSIGN		= 5,
@@ -78,6 +82,7 @@ enum
 	PLO_ITEMDEL			= 23,
 
 	PLO_SIGNATURE		= 25,
+	PLO_BADDYHURT		= 27,
 	PLO_FILESENDFAILED	= 30,
 	PLO_NPCWEAPONIMG	= 32,
 	PLO_NPCWEAPONADD	= 33,
@@ -170,6 +175,9 @@ class TPlayer : public TAccount
 		bool msgPLI_ITEMADD(CString& pPacket);
 		bool msgPLI_ITEMDEL(CString& pPacket);
 		bool msgPLI_CLAIMPKER(CString& pPacket);
+		bool msgPLI_BADDYPROPS(CString& pPacket);
+		bool msgPLI_BADDYHURT(CString& pPacket);
+		bool msgPLI_BADDYADD(CString& pPacket);
 
 		bool msgPLI_OPENCHEST(CString& pPacket);
 

@@ -23,6 +23,9 @@ TLevel::TLevel(TServer* pServer)
 server(pServer), modTime(0), levelSpar(false)
 {
 	memset(levelTiles, 0, sizeof(levelTiles));
+
+	// Baddy id 0 breaks the client.  Put a null pointer in id 0.
+	levelBaddyIds.resize(1, 0);
 }
 
 TLevel::~TLevel()
@@ -34,7 +37,15 @@ TLevel::~TLevel()
 */
 CString TLevel::getBaddyPacket()
 {
-	return CString();
+	CString retVal;
+	for (std::vector<TLevelBaddy *>::iterator i = levelBaddies.begin(); i != levelBaddies.end(); ++i)
+	{
+		TLevelBaddy* baddy = *i;
+		if (baddy == 0) continue;
+		if (baddy->getProp(BDPROP_MODE).readGChar() != BDMODE_DIE)
+			retVal >> (char)PLO_BADDYPROPS >> (char)baddy->getId() << baddy->getProps() << "\n";
+	}
+	return retVal;
 }
 
 CString TLevel::getBoardPacket()
@@ -259,6 +270,36 @@ bool TLevel::loadNW(const CString& pLevelName)
 			// Add the new sign.
 			levelSigns.push_back(new TLevelSign(x, y, text));
 		}
+		else if (curLine[0] == "BADDY")
+		{
+			if (curLine.size() != 4)
+				continue;
+
+			int x = strtoint(curLine[1]);
+			int y = strtoint(curLine[2]);
+			int type = strtoint(curLine[3]);
+
+			// Add the baddy.
+			TLevelBaddy* baddy = addBaddy((float)x, (float)y, type);
+			if (baddy == 0)
+				continue;
+
+			// Load the verses.
+			std::vector<CString> bverse;
+			++i;
+			while (i != fileData.end())
+			{
+				CString line = *i;
+				if (line[line.length() - 1] == '\r') line.removeI(line.length() - 1, 1);
+				if (line == "BADDYEND") break;
+				bverse.push_back(line);
+				++i;
+			}
+			CString props;
+			for (char j = 0; j < (char)bverse.size(); ++j)
+				props >> (char)(BDPROP_VERSESIGHT + j) >> (char)bverse[j].length() << bverse[j];
+			if (props.length() != 0) baddy->setProps(props);
+		}
 	}
 
 	return true;
@@ -267,7 +308,7 @@ bool TLevel::loadNW(const CString& pLevelName)
 /*
 	TLevel: Find Level
 */
-TLevel * TLevel::findLevel(const CString& pLevelName, TServer* server)
+TLevel* TLevel::findLevel(const CString& pLevelName, TServer* server)
 {
 	std::vector<TLevel*>* levelList = &(server->getLevelList());
 
@@ -422,6 +463,72 @@ char TLevel::removeItem(float pX, float pY)
 	return -1;
 }
 
+TLevelBaddy* TLevel::addBaddy(float pX, float pY, char pType)
+{
+	// Limit of 50 baddies per level.
+	if (levelBaddies.size() > 50) return 0;
+
+	// New Baddy
+	TLevelBaddy* newBaddy = new TLevelBaddy(pX, pY, pType, this, server);
+	levelBaddies.push_back(newBaddy);
+
+	// Assign Baddy Id
+	// Don't assign id 0.
+	for (unsigned int i = 1; i < levelBaddyIds.size(); ++i)
+	{
+		if (levelBaddyIds[i] == 0)
+		{
+			levelBaddyIds[i] = newBaddy;
+			newBaddy->setId((char)i);
+			return newBaddy;
+		}
+	}
+
+	newBaddy->setId((char)levelBaddyIds.size());
+	levelBaddyIds.push_back(newBaddy);
+
+	return newBaddy;
+}
+
+void TLevel::removeBaddy(char pId)
+{
+	// Don't allow us to remove id 0 or any id over 50.
+	if (pId < 1 || pId > 50) return;
+
+	TLevelBaddy* baddy = levelBaddyIds[pId];
+	delete baddy;
+	levelBaddyIds[pId] = 0;
+}
+
+TLevelBaddy* TLevel::getBaddy(char id)
+{
+	if ((unsigned char)id >= levelBaddyIds.size()) return 0;
+	return levelBaddyIds[id];
+}
+
+int TLevel::addPlayer(TPlayer* player)
+{
+	levelPlayerList.push_back(player);
+	return levelPlayerList.size() - 1;
+}
+
+void TLevel::removePlayer(TPlayer* player)
+{
+	for (std::vector<TPlayer *>::iterator i = levelPlayerList.begin(); i != levelPlayerList.end(); )
+	{
+		TPlayer* search = *i;
+		if (player == search)
+			i = levelPlayerList.erase(i);
+		else ++i;
+	}
+}
+
+TPlayer* TLevel::getPlayer(unsigned int id)
+{
+	if (id >= levelPlayerList.size()) return 0;
+	return levelPlayerList[id];
+}
+
 bool TLevel::doTimedEvents()
 {
 	// Check if we should revert any board changes.
@@ -456,7 +563,16 @@ bool TLevel::doTimedEvents()
 
 	// TODO: horse timeout.
 
-	// TODO: baddy respawn.
-
+	// Check if any baddies need to be respawned.
+	for (std::vector<TLevelBaddy *>::iterator i = levelBaddies.begin(); i != levelBaddies.end(); ++i)
+	{
+		TLevelBaddy* baddy = *i;
+		int respawnTimer = baddy->timeout.doTimeout();
+		if (respawnTimer == 0)
+		{
+			baddy->reset();
+			server->sendPacketToLevel(CString() >> (char)PLO_BADDYPROPS >> (char)baddy->getId() << baddy->getProps(), this);
+		}
+	}
 	return true;
 }

@@ -19,8 +19,11 @@ class TNPC;
 class TLevel
 {
 	public:
-		TLevel(TServer* pServer);
-		~TLevel();
+		//! Finds a level with the specified level name and returns it.  If not found, it tries to load it from the disk.
+		//! \param pLevelName The name of the level to search for.
+		//! \param server The server the level belongs to.
+		//! \return A pointer to the level found.
+		static TLevel* findLevel(const CString& pLevelName, TServer* server);
 
 		// get crafted packets
 		CString getBaddyPacket();
@@ -32,37 +35,103 @@ class TLevel
 		CString getNpcsPacket(time_t time);
 		CString getSignsPacket();
 
+		//! Gets the level name.
+		//! \return The level name.
+		CString getLevelName() const					{ return levelName; }
+
+		//! Gets the raw level tile data.
+		//! \return A pointer to all 4096 raw level tiles.
+		short* getTiles()								{ return levelTiles; }
+
+		//! Gets the level mod time.
+		//! \return The modified time of the level when it was first loaded from the disk.
+		time_t getModTime() const						{ return modTime; }
+
+		//! Gets a vector full of all the level chests.
+		//! \return The level chests.
+		std::vector<TLevelChest *>& getLevelChests()	{ return levelChests; }
+
+		//! Gets the sparring zone status of the level.
+		//! \return The sparring zone status.  If true, the level is a sparring zone.
+		bool getSparringZone() const					{ return levelSpar; }
+
+		//! Sets the sparring zone status of the level.
+		//! \param pLevelSpar If true, the level becomes a sparring zone level.
+		void setSparringZone(bool pLevelSpar)			{ levelSpar = pLevelSpar; }
+
+		//! Adds a board change to the level.
+		//! \param pTileData Linear array of Graal-packed tiles.  Starts with the top-left tile, ends with the bottom-right.
+		//! \param pX X location of the top-left tile.
+		//! \param pY Y location of the top-left tile.
+		//! \param pWidth How many tiles wide we are altering.
+		//! \param pHeight How many tiles high we are altering.
+		//! \param player The player who initiated this board change.
+		//! \return True if it succeeds, false if it doesn't.
+		bool alterBoard(CString& pTileData, int pX, int pY, int pWidth, int pHeight, TPlayer* player);
+
+		//! Adds an item to the level.
+		//! \param pX X location of the item to add.
+		//! \param pY Y location of the item to add.
+		//! \param pItem The item we are adding.  Use TLevelItem::getItemId() to get the item type from an item name.
+		//! \return True if it succeeds, false if it doesn't.
+		bool addItem(float pX, float pY, char pItem);
+
+		//! Removes an item from the level.
+		//! \param pX X location of the item to remove.
+		//! \param pY Y location of the item to remove.
+		//! \return The type of item removed.  Use TLevelItem::getItemId() to get the item type from an item name.
+		char removeItem(float pX, float pY);
+
+		//! Adds a baddy to the level.
+		//! \param pX X location of the baddy to add.
+		//! \param pY Y location of the baddy to add.
+		//! \param pType The type of baddy to add.
+		//! \return A pointer to the new TLevelBaddy.
+		TLevelBaddy* addBaddy(float pX, float pY, char pType);
+
+		//! Removes a baddy from the level.
+		//! \param pId ID of the baddy to remove.
+		void removeBaddy(char pId);
+
+		//! Finds a baddy by the specified id number.
+		//! \param pId The ID number of the baddy to find.
+		//! \return A pointer to the found TLevelBaddy.
+		TLevelBaddy* getBaddy(char id);
+
+		//! Adds a player to the level.
+		//! \param player The player to add.
+		//! \return The id number of the player in the level.
+		int addPlayer(TPlayer* player);
+
+		//! Removes a player from the level.
+		//! \param player The player to remove.
+		void removePlayer(TPlayer* player);
+
+		//! Gets a player from the level with the specified level id.
+		//! \param id The level id the player is at.  0 will return the level leader.
+		//! \return The player at the id location.
+		TPlayer* getPlayer(unsigned int id);
+
+		//! Does special events that should happen every second.
+		//! \return Currently, it always returns true.
+		bool doTimedEvents();
+
+	private:
+		TLevel(TServer* pServer);
+		~TLevel();
+
 		// level-loading functions
 		bool loadLevel(const CString& pLevelName);
 		bool loadGraal(const CString& pLevelName);
 		bool loadNW(const CString& pLevelName);
 
-		// find level
-		static TLevel * findLevel(const CString& pLevelName, TServer* server);
-
-		// get functions
-		CString getLevelName() const					{ return levelName; }
-		short* getTiles()								{ return levelTiles; }
-		time_t getModTime() const						{ return modTime; }
-		std::vector<TLevelChest *>& getLevelChests()	{ return levelChests; }
-		bool getSparringZone() const					{ return levelSpar; }
-
-		// set functions
-		void setSparringZone(bool pLevelSpar)			{ levelSpar = pLevelSpar; }
-
-		// other functions
-		bool alterBoard(CString& pTileData, int pX, int pY, int pWidth, int pHeight, TPlayer* player);
-		bool addItem(float pX, float pY, char pItem);
-		char removeItem(float pX, float pY);
-		bool doTimedEvents();
-
-	private:
 		TServer* server;
 		time_t modTime;
 		bool levelSpar;
 		short levelTiles[4096];
 		CString fileName, fileVersion, levelName;
-		std::vector<TLevelBaddy *> levelBaddys;
+		std::vector<TLevelBaddy *> levelBaddies;
+		std::vector<TLevelBaddy *> levelBaddyIds;
 		std::vector<TLevelBoardChange *> levelBoardChanges;
 		std::vector<TLevelChest *> levelChests;
 		std::vector<TLevelHorse *> levelHorses;
@@ -70,6 +139,7 @@ class TLevel
 		std::vector<TLevelLink *> levelLinks;
 		std::vector<TLevelSign *> levelSigns;
 		std::vector<TNPC *> levelNPCs;
+		std::vector<TPlayer *> levelPlayerList;
 };
 
 #endif // TLEVEL_H

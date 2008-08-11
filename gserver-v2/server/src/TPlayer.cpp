@@ -120,6 +120,9 @@ void createPLFunctions()
 	TPLFunc[PLI_ITEMADD] = &TPlayer::msgPLI_ITEMADD;
 	TPLFunc[PLI_ITEMDEL] = &TPlayer::msgPLI_ITEMDEL;
 	TPLFunc[PLI_CLAIMPKER] = &TPlayer::msgPLI_CLAIMPKER;
+	TPLFunc[PLI_BADDYPROPS] = &TPlayer::msgPLI_BADDYPROPS;
+	TPLFunc[PLI_BADDYHURT] = &TPlayer::msgPLI_BADDYHURT;
+	TPLFunc[PLI_BADDYADD] = &TPlayer::msgPLI_BADDYADD;
 
 	TPLFunc[PLI_OPENCHEST] = &TPlayer::msgPLI_OPENCHEST;
 
@@ -162,8 +165,13 @@ TPlayer::~TPlayer()
 		//vecRemove(playerList, this);
 
 		// TODO: save pending weapons.
+
+		// Save account.
 		if (type == CLIENTTYPE_CLIENT)
 			saveAccount();
+
+		// Remove from the level.
+		if (level) level->removePlayer(this);
 
 		// Announce our departure to other clients.
 		server->sendPacketTo(CLIENTTYPE_CLIENT, CString() >> (char)PLO_OTHERPLPROPS >> (short)id >> (char)PLPROP_PCONNECTED, this);
@@ -432,8 +440,12 @@ bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTi
 		}
 		if (found == false) cachedLevels.push_back(new SCachedLevel(level, time(0)));
 
-		// TODO: Remove self from list of players in level.
-		// TODO: Send PLO_ISLEADER to new level leader.
+		// Remove self from list of players in level.
+		level->removePlayer(this);
+
+		// Send PLO_ISLEADER to new level leader.
+		TPlayer* leader = level->getPlayer(0);
+		if (leader != 0) leader->sendPacket(CString() >> (char)PLO_ISLEADER);
 
 		// Tell everyone I left.
 		server->sendPacketToLevel(this->getProps(0, 0) >> (char)PLPROP_JOINLEAVELVL >> (char)0, level, this);
@@ -451,6 +463,10 @@ bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTi
 	if (level == 0)
 		return false;
 
+	// Add myself to the level playerlist.
+	level->addPlayer(this);
+
+	// Set x/y location.
 	this->x = x;
 	this->y = y;
 
@@ -482,15 +498,13 @@ bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTi
 	sendPacket(CString() << level->getBaddyPacket());
 
 	// Send leader status and NPCs.
-	// TODO: only send PLO_ISLEADER if they are actually the leader.
-	sendPacket(CString() >> (char)PLO_ISLEADER);
-	sendPacket(CString() << level->getNpcsPacket(0));
-	//sendPacket(CString() << level->getNpcsPacket(l_time));
+	TPlayer* leader = level->getPlayer(0);
+	if (leader == this) sendPacket(CString() >> (char)PLO_ISLEADER);
+	sendPacket(CString() << level->getNpcsPacket(l_time));
 
 	// If the level is a sparring zone and you have 100 AP, change AP to 99 and
 	// the apcounter to 1.
-	// TODO: sparring zone levels.
-	if ( false /*level->sparZone == true && ap == 100*/ )
+	if (level->getSparringZone() && ap == 100)
 	{
 		ap = 99;
 		apCounter = 1;
@@ -888,6 +902,52 @@ bool TPlayer::msgPLI_CLAIMPKER(CString& pPacket)
 	return true;
 }
 
+bool TPlayer::msgPLI_BADDYPROPS(CString& pPacket)
+{
+	char id = pPacket.readGChar();
+	CString props = pPacket.readString("");
+
+	// Get the baddy.
+	TLevelBaddy* baddy = level->getBaddy(id);
+	if (baddy == 0) return true;
+
+	// Set the props and send to everybody in the level.
+	baddy->setProps(props);
+	server->sendPacketToLevel(CString() >> (char)PLO_BADDYPROPS >> (char)baddy->getId() << props, level);
+	return true;
+}
+
+bool TPlayer::msgPLI_BADDYHURT(CString& pPacket)
+{
+	TPlayer* leader = level->getPlayer(0);
+	if (leader == 0) return true;
+	leader->sendPacket(CString() >> (char)PLO_BADDYHURT << pPacket.text() + 1);
+	return true;
+}
+
+bool TPlayer::msgPLI_BADDYADD(CString& pPacket)
+{
+	float bX = (float)pPacket.readGChar() / 2.0f;
+	float bY = (float)pPacket.readGChar() / 2.0f;
+	char bType = pPacket.readGChar();
+	CString bImage = pPacket.readChars(pPacket.bytesLeft() - 1);
+	char bPower = pPacket.readGChar();
+	bPower = min(bPower, 12);		// Hard-limit to 6 hearts.
+
+	// Add the baddy.
+	TLevelBaddy* baddy = level->addBaddy(bX, bY, bType);
+	if (baddy == 0) return true;
+
+	// Set the baddy props.
+	baddy->setRespawn(false);
+	baddy->setProps(CString() >> (char)BDPROP_POWERIMAGE >> (char)bPower >> (char)bImage.length() << bImage);
+
+	// Send the props to everybody in the level.
+	server->sendPacketToLevel(CString() >> (char)PLO_BADDYPROPS >> (char)baddy->getId() << baddy->getProps(), level);
+	return true;
+}
+
+
 bool TPlayer::msgPLI_OPENCHEST(CString& pPacket)
 {
 	unsigned char cX = pPacket.readGUChar();
@@ -1092,7 +1152,8 @@ bool TPlayer::msgPLI_ADJACENTLEVEL(CString& pPacket)
 
 	// Set our old level back to normal.
 	sendPacket(CString() >> (char)PLO_LEVELNAME << this->level->getLevelName());
-//	if (level->players.count() == 1)
+	TPlayer* leader = level->getPlayer(0);
+	if (leader == this)
 		sendPacket(CString() >> (char)PLO_ISLEADER);
 
 	return true;

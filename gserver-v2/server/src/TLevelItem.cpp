@@ -120,9 +120,9 @@ CString TLevelItem::getItemPlayerProp(const CString& pItemName, TPlayer* player)
 		case 11:	// fullheart
 		{
 			CString playerProp = player->getProp(PLPROP_MAXPOWER);
-			char heartMax = playerProp.readGChar() + (1 * 2);
+			unsigned char heartMax = playerProp.readGUChar() + 1;
 			heartMax = clip(heartMax, 0, 20);		// Hard limit of 20 hearts.
-			return CString() >> (char)PLPROP_MAXPOWER >> (char)heartMax >> (char)PLPROP_CURPOWER >> (char)heartMax;
+			return CString() >> (char)PLPROP_MAXPOWER >> (char)heartMax >> (char)PLPROP_CURPOWER >> (char)(heartMax * 2);
 		}
 
 		case 20:	// fireball
