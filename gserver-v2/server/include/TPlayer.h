@@ -9,6 +9,7 @@
 #include "TServer.h"
 #include "TAccount.h"
 #include "TLevel.h"
+#include "TWeapon.h"
 #include "codec.h"
 
 /*
@@ -29,17 +30,19 @@ enum
 	PLI_HORSEDEL		= 8,
 	PLI_ARROWADD		= 9,
 	PLI_FIRESPY			= 10,
-
 	PLI_THROWCARRIED	= 11,
 	PLI_ITEMADD			= 12,
 	PLI_ITEMDEL			= 13,
 
+	PLI_OPENCHEST		= 20,
 	PLI_WANTFILE		= 23,
 	PLI_NPCWEAPONIMG	= 24,
+
+	PLI_NPCWEAPONDEL	= 29,
 	PLI_FORCELEVELWARP	= 30,
-
+	PLI_PACKETCOUNT		= 31,
 	PLI_ITEMTAKE		= 32,
-
+	PLI_WEAPONADD		= 33,
 	PLI_UPDATEFILE		= 34,
 	PLI_ADJACENTLEVEL	= 35,
 	PLI_LANGUAGE		= 37,
@@ -76,7 +79,8 @@ enum
 	PLO_SIGNATURE		= 25,
 	PLO_FILESENDFAILED	= 30,
 	PLO_NPCWEAPONIMG	= 32,
-	PLO_DELNPCWEAPON	= 34,
+	PLO_NPCWEAPONADD	= 33,
+	PLO_NPCWEAPONDEL	= 34,
 	PLO_LEVELMODTIME	= 39,
 	PLO_TRIGGERACTION	= 48,
 	PLO_EMPTY49			= 49,	// Causes level to freeze with "Loading" for some reason.  Might be server-side setlevel.
@@ -126,9 +130,12 @@ class TPlayer : public TAccount
 
 		// Prop-Manipulation
 		CString getProp(int pPropId);
-		void setProps(CString& pPacket, bool pForward = false);
+		void setProps(CString& pPacket, bool pForward = false, bool pForwardToSelf = false);
 		void sendProps(bool *pProps, int pCount);
 		CString getProps(bool *pProps, int pCount);
+
+		// Weapons
+		std::vector<TWeapon*>& getWeaponList()		{ return weaponList; }
 
 		// Socket-Functions
 		bool doMain();
@@ -157,8 +164,12 @@ class TPlayer : public TAccount
 		bool msgPLI_ITEMADD(CString& pPacket);
 		bool msgPLI_ITEMDEL(CString& pPacket);
 
+		bool msgPLI_OPENCHEST(CString& pPacket);
+
 		bool msgPLI_WANTFILE(CString& pPacket);
 		bool msgPLI_NPCWEAPONIMG(CString& pPacket);
+		bool msgPLI_NPCWEAPONDEL(CString& pPacket);
+		bool msgPLI_WEAPONADD(CString& pPacket);
 		bool msgPLI_UPDATEFILE(CString& pPacket);
 		bool msgPLI_ADJACENTLEVEL(CString& pPacket);
 		bool msgPLI_LANGUAGE(CString& pPacket);
@@ -197,6 +208,9 @@ class TPlayer : public TAccount
 		time_t lastData, lastMovement, lastChat, lastMessage;
 		TServer* server;
 		std::vector<SCachedLevel*> cachedLevels;
+		std::vector<TWeapon*> weaponList;
+		bool allowBomb;
+		bool hadBomb;
 };
 
 inline bool TPlayer::isLoggedIn()

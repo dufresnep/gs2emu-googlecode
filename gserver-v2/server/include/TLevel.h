@@ -31,7 +31,6 @@ class TLevel
 		CString getLinksPacket();
 		CString getNpcsPacket(time_t time);
 		CString getSignsPacket();
-		inline CString getLevelName();
 
 		// level-loading functions
 		bool loadLevel(const CString& pLevelName);
@@ -42,8 +41,13 @@ class TLevel
 		static TLevel * findLevel(const CString& pLevelName, TServer* server);
 
 		// get functions
-		short* getTiles();
-		time_t getModTime()		{ return modTime; }
+		CString getLevelName()					{ return levelName; }
+		short* getTiles()						{ return levelTiles; }
+		time_t getModTime()						{ return modTime; }
+		std::vector<TLevelChest *>& getLevelChests()	{ return levelChests; }
+
+		// set functions
+		void setSparringZone(bool pLevelSpar)	{ levelSpar = pLevelSpar; }
 
 		// other functions
 		bool alterBoard(CString& pTileData, int pX, int pY, int pWidth, int pHeight, TPlayer* player);
@@ -66,16 +70,5 @@ class TLevel
 		std::vector<TLevelSign *> levelSigns;
 		std::vector<TNPC *> levelNPCs;
 };
-
-
-inline CString TLevel::getLevelName()
-{
-	return levelName;
-}
-
-inline short* TLevel::getTiles()
-{
-	return levelTiles;
-}
 
 #endif // TLEVEL_H

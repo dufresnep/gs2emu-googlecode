@@ -2,6 +2,7 @@
 #define TNPC_H
 
 #include "ICommon.h"
+#include "CString.h"
 //#include "TLevel.h"
 
 enum
@@ -90,13 +91,20 @@ class TNPC
 		TNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC = true);
 		~TNPC();
 
+		// prop functions
 		CString getProp(int pId) const;
 		CString getProps(time_t newTime) const;
 		void setProps(CString& pProps);
 
+		// set functions
 		void setId(int pId)			{ id = pId; }
-		int getId()					{ return id; }
-		TLevel* getLevel()			{ return level; }
+
+		// get functions
+		int getId() const				{ return id; }
+		TLevel* getLevel()				{ return level; }
+		CString getWeaponName() const	{ return weaponName; }
+		CString getServerCode() const	{ return serverCode; }
+		CString getClientCode() const	{ return clientCode; }
 
 	private:
 		bool levelNPC;

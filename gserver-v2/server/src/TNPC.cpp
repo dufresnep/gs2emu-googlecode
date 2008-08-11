@@ -1,11 +1,16 @@
+#include <vector>
 #include <time.h>
 #include "ICommon.h"
 #include "IUtil.h"
 #include "CString.h"
 #include "TNPC.h"
+#include "TLevel.h"
 
 char __savePackets[10] = { 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
 char __attrPackets[30] = { 36, 37, 38, 39, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68 };
+
+static CString toWeaponName(const CString& code);
+static std::vector<CString> removeComments(const CString& code);
 
 TNPC::TNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC)
 :
@@ -14,7 +19,7 @@ x(pX), y(pY), hurtX(32.0f), hurtY(32.0f),
 id(-1), rupees(0),
 darts(0), bombs(0), glovePower(0), bombPower(0), swordPower(0), shieldPower(0),
 visFlags(1), blockFlags(0), sprite(2), power(0), ap(50),
-gani("idle"),
+image(pImage), gani("idle"),
 level(pLevel)
 {
 	memset((void*)colors, 0, sizeof(colors));
@@ -30,12 +35,21 @@ level(pLevel)
 	modTime[NPCPROP_IMAGE] = modTime[NPCPROP_SCRIPT] = modTime[NPCPROP_X] = modTime[NPCPROP_Y]
 		= modTime[NPCPROP_VISFLAGS] = modTime[NPCPROP_SPRITE] = time(0);
 
-	image = pImage;
-	clientCode = pScript;
+	// Search if the NPC is a sparringzone NPC.
+	if (pScript.subString(0, 12) == "sparringzone") pLevel->setSparringZone(true);
 
-	// TODO: Grab weapon name from script.
+	// Remove comments and separate clientside and serverside scripts.
+	std::vector<CString> parsedCode = removeComments(pScript);
+	if (parsedCode.size() == 1) clientCode = parsedCode[0];
+	else if (parsedCode.size() > 1)
+	{
+		serverCode = parsedCode[0];
+		for (unsigned int i = 1; i < parsedCode.size(); ++i)
+			clientCode << parsedCode[i];
+	}
 
-	// TODO: Check if sparring zone NPC.
+	// Search for toweapons in the clientside code and extract the name of the weapon.
+	weaponName = toWeaponName(clientCode);
 
 	// TODO: Create plugin hook so NPCServer can acquire/format code.
 }
@@ -385,4 +399,95 @@ void TNPC::setProps(CString& pProps)
 				modTime[propId] = time(0);
 		}
 	}
+}
+
+CString toWeaponName(const CString& code)
+{
+	int name_start = code.find("toweapons ");
+	if (name_start == -1) return CString();
+	name_start += 10;	// 10 = strlen("toweapons ")
+
+	int name_end = code.find(";", name_start);
+	if (name_end == -1) return CString();
+
+	return code.subString(name_start, name_end - name_start).trim();
+}
+
+std::vector<CString> removeComments(const CString& code)
+{
+	CString outLine;
+	std::vector<CString> retVal;
+	std::vector<CString> script = code.tokenize("\xa7");
+	bool multiLine = false;
+	for (std::vector<CString>::iterator i = script.begin(); i != script.end(); ++i)
+	{
+		CString line = *i;
+
+		// Loop until every comment is removed from the line.
+		bool doLoop = true;
+		while (doLoop)
+		{
+			// First, we check for multi-line comments.
+			// If multiLine is true, search for the end of the multi-line comment.
+			if (multiLine)
+			{
+				int mlc_end = line.find("*/");
+		
+				// If not found, we can discard this entire line.
+				if (mlc_end == -1)
+				{
+					doLoop = false;
+					line.clear();
+				}
+				else
+				{
+					// If found, erase up to it.
+					line.removeI(0, mlc_end + 2);
+					multiLine = false;
+				}
+				continue;
+			}
+
+			// Check for the start of a multi-line comment.
+			int mlc_start = line.find("/*");
+			if (mlc_start != -1)
+			{
+				multiLine = true;
+				int mlc_end = line.find("*/");
+				if (mlc_end == -1)
+				{
+					// If no end was found, remove the rest of the line and break the loop.
+					line.removeI(mlc_start, line.length());
+					doLoop = false;
+				}
+				else
+					line.removeI(mlc_start, (mlc_end + 2) - mlc_start);
+				continue;
+			}
+
+			// Check for a single line comment.
+			int slc_start = line.find("//");
+			if (slc_start != -1)
+			{
+				// If //#CLIENTSIDE is found, add the current code read as serverside script.
+				if (line.subString(slc_start, 13) == "//#CLIENTSIDE")
+				{
+					retVal.push_back(outLine);
+					outLine.clear();
+				}
+				line.removeI(slc_start, line.length());
+				continue;
+			}
+
+			doLoop = false;
+		}
+
+		// If line has any data left in it, add it to the retVal;
+		if (line.length() != 0)
+			outLine << line << "\xa7";
+	}
+
+	// Add our code to the vector.  If serverside code was added, the size should now be 2.
+	retVal.push_back(outLine);
+	return retVal;
 }

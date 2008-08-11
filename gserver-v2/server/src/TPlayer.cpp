@@ -119,9 +119,13 @@ void createPLFunctions()
 	TPLFunc[PLI_ITEMADD] = &TPlayer::msgPLI_ITEMADD;
 	TPLFunc[PLI_ITEMDEL] = &TPlayer::msgPLI_ITEMDEL;
 
+	TPLFunc[PLI_OPENCHEST] = &TPlayer::msgPLI_OPENCHEST;
+
 	TPLFunc[PLI_WANTFILE] = &TPlayer::msgPLI_WANTFILE;
 	TPLFunc[PLI_NPCWEAPONIMG] = &TPlayer::msgPLI_NPCWEAPONIMG;
+	TPLFunc[PLI_NPCWEAPONDEL] = &TPlayer::msgPLI_NPCWEAPONDEL;
 	TPLFunc[PLI_FORCELEVELWARP] = &TPlayer::msgPLI_LEVELWARP;	// Shared with PLI_LEVELWARP
+	TPLFunc[PLI_WEAPONADD] = &TPlayer::msgPLI_WEAPONADD;
 	TPLFunc[PLI_ITEMTAKE] = &TPlayer::msgPLI_ITEMDEL;			// Shared with PLI_ITEMDEL
 	TPLFunc[PLI_UPDATEFILE] = &TPlayer::msgPLI_UPDATEFILE;
 	TPLFunc[PLI_ADJACENTLEVEL] = &TPlayer::msgPLI_ADJACENTLEVEL;
@@ -139,7 +143,7 @@ TPlayer::TPlayer(TServer* pServer, CSocket *pSocket)
 : TAccount(pServer),
 playerSock(pSocket), iterator(0x04A80B38), key(0),
 PLE_POST22(false), os("wind"), codepage(1252), level(0),
-id(0), type(CLIENTTYPE_AWAIT), server(pServer)
+id(0), type(CLIENTTYPE_AWAIT), server(pServer), allowBomb(false), hadBomb(false)
 {
 	// TODO: lastChat and lastMessage
 	lastData = lastMovement = lastChat = lastMessage = time(0);
@@ -266,7 +270,7 @@ bool TPlayer::doTimedEvents()
 			if (ap < 100)
 			{
 				ap++;
-				setProps(CString() >> (char)PLPROP_ALIGNMENT >> (char)ap, true);
+				setProps(CString() >> (char)PLPROP_ALIGNMENT >> (char)ap, true, true);
 			}
 			if (ap < 20) apCounter = settings->getInt("aptime0", 30);
 			else if (ap < 40) apCounter = settings->getInt("aptime1", 90);
@@ -793,11 +797,29 @@ bool TPlayer::msgPLI_ITEMDEL(CString& pPacket)
 
 	// If this is a PLI_ITEMTAKE packet, give the item to the player.
 	if (pPacket[0] - 32 == PLI_ITEMTAKE)
-		this->setProps(TLevelItem::getItemPlayerProp(item, this), true);
+		this->setProps(TLevelItem::getItemPlayerProp(item, this), true, true);
 
 	return true;
 }
 
+bool TPlayer::msgPLI_OPENCHEST(CString& pPacket)
+{
+	unsigned char cX = pPacket.readGUChar();
+	unsigned char cY = pPacket.readGUChar();
+	std::vector<TLevelChest *>* levelChests = &(level->getLevelChests());
+
+	for (std::vector<TLevelChest*>::iterator i = levelChests->begin(); i != levelChests->end(); ++i)
+	{
+		TLevelChest* chest = *i;
+		if (chest->getX() == cX && chest->getY() == cY)
+		{
+			int chestItem = chest->getItemIndex();
+			this->setProps(TLevelItem::getItemPlayerProp((char)chestItem, this), true, true);
+			// TODO: save chest to player.
+		}
+	}
+	return true;
+}
 
 bool TPlayer::msgPLI_WANTFILE(CString& pPacket)
 {
@@ -831,6 +853,105 @@ bool TPlayer::msgPLI_NPCWEAPONIMG(CString& pPacket)
 	server->sendPacketToLevel(CString() >> (char)PLO_NPCWEAPONIMG >> (short)id << pPacket.text() + 1, level, this);
 	return true;
 }
+
+bool TPlayer::msgPLI_NPCWEAPONDEL(CString& pPacket)
+{
+	CString weapon = pPacket.readString("");
+	for (std::vector<TWeapon*>::iterator i = weaponList.begin(); i != weaponList.end(); )
+	{
+		TWeapon* weap = *i;
+		if (weap->getName() == weapon)
+			i = weaponList.erase(i);
+		else ++i;
+	}
+	return true;
+}
+
+bool TPlayer::msgPLI_WEAPONADD(CString& pPacket)
+{
+	CSettings* settings = &(server->getSettings());
+	char type = pPacket.readGChar();
+
+	// Type 0 means it is a default weapon.
+	if (type == 0)
+	{
+		if (settings->getBool("defaultweapons", true) == false)
+			return true;
+
+		char item = pPacket.readGChar();
+		if (item == 8 && allowBomb == false)
+		{
+			allowBomb = true;
+			return true;
+		}
+	}
+	// NPC weapons.
+	else
+	{
+		std::vector<TNPC*> npcIds = server->getNPCIdList();
+		std::vector<TWeapon*>* weaponList = &(server->getWeaponList());
+
+		// Get the NPC id.
+		int npcId = pPacket.readGInt();
+		TNPC* npc = npcIds[npcId];
+		if (npc == 0)
+			return true;
+
+		// Get the name of the weapon.
+		CString name = npc->getWeaponName();
+		if (name.length() == 0)
+			return true;
+
+		// See if we can find the weapon in the server weapon list.
+		TWeapon* weapon = 0;
+		for (std::vector<TWeapon*>::iterator i = weaponList->begin(); i != weaponList->end(); ++i)
+		{
+			TWeapon* search = *i;
+			if (search->getName() == name)
+			{
+				weapon = search;
+				break;
+			}
+		}
+
+		// If weapon is 0, that means the NPC was not found.  Add the NPC to the list.
+		if (weapon == 0)
+		{
+			weapon = new TWeapon(npc);
+			weaponList->push_back(weapon);
+		}
+
+		// Check and see if the weapon has changed recently.  If it has, we should
+		// send the new NPC to everybody on the server.
+		bool foundThis = false;
+		if (weapon->getModTime() != npc->getLevel()->getModTime())
+		{
+			std::vector<TPlayer*> playerList = server->getPlayerList();
+			for (std::vector<TPlayer*>::iterator i = playerList.begin(); i != playerList.end(); ++i)
+			{
+				TPlayer* player = *i;
+				for (std::vector<TWeapon*>::iterator j = player->getWeaponList().begin(); j != player->getWeaponList().end(); ++j)
+				{
+					TWeapon* pWeapon = *j;
+					if (weapon == pWeapon)
+					{
+						if (player == this) foundThis = true;
+						player->sendPacket(CString() >> (char)PLO_NPCWEAPONDEL << weapon->getName());
+						player->sendPacket(CString() << weapon->getWeaponPacket());
+					}
+				}
+			}
+		}
+
+		// Send the weapon to the player now.
+		if (foundThis == false)
+			sendPacket(CString() << weapon->getWeaponPacket());
+
+		// TODO: saving weapons
+	}
+	return true;
+}
+
 
 bool TPlayer::msgPLI_UPDATEFILE(CString& pPacket)
 {

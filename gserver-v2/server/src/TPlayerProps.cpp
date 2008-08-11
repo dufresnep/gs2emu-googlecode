@@ -200,10 +200,10 @@ CString TPlayer::getProp(int pPropId)
 	return CString();
 }
 
-void TPlayer::setProps(CString& pPacket, bool pForward)
+void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 {
 	CSettings* settings = &(server->getSettings());
-	CString globalBuff, levelBuff;
+	CString globalBuff, levelBuff, selfBuff;
 	int len = 0;
 /*
 	printf("\n");
@@ -598,6 +598,9 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 
 		if (pForward && __sendLocal[propId] == true)
 			levelBuff >> (char)propId << getProp(propId);
+
+		if (pForwardToSelf)
+			selfBuff >> (char)propId << getProp(propId);
 	}
 
 	// Send Buffers Out
@@ -607,6 +610,8 @@ void TPlayer::setProps(CString& pPacket, bool pForward)
 			server->sendPacketToAll(CString() >> (char)PLO_OTHERPLPROPS >> (short)this->id << globalBuff, this);
 		if (levelBuff.length() > 0)
 			server->sendPacketToLevel(CString() >> (char)PLO_OTHERPLPROPS >> (short)this->id << levelBuff, getLevel(), this);
+		if (selfBuff.length() > 0)
+			sendPacket(CString() >> (char)PLO_PLAYERPROPS << selfBuff);
 		sendCompress();
 	}
 }

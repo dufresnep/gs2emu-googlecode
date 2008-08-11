@@ -120,7 +120,7 @@ bool TPlayer::sendLoginClient()
 
 	// Delete the bomb.  It gets automagically added by the client for
 	// God knows which reason.  Bomb must be capitalized.
-	sendPacket(CString() >> (char)PLO_DELNPCWEAPON << "Bomb");
+	sendPacket(CString() >> (char)PLO_NPCWEAPONDEL << "Bomb");
 
 	return true;
 }

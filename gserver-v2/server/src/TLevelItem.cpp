@@ -34,7 +34,7 @@ CString TLevelItem::getItemPlayerProp(const CString& pItemName, TPlayer* player)
 		case 0:		// greenrupee
 		case 1:		// bluerupee
 		case 2:		// redrupee
-		case 20:	// goldrupee
+		case 19:	// goldrupee
 		{
 			CString playerProp = player->getProp(PLPROP_RUPEESCOUNT);
 			int rupeeCount = playerProp.readGInt();
@@ -46,7 +46,7 @@ CString TLevelItem::getItemPlayerProp(const CString& pItemName, TPlayer* player)
 			return CString() >> (char)PLPROP_RUPEESCOUNT >> (int)rupeeCount;
 		}
 
-		case 4:		// bombs
+		case 3:		// bombs
 		{
 			CString playerProp = player->getProp(PLPROP_BOMBSCOUNT);
 			char bombCount = playerProp.readGChar() + 5;
@@ -54,7 +54,7 @@ CString TLevelItem::getItemPlayerProp(const CString& pItemName, TPlayer* player)
 			return CString() >> (char)PLPROP_BOMBSCOUNT >> (char)bombCount;
 		}
 		
-		case 5:		// darts
+		case 4:		// darts
 		{
 			CString playerProp = player->getProp(PLPROP_ARROWSCOUNT);
 			char arrowCount = playerProp.readGChar() + 5;
@@ -62,7 +62,7 @@ CString TLevelItem::getItemPlayerProp(const CString& pItemName, TPlayer* player)
 			return CString() >> (char)PLPROP_ARROWSCOUNT >> (char)arrowCount;
 		}
 
-		case 6:		// heart
+		case 5:		// heart
 		{
 			CString playerProp = player->getProp(PLPROP_CURPOWER);
 			char heartCount = playerProp.readGChar() + (1 * 2);
@@ -72,8 +72,8 @@ CString TLevelItem::getItemPlayerProp(const CString& pItemName, TPlayer* player)
 			return CString() >> (char)PLPROP_CURPOWER >> (char)heartCount;
 		}
 
-		case 7:		// glove1
-		case 17:	// glove2
+		case 6:		// glove1
+		case 16:	// glove2
 		{
 			CString playerProp = player->getProp(PLPROP_GLOVEPOWER);
 			char glovePower = playerProp.readGChar();
@@ -82,12 +82,12 @@ CString TLevelItem::getItemPlayerProp(const CString& pItemName, TPlayer* player)
 			return CString() >> (char)PLPROP_GLOVEPOWER >> (char)glovePower;
 		}
 
-		case 8:		// bow
-		case 9:		// bomb
+		case 7:		// bow
+		case 8:		// bomb
 
-		case 10:	// shield
-		case 16:	// mirrorshield
-		case 18:	// lizardshield
+		case 9:	// shield
+		case 15:	// mirrorshield
+		case 17:	// lizardshield
 		{
 			CString playerProp = player->getProp(PLPROP_SHIELDPOWER);
 			char shieldPower = playerProp.readGChar();
@@ -97,10 +97,10 @@ CString TLevelItem::getItemPlayerProp(const CString& pItemName, TPlayer* player)
 			return CString() >> (char)PLPROP_SHIELDPOWER >> (char)shieldPower;
 		}
 
-		case 11:	// sword
-		case 14:	// battleaxe
-		case 19:	// lizardsword
-		case 15:	// goldensword
+		case 10:	// sword
+		case 13:	// battleaxe
+		case 18:	// lizardsword
+		case 14:	// goldensword
 		{
 			CString playerProp = player->getProp(PLPROP_SWORDPOWER);
 			char swordPower = playerProp.readGChar();
@@ -111,7 +111,7 @@ CString TLevelItem::getItemPlayerProp(const CString& pItemName, TPlayer* player)
 			return CString() >> (char)PLPROP_SWORDPOWER >> (char)swordPower;
 		}
 
-		case 12:	// fullheart
+		case 11:	// fullheart
 		{
 			CString playerProp = player->getProp(PLPROP_MAXPOWER);
 			char heartMax = playerProp.readGChar() + (1 * 2);
@@ -119,12 +119,12 @@ CString TLevelItem::getItemPlayerProp(const CString& pItemName, TPlayer* player)
 			return CString() >> (char)PLPROP_MAXPOWER >> (char)heartMax >> (char)PLPROP_CURPOWER >> (char)heartMax;
 		}
 
-		case 21:	// fireball
-		case 22:	// fireblast
-		case 23:	// nukeshot
-		case 24:	// joltbomb
+		case 20:	// fireball
+		case 21:	// fireblast
+		case 22:	// nukeshot
+		case 23:	// joltbomb
 
-		case 25:	// spinattack
+		case 24:	// spinattack
 		{
 			CString playerProp = player->getProp(PLPROP_STATUS);
 			char status = playerProp.readGChar();
@@ -133,4 +133,6 @@ CString TLevelItem::getItemPlayerProp(const CString& pItemName, TPlayer* player)
 			return CString() >> (char)PLPROP_STATUS >> (char)status;
 		}
 	}
+
+	return CString();
 }
