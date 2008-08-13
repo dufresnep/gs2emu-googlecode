@@ -36,8 +36,8 @@ bool TPlayer::sendLogin()
 	if (failed) return false;
 
 	// Exchange props with everybody on the server.
-	std::vector<TPlayer*> playerList = server->getPlayerList();
-	for (std::vector<TPlayer*>::iterator i = playerList.begin(); i != playerList.end(); ++i)
+	std::vector<TPlayer*>* playerList = server->getPlayerList();
+	for (std::vector<TPlayer*>::iterator i = playerList->begin(); i != playerList->end(); ++i)
 	{
 		TPlayer* player = (TPlayer*)*i;
 		if (player == this) continue;
@@ -69,7 +69,7 @@ bool TPlayer::sendLogin()
 	}
 
 	// Tell the serverlist that the player connected.
-	server->getServerList().addPlayer(this);
+	server->getServerList()->addPlayer(this);
 
 	sendCompress();
 	return true;
@@ -77,7 +77,7 @@ bool TPlayer::sendLogin()
 
 bool TPlayer::sendLoginClient()
 {
-	CSettings* settings = &(server->getSettings());
+	CSettings* settings = server->getSettings();
 
 	// Send the player his login props.
 	sendProps(__sendLogin, sizeof(__sendLogin) / sizeof(bool));

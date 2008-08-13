@@ -150,12 +150,12 @@ bool TLevel::loadGraal(const CString& pLevelName)
 
 bool TLevel::loadNW(const CString& pLevelName)
 {
-	CFileSystem fileSystem = server->getFileSystem();
+	CFileSystem* fileSystem = server->getFileSystem();
 
 	// Path-To-File
 	levelName = pLevelName;
-	fileName = fileSystem.find(pLevelName);
-	modTime = fileSystem.getModTime(pLevelName);
+	fileName = fileSystem->find(pLevelName);
+	modTime = fileSystem->getModTime(pLevelName);
 
 	// Load File
 	std::vector<CString> fileData = CString::loadToken(fileName);
@@ -169,13 +169,9 @@ bool TLevel::loadNW(const CString& pLevelName)
 	for (std::vector<CString>::iterator i = fileData.begin(); i != fileData.end(); ++i)
 	{
 		// Tokenize
-		std::vector<CString> curLine = i->tokenize();
+		std::vector<CString> curLine = i->removeAll("\r").tokenize();
 		if (curLine.size() < 1)
 			continue;
-
-		// Get rid of \r
-		if (curLine[curLine.size() - 1][curLine[curLine.size() - 1].length() - 1] == '\r')
-			curLine[curLine.size() - 1].removeI(curLine[curLine.size() - 1].length() - 1, 1);
 
 		// Parse Each Type
 		if (curLine[0] == "BOARD")
@@ -216,7 +212,7 @@ bool TLevel::loadNW(const CString& pLevelName)
 		{
 			if (curLine.size() != 8)
 				continue;
-			if (fileSystem.find(curLine[1]).length() < 1)
+			if (fileSystem->find(curLine[1]).length() < 1)
 				continue;
 
 			levelLinks.push_back(new TLevelLink(curLine));
@@ -237,7 +233,6 @@ bool TLevel::loadNW(const CString& pLevelName)
 			while (i != fileData.end())
 			{
 				CString line = *i;
-				if (line[line.length() - 1] == '\r') line.removeI(line.length() - 1, 1);
 				if (line == "NPCEND") break;
 				code << line << "\xa7";
 				++i;
@@ -261,7 +256,6 @@ bool TLevel::loadNW(const CString& pLevelName)
 			while (i != fileData.end())
 			{
 				CString line = *i;
-				if (line[line.length() - 1] == '\r') line.removeI(line.length() - 1, 1);
 				if (line == "SIGNEND") break;
 				text << line << "\n";
 				++i;
@@ -290,7 +284,6 @@ bool TLevel::loadNW(const CString& pLevelName)
 			while (i != fileData.end())
 			{
 				CString line = *i;
-				if (line[line.length() - 1] == '\r') line.removeI(line.length() - 1, 1);
 				if (line == "BADDYEND") break;
 				bverse.push_back(line);
 				++i;
@@ -310,7 +303,7 @@ bool TLevel::loadNW(const CString& pLevelName)
 */
 TLevel* TLevel::findLevel(const CString& pLevelName, TServer* server)
 {
-	std::vector<TLevel*>* levelList = &(server->getLevelList());
+	std::vector<TLevel*>* levelList = server->getLevelList();
 
 	// Find Appropriate Level by Name
 	for (std::vector<TLevel *>::iterator i = levelList->begin(); i != levelList->end(); )
@@ -347,7 +340,7 @@ bool TLevel::alterBoard(CString& pTileData, int pX, int pY, int pWidth, int pHei
 		pX + pWidth > 64 || pY + pHeight > 64 )
 		return false;
 
-	CSettings* settings = &(server->getSettings());
+	CSettings* settings = server->getSettings();
 
 	// Do the check for the push-pull block.
 	if (pWidth == 4 && pHeight == 4 && settings->getBool("clientsidepushpull", true))

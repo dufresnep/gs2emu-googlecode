@@ -130,7 +130,7 @@ bool TServerList::init(const CString& pServerIp, const CString& pServerPort)
 
 bool TServerList::connectServer()
 {
-	CSettings* settings = &(server->getSettings());
+	CSettings* settings = server->getSettings();
 
 	if (isConnected == true)
 		return true;
@@ -200,7 +200,7 @@ void TServerList::sendPlayers()
 	int playerCount = 0;
 
 	// Iterate Playerlist
-	for (std::vector<TPlayer *>::iterator i = server->getPlayerList().begin(); i != server->getPlayerList().end();)
+	for (std::vector<TPlayer *>::iterator i = server->getPlayerList()->begin(); i != server->getPlayerList()->end();)
 	{
 		TPlayer *pPlayer = (TPlayer*)*i;
 		if (pPlayer == 0)
@@ -237,7 +237,7 @@ void TServerList::setIp(const CString& pServerIp)
 
 void TServerList::setName(const CString& pServerName)
 {
-	bool uc = server->getSettings().getBool("underconstruction", false);
+	bool uc = server->getSettings()->getBool("underconstruction", false);
 	sendPacket(CString() >> (char)SVO_SETNAME << (uc ? "U " : "") << pServerName);
 }
 

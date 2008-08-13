@@ -134,9 +134,9 @@ CString CString::readString(const CString& pString)
 	retVal.write(&buffer[readc], len);
 
 	// If len was set to bytesLeft(), it MIGHT have pString.
-	int len2;
-	if ((len2 = retVal.find(pString)) != -1)
-		retVal.removeI(len2, pString.length());
+	//int len2;
+	//if ((len2 = retVal.find(pString)) != -1)
+	//	retVal.removeI(len2, pString.length());
 
 	readc += len + pString.length();
 	//readc = (readc > sizec ? sizec : readc); // GO
@@ -233,6 +233,35 @@ CString CString::remove(int pStart, int pLength) const
 	memmove(retVal.text() + pStart, retVal.text() + pStart + pLength, retVal.length() - pStart - (pLength - 1));
 	retVal.setSize(retVal.length() - pLength);
 	retVal[retVal.length()] = 0;
+	return retVal;
+}
+
+CString CString::removeAll(const CString& pString) const
+{
+	// Sanity checks.
+	if (pString.length() == 0 || length() == 0) return *this;
+
+	// First check and see if we even have the string to remove.
+	// pLoc will be initially set here.
+	int pLoc = find(pString);
+	if (pLoc == -1) return *this;
+
+	// Resize retVal to the current length of the class.
+	// This will prevent unnecessary realloc() calls.
+	retVal.clear(sizec);
+
+	// Construct retVal.
+	const int pLen = pString.length();
+	int pStart = 0;
+	do
+	{
+		int pRead = pLoc - pStart;
+		retVal << subString(pStart, pRead);
+		pStart += (pRead + pLen);
+	}
+	while ((pLoc = find(pString, pStart)) != -1);
+
+	// Done!
 	return retVal;
 }
 

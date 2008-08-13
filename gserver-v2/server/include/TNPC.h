@@ -48,8 +48,8 @@ enum
 	NPCPROP_GATTRIB3		= 38,
 	NPCPROP_GATTRIB4		= 39,
 	NPCPROP_GATTRIB5		= 40,
-	NPCPROP_EMPTY41			= 41,
-	NPCPROP_EMPTY42			= 42,
+	NPCPROP_EMPTY41			= 41,	// Maybe gmap level x?
+	NPCPROP_EMPTY42			= 42,	// Maybe gmap level y?
 	NPCPROP_EMPTY43			= 43,
 	NPCPROP_GATTRIB6		= 44,
 	NPCPROP_GATTRIB7		= 45,
@@ -78,6 +78,7 @@ enum
 	NPCPROP_GATTRIB28		= 66,
 	NPCPROP_GATTRIB29		= 67,
 	NPCPROP_GATTRIB30		= 68,
+	NPCPROP_EMPTY75			= 75,		// Could possibly be modTime
 };
 
 #define npcpropcount 48

@@ -24,7 +24,7 @@ CFileSystem::CFileSystem(TServer* pServer)
 void CFileSystem::init()
 {
 	if (server == 0) return;
-	CSettings* settings = &(server->getSettings());
+	CSettings* settings = server->getSettings();
 
 	// Load every directory if we aren't using folders config.
 	if (settings->getBool("nofoldersconfig", false) == true)

@@ -35,6 +35,7 @@ bool CSettings::loadFile(const CString& pStr)
 		return false;
 
 	// Parse Data
+	fileData.removeAllI("\r");
 	strList = fileData.tokenize("\n");
 	for (unsigned int i = 0; i < strList.size(); i++)
 	{
@@ -47,15 +48,14 @@ bool CSettings::loadFile(const CString& pStr)
 		line[0].toLowerI();
 		if (line.size() == 1) continue;
 
-		// Remove \r
-		if (line[1][line[1].length() - 1] == '\r') line[1].removeI(line[1].length() - 1, 1);
-
 		// Trim
 		for (unsigned int j = 0; j < line.size(); j++)
 			line[j].trimI();
 
 		// Create Key
 		keys.push_back(new CKey(line[0], line[1]));
+
+		// TODO: re-implement this commented out section.
 		/*
 		CKey *key;
 		if ((key = getKey(line[0])) == 0)

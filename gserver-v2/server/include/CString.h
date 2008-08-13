@@ -62,6 +62,7 @@ class CString
 		CString left(int pLength) const;
 		CString right(int pLength) const;
 		CString remove(int pStart, int pLength) const;
+		CString removeAll(const CString& pString) const;
 		CString subString(int pStart, int pLength = -1) const;
 		CString toLower() const;
 		CString toUpper() const;
@@ -81,6 +82,7 @@ class CString
 		/* In-Functions */
 		inline CString& escapeI();
 		inline CString& removeI(int pStart, int pLength);
+		inline CString& removeAllI(const CString& pString);
 		inline CString& toLowerI();
 		inline CString& toUpperI();
 		inline CString& trimI();
@@ -275,6 +277,12 @@ inline CString& CString::escapeI()
 inline CString& CString::removeI(int pStart, int pLength)
 {
 	*this = remove(pStart, pLength);
+	return *this;
+}
+
+inline CString& CString::removeAllI(const CString& pString)
+{
+	*this = removeAll(pString);
 	return *this;
 }
 

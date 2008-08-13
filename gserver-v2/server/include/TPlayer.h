@@ -40,7 +40,7 @@ enum
 
 	PLI_OPENCHEST		= 20,
 	PLI_WANTFILE		= 23,
-	PLI_NPCWEAPONIMG	= 24,
+	PLI_SHOWIMG			= 24,
 
 	PLI_NPCWEAPONDEL	= 29,
 	PLI_FORCELEVELWARP	= 30,
@@ -83,23 +83,28 @@ enum
 
 	PLO_SIGNATURE		= 25,
 	PLO_BADDYHURT		= 27,
+	PLO_FLAGSET			= 28,
 	PLO_FILESENDFAILED	= 30,
-	PLO_NPCWEAPONIMG	= 32,
+	PLO_SHOWIMG			= 32,
 	PLO_NPCWEAPONADD	= 33,
 	PLO_NPCWEAPONDEL	= 34,
 	PLO_LEVELMODTIME	= 39,
 	PLO_DEFAULTWEAPON	= 43,
+	PLO_LISTPROCESSES	= 44,	// Requests a list of running processes.
 	PLO_STAFFGUILDS		= 47,
 	PLO_TRIGGERACTION	= 48,
-	PLO_EMPTY49			= 49,	// Causes level to freeze with "Loading" for some reason.  Might be server-side setlevel.
+	PLO_EMPTY49			= 49,	// Held 5 bytes then the gmap.  Might be modTime + gmap.
 	PLO_ADDPLAYER		= 55,
 	PLO_DELPLAYER		= 56,
 	PLO_LARGEFILESTART	= 68,
 	PLO_LARGEFILEEND	= 69,
+	PLO_EMPTY73			= 73,
 	PLO_RCMESSAGE		= 74,
 	PLO_RAWDATA			= 100,
 	PLO_BOARDPACKET		= 101,
 	PLO_FILE			= 102,
+	PLO_EMPTY156		= 156,	// Held the gmap. {156}{gmap name}
+	PLO_GHOSTICON		= 174,	// Pass 1 to enable the ghost icon
 	PLO_RPGWINDOW		= 179,
 	PLO_STATUSLIST		= 180,
 };
@@ -187,7 +192,7 @@ class TPlayer : public TAccount
 		bool msgPLI_OPENCHEST(CString& pPacket);
 
 		bool msgPLI_WANTFILE(CString& pPacket);
-		bool msgPLI_NPCWEAPONIMG(CString& pPacket);
+		bool msgPLI_SHOWIMG(CString& pPacket);
 		bool msgPLI_NPCWEAPONDEL(CString& pPacket);
 		bool msgPLI_WEAPONADD(CString& pPacket);
 		bool msgPLI_UPDATEFILE(CString& pPacket);

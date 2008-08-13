@@ -15,7 +15,7 @@ extern int __attrPackets[30];
 */
 CString TPlayer::getProp(int pPropId)
 {
-	CSettings* settings = &(server->getSettings());
+	CSettings* settings = server->getSettings();
 	switch (pPropId)
 	{
 		case PLPROP_NICKNAME:
@@ -202,7 +202,7 @@ CString TPlayer::getProp(int pPropId)
 
 void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 {
-	CSettings* settings = &(server->getSettings());
+	CSettings* settings = server->getSettings();
 	CString globalBuff, levelBuff, levelBuff2, selfBuff;
 	int len = 0;
 /*

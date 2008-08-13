@@ -30,15 +30,15 @@ class TServer
 		bool doMain();
 
 		// Get functions.
-		CSettings& getSettings()				{ return settings; }
-		std::vector<TPlayer*>& getPlayerList()	{ return playerList; }
-		std::vector<TPlayer*>& getPlayerIdList(){ return playerIds; }
-		std::vector<TNPC*>& getNPCList()		{ return npcList; }
-		std::vector<TNPC*>& getNPCIdList()		{ return npcIds; }
-		std::vector<TLevel*>& getLevelList()	{ return levelList; }
-		std::vector<TWeapon*>& getWeaponList()	{ return weaponList; }
-		TServerList& getServerList()			{ return serverlist; }
-		CFileSystem& getFileSystem()			{ return filesystem; }
+		CSettings* getSettings()				{ return &settings; }
+		std::vector<TPlayer*>* getPlayerList()	{ return &playerList; }
+		std::vector<TPlayer*>* getPlayerIdList(){ return &playerIds; }
+		std::vector<TNPC*>* getNPCList()		{ return &npcList; }
+		std::vector<TNPC*>* getNPCIdList()		{ return &npcIds; }
+		std::vector<TLevel*>* getLevelList()	{ return &levelList; }
+		std::vector<TWeapon*>* getWeaponList()	{ return &weaponList; }
+		TServerList* getServerList()			{ return &serverlist; }
+		CFileSystem* getFileSystem()			{ return &filesystem; }
 		CString getServerPath()					{ return serverpath; }
 		CLog& getServerLog()					{ return serverlog; }
 		CLog& getRCLog()						{ return rclog; }

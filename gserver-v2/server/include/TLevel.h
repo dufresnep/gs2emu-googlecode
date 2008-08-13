@@ -49,7 +49,7 @@ class TLevel
 
 		//! Gets a vector full of all the level chests.
 		//! \return The level chests.
-		std::vector<TLevelChest *>& getLevelChests()	{ return levelChests; }
+		std::vector<TLevelChest *>* getLevelChests()	{ return &levelChests; }
 
 		//! Gets the sparring zone status of the level.
 		//! \return The sparring zone status.  If true, the level is a sparring zone.

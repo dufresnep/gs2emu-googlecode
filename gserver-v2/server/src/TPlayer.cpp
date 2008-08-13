@@ -127,7 +127,7 @@ void createPLFunctions()
 	TPLFunc[PLI_OPENCHEST] = &TPlayer::msgPLI_OPENCHEST;
 
 	TPLFunc[PLI_WANTFILE] = &TPlayer::msgPLI_WANTFILE;
-	TPLFunc[PLI_NPCWEAPONIMG] = &TPlayer::msgPLI_NPCWEAPONIMG;
+	TPLFunc[PLI_SHOWIMG] = &TPlayer::msgPLI_SHOWIMG;
 	TPLFunc[PLI_NPCWEAPONDEL] = &TPlayer::msgPLI_NPCWEAPONDEL;
 	TPLFunc[PLI_FORCELEVELWARP] = &TPlayer::msgPLI_LEVELWARP;	// Shared with PLI_LEVELWARP
 	TPLFunc[PLI_WEAPONADD] = &TPlayer::msgPLI_WEAPONADD;
@@ -159,11 +159,6 @@ TPlayer::~TPlayer()
 {
 	if (id >= 0)
 	{
-		// TODO: Fix playerIds.
-		//playerIds[id] = 0;
-		//vecRemove<TPlayer*>(playerList, this);
-		//vecRemove(playerList, this);
-
 		// TODO: save pending weapons.
 
 		// Save account.
@@ -252,7 +247,7 @@ bool TPlayer::doTimedEvents()
 	onlineTime++;
 
 	// Disconnect if players are inactive.
-	CSettings* settings = &(server->getSettings());
+	CSettings* settings = server->getSettings();
 	if (settings->getBool("disconnectifnotmoved"))
 	{
 		if ((int)difftime(currTime, lastMovement) > settings->getInt("maxnomovement", 1200))
@@ -271,10 +266,11 @@ bool TPlayer::doTimedEvents()
 	}
 
 	// Increase player AP.
-	if (settings->getBool("apsystem"))
+	if (settings->getBool("apsystem") && level != 0)
 	{
 		if (!(status & PLSTATUS_PAUSED) && level->getSparringZone() == false)
 			apCounter--;
+
 		if (apCounter <= 0)
 		{
 			if (ap < 100)
@@ -308,10 +304,10 @@ bool TPlayer::parsePacket(CString& pPacket)
 
 	while (pPacket.bytesLeft() > 0)
 	{
-		// grab packet -- are you sure that \n is really still there.. kinda wierd that it is -- i've done some tests and it never stayed... - Joey
+		// grab packet
 		CString curPacket = pPacket.readString("\n");
-		if (curPacket[curPacket.length()-1] == '\n')
-			curPacket.removeI(curPacket.length() - 1, 1);
+		//if (curPacket[curPacket.length()-1] == '\n')
+		//	curPacket.removeI(curPacket.length() - 1, 1);
 
 		// decrypt packet
 		if (!PLE_POST22)
@@ -387,14 +383,8 @@ void TPlayer::sendCompress()
 		return;
 
 	// compress buffer
-	if (PLE_POST22) // anyway we can better this -- less instructions = better :p
+	if (PLE_POST22)
 	{
-		/*
-		FILE* f = fopen("test2.out", "wb");
-		fwrite(sBuffer.text(), 1, sBuffer.length(), f);
-		fclose(f);
-		exit(0);
-		*/
 		// Choose which compression to use and apply it.
 		int compressionType = ENCRYPT22_UNCOMPRESSED;
 		if (sBuffer.length() > 0x2000)	// 8KB
@@ -429,7 +419,7 @@ void TPlayer::sendCompress()
 */
 bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTime)
 {
-	std::vector<TPlayer*> playerList = server->getPlayerList();
+	std::vector<TPlayer*>* playerList = server->getPlayerList();
 
 	if (level != 0)
 	{
@@ -455,7 +445,7 @@ bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTi
 
 		// Tell everyone I left.
 		server->sendPacketToLevel(this->getProps(0, 0) >> (char)PLPROP_JOINLEAVELVL >> (char)0, level, this);
-		for (std::vector<TPlayer*>::iterator i = playerList.begin(); i != playerList.end(); ++i)
+		for (std::vector<TPlayer*>::iterator i = playerList->begin(); i != playerList->end(); ++i)
 		{
 			TPlayer* player = (TPlayer*)*i;
 			if (player == this) continue;
@@ -522,7 +512,7 @@ bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTi
 
 	// Do props stuff.
 	server->sendPacketToLevel(this->getProps(__getLogin, sizeof(__getLogin)/sizeof(bool)), this->level, this);
-	for (std::vector<TPlayer*>::iterator i = playerList.begin(); i != playerList.end(); ++i)
+	for (std::vector<TPlayer*>::iterator i = playerList->begin(); i != playerList->end(); ++i)
 	{
 		TPlayer* player = (TPlayer*)*i;
 		if (player == this) continue;
@@ -643,7 +633,7 @@ bool TPlayer::msgPLI_LEVELWARP(CString& pPacket)
 
 bool TPlayer::msgPLI_BOARDMODIFY(CString& pPacket)
 {
-	CSettings* settings = &(server->getSettings());
+	CSettings* settings = server->getSettings();
 	signed char loc[2] = {pPacket.readGChar(), pPacket.readGChar()};
 	signed char dim[2] = {pPacket.readGChar(), pPacket.readGChar()};
 	CString tiles = pPacket.readString("");
@@ -741,8 +731,8 @@ bool TPlayer::msgPLI_TOALL(CString& pPacket)
 	CString message = pPacket.readString("");
 	// TODO: word filter.
 
-	std::vector<TPlayer*> playerList = server->getPlayerList();
-	for (std::vector<TPlayer*>::iterator i = playerList.begin(); i != playerList.end(); ++i)
+	std::vector<TPlayer*>* playerList = server->getPlayerList();
+	for (std::vector<TPlayer*>::iterator i = playerList->begin(); i != playerList->end(); ++i)
 	{
 		TPlayer* player = *i;
 		if (player == this) continue;
@@ -835,6 +825,7 @@ bool TPlayer::msgPLI_CLAIMPKER(CString& pPacket)
 
 	// Sparring zone rating code.
 	// Uses the glicko rating system.
+	if (level == 0) return true;
 	if ( level->getSparringZone() )
 	{
 		// Get some stats we are going to use.
@@ -881,7 +872,7 @@ bool TPlayer::msgPLI_CLAIMPKER(CString& pPacket)
 	}
 	else
 	{
-		CSettings* settings = &(server->getSettings());
+		CSettings* settings = server->getSettings();
 
 		// Give a kill to the player who killed me.
 		if (settings->getBool("dontchangekills", false) == false)
@@ -959,7 +950,7 @@ bool TPlayer::msgPLI_OPENCHEST(CString& pPacket)
 {
 	unsigned char cX = pPacket.readGUChar();
 	unsigned char cY = pPacket.readGUChar();
-	std::vector<TLevelChest *>* levelChests = &(level->getLevelChests());
+	std::vector<TLevelChest *>* levelChests = level->getLevelChests();
 
 	for (std::vector<TLevelChest*>::iterator i = levelChests->begin(); i != levelChests->end(); ++i)
 	{
@@ -976,7 +967,7 @@ bool TPlayer::msgPLI_OPENCHEST(CString& pPacket)
 
 bool TPlayer::msgPLI_WANTFILE(CString& pPacket)
 {
-	CFileSystem* fileSystem = &(server->getFileSystem());
+	CFileSystem* fileSystem = server->getFileSystem();
 
 	// Load file.
 	CString file = pPacket.readString("");
@@ -1016,9 +1007,9 @@ bool TPlayer::msgPLI_WANTFILE(CString& pPacket)
 	return true;
 }
 
-bool TPlayer::msgPLI_NPCWEAPONIMG(CString& pPacket)
+bool TPlayer::msgPLI_SHOWIMG(CString& pPacket)
 {
-	server->sendPacketToLevel(CString() >> (char)PLO_NPCWEAPONIMG >> (short)id << pPacket.text() + 1, level, this);
+	server->sendPacketToLevel(CString() >> (char)PLO_SHOWIMG >> (short)id << pPacket.text() + 1, level, this);
 	return true;
 }
 
@@ -1036,13 +1027,13 @@ bool TPlayer::msgPLI_NPCWEAPONDEL(CString& pPacket)
 
 bool TPlayer::msgPLI_WEAPONADD(CString& pPacket)
 {
-	CSettings* settings = &(server->getSettings());
+	CSettings* settings = server->getSettings();
 	char type = pPacket.readGChar();
 
 	// Type 0 means it is a default weapon.
 	if (type == 0)
 	{
-		std::vector<TWeapon*>* weaponList = &(server->getWeaponList());
+		std::vector<TWeapon*>* weaponList = server->getWeaponList();
 
 		if (settings->getBool("defaultweapons", true) == false)
 			return true;
@@ -1065,12 +1056,12 @@ bool TPlayer::msgPLI_WEAPONADD(CString& pPacket)
 	// NPC weapons.
 	else
 	{
-		std::vector<TNPC*> npcIds = server->getNPCIdList();
-		std::vector<TWeapon*>* weaponList = &(server->getWeaponList());
+		std::vector<TNPC*>* npcIds = server->getNPCIdList();
+		std::vector<TWeapon*>* weaponList = server->getWeaponList();
 
 		// Get the NPC id.
 		int npcId = pPacket.readGInt();
-		TNPC* npc = npcIds[npcId];
+		TNPC* npc = (*npcIds)[npcId];
 		if (npc == 0)
 			return true;
 
@@ -1094,8 +1085,8 @@ bool TPlayer::msgPLI_WEAPONADD(CString& pPacket)
 		bool foundThis = false;
 		if (weapon->getModTime() != npc->getLevel()->getModTime())
 		{
-			std::vector<TPlayer*> playerList = server->getPlayerList();
-			for (std::vector<TPlayer*>::iterator i = playerList.begin(); i != playerList.end(); ++i)
+			std::vector<TPlayer*>* playerList = server->getPlayerList();
+			for (std::vector<TPlayer*>::iterator i = playerList->begin(); i != playerList->end(); ++i)
 			{
 				TPlayer* player = *i;
 				if (player->hasWeapon(weapon->getName()))
@@ -1119,7 +1110,7 @@ bool TPlayer::msgPLI_WEAPONADD(CString& pPacket)
 
 bool TPlayer::msgPLI_UPDATEFILE(CString& pPacket)
 {
-	CFileSystem* fileSystem = &(server->getFileSystem());
+	CFileSystem* fileSystem = server->getFileSystem();
 
 	// Get the packet data and file mod time.
 	time_t modTime = pPacket.readGUInt5();
@@ -1181,7 +1172,6 @@ bool TPlayer::msgPLI_ADJACENTLEVEL(CString& pPacket)
 
 bool TPlayer::msgPLI_LANGUAGE(CString& pPacket)
 {
-	//language = pPacket.readChars(pPacket.readGUChar());
 	language = pPacket.readString("");
 	return true;
 }

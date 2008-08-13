@@ -133,7 +133,7 @@ void TLevelBaddy::setProps(CString &pProps)
 				if (mode == BDMODE_DIE)
 				{
 					if (respawn)
-						timeout.setTimeout(server->getSettings().getInt("baddyrespawntime", 60));
+						timeout.setTimeout(server->getSettings()->getInt("baddyrespawntime", 60));
 					else
 						level->removeBaddy(id);
 				}
