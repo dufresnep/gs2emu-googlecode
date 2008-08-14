@@ -11,6 +11,10 @@ CString TWeapon::getWeaponPacket() const
 		>> (char)getName().length() << getName()
 		>> (char)0 >> (char)getImage().length() << getImage()
 		>> (char)1 >> (short)getScript().length() << getScript();
+
+	// 0x00 - image
+	// 0x01 - script
+	// 0x4A - npcserver class script whatever.
 }
 
 CString TWeapon::getName() const

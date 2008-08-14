@@ -78,7 +78,8 @@ enum
 	NPCPROP_GATTRIB28		= 66,
 	NPCPROP_GATTRIB29		= 67,
 	NPCPROP_GATTRIB30		= 68,
-	NPCPROP_EMPTY75			= 75,		// Could possibly be modTime
+	NPCPROP_X2				= 75,
+	NPCPROP_Y2				= 76,
 };
 
 #define npcpropcount 48
@@ -111,6 +112,7 @@ class TNPC
 		bool levelNPC;
 		time_t modTime[npcpropcount];
 		float x, y, hurtX, hurtY;
+		int x2, y2;
 		int id, rupees;
 		unsigned char darts, bombs, glovePower, bombPower, swordPower, shieldPower;
 		unsigned char visFlags, blockFlags, sprite, colors[5], power, ap;

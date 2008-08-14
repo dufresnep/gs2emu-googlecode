@@ -16,6 +16,7 @@ TNPC::TNPC(const CString& pImage, const CString& pScript, float pX, float pY, TL
 :
 levelNPC(pLevelNPC),
 x(pX), y(pY), hurtX(32.0f), hurtY(32.0f),
+x2((int)(pX*16)), y2((int)(pY*16)),
 id(-1), rupees(0),
 darts(0), bombs(0), glovePower(0), bombPower(0), swordPower(0), shieldPower(0),
 visFlags(1), blockFlags(0), sprite(2), power(0), ap(50),
@@ -33,7 +34,8 @@ level(pLevel)
 	// We need to alter the modTime of the following props as they should be always sent.
 	// If we don't, they won't be sent until the prop gets modified.
 	modTime[NPCPROP_IMAGE] = modTime[NPCPROP_SCRIPT] = modTime[NPCPROP_X] = modTime[NPCPROP_Y]
-		= modTime[NPCPROP_VISFLAGS] = modTime[NPCPROP_SPRITE] = time(0);
+		= modTime[NPCPROP_VISFLAGS] = modTime[NPCPROP_SPRITE]
+		= modTime[NPCPROP_X2] = modTime[NPCPROP_Y2] = time(0);
 
 	// Search if the NPC is a sparringzone NPC.
 	if (pScript.subString(0, 12) == "sparringzone") pLevel->setSparringZone(true);
@@ -154,6 +156,22 @@ CString TNPC::getProp(int pId) const
 
 		case NPCPROP_BODYIMAGE:
 		return CString() >> (char)bodyImage.length() << bodyImage;
+
+		case NPCPROP_X2:
+		{
+			unsigned short val = (x2 < 0 ? -x2 : x2);
+			val <<= 1;
+			if (x2 < 0) val |= 0x0001;
+			return CString().writeGShort(val);
+		}
+
+		case NPCPROP_Y2:
+		{
+			unsigned short val = (y2 < 0 ? -y2 : y2);
+			val <<= 1;
+			if (y2 < 0) val |= 0x0001;
+			return CString().writeGShort((short)val);
+		}
 	}
 
 	// Saves.
@@ -210,10 +228,12 @@ void TNPC::setProps(CString& pProps)
 
 			case NPCPROP_X:
 				x = (float)(pProps.readGChar())/2;
+				x2 = (int)(x * 16);
 			break;
 
 			case NPCPROP_Y:
 				y = (float)(pProps.readGChar())/2;
+				y2 = (int)(y * 16);
 			break;
 
 			case NPCPROP_POWER:
@@ -344,6 +364,31 @@ void TNPC::setProps(CString& pProps)
 			case NPCPROP_BODYIMAGE:
 				bodyImage = pProps.readChars(pProps.readGUChar());
 			break;
+
+			// Location, in pixels, of the npc on the level in 2.2+ clients.
+			// Bit 0x0001 controls if it is negative or not.
+			// Bits 0xFFFE are the actual value.
+			case NPCPROP_X2:
+				x2 = len = pProps.readGUShort();
+
+				// If the first bit is 1, our position is negative.
+				x2 >>= 1;
+				if ((short)len & 0x0001) x2 = -x2;
+
+				// Let pre-2.2+ clients see 2.2+ movement.
+				x = (float)x2 / 16.0f;
+				break;
+
+			case NPCPROP_Y2:
+				y2 = len = pProps.readGUShort();
+
+				// If the first bit is 1, our position is negative.
+				y2 >>= 1;
+				if ((short)len & 0x0001) y2 = -y2;
+
+				// Let pre-2.2+ clients see 2.2+ movement.
+				y = (float)y2 / 16.0f;
+				break;
 
 			case NPCPROP_SAVE0: saves[0] = pProps.readGUChar(); break;
 			case NPCPROP_SAVE1: saves[1] = pProps.readGUChar(); break;

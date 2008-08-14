@@ -57,6 +57,7 @@ enum
 
 enum
 {
+	PLO_LEVELBOARD		= 0,
 	PLO_LEVELLINK		= 1,
 	PLO_BADDYPROPS		= 2,
 	PLO_NPCPROPS		= 3,
@@ -104,9 +105,13 @@ enum
 	PLO_BOARDPACKET		= 101,
 	PLO_FILE			= 102,
 	PLO_EMPTY156		= 156,	// Held the gmap. {156}{gmap name}
+	PLO_BIGMAP			= 172,	// [172] zodiacminimap.txt,zodiacworldminimap3.png,10,10
 	PLO_GHOSTICON		= 174,	// Pass 1 to enable the ghost icon
 	PLO_RPGWINDOW		= 179,
 	PLO_STATUSLIST		= 180,
+	PLO_EMPTY190		= 190,	// Was blank.  Sent before weapon list.
+	PLO_EMPTY194		= 194,	// Was blank.  Sent before weapon list.
+	PLO_EMPTY197		= 197,	// Related to npcserver.  Seems to register npcs on the client.
 };
 
 enum

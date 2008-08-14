@@ -115,7 +115,7 @@ bool CString::save(const CString& pString) const
 
 CString CString::readChars(int pLength)
 {
-	retVal.clear();
+	CString retVal;
 	pLength = clip(pLength, 0, sizec - readc);
 	retVal.write(&buffer[readc], pLength);
 	readc += pLength;
@@ -124,7 +124,7 @@ CString CString::readChars(int pLength)
 
 CString CString::readString(const CString& pString)
 {
-	retVal.clear();
+	CString retVal;
 	if (readc > sizec) return retVal;
 
 	int len;
@@ -134,12 +134,11 @@ CString CString::readString(const CString& pString)
 	retVal.write(&buffer[readc], len);
 
 	// If len was set to bytesLeft(), it MIGHT have pString.
-	//int len2;
-	//if ((len2 = retVal.find(pString)) != -1)
-	//	retVal.removeI(len2, pString.length());
+	int len2;
+	if ((len2 = retVal.find(pString)) != -1)
+		retVal.removeI(len2, pString.length());
 
 	readc += len + pString.length();
-	//readc = (readc > sizec ? sizec : readc); // GO
 	return retVal;
 }
 
@@ -194,7 +193,7 @@ void CString::clear(int pSize)
 
 CString CString::escape() const
 {
-	retVal.clear();
+	CString retVal;
 
 	for (int i = 0; i < length(); i++)
 	{
@@ -223,7 +222,7 @@ CString CString::right(int pLength) const
 
 CString CString::remove(int pStart, int pLength) const
 {
-	retVal = *this;
+	CString retVal(*this);
 	if (pLength < 1 || pStart < 0)
 		return retVal;
 	if (pStart >= sizec)
@@ -248,6 +247,7 @@ CString CString::removeAll(const CString& pString) const
 
 	// Resize retVal to the current length of the class.
 	// This will prevent unnecessary realloc() calls.
+	CString retVal;
 	retVal.clear(sizec);
 
 	// Construct retVal.
@@ -271,7 +271,7 @@ CString CString::subString(int pStart, int pLength) const
 	if (pLength == -1)
 		pLength = length();
 
-	retVal.clear();
+	CString retVal;
 	pStart = clip(pStart, 0, length());
 	pLength = clip(pLength, 0, length()-pStart);
 
@@ -282,7 +282,7 @@ CString CString::subString(int pStart, int pLength) const
 
 CString CString::toLower() const
 {
-	retVal = *this;
+	CString retVal(*this);
 	for (int i = 0; i < retVal.length(); i++)
 	{
 		if (in(retVal[i], 'A', 'Z'))
@@ -294,7 +294,7 @@ CString CString::toLower() const
 
 CString CString::toUpper() const
 {
-	retVal = *this;
+	CString retVal(*this);
 	for (int i = 0; i < retVal.length(); i++)
 	{
 		if (in(retVal[i], 'a', 'z'))
@@ -334,7 +334,7 @@ CString CString::trimRight() const
 
 CString CString::bzcompress() const
 {
-	retVal.clear();
+	CString retVal;
 	char buf[65536];
 	int error = 0;
 	unsigned int clen = sizeof(buf);
@@ -348,7 +348,7 @@ CString CString::bzcompress() const
 
 CString CString::bzuncompress() const
 {
-	retVal.clear();
+	CString retVal;
 	char buf[65536];
 	int error = 0;
 	unsigned int clen = sizeof(buf);
@@ -362,7 +362,7 @@ CString CString::bzuncompress() const
 
 CString CString::zcompress() const
 {
-	retVal.clear();
+	CString retVal;
 	char buf[65536];
 	int error = 0;
 	unsigned long clen = sizeof(buf);
@@ -376,7 +376,7 @@ CString CString::zcompress() const
 
 CString CString::zuncompress() const
 {
-	retVal.clear();
+	CString retVal;
 	char buf[65536];
 	int error = 0;
 	unsigned long clen = sizeof(buf);
@@ -390,9 +390,17 @@ CString CString::zuncompress() const
 
 int CString::find(const CString& pString, int pStart) const
 {
-	char* loc = strstr(buffer + pStart, pString.text());
-	if (loc == 0) return -1;
-	return (int)(loc - buffer);
+	for (int i = pStart; i <= sizec - pString.length(); ++i)
+	{
+		if (buffer[i] == 0)
+		{
+			if (pString.length() == 0) return i;
+			else continue;
+		}
+		if (strncmp(buffer + i, pString.text(), pString.length()) == 0)
+			return i;
+	}
+	return -1;
 }
 
 int CString::findi(const CString& pString, int pStart) const
@@ -414,7 +422,7 @@ int CString::findl(char pChar) const
 
 std::vector<CString> CString::tokenize(const CString& pString) const
 {
-	retVal = *this;
+	CString retVal(*this);
 	std::vector<CString> strList;
 	char *tok = strtok(retVal.text(), pString.text());
 
@@ -659,8 +667,7 @@ CString CString::B64_Encode()
 {
 	static const char *EncodeTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-//	CString retVal;
-	retVal.clear();
+	CString retVal;
 
 	for (int i = 0; i < sizec; i++)
 	{
@@ -733,8 +740,7 @@ CString CString::B64_Decode()
 	-1, -1, -1, -1, -1, -1				   // 250 - 256
 	};
 
-	//CString retVal;
-	retVal.clear();
+	CString retVal;
 
 	for (int i = 0; i < sizec; i++)
 	{

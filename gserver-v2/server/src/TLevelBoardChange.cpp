@@ -3,7 +3,7 @@
 
 CString TLevelBoardChange::getBoardStr(const CString ignore) const
 {
-	return CString() >> (char)PLO_BOARDMODIFY >> (char)x >> (char)y >> (char)width >> (char)height << tiles;
+	return CString() >> (char)x >> (char)y >> (char)width >> (char)height << tiles;
 }
 
 void TLevelBoardChange::swapTiles()

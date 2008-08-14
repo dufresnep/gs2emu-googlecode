@@ -58,7 +58,7 @@ CString TLevel::getBoardPacket()
 
 CString TLevel::getBoardChangesPacket()
 {
-	CString retVal;
+	CString retVal((char)PLO_LEVELBOARD);
 	for (std::vector<TLevelBoardChange*>::const_iterator i = levelBoardChanges.begin(); i != levelBoardChanges.end(); ++i)
 	{
 		TLevelBoardChange* change = *i;
@@ -232,7 +232,7 @@ bool TLevel::loadNW(const CString& pLevelName)
 			++i;
 			while (i != fileData.end())
 			{
-				CString line = *i;
+				CString line = i->removeAll("\r");
 				if (line == "NPCEND") break;
 				code << line << "\xa7";
 				++i;
@@ -255,7 +255,7 @@ bool TLevel::loadNW(const CString& pLevelName)
 			++i;
 			while (i != fileData.end())
 			{
-				CString line = *i;
+				CString line = i->removeAll("\r");
 				if (line == "SIGNEND") break;
 				text << line << "\n";
 				++i;
@@ -283,7 +283,7 @@ bool TLevel::loadNW(const CString& pLevelName)
 			++i;
 			while (i != fileData.end())
 			{
-				CString line = *i;
+				CString line = i->removeAll("\r");
 				if (line == "BADDYEND") break;
 				bverse.push_back(line);
 				++i;
@@ -555,7 +555,7 @@ bool TLevel::doTimedEvents()
 			// change, the client won't get the new data.
 			change->swapTiles();
 			change->setModTime(time(0));
-			server->sendPacketToLevel(change->getBoardStr(), this);
+			server->sendPacketToLevel(CString() >> (char)PLO_BOARDMODIFY << change->getBoardStr(), this);
 		}
 	}
 

@@ -88,8 +88,9 @@ enum
 	PLPROP_UNKNOWN77		= 77,
 	PLPROP_X2				= 78,
 	PLPROP_Y2				= 79,
+	PLPROP_ACCOUNTNAME2		= 82,
 };
-#define propscount	80
+#define propscount	83
 
 class TServer;
 

@@ -149,8 +149,6 @@ class CString
 		int buffc, sizec, readc, writec;
 };
 
-static CString retVal;
-
 /*
 	Inline Functions
 */

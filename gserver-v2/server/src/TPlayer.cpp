@@ -35,7 +35,7 @@ bool __sendLogin[propscount] =
 	true,  true,  true,  true,  true,  true,  // 60-65
 	true,  true,  true,  true,  true,  true,  // 66-71
 	true,  true,  true,  false, false, false, // 72-77
-	true,  true, // 78-79
+	true,  true,  false, false, true, // 78-82
 };
 
 bool __getLogin[propscount] =
@@ -53,7 +53,7 @@ bool __getLogin[propscount] =
 	false, false, false, false, false, false, // 60-65
 	false, false, false, false, false, false, // 66-71
 	false, false, false, false, false, false, // 72-77
-	true,  true, // 78-79
+	true,  true,  false, false, true, // 78-82
 };
 
 bool __getLoginRC[propscount] =
@@ -72,7 +72,7 @@ bool __getLoginRC[propscount] =
 	false, false, false, false, false, false, // 60-65
 	false, false, false, false, false, false, // 66-71
 	false, false, false, false, false, false, // 72-77
-	false, false, // 78-79
+	true,  true,  false, false, true, // 78-82
 };
 
 bool __sendLocal[propscount] =
@@ -90,7 +90,7 @@ bool __sendLocal[propscount] =
 	true,  true,  true,  true,  true,  true,  // 60-65
 	true,  true,  true,  true,  true,  true,  // 66-71
 	true,  true,  true,  false, false, false, // 72-77
-	true,  true, // 78-79
+	true,  true,  false, false, true, // 78-82
 };
 
 /*
@@ -1147,9 +1147,9 @@ bool TPlayer::msgPLI_ADJACENTLEVEL(CString& pPacket)
 	}
 
 	// Send the new level.
+	sendPacket(CString() >> (char)PLO_LEVELNAME << adjacentLevel->getLevelName());
 	if ((modTime != adjacentLevel->getModTime()) || alreadyVisited == false)
 	{
-		sendPacket(CString() >> (char)PLO_LEVELNAME << adjacentLevel->getLevelName());
 		sendPacket(CString() >> (char)PLO_RAWDATA >> (int)(1+(64*64*2)+1));
 		sendPacket(CString() << adjacentLevel->getBoardPacket());
 		sendCompress();
@@ -1157,14 +1157,13 @@ bool TPlayer::msgPLI_ADJACENTLEVEL(CString& pPacket)
 		// Send links, board changes, chests, and modification time.
 		sendPacket(CString() >> (char)PLO_LEVELMODTIME >> (long long)adjacentLevel->getModTime());
 		sendPacket(CString() << adjacentLevel->getLinksPacket());
-		sendPacket(CString() << adjacentLevel->getBoardChangesPacket());
 		sendPacket(CString() << adjacentLevel->getChestPacket(this));
 	}
+	sendPacket(CString() << adjacentLevel->getBoardChangesPacket());
 
 	// Set our old level back to normal.
 	sendPacket(CString() >> (char)PLO_LEVELNAME << this->level->getLevelName());
-	TPlayer* leader = level->getPlayer(0);
-	if (leader == this)
+	if (level->getPlayer(0) == this)
 		sendPacket(CString() >> (char)PLO_ISLEADER);
 
 	return true;

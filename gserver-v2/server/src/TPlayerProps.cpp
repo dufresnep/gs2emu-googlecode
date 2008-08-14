@@ -186,6 +186,9 @@ CString TPlayer::getProp(int pPropId)
 
 		case PLPROP_GMAPLEVELY:
 		return CString() >> (char)gmaplevely;
+
+		case PLPROP_ACCOUNTNAME2:
+		return CString() >> (char)accountName.length() << accountName;
 	}
 
 	if (inrange(pPropId, 37, 41) || inrange(pPropId, 46, 49) || inrange(pPropId, 54, 74))
@@ -495,10 +498,12 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 				//rating = (float)((len >> 9) & 0xFFF);
 				//oldDeviation = deviation = (float)(len & 0x1FF);
 			break;
-/*
-			case PLPROP_UNKNOWN42:
-				break;
 
+			case PLPROP_UNKNOWN42:
+				len = pPacket.readGInt4();
+				printf( "PLPROP_UNKNOWN42: %d\n", len );
+				break;
+/*
 			case PLPROP_UNKNOWN50:
 				break;
 */
@@ -601,6 +606,9 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 				gmaplevely = pPacket.readGUChar();
 				printf( "gmap level y: %d\n", gmaplevely );
 				break;
+
+			case PLPROP_ACCOUNTNAME2:
+				pPacket.readChars(pPacket.readGUChar());
 
 			default:
 			{
