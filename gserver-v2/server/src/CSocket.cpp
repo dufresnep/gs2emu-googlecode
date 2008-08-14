@@ -154,6 +154,19 @@ void CSocket::destroy()
 	// Mark socket as terminating.
 	properties.state = SOCKET_STATE_TERMINATING;
 
+	// Gracefully shut it down.
+	if (properties.protocol == SOCKET_PROTOCOL_TCP)
+	{
+		char buff[ 0x2000 ];
+		int size;
+		while ( true )
+		{
+			size = recv( properties.handle, buff, 0x2000, 0 );
+			if (size == 0 || size != EWOULDBLOCK || size != EINPROGRESS)
+				break;
+		}
+	}
+
 	// Destroy the socket of d00m.
 #if defined(_WIN32) || defined(_WIN64)
 	if (closesocket(properties.handle) == SOCKET_ERROR)
