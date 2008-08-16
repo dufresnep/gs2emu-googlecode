@@ -1679,13 +1679,6 @@ void CPlayer::sendFiles()
 						if (isLargeFile)
 							sendPacket(CPacket() << (char)SLARGEFILEEND << shortName);
 					}
-					if (fileData.load(longName.text()) && fileData.length() <= 64500)
-					{
-						failed = false;
-						int len = 1 + 5 + 1 + shortName.length() + fileData.length() + 1;
-						sendPacket(CPacket() << (char)100 << (int)len);
-						sendPacket(CPacket() << (char)102 << (long long)modTime << (char)shortName.length() << shortName << fileData << "\n");
-					}
 				}
 			}
 		}
