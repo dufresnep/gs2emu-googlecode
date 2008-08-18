@@ -5,6 +5,7 @@
 #include "CString.h"
 #include "TNPC.h"
 #include "TLevel.h"
+#include "TGMap.h"
 
 char __savePackets[10] = { 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
 char __attrPackets[30] = { 36, 37, 38, 39, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68 };
@@ -17,6 +18,7 @@ TNPC::TNPC(const CString& pImage, const CString& pScript, float pX, float pY, TL
 levelNPC(pLevelNPC),
 x(pX), y(pY), hurtX(32.0f), hurtY(32.0f),
 x2((int)(pX*16)), y2((int)(pY*16)),
+gmaplevelx(0), gmaplevely(0),
 id(-1), rupees(0),
 darts(0), bombs(0), glovePower(0), bombPower(0), swordPower(0), shieldPower(0),
 visFlags(1), blockFlags(0), sprite(2), power(0), ap(50),
@@ -31,10 +33,19 @@ level(pLevel)
 	for (int i = 0; i < 6; i++)
 		imagePart.writeGChar(0);
 
+	// Set the gmap levels.
+	TGMap* gmap = level->getGMap();
+	if (gmap)
+	{
+		gmaplevelx = gmap->getLevelX(level->getLevelName());
+		gmaplevely = gmap->getLevelY(level->getLevelName());
+	}
+
 	// We need to alter the modTime of the following props as they should be always sent.
 	// If we don't, they won't be sent until the prop gets modified.
 	modTime[NPCPROP_IMAGE] = modTime[NPCPROP_SCRIPT] = modTime[NPCPROP_X] = modTime[NPCPROP_Y]
 		= modTime[NPCPROP_VISFLAGS] = modTime[NPCPROP_SPRITE]
+		= modTime[NPCPROP_GMAPLEVELX] = modTime[NPCPROP_GMAPLEVELY]
 		= modTime[NPCPROP_X2] = modTime[NPCPROP_Y2] = time(0);
 
 	// Search if the NPC is a sparringzone NPC.
@@ -156,6 +167,15 @@ CString TNPC::getProp(int pId) const
 
 		case NPCPROP_BODYIMAGE:
 		return CString() >> (char)bodyImage.length() << bodyImage;
+
+		case NPCPROP_GMAPLEVELX:
+		return CString() >> (char)gmaplevelx;
+
+		case NPCPROP_GMAPLEVELY:
+		return CString() >> (char)gmaplevely;
+
+		case NPCPROP_CLASS:
+		return CString() >> (short)0;
 
 		case NPCPROP_X2:
 		{
@@ -363,6 +383,18 @@ void TNPC::setProps(CString& pProps)
 
 			case NPCPROP_BODYIMAGE:
 				bodyImage = pProps.readChars(pProps.readGUChar());
+			break;
+
+			case NPCPROP_GMAPLEVELX:
+				pProps.readGChar();
+			break;
+
+			case NPCPROP_GMAPLEVELY:
+				pProps.readGChar();
+			break;
+
+			case NPCPROP_CLASS:
+				pProps.readChars(pProps.readGShort());
 			break;
 
 			// Location, in pixels, of the npc on the level in 2.2+ clients.

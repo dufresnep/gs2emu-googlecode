@@ -187,8 +187,8 @@ CString TPlayer::getProp(int pPropId)
 		case PLPROP_GMAPLEVELY:
 		return CString() >> (char)gmaplevely;
 
-		case PLPROP_ACCOUNTNAME2:
-		return CString() >> (char)accountName.length() << accountName;
+		case PLPROP_COMMUNITYNAME:
+		return CString() >> (char)communityName.length() << communityName;
 	}
 
 	if (inrange(pPropId, 37, 41) || inrange(pPropId, 46, 49) || inrange(pPropId, 54, 74))
@@ -342,28 +342,32 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 
 			case PLPROP_X:
 				x = (float)(pPacket.readGUChar() / 2.0f);
-				status &= (~0 - 1);
+				status &= (~PLSTATUS_PAUSED);
 				lastMovement = time(0);
 
-				// Let 2.2+ clients see pre-2.2 movement.
+				// Let 2.30+ clients see pre-2.30 movement.
 				x2 = (int)(x * 16);
 				levelBuff2 >> (char)PLPROP_X2 << getProp(PLPROP_X2);
 			break;
 
 			case PLPROP_Y:
 				y = (float)(pPacket.readGUChar() / 2.0f);
-				status &= (~0 - 1);
+				status &= (~PLSTATUS_PAUSED);
 				lastMovement = time(0);
 
-				// Let 2.2+ clients see pre-2.2 movement.
+				// Let 2.30+ clients see pre-2.30 movement.
 				y2 = (int)(y * 16);
 				levelBuff2 >> (char)PLPROP_Y2 << getProp(PLPROP_Y2);
 			break;
 
 			case PLPROP_Z:
 				z = (float)(pPacket.readGUChar() / 2.0f);
-				status &= (~0 - 1);
+				status &= (~PLSTATUS_PAUSED);
 				lastMovement = time(0);
+
+				// Let 2.30+ clients see pre-2.30 movement.
+				z2 = (int)(z * 16);
+				levelBuff2 >> (char)PLPROP_Z2 << getProp(PLPROP_Z2);
 			break;
 
 			case PLPROP_SPRITE:
@@ -568,33 +572,49 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 				codepage = pPacket.readGInt();
 				break;
 
-			// Location, in pixels, of the player on the level in 2.2+ clients.
+			// Location, in pixels, of the player on the level in 2.30+ clients.
 			// Bit 0x0001 controls if it is negative or not.
 			// Bits 0xFFFE are the actual value.
 			case PLPROP_X2:
 				x2 = len = pPacket.readGUShort();
+				status &= (~PLSTATUS_PAUSED);
 				lastMovement = time(0);
 
 				// If the first bit is 1, our position is negative.
 				x2 >>= 1;
 				if ((short)len & 0x0001) x2 = -x2;
 
-				// Let pre-2.2+ clients see 2.2+ movement.
+				// Let pre-2.30+ clients see 2.30+ movement.
 				x = (float)x2 / 16.0f;
 				levelBuff2 >> (char)PLPROP_X << getProp(PLPROP_X);
 				break;
 
 			case PLPROP_Y2:
 				y2 = len = pPacket.readGUShort();
+				status &= (~PLSTATUS_PAUSED);
 				lastMovement = time(0);
 
 				// If the first bit is 1, our position is negative.
 				y2 >>= 1;
 				if ((short)len & 0x0001) y2 = -y2;
 
-				// Let pre-2.2+ clients see 2.2+ movement.
+				// Let pre-2.30+ clients see 2.30+ movement.
 				y = (float)y2 / 16.0f;
 				levelBuff2 >> (char)PLPROP_Y << getProp(PLPROP_Y);
+				break;
+
+			case PLPROP_Z2:
+				z2 = len = pPacket.readGUShort();
+				status &= (~PLSTATUS_PAUSED);
+				lastMovement = time(0);
+
+				// If the first bit is 1, our position is negative.
+				z2 >>= 1;
+				if ((short)len & 0x0001) z2 = -z2;
+
+				// Let pre-2.30+ clients see 2.30+ movement.
+				z = (float)z2 / 16.0f;
+				levelBuff2 >> (char)PLPROP_Z << getProp(PLPROP_Z);
 				break;
 
 			case PLPROP_GMAPLEVELX:
@@ -607,8 +627,9 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 				printf( "gmap level y: %d\n", gmaplevely );
 				break;
 
-			case PLPROP_ACCOUNTNAME2:
+			case PLPROP_COMMUNITYNAME:
 				pPacket.readChars(pPacket.readGUChar());
+				break;
 
 			default:
 			{

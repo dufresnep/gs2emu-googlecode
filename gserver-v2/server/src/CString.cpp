@@ -443,6 +443,152 @@ std::vector<CString> CString::loadToken(const CString& pFile, const CString& pTo
 	return fileData.tokenize(pToken);
 }
 
+CString CString::replaceAll(const CString& pString, const CString& pNewString) const
+{
+	CString retVal(*this);
+	int pos = 0;
+	int len = pString.length();
+	int len2 = pNewString.length();
+
+	while (true)
+	{
+		pos = retVal.find(pString, pos);
+		if (pos == -1) break;
+
+		// Remove the string.
+		retVal.removeI(pos, len);
+
+		// Add the new string where the removed data used to be.
+		retVal = CString() << retVal.subString(0, pos) << pNewString << retVal.subString(pos);
+
+		pos += len2;
+	}
+	return retVal;
+}
+
+CString CString::gtokenize() const
+{
+	CString retVal;
+	int pos[] = {0, 0};
+
+	// Add a trailing \n to the line if one doesn't already exist.
+	if (buffer[sizec - 1] != '\n') retVal.writeChar('\n');
+
+	// Do the tokenization stuff.
+	while ((pos[0] = find("\n", pos[1])) != -1)
+	{
+		CString temp(subString(pos[1], pos[0] - pos[1]));
+		temp.replaceAllI( "\"", "\"\"" );	// Change all " to ""
+		temp.removeAllI("\r");
+		if (temp.length() != 0)
+			retVal << "\"" << temp << "\",";
+		else
+			retVal << ",";
+		pos[1] = pos[0] + 1;
+	}
+
+	// Kill the trailing comma and return our new string.
+	retVal.removeI(retVal.length() - 1, 1);
+	return retVal;
+}
+
+CString CString::guntokenize() const
+{
+	CString retVal;
+	std::vector<CString> temp;
+	int pos[] = {0, 1};
+
+	// Copy the buffer data to a working copy and trim it.
+	CString nData(*this);
+	nData.trimI();
+
+	// Check to see if it starts with a quotation mark.  If not, set pos[1] to 0.
+	if (nData[0] != '\"') pos[1] = 0;
+
+	// Untokenize.
+	while ((pos[0] = nData.find(",", pos[1])) != -1)
+	{
+		// Empty blocks are blank lines.
+		if (pos[0] == pos[1])
+		{
+			pos[1]++;
+			temp.push_back(CString("\r"));	// Workaround strtok() limitation.
+			continue;
+		}
+
+		// Check for ,,"""blah"
+		if (nData[pos[1]] == '\"' && nData[pos[1]+1] != '\"')
+		{
+			// Check to make sure it isn't ,"",
+			if (!(pos[1] + 2 < nData.length() && nData[pos[1]+2] == ','))
+				pos[1]++;
+		}
+
+		// Check and see if the comma is outside or inside of the thing string.
+		// If pos[1] points to a quotation mark we have to find the closing quotation mark.
+		if (pos[1] > 0 && nData[pos[1] - 1] == '\"')
+		{
+			while (true)
+			{
+				if ( pos[0] == -1 ) break;
+				if ((nData[pos[0]-1] != '\"') ||
+					(nData[pos[0]-1] == '\"' && nData[pos[0]-2] == '\"') )
+					pos[0] = nData.find( ",", pos[0] + 1 );
+				else
+					break;
+			}
+		}
+
+		// Exit out if we previously failed to find the end.
+		if (pos[0] == -1) break;
+
+		// "test",test
+		CString t2;
+		if (pos[0] > 0 && nData[pos[0] - 1] == '\"')
+			t2 = nData.subString(pos[1], pos[0] - pos[1] - 1);
+		else
+			t2 = nData.subString(pos[1], pos[0] - pos[1]);
+
+		// Check if the string is valid and if it is, copy it.
+		t2.replaceAllI( "\"\"", "\"" );
+		t2.removeAllI("\n");
+		t2.removeAllI("\r");
+
+		// Add it.
+		temp.push_back(t2);
+
+		// Move forward the correct number of spaces.
+		if (pos[0] + 1 != nData.length() && nData[pos[0] + 1] == '\"')
+			pos[1] = pos[0] + (int)strlen(",\"");	// test,"test
+		else
+			pos[1] = pos[0] + (int)strlen(",");		// test,test
+	}
+
+	// Try and grab the very last element.
+	if (pos[1] < nData.length())
+	{
+		// If the end is a quotation mark, remove it.
+		if (nData[nData.length() - 1] == '\"')
+			nData.removeI(nData.length() - 1, 1);
+
+		// Sanity check.
+		if (pos[1] != nData.length())
+		{
+			CString buf(nData.subString(pos[1]));
+			buf.replaceAllI("\"\"", "\"");	// Replace "" with "
+			buf.removeAllI("\n");
+			buf.removeAllI("\r");
+			temp.push_back(buf);
+		}
+	}
+
+	// Write the correct string out.
+	for ( unsigned int i = 0; i < temp.size(); ++i )
+		retVal << temp[i] << "\n";
+
+	return retVal;
+}
+
 /*
 	Operators
 */

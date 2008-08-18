@@ -79,6 +79,7 @@ bool TServerList::main()
 	sock.getBuffer().clear();
 
 	// do we have enough data to parse?
+	rBuffer.setRead(0);
 	if (rBuffer.length() > 0)
 	{
 		// parse data

@@ -26,6 +26,9 @@ bool TPlayer::sendLogin()
 	// players will be playing.
 	sendPacket(CString() >> (char)PLO_SIGNATURE >> (char)73);
 
+	// List processes.
+	sendPacket(CString() >> (char)PLO_LISTPROCESSES);
+
 	// Check if the account is already in use.
 	printf("TODO: TPlayer::sendLogin, Check if account is in use.\n");
 
@@ -84,7 +87,6 @@ bool TPlayer::sendLoginClient()
 
 	// Send the level to the player.
 	// setLevel will call sendCompress() for us.
-	printf("TODO: TPlayer::sendLoginClient, Send correct level to player.\n");
 	if (!setLevel(this->levelName, this->x, this->y, 0))
 	{
 		sendPacket(CString() >> (char)PLO_WARPFAILED);

@@ -95,8 +95,15 @@ int main(int argc, char* argv[])
 		wait(1);
 	}
 
+	// Delete all the servers.
+	for (std::map<CString, TServer*>::iterator i = serverList.begin(); i != serverList.end(); )
+	{
+		delete i->second;
+		i = serverList.erase(i);
+	}
+
 	// Destroy the sockets.
-	//CSocket::socketSystemDestroy();
+	CSocket::socketSystemDestroy();
 
 	return ERR_SUCCESS;
 }

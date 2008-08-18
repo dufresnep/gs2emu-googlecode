@@ -25,6 +25,39 @@ TServer::TServer(CString pName)
 	filesystem.setServer(this);
 }
 
+TServer::~TServer()
+{
+	for (std::vector<TPlayer*>::iterator i = playerList.begin(); i != playerList.end(); )
+	{
+		delete *i;
+		i = playerList.erase(i);
+	}
+
+	for (std::vector<TNPC*>::iterator i = npcList.begin(); i != npcList.end(); )
+	{
+		delete *i;
+		i = npcList.erase(i);
+	}
+
+	for (std::vector<TLevel*>::iterator i = levelList.begin(); i != levelList.end(); )
+	{
+		delete *i;
+		i = levelList.erase(i);
+	}
+
+	for (std::vector<TGMap*>::iterator i = gmapList.begin(); i != gmapList.end(); )
+	{
+		delete *i;
+		i = gmapList.erase(i);
+	}
+
+	for (std::vector<TWeapon*>::iterator i = weaponList.begin(); i != weaponList.end(); )
+	{
+		delete *i;
+		i = weaponList.erase(i);
+	}
+}
+
 int TServer::init()
 {
 	// Load Settings
@@ -38,6 +71,25 @@ int TServer::init()
 
 	// Load file system.
 	filesystem.init();
+
+	// Load gmaps.
+	std::vector<CString> gmaps = settings.getStr("gmaps").guntokenize().tokenize("\n");
+	for (std::vector<CString>::iterator i = gmaps.begin(); i != gmaps.end(); ++i)
+	{
+		// Check for blank lines.
+		if (*i == "\r") continue;
+
+		// Load the gmap.
+		TGMap* gmap = new TGMap();
+		if (gmap->load(CString() << *i << ".gmap", this) == false)
+		{
+			serverlog.out(CString() << "[Error] Could not load " << *i << ".gmap" << "\n");
+			delete gmap;
+			continue;
+		}
+
+		gmapList.push_back(gmap);
+	}
 
 	// Initialize the player socket.
 	playerSock.setType(SOCKET_TYPE_SERVER);
@@ -200,6 +252,17 @@ TNPC* TServer::addNewNPC(const CString& pImage, const CString& pScript, float pX
 	npcIds.push_back(newNPC);
 
 	return newNPC;
+}
+
+TGMap* TServer::getLevelGMap(const TLevel* pLevel) const
+{
+	for (std::vector<TGMap*>::const_iterator i = gmapList.begin(); i != gmapList.end(); ++i)
+	{
+		TGMap* gmap = *i;
+		if (gmap->isLevelOnGMap(pLevel->getLevelName()))
+			return gmap;
+	}
+	return 0;
 }
 
 /*

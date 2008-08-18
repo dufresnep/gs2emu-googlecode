@@ -56,13 +56,15 @@ CString TLevel::getBoardPacket()
 	return retVal;
 }
 
-CString TLevel::getBoardChangesPacket()
+CString TLevel::getBoardChangesPacket(time_t time)
 {
-	CString retVal((char)PLO_LEVELBOARD);
+	CString retVal;
+	retVal >> (char)PLO_LEVELBOARD;
 	for (std::vector<TLevelBoardChange*>::const_iterator i = levelBoardChanges.begin(); i != levelBoardChanges.end(); ++i)
 	{
 		TLevelBoardChange* change = *i;
-		retVal << change->getBoardStr() << "\n";
+		if (change->getModTime() >= time)
+			retVal << change->getBoardStr();
 	}
 	return retVal;
 }
@@ -539,6 +541,11 @@ TPlayer* TLevel::getPlayer(unsigned int id)
 {
 	if (id >= levelPlayerList.size()) return 0;
 	return levelPlayerList[id];
+}
+
+TGMap* TLevel::getGMap() const
+{
+	return server->getLevelGMap(this);
 }
 
 bool TLevel::doTimedEvents()

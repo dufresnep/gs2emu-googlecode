@@ -88,7 +88,10 @@ enum
 	PLPROP_UNKNOWN77		= 77,
 	PLPROP_X2				= 78,
 	PLPROP_Y2				= 79,
-	PLPROP_ACCOUNTNAME2		= 82,
+	PLPROP_Z2				= 80,
+
+	// In Graal v5, where players have the Graal######## accounts, this is their chosen account alias (community name.)
+	PLPROP_COMMUNITYNAME	= 82,
 };
 #define propscount	83
 
@@ -120,14 +123,14 @@ class TAccount
 
 		// Player-Account
 		bool isBanned, isFtp, isLoadOnly;
-		CString adminIp, accountComments, accountName, banReason, lastFolder;
+		CString adminIp, accountComments, accountName, communityName, banReason, lastFolder;
 		int accountIp, adminRights;
 
 		// Player-Attributes
 		CString attrList[30], bodyImg, chatMsg, headImg, horseImg, gAni, language;
 		CString levelName, nickName, shieldImg, swordImg;
 		float deviation, oldDeviation, power, rating, x, y, z;
-		int x2, y2, gmaplevelx, gmaplevely;
+		int x2, y2, z2, gmaplevelx, gmaplevely;
 		int additionalFlags, ap, apCounter, arrowc, bombc, bombPower, carrySprite;
 		unsigned char colors[5];
 		int deaths, glovePower, gralatc, horsec, kills, mp, maxPower;

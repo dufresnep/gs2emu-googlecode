@@ -10,6 +10,7 @@
 #include "TPlayer.h"
 #include "TServerList.h"
 #include "TLevel.h"
+#include "TGMap.h"
 #include "TNPC.h"
 #include "TWeapon.h"
 
@@ -25,6 +26,7 @@ class TServer
 {
 	public:
 		TServer(CString pName);
+		~TServer();
 
 		int init();
 		bool doMain();
@@ -36,6 +38,7 @@ class TServer
 		std::vector<TNPC*>* getNPCList()		{ return &npcList; }
 		std::vector<TNPC*>* getNPCIdList()		{ return &npcIds; }
 		std::vector<TLevel*>* getLevelList()	{ return &levelList; }
+		std::vector<TGMap*>* getGMapList()		{ return &gmapList; }
 		std::vector<TWeapon*>* getWeaponList()	{ return &weaponList; }
 		TServerList* getServerList()			{ return &serverlist; }
 		CFileSystem* getFileSystem()			{ return &filesystem; }
@@ -48,6 +51,8 @@ class TServer
 		TNPC* getNPC(const unsigned int id);
 
 		TNPC* addNewNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC = true);
+
+		TGMap* getLevelGMap(const TLevel* pLevel) const;
 
 		// Packet sending.
 		void sendPacketToAll(CString pPacket) const;
@@ -66,6 +71,7 @@ class TServer
 		std::vector<TPlayer*> playerIds, playerList;
 		std::vector<TNPC*> npcIds, npcList;
 		std::vector<TLevel*> levelList;
+		std::vector<TGMap*> gmapList;
 		std::vector<TWeapon*> weaponList;
 		CSocket playerSock, serverSock;
 		TServerList serverlist;

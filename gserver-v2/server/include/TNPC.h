@@ -48,8 +48,8 @@ enum
 	NPCPROP_GATTRIB3		= 38,
 	NPCPROP_GATTRIB4		= 39,
 	NPCPROP_GATTRIB5		= 40,
-	NPCPROP_EMPTY41			= 41,	// Maybe gmap level x?
-	NPCPROP_EMPTY42			= 42,	// Maybe gmap level y?
+	NPCPROP_GMAPLEVELX		= 41,
+	NPCPROP_GMAPLEVELY		= 42,
 	NPCPROP_EMPTY43			= 43,
 	NPCPROP_GATTRIB6		= 44,
 	NPCPROP_GATTRIB7		= 45,
@@ -78,6 +78,7 @@ enum
 	NPCPROP_GATTRIB28		= 66,
 	NPCPROP_GATTRIB29		= 67,
 	NPCPROP_GATTRIB30		= 68,
+	NPCPROP_CLASS			= 74,	// NPC-Server class.  Possibly also join scripts.
 	NPCPROP_X2				= 75,
 	NPCPROP_Y2				= 76,
 };
@@ -113,6 +114,7 @@ class TNPC
 		time_t modTime[npcpropcount];
 		float x, y, hurtX, hurtY;
 		int x2, y2;
+		int gmaplevelx, gmaplevely;
 		int id, rupees;
 		unsigned char darts, bombs, glovePower, bombPower, swordPower, shieldPower;
 		unsigned char visFlags, blockFlags, sprite, colors[5], power, ap;

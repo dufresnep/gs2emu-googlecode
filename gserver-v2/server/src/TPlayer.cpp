@@ -206,6 +206,7 @@ bool TPlayer::doMain()
 	playerSock->getBuffer().clear();
 
 	// parse data
+	rBuffer.setRead(0);
 	while (rBuffer.length() >= 2)
 	{
 		// New data.
@@ -468,8 +469,16 @@ bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTi
 	this->y = y;
 
 	// Tell the client their new level.
-	if (modTime == 0) sendPacket(CString() >> (char)PLO_PLAYERWARP >> (char)(x * 2) >> (char)(y * 2) << level->getLevelName());
-	sendPacket(CString() >> (char)PLO_LEVELNAME << level->getLevelName());
+	TGMap* gmap = server->getLevelGMap(level);
+	if (modTime == 0)
+	{
+		// GMaps use a special warp packet.
+		if (gmap != 0)
+			sendPacket(CString() >> (char)PLO_PLAYERWARPGMAP >> (char)(x * 2) >> (char)(y * 2) >> (char)(z * 2) >> (char)gmap->getLevelX(levelName) >> (char)gmap->getLevelY(levelName) << gmap->getMapName());
+		else
+			sendPacket(CString() >> (char)PLO_PLAYERWARP >> (char)(x * 2) >> (char)(y * 2) << levelName);
+	}
+	sendPacket(CString() >> (char)PLO_LEVELNAME << levelName);
 
 	// Send Level
 	time_t l_time = getCachedLevelModTime(level);
@@ -487,15 +496,27 @@ bool TPlayer::setLevel(const CString& pLevelName, float x, float y, time_t modTi
 		sendPacket(CString() << level->getSignsPacket());
 		sendPacket(CString() >> (char)PLO_LEVELMODTIME >> (long long)level->getModTime());
 	}
+	//if (gmap) sendPacket(CString() >> (char)PLO_LEVELNAME << gmap->getMapName());
 
 	// Send board changes, chests, horses, and baddies.
-	sendPacket(CString() << level->getBoardChangesPacket());
+	sendPacket(CString() << level->getBoardChangesPacket(l_time));
 	sendPacket(CString() << level->getChestPacket(this));
 	sendPacket(CString() << level->getHorsePacket());
 	sendPacket(CString() << level->getBaddyPacket());
 
-	// Send leader status and NPCs.
-	if (level->getPlayer(0) == this) sendPacket(CString() >> (char)PLO_ISLEADER);
+	// Tell the client if there are any ghost players in the level.
+	// Graal Reborn doesn't support trial accounts so pass 0 (no ghosts) instead of 1 (ghosts present).
+	//sendPacket(CString() >> (char)PLO_GHOSTICON >> (char)0);
+
+	// If we are the leader, send it now.
+	if (level->getPlayer(0) == this)
+		sendPacket(CString() >> (char)PLO_ISLEADER);
+
+	// TODO: Send new world time.
+
+	// Send NPCs.
+	sendPacket(CString() >> (char)PLO_SETNPCLEVEL << ((gmap != 0) ? gmap->getMapName() : levelName));
+	//sendPacket(CString() >> (char)PLO_SETNPCLEVEL << levelName);
 	sendPacket(CString() << level->getNpcsPacket(l_time));
 
 	// If the level is a sparring zone and you have 100 AP, change AP to 99 and
@@ -1147,7 +1168,9 @@ bool TPlayer::msgPLI_ADJACENTLEVEL(CString& pPacket)
 	}
 
 	// Send the new level.
-	sendPacket(CString() >> (char)PLO_LEVELNAME << adjacentLevel->getLevelName());
+	TGMap* gmap = server->getLevelGMap(adjacentLevel);
+	sendPacket(CString() >> (char)PLO_LEVELNAME << /*((gmap != 0) ? gmap->getMapName() : */adjacentLevel->getLevelName()/*)*/);
+	//sendPacket(CString() >> (char)PLO_LEVELNAME << ((gmap != 0) ? gmap->getMapName() : adjacentLevel->getLevelName()));
 	if ((modTime != adjacentLevel->getModTime()) || alreadyVisited == false)
 	{
 		sendPacket(CString() >> (char)PLO_RAWDATA >> (int)(1+(64*64*2)+1));
@@ -1159,10 +1182,11 @@ bool TPlayer::msgPLI_ADJACENTLEVEL(CString& pPacket)
 		sendPacket(CString() << adjacentLevel->getLinksPacket());
 		sendPacket(CString() << adjacentLevel->getChestPacket(this));
 	}
-	sendPacket(CString() << adjacentLevel->getBoardChangesPacket());
+	sendPacket(CString() << adjacentLevel->getBoardChangesPacket(modTime));
 
 	// Set our old level back to normal.
-	sendPacket(CString() >> (char)PLO_LEVELNAME << this->level->getLevelName());
+	//sendPacket(CString() >> (char)PLO_LEVELNAME << /*((gmap != 0) ? gmap->getMapName() : */level->getLevelName()/*)*/);
+	sendPacket(CString() >> (char)PLO_LEVELNAME << ((gmap != 0) ? gmap->getMapName() : level->getLevelName()));
 	if (level->getPlayer(0) == this)
 		sendPacket(CString() >> (char)PLO_ISLEADER);
 

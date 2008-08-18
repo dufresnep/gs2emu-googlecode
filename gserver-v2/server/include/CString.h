@@ -1,6 +1,7 @@
 #ifndef CSTRING_H
 #define CSTRING_H
 
+#define _WINSOCKAPI_
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
@@ -78,6 +79,9 @@ class CString
 		int findl(char pChar) const;
 		std::vector<CString> tokenize(const CString& pString = " ") const;
 		static std::vector<CString> loadToken(const CString& pFile, const CString& pToken = "\n");
+		CString replaceAll(const CString& pString, const CString& pNewString) const;
+		CString gtokenize() const;
+		CString guntokenize() const;
 
 		/* In-Functions */
 		inline CString& escapeI();
@@ -90,6 +94,9 @@ class CString
 		inline CString& bzuncompressI();
 		inline CString& zcompressI();
 		inline CString& zuncompressI();
+		inline CString& replaceAllI(const CString& pString, const CString& pNewString);
+		inline CString& gtokenizeI();
+		inline CString& guntokenizeI();
 
 		/* Operators */
 		char& operator[](int pIndex);
@@ -323,6 +330,24 @@ inline CString& CString::zcompressI()
 inline CString& CString::zuncompressI()
 {
 	*this = zuncompress();
+	return *this;
+}
+
+inline CString& CString::replaceAllI(const CString& pString, const CString& pNewString)
+{
+	*this = replaceAll(pString, pNewString);
+	return *this;
+}
+
+inline CString& CString::gtokenizeI()
+{
+	*this = gtokenize();
+	return *this;
+}
+
+inline CString& CString::guntokenizeI()
+{
+	*this = guntokenize();
 	return *this;
 }
 

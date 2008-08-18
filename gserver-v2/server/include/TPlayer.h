@@ -90,11 +90,12 @@ enum
 	PLO_NPCWEAPONADD	= 33,
 	PLO_NPCWEAPONDEL	= 34,
 	PLO_LEVELMODTIME	= 39,
+	PLO_NEWWORLDTIME	= 42,
 	PLO_DEFAULTWEAPON	= 43,
 	PLO_LISTPROCESSES	= 44,	// Requests a list of running processes.
 	PLO_STAFFGUILDS		= 47,
 	PLO_TRIGGERACTION	= 48,
-	PLO_EMPTY49			= 49,	// Held 5 bytes then the gmap.  Might be modTime + gmap.
+	PLO_PLAYERWARPGMAP	= 49,	// Bytes 1-3 may be x/y/z. 4 = level x in gmap, 5 = level y in gmap.
 	PLO_ADDPLAYER		= 55,
 	PLO_DELPLAYER		= 56,
 	PLO_LARGEFILESTART	= 68,
@@ -104,7 +105,8 @@ enum
 	PLO_RAWDATA			= 100,
 	PLO_BOARDPACKET		= 101,
 	PLO_FILE			= 102,
-	PLO_EMPTY156		= 156,	// Held the gmap. {156}{gmap name}
+	PLO_NPCBYTECODE		= 131,	// Compiled Torque-script for an NPC.
+	PLO_SETNPCLEVEL		= 156,	// Sets the level to receive NPC props.
 	PLO_BIGMAP			= 172,	// [172] zodiacminimap.txt,zodiacworldminimap3.png,10,10
 	PLO_GHOSTICON		= 174,	// Pass 1 to enable the ghost icon
 	PLO_RPGWINDOW		= 179,

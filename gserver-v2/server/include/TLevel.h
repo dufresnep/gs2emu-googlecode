@@ -15,10 +15,14 @@
 
 class TPlayer;
 class TNPC;
+class TGMap;
 
 class TLevel
 {
 	public:
+		//! Destructor.
+		~TLevel();
+
 		//! Finds a level with the specified level name and returns it.  If not found, it tries to load it from the disk.
 		//! \param pLevelName The name of the level to search for.
 		//! \param server The server the level belongs to.
@@ -28,7 +32,7 @@ class TLevel
 		// get crafted packets
 		CString getBaddyPacket();
 		CString getBoardPacket();
-		CString getBoardChangesPacket();
+		CString getBoardChangesPacket(time_t time);
 		CString getChestPacket(TPlayer *pPlayer);
 		CString getHorsePacket();
 		CString getLinksPacket();
@@ -124,13 +128,16 @@ class TLevel
 		//! \return The player at the id location.
 		TPlayer* getPlayer(unsigned int id);
 
+		//! Gets the gmap this level belongs to.
+		//! \return The gmap this level belongs to.
+		TGMap* getGMap() const;
+
 		//! Does special events that should happen every second.
 		//! \return Currently, it always returns true.
 		bool doTimedEvents();
 
 	private:
 		TLevel(TServer* pServer);
-		~TLevel();
 
 		// level-loading functions
 		bool loadLevel(const CString& pLevelName);

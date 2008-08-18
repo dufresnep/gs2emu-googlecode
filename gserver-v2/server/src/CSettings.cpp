@@ -53,16 +53,11 @@ bool CSettings::loadFile(const CString& pStr)
 			line[j].trimI();
 
 		// Create Key
-		keys.push_back(new CKey(line[0], line[1]));
-
-		// TODO: re-implement this commented out section.
-		/*
 		CKey *key;
 		if ((key = getKey(line[0])) == 0)
 			keys.push_back(new CKey(line[0], line[1]));
 		else
 			key->value << "," << line[1];
-		*/
 	}
 
 	return true;

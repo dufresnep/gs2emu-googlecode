@@ -26,6 +26,7 @@ class TLevelBoardChange
 		int getWidth() const			{ return width; }
 		int getHeight() const			{ return height; }
 		CString getTiles() const		{ return tiles; }
+		time_t getModTime() const		{ return modTime; }
 
 		// set private variables
 		void setModTime(time_t ntime)	{ modTime = ntime; }
