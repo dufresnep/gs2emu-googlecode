@@ -123,6 +123,8 @@ void createPLFunctions()
 	TPLFunc[PLI_BADDYPROPS] = &TPlayer::msgPLI_BADDYPROPS;
 	TPLFunc[PLI_BADDYHURT] = &TPlayer::msgPLI_BADDYHURT;
 	TPLFunc[PLI_BADDYADD] = &TPlayer::msgPLI_BADDYADD;
+	TPLFunc[PLI_FLAGSET] = &TPlayer::msgPLI_FLAGSET;
+	TPLFunc[PLI_FLAGDEL] = &TPlayer::msgPLI_FLAGDEL;
 
 	TPLFunc[PLI_OPENCHEST] = &TPlayer::msgPLI_OPENCHEST;
 
@@ -1085,6 +1087,102 @@ bool TPlayer::msgPLI_BADDYADD(CString& pPacket)
 	return true;
 }
 
+bool TPlayer::msgPLI_FLAGSET(CString& pPacket)
+{
+	CSettings* settings = server->getSettings();
+
+	CString flagPacket = pPacket.readString("");
+	CString flagName = flagPacket.readString("=").trim();
+	CString flagValue = flagPacket.readString("").trim();
+	CString flagNew = CString() << flagName << "=" << flagValue;
+
+	// 2.171 clients didn't support this.strings and tried to set them as a
+	// normal flag.  Don't allow that.
+	if (flagName.find("this.") != -1) return true;
+
+	// Don't allow anybody to set read-only strings.
+	if (flagName.find("clientr.") != -1) return true;
+	if (flagName.find("serverr.") != -1) return true;
+
+	// Server flags are handled differently than client flags.
+	bool isServer = false;
+	std::vector<CString>* tflags = 0;
+	if (flagName.find("server.") != -1)
+	{
+		if (settings->getBool("dontaddserverflags", false) == true) return true;
+		tflags = server->getServerFlags();
+		isServer = true;
+	}
+	else tflags = &flagList;
+
+	// Loop for flags now.
+	for (std::vector<CString>::iterator i = tflags->begin(); i != tflags->end(); )
+	{
+		CString tflag = *i;
+		CString tflagName = tflag.readString("=").trim();
+		if (tflagName == flagName)
+		{
+			// A flag with a value of 0 means we should unset it.
+			if (flagValue.length() == 0)
+			{
+				if (isServer) server->sendPacketToAll(CString() >> (char)PLO_FLAGDEL << flagName);
+				tflags->erase(i);
+				return true;
+			}
+
+			// If we didn't unset it, alter the existing flag.
+			if (isServer) server->sendPacketToAll(CString() >> (char)PLO_FLAGSET << flagNew);
+			*i = flagNew;
+			return true;
+		}
+	}
+
+	// We didn't find a pre-existing flag so let's create a new one.
+	if (isServer) server->sendPacketToAll(CString() >> (char)PLO_FLAGSET << flagNew);
+	tflags->push_back(flagNew);
+	return true;
+}
+
+bool TPlayer::msgPLI_FLAGDEL(CString& pPacket)
+{
+	CSettings* settings = server->getSettings();
+
+	CString flagPacket = pPacket.readString("");
+	CString flagName = flagPacket.readString("=").trim();
+
+	// this.flags should never be in any server flag list, so just exit.
+	if (flagName.find("this.") != -1) return true;
+
+	// Don't allow anybody to alter read-only strings.
+	if (flagName.find("clientr.") != -1) return true;
+	if (flagName.find("serverr.") != -1) return true;
+
+	// Server flags are handled differently than client flags.
+	bool isServer = false;
+	std::vector<CString>* tflags = 0;
+	if (flagName.find("server.") != -1)
+	{
+		if (settings->getBool("dontaddserverflags", false) == true) return true;
+		tflags = server->getServerFlags();
+		isServer = true;
+	}
+	else tflags = &flagList;
+
+	// Loop for flags now.
+	for (std::vector<CString>::iterator i = tflags->begin(); i != tflags->end(); )
+	{
+		CString tflag = *i;
+		CString tflagName = tflag.readString("=").trim();
+		if (tflagName == flagName)
+		{
+			if (isServer) server->sendPacketToAll(CString() >> (char)PLO_FLAGDEL << flagName);
+			tflags->erase(i);
+			return true;
+		}
+	}
+
+	return true;
+}
 
 bool TPlayer::msgPLI_OPENCHEST(CString& pPacket)
 {

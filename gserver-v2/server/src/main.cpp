@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
 		// Wait
 		//wait(100);
-		wait(1);
+		wait(10);
 	}
 
 	// Delete all the servers.

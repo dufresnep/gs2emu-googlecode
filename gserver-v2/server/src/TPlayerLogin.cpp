@@ -140,6 +140,10 @@ bool TPlayer::sendLoginClient()
 	// Send the start message to the player.
 	printf("TODO: TPlayer::sendLoginClient, Send the start message to the player.\n");
 
+	// Delete the bomb.  It gets automagically added by the client for
+	// God knows which reason.  Bomb must be capitalized.
+	sendPacket(CString() >> (char)PLO_NPCWEAPONDEL << "Bomb");
+
 	// Send the player's weapons.
 	for (std::vector<CString>::iterator i = weaponList.begin(); i != weaponList.end(); ++i)
 	{
@@ -163,10 +167,6 @@ bool TPlayer::sendLoginClient()
 
 	// Send the server's flags to the player.
 	printf("TODO: TPlayer::sendLoginClient, Send the server's flags to the player.\n");
-
-	// Delete the bomb.  It gets automagically added by the client for
-	// God knows which reason.  Bomb must be capitalized.
-	sendPacket(CString() >> (char)PLO_NPCWEAPONDEL << "Bomb");
 
 	//sendPacket(CString() >> (char)195 >> (char)4 << "idle" << "\"SETBACKTO \"");
 	//sendPacket(CString() >> (char)195 >> (char)4 << "walk" << "\"SETBACKTO \"");

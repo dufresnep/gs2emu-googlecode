@@ -40,6 +40,7 @@ class TServer
 		std::vector<TLevel*>* getLevelList()	{ return &levelList; }
 		std::vector<TMap*>* getMapList()		{ return &mapList; }
 		std::vector<TWeapon*>* getWeaponList()	{ return &weaponList; }
+		std::vector<CString>* getServerFlags()	{ return &serverFlags; }
 		TServerList* getServerList()			{ return &serverlist; }
 		CFileSystem* getFileSystem()			{ return &filesystem; }
 		CString getServerPath()					{ return serverpath; }
@@ -74,6 +75,7 @@ class TServer
 		std::vector<TLevel*> levelList;
 		std::vector<TMap*> mapList;
 		std::vector<TWeapon*> weaponList;
+		std::vector<CString> serverFlags;
 		CSocket playerSock, serverSock;
 		TServerList serverlist;
 		CFileSystem filesystem;

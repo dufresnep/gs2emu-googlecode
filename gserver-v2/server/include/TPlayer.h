@@ -37,6 +37,8 @@ enum
 	PLI_BADDYPROPS		= 15,
 	PLI_BADDYHURT		= 16,
 	PLI_BADDYADD		= 17,
+	PLI_FLAGSET			= 18,
+	PLI_FLAGDEL			= 19,
 
 	PLI_OPENCHEST		= 20,
 	PLI_WANTFILE		= 23,
@@ -85,7 +87,10 @@ enum
 	PLO_SIGNATURE		= 25,
 	PLO_BADDYHURT		= 27,
 	PLO_FLAGSET			= 28,
+
 	PLO_FILESENDFAILED	= 30,
+
+	PLO_FLAGDEL			= 31,
 	PLO_SHOWIMG			= 32,
 	PLO_NPCWEAPONADD	= 33,
 	PLO_NPCWEAPONDEL	= 34,
@@ -201,6 +206,8 @@ class TPlayer : public TAccount
 		bool msgPLI_BADDYPROPS(CString& pPacket);
 		bool msgPLI_BADDYHURT(CString& pPacket);
 		bool msgPLI_BADDYADD(CString& pPacket);
+		bool msgPLI_FLAGSET(CString& pPacket);
+		bool msgPLI_FLAGDEL(CString& pPacket);
 
 		bool msgPLI_OPENCHEST(CString& pPacket);
 
