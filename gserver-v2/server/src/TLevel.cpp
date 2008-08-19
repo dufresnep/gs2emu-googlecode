@@ -82,10 +82,8 @@ CString TLevel::getChestPacket(TPlayer *pPlayer)
 		bool hasChest = pPlayer->hasChest(chest);
 
 		retVal >> (char)PLO_LEVELCHEST >> (char)(hasChest ? 1 : 0) >> (char)chest->getX() >> (char)chest->getY();
-		if (!hasChest)
-			retVal >> (char)chest->getItemIndex() >> (char)chest->getSignIndex() << "\n";
-		else
-			retVal << "\n";
+		if (!hasChest) retVal >> (char)chest->getItemIndex() >> (char)chest->getSignIndex();
+		retVal << "\n";
 	}
 
 	return retVal;
@@ -543,9 +541,9 @@ TPlayer* TLevel::getPlayer(unsigned int id)
 	return levelPlayerList[id];
 }
 
-TGMap* TLevel::getGMap() const
+TMap* TLevel::getMap() const
 {
-	return server->getLevelGMap(this);
+	return server->getLevelMap(this);
 }
 
 bool TLevel::doTimedEvents()

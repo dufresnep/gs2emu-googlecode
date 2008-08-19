@@ -15,7 +15,7 @@
 
 class TPlayer;
 class TNPC;
-class TGMap;
+class TMap;
 
 class TLevel
 {
@@ -136,7 +136,7 @@ class TLevel
 
 		//! Gets the gmap this level belongs to.
 		//! \return The gmap this level belongs to.
-		TGMap* getGMap() const;
+		TMap* getMap() const;
 
 		//! Does special events that should happen every second.
 		//! \return Currently, it always returns true.

@@ -85,6 +85,18 @@ bool TPlayer::sendLoginClient()
 	// Send the player his login props.
 	sendProps(__sendLogin, sizeof(__sendLogin) / sizeof(bool));
 
+	// Workaround for 2.2+ clients.  They don't request the map file when used with setmap.
+	// So, just send them all the maps loaded into the server.
+	if (PLE_POST22)
+	{
+		for (std::vector<TMap*>::iterator i = server->getMapList()->begin(); i != server->getMapList()->end(); ++i)
+		{
+			TMap* map = *i;
+			if (map->getType() == MAPTYPE_BIGMAP)
+				msgPLI_WANTFILE(map->getMapName());
+		}
+	}
+
 	// Send the level to the player.
 	// warp will call sendCompress() for us.
 	if (warp(levelName, x, y) == false)

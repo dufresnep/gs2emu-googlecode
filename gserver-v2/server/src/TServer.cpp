@@ -45,10 +45,10 @@ TServer::~TServer()
 		i = levelList.erase(i);
 	}
 
-	for (std::vector<TGMap*>::iterator i = gmapList.begin(); i != gmapList.end(); )
+	for (std::vector<TMap*>::iterator i = mapList.begin(); i != mapList.end(); )
 	{
 		delete *i;
-		i = gmapList.erase(i);
+		i = mapList.erase(i);
 	}
 
 	for (std::vector<TWeapon*>::iterator i = weaponList.begin(); i != weaponList.end(); )
@@ -80,7 +80,7 @@ int TServer::init()
 		if (*i == "\r") continue;
 
 		// Load the gmap.
-		TGMap* gmap = new TGMap();
+		TMap* gmap = new TMap(MAPTYPE_GMAP);
 		if (gmap->load(CString() << *i << ".gmap", this) == false)
 		{
 			serverlog.out(CString() << "[Error] Could not load " << *i << ".gmap" << "\n");
@@ -88,7 +88,26 @@ int TServer::init()
 			continue;
 		}
 
-		gmapList.push_back(gmap);
+		mapList.push_back(gmap);
+	}
+
+	// Load bigmaps.
+	std::vector<CString> bigmaps = settings.getStr("maps").guntokenize().tokenize("\n");
+	for (std::vector<CString>::iterator i = bigmaps.begin(); i != bigmaps.end(); ++i)
+	{
+		// Check for blank lines.
+		if (*i == "\r") continue;
+
+		// Load the bigmap.
+		TMap* bigmap = new TMap(MAPTYPE_BIGMAP);
+		if (bigmap->load(*i, this) == false)
+		{
+			serverlog.out(CString() << "[Error] Could not load " << *i << "\n");
+			delete bigmap;
+			continue;
+		}
+
+		mapList.push_back(bigmap);
 	}
 
 	// Initialize the player socket.
@@ -254,14 +273,14 @@ TNPC* TServer::addNewNPC(const CString& pImage, const CString& pScript, float pX
 	return newNPC;
 }
 
-TGMap* TServer::getLevelGMap(const TLevel* pLevel) const
+TMap* TServer::getLevelMap(const TLevel* pLevel) const
 {
 	if (pLevel == 0) return 0;
-	for (std::vector<TGMap*>::const_iterator i = gmapList.begin(); i != gmapList.end(); ++i)
+	for (std::vector<TMap*>::const_iterator i = mapList.begin(); i != mapList.end(); ++i)
 	{
-		TGMap* gmap = *i;
-		if (gmap->isLevelOnGMap(pLevel->getLevelName()))
-			return gmap;
+		TMap* pMap = *i;
+		if (pMap->isLevelOnMap(pLevel->getLevelName()))
+			return pMap;
 	}
 	return 0;
 }
@@ -304,7 +323,7 @@ void TServer::sendPacketToLevel(CString pPacket, TLevel *pLevel, TPlayer *pPlaye
 	}
 }
 
-void TServer::sendPacketToLevel(CString pPacket, TGMap *pLevel, TPlayer *pPlayer, bool sendToSelf) const
+void TServer::sendPacketToLevel(CString pPacket, TMap* pMap, TPlayer* pPlayer, bool sendToSelf) const
 {
 	for (std::vector<TPlayer *>::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
 	{
@@ -314,10 +333,27 @@ void TServer::sendPacketToLevel(CString pPacket, TGMap *pLevel, TPlayer *pPlayer
 			if (sendToSelf) pPlayer->sendPacket(pPacket);
 			continue;
 		}
-		if ((*i)->getGMap() == pLevel)
+		if ((*i)->getMap() == pMap)
 		{
-			int ogmap[2] = { (*i)->getProp(PLPROP_GMAPLEVELX).readGUChar(), (*i)->getProp(PLPROP_GMAPLEVELY).readGUChar() };
-			int sgmap[2] = { pPlayer->getProp(PLPROP_GMAPLEVELX).readGUChar(), pPlayer->getProp(PLPROP_GMAPLEVELY).readGUChar() };
+			int ogmap[2], sgmap[2];
+			switch (pMap->getType())
+			{
+				case MAPTYPE_GMAP:
+					ogmap[0] = (*i)->getProp(PLPROP_GMAPLEVELX).readGUChar();
+					ogmap[1] = (*i)->getProp(PLPROP_GMAPLEVELY).readGUChar();
+					sgmap[0] = pPlayer->getProp(PLPROP_GMAPLEVELX).readGUChar();
+					sgmap[1] = pPlayer->getProp(PLPROP_GMAPLEVELY).readGUChar();
+					break;
+				
+				default:
+				case MAPTYPE_BIGMAP:
+					ogmap[0] = pMap->getLevelX((*i)->getLevel()->getLevelName());
+					ogmap[1] = pMap->getLevelY((*i)->getLevel()->getLevelName());
+					sgmap[0] = pMap->getLevelX(pPlayer->getLevel()->getLevelName());
+					sgmap[1] = pMap->getLevelY(pPlayer->getLevel()->getLevelName());
+					break;
+			}
+
 			if (abs(ogmap[0] - sgmap[0]) < 2 && abs(ogmap[1] - sgmap[1]) < 2)
 				(*i)->sendPacket(pPacket);
 		}

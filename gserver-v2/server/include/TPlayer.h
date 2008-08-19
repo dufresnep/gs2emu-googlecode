@@ -137,7 +137,7 @@ struct SCachedLevel
 	time_t modTime;
 };
 
-class TGMap;
+class TMap;
 class TPlayer : public TAccount
 {
 	public:
@@ -150,7 +150,7 @@ class TPlayer : public TAccount
 
 		// Get Properties
 		TLevel* getLevel()		{ return level; }
-		TGMap* getGMap()		{ return gmap; }
+		TMap* getMap()			{ return pmap; }
 		int getId() const;
 		int getType() const;
 
@@ -161,10 +161,7 @@ class TPlayer : public TAccount
 		// Level manipulation
 		bool warp(const CString& pLevelName, float pX, float pY, time_t modTime = 0);
 		bool setLevel(const CString& pLevelName, time_t modTime = 0);
-		bool sendLevel(TLevel* level, time_t modTime, bool skipActors = false);
-
-		bool setLevelGMap(const CString& pLevelName, float pX, float pY, time_t modTime = 0);
-		bool sendGMapLevel(TGMap* gmap, int gmapx, int gmapy, time_t modTime = 0, bool leader = false);
+		bool sendLevel(TLevel* pLevel, time_t modTime, bool skipActors = false);
 		bool leaveLevel();
 		time_t getCachedLevelModTime(const TLevel* level) const;
 
@@ -251,7 +248,7 @@ class TPlayer : public TAccount
 		std::vector<SCachedLevel*> cachedLevels;
 		bool allowBomb;
 		bool hadBomb;
-		TGMap* gmap;
+		TMap* pmap;
 };
 
 inline bool TPlayer::isLoggedIn()

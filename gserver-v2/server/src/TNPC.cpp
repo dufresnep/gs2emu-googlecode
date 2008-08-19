@@ -5,7 +5,7 @@
 #include "CString.h"
 #include "TNPC.h"
 #include "TLevel.h"
-#include "TGMap.h"
+#include "TMap.h"
 
 char __savePackets[10] = { 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
 char __attrPackets[30] = { 36, 37, 38, 39, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68 };
@@ -34,12 +34,11 @@ level(pLevel)
 		imagePart.writeGChar(0);
 
 	// Set the gmap levels.
-	TGMap* gmap = level->getGMap();
-	if (gmap)
+	TMap* gmap = level->getMap();
+	if (gmap && gmap->getType() == MAPTYPE_GMAP)
 	{
 		gmaplevelx = gmap->getLevelX(level->getLevelName());
 		gmaplevely = gmap->getLevelY(level->getLevelName());
-		printf("gmapx: %d, gmapy: %d\n", gmaplevelx, gmaplevely);
 	}
 
 	// We need to alter the modTime of the following props as they should be always sent.

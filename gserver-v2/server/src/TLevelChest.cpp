@@ -28,4 +28,3 @@ void TLevelChest::parseChestStr(const std::vector<CString>& pChest)
 	itemIndex = strtoint(pChest[3]);
 	signIndex = strtoint(pChest[4]);
 }
-

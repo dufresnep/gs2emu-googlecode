@@ -149,7 +149,7 @@ TPlayer::TPlayer(TServer* pServer, CSocket *pSocket)
 playerSock(pSocket), iterator(0x04A80B38), key(0),
 PLE_POST22(false), os("wind"), codepage(1252), level(0),
 id(0), type(CLIENTTYPE_AWAIT), server(pServer), allowBomb(false), hadBomb(false),
-gmap(0)
+pmap(0)
 {
 	// TODO: lastChat and lastMessage
 	lastData = lastMovement = lastChat = lastMessage = lastSave = time(0);
@@ -436,7 +436,7 @@ bool TPlayer::warp(const CString& pLevelName, float pX, float pY, time_t modTime
 	float unstickY = settings->getFloat("unstickmey", 35.0f);
 
 	// See if the new level is on a gmap.
-	gmap = server->getLevelGMap(newLevel);
+	pmap = server->getLevelMap(newLevel);
 
 	// Leave our current level.
 	leaveLevel();
@@ -484,18 +484,19 @@ bool TPlayer::setLevel(const CString& pLevelName, time_t modTime)
 	levelName = level->getLevelName();
 
 	// Tell the client their new level.
-	//if (modTime == 0) sendPacket(CString() >> (char)PLO_PLAYERWARP >> (char)(x * 2) >> (char)(y * 2) << levelName);
 	if (modTime == 0)
 	{
-		if (gmap)
+		if (pmap && pmap->getType() == MAPTYPE_GMAP)
 		{
-			gmaplevelx = gmap->getLevelX(levelName);
-			gmaplevely = gmap->getLevelY(levelName);
+			gmaplevelx = pmap->getLevelX(levelName);
+			gmaplevely = pmap->getLevelY(levelName);
+			sendPacket(CString() >> (char)PLO_PLAYERWARP2
+				>> (char)(x * 2) >> (char)(y * 2) >> (char)((z * 2) + 50)
+				>> (char)gmaplevelx >> (char)gmaplevely
+				<< pmap->getMapName());
 		}
-		sendPacket(CString() >> (char)PLO_PLAYERWARP2
-			>> (char)(x * 2) >> (char)(y * 2) >> (char)((z * 2) + 50)
-			>> (char)gmaplevelx >> (char)gmaplevely
-			<< (gmap ? gmap->getMapName() : level->getLevelName()));
+		else
+			sendPacket(CString() >> (char)PLO_PLAYERWARP >> (char)(x * 2) >> (char)(y * 2) << levelName);
 	}
 	if (sendLevel(level, modTime, false) == false)
 	{
@@ -520,39 +521,39 @@ bool TPlayer::setLevel(const CString& pLevelName, time_t modTime)
 	return true;
 }
 
-bool TPlayer::sendLevel(TLevel* level, time_t modTime, bool skipActors)
+bool TPlayer::sendLevel(TLevel* pLevel, time_t modTime, bool skipActors)
 {
-	if (level == 0) return false;
+	if (pLevel == 0) return false;
 
 	// Send Level
-	sendPacket(CString() >> (char)PLO_LEVELNAME << level->getLevelName());
-	time_t l_time = getCachedLevelModTime(level);
-	if (modTime == -1) modTime = level->getModTime();
+	sendPacket(CString() >> (char)PLO_LEVELNAME << pLevel->getLevelName());
+	time_t l_time = getCachedLevelModTime(pLevel);
+	if (modTime == -1) modTime = pLevel->getModTime();
 	if (l_time == 0)
 	{
-		if (modTime != level->getModTime())
+		if (modTime != pLevel->getModTime())
 		{
 			sendPacket(CString() >> (char)PLO_RAWDATA >> (int)(1+(64*64*2)+1));
-			sendPacket(CString() << level->getBoardPacket());
+			sendPacket(CString() << pLevel->getBoardPacket());
 		}
 		sendCompress();
 
 		// Send links, signs, and mod time.
-		sendPacket(CString() << level->getLinksPacket());
-		sendPacket(CString() << level->getSignsPacket());
-		sendPacket(CString() >> (char)PLO_LEVELMODTIME >> (long long)level->getModTime());
+		sendPacket(CString() << pLevel->getLinksPacket());
+		sendPacket(CString() << pLevel->getSignsPacket());
+		sendPacket(CString() >> (char)PLO_LEVELMODTIME >> (long long)pLevel->getModTime());
 	}
 
 	// Send board changes, chests, horses, and baddies.
-	sendPacket(CString() << level->getBoardChangesPacket(l_time));
+	sendPacket(CString() << pLevel->getBoardChangesPacket(l_time));
 	if (skipActors == false)
 	{
-		sendPacket(CString() << level->getChestPacket(this));
-		sendPacket(CString() << level->getHorsePacket());
-		sendPacket(CString() << level->getBaddyPacket());
+		sendPacket(CString() << pLevel->getChestPacket(this));
+		sendPacket(CString() << pLevel->getHorsePacket());
+		sendPacket(CString() << pLevel->getBaddyPacket());
 
 		// If we are the leader, send it now.
-		if (level->getPlayer(0) == this)
+		if (pLevel->getPlayer(0) == this)
 			sendPacket(CString() >> (char)PLO_ISLEADER);
 	}
 
@@ -561,30 +562,45 @@ bool TPlayer::sendLevel(TLevel* level, time_t modTime, bool skipActors)
 	//sendPacket(CString() >> (char)PLO_GHOSTICON >> (char)0);
 
 	// If we are on a gmap, change our level back to the gmap.
-	if (gmap) sendPacket(CString() >> (char)PLO_LEVELNAME << gmap->getMapName());
+	if (pmap && pmap->getType() == MAPTYPE_GMAP)
+		sendPacket(CString() >> (char)PLO_LEVELNAME << pmap->getMapName());
 
 	// TODO: Send new world time.
 
 	if (skipActors == false)
 	{
 		// Send NPCs.
-		sendPacket(CString() >> (char)PLO_SETACTIVELEVEL << (gmap ? gmap->getMapName() : level->getLevelName()));
-		sendPacket(CString() << level->getNpcsPacket(l_time));
+		if (pmap && pmap->getType() == MAPTYPE_GMAP)
+			sendPacket(CString() >> (char)PLO_SETACTIVELEVEL << pmap->getMapName());
+		else
+			sendPacket(CString() >> (char)PLO_SETACTIVELEVEL << pLevel->getLevelName());
+		sendPacket(CString() << pLevel->getNpcsPacket(l_time));
 	}
 
 	// Do props stuff.
-	// GMaps send to players in adjacent levels too.
-	if (gmap)
+	// Maps send to players in adjacent levels too.
+	if (pmap)
 	{
 		std::vector<TPlayer*>* playerList = server->getPlayerList();
-		server->sendPacketToLevel(this->getProps(__getLogin, sizeof(__getLogin)/sizeof(bool)), gmap, this, false);
+		server->sendPacketToLevel(this->getProps(__getLogin, sizeof(__getLogin)/sizeof(bool)), pmap, this, false);
 		for (std::vector<TPlayer*>::iterator i = playerList->begin(); i != playerList->end(); ++i)
 		{
 			TPlayer* player = (TPlayer*)*i;
 			if (player == this) continue;
-			int ogmap[2] = { player->getProp(PLPROP_GMAPLEVELX).readGUChar(), player->getProp(PLPROP_GMAPLEVELY).readGUChar() };
-			if (abs(ogmap[0] - gmaplevelx) < 2 && abs(ogmap[1] - gmaplevely) < 2)
-				this->sendPacket(player->getProps(__getLogin, sizeof(__getLogin)/sizeof(bool)));
+
+			if (pmap->getType() == MAPTYPE_GMAP)
+			{
+				int ogmap[2] = {player->getProp(PLPROP_GMAPLEVELX).readGUChar(), player->getProp(PLPROP_GMAPLEVELY).readGUChar()};
+				if (abs(ogmap[0] - gmaplevelx) < 2 && abs(ogmap[1] - gmaplevely) < 2)
+					this->sendPacket(player->getProps(__getLogin, sizeof(__getLogin)/sizeof(bool)));
+			}
+			else if (pmap->getType() == MAPTYPE_BIGMAP)
+			{
+				int ogmap[2] = {pmap->getLevelX(player->getLevel()->getLevelName()), pmap->getLevelY(player->getLevel()->getLevelName())};
+				int sgmap[2] = {pmap->getLevelX(pLevel->getLevelName()), pmap->getLevelY(pLevel->getLevelName())};
+				if (abs(ogmap[0] - sgmap[0]) < 2 && abs(ogmap[1] - sgmap[1]) < 2)
+					this->sendPacket(player->getProps(__getLogin, sizeof(__getLogin)/sizeof(bool)));
+			}
 		}
 	}
 	else
@@ -826,7 +842,8 @@ bool TPlayer::msgPLI_NPCPROPS(CString& pPacket)
 		return true;
 
 	CString packet = CString() >> (char)PLO_NPCPROPS << pPacket.text() + 1;
-	if (gmap) server->sendPacketToLevel(packet, gmap, this, false);
+	if (pmap && pmap->getType() == MAPTYPE_GMAP)
+		server->sendPacketToLevel(packet, pmap, this, false);
 	else server->sendPacketToLevel(packet, level, this);
 	npc->setProps(npcProps);
 
@@ -1271,10 +1288,12 @@ bool TPlayer::msgPLI_ADJACENTLEVEL(CString& pPacket)
 	}
 
 	// Send the level.
-	sendLevel(adjacentLevel, modTime, (gmap ? false : true));
+	sendLevel(adjacentLevel, modTime, (pmap ? false : true));
 
 	// Set our old level back to normal.
-	sendPacket(CString() >> (char)PLO_LEVELNAME << ((gmap != 0) ? gmap->getMapName() : level->getLevelName()));
+	if (pmap && pmap->getType() == MAPTYPE_GMAP)
+		sendPacket(CString() >> (char)PLO_LEVELNAME << pmap->getMapName());
+	else sendPacket(CString() >> (char)PLO_LEVELNAME << level->getLevelName());
 	if (level->getPlayer(0) == this)
 		sendPacket(CString() >> (char)PLO_ISLEADER);
 
@@ -1310,9 +1329,8 @@ bool TPlayer::msgPLI_MAPINFO(CString& pPacket)
 
 bool TPlayer::msgPLI_UNKNOWN46(CString& pPacket)
 {
-	printf("TODO: TPlayer::msgPLI_UNKNOWN46\n");
+	printf("TODO: TPlayer::msgPLI_UNKNOWN46: ");
 	CString packet = pPacket.readString("");
-	printf( "%s\n", packet.text() );
 	for (int i = 0; i < packet.length(); ++i) printf( "%02x ", (unsigned char)packet[i] );
 	printf( "\n" );
 	return true;

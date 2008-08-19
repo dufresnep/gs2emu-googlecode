@@ -10,7 +10,7 @@
 #include "TPlayer.h"
 #include "TServerList.h"
 #include "TLevel.h"
-#include "TGMap.h"
+#include "TMap.h"
 #include "TNPC.h"
 #include "TWeapon.h"
 
@@ -38,7 +38,7 @@ class TServer
 		std::vector<TNPC*>* getNPCList()		{ return &npcList; }
 		std::vector<TNPC*>* getNPCIdList()		{ return &npcIds; }
 		std::vector<TLevel*>* getLevelList()	{ return &levelList; }
-		std::vector<TGMap*>* getGMapList()		{ return &gmapList; }
+		std::vector<TMap*>* getMapList()		{ return &mapList; }
 		std::vector<TWeapon*>* getWeaponList()	{ return &weaponList; }
 		TServerList* getServerList()			{ return &serverlist; }
 		CFileSystem* getFileSystem()			{ return &filesystem; }
@@ -52,14 +52,14 @@ class TServer
 
 		TNPC* addNewNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC = true);
 
-		TGMap* getLevelGMap(const TLevel* pLevel) const;
+		TMap* getLevelMap(const TLevel* pLevel) const;
 
 		// Packet sending.
 		void sendPacketToAll(CString pPacket) const;
 		void sendPacketToAll(CString pPacket, TPlayer *pPlayer) const;
 		void sendPacketToLevel(CString pPacket, TLevel *pLevel) const;
 		void sendPacketToLevel(CString pPacket, TLevel *pLevel, TPlayer *pPlayer) const;
-		void sendPacketToLevel(CString pPacket, TGMap *pLevel, TPlayer *pPlayer, bool sendToSelf = false) const;
+		void sendPacketToLevel(CString pPacket, TMap* pMap, TPlayer* pPlayer, bool sendToSelf = false) const;
 		void sendPacketTo(int who, CString pPacket) const;
 		void sendPacketTo(int who, CString pPacket, TPlayer* pPlayer) const;
 
@@ -72,7 +72,7 @@ class TServer
 		std::vector<TPlayer*> playerIds, playerList;
 		std::vector<TNPC*> npcIds, npcList;
 		std::vector<TLevel*> levelList;
-		std::vector<TGMap*> gmapList;
+		std::vector<TMap*> mapList;
 		std::vector<TWeapon*> weaponList;
 		CSocket playerSock, serverSock;
 		TServerList serverlist;
