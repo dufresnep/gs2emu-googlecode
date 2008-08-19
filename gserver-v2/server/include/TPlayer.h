@@ -43,7 +43,7 @@ enum
 	PLI_SHOWIMG			= 24,
 
 	PLI_NPCWEAPONDEL	= 29,
-	PLI_FORCELEVELWARP	= 30,
+	PLI_LEVELWARPMOD	= 30,
 	PLI_PACKETCOUNT		= 31,
 	PLI_ITEMTAKE		= 32,
 	PLI_WEAPONADD		= 33,
@@ -96,7 +96,7 @@ enum
 	PLO_FILEUPTODATE	= 45,
 	PLO_STAFFGUILDS		= 47,
 	PLO_TRIGGERACTION	= 48,
-	PLO_PLAYERWARPGMAP	= 49,	// Bytes 1-3 are x/y/z. 4 = level x in gmap, 5 = level y in gmap.
+	PLO_PLAYERWARP2		= 49,	// Bytes 1-3 are x/y/z. 4 = level x in gmap, 5 = level y in gmap.
 	PLO_ADDPLAYER		= 55,
 	PLO_DELPLAYER		= 56,
 	PLO_LARGEFILESTART	= 68,
@@ -107,7 +107,7 @@ enum
 	PLO_BOARDPACKET		= 101,
 	PLO_FILE			= 102,
 	PLO_NPCBYTECODE		= 131,	// Compiled Torque-script for an NPC.
-	PLO_SETNPCLEVEL		= 156,	// Sets the level to receive NPC props.
+	PLO_SETACTIVELEVEL	= 156,	// Sets the level to receive chests, baddies, NPCs, etc.
 	PLO_BIGMAP			= 172,	// [172] zodiacminimap.txt,zodiacworldminimap3.png,10,10
 	PLO_GHOSTICON		= 174,	// Pass 1 to enable the ghost icon
 	PLO_RPGWINDOW		= 179,
@@ -150,6 +150,7 @@ class TPlayer : public TAccount
 
 		// Get Properties
 		TLevel* getLevel()		{ return level; }
+		TGMap* getGMap()		{ return gmap; }
 		int getId() const;
 		int getType() const;
 
@@ -159,7 +160,9 @@ class TPlayer : public TAccount
 
 		// Level manipulation
 		bool warp(const CString& pLevelName, float pX, float pY, time_t modTime = 0);
-		bool setLevel(const CString& pLevelName, float pX, float pY, time_t modTime = 0);
+		bool setLevel(const CString& pLevelName, time_t modTime = 0);
+		bool sendLevel(TLevel* level, time_t modTime, bool skipActors = false);
+
 		bool setLevelGMap(const CString& pLevelName, float pX, float pY, time_t modTime = 0);
 		bool sendGMapLevel(TGMap* gmap, int gmapx, int gmapy, time_t modTime = 0, bool leader = false);
 		bool leaveLevel();
@@ -248,6 +251,7 @@ class TPlayer : public TAccount
 		std::vector<SCachedLevel*> cachedLevels;
 		bool allowBomb;
 		bool hadBomb;
+		TGMap* gmap;
 };
 
 inline bool TPlayer::isLoggedIn()

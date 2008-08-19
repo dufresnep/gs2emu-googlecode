@@ -156,6 +156,10 @@ bool TPlayer::sendLoginClient()
 	// God knows which reason.  Bomb must be capitalized.
 	sendPacket(CString() >> (char)PLO_NPCWEAPONDEL << "Bomb");
 
+	//sendPacket(CString() >> (char)195 >> (char)4 << "idle" << "\"SETBACKTO \"");
+	//sendPacket(CString() >> (char)195 >> (char)4 << "walk" << "\"SETBACKTO \"");
+	//sendPacket(CString() >> (char)195 >> (char)5 << "sword" << "\"SETBACKTO idle\"");
+
 	return true;
 }
 

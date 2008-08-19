@@ -70,7 +70,7 @@ CString TPlayer::getProp(int pPropId)
 		return CString() >> (char)(y * 2);
 
 		case PLPROP_Z:
-		return CString() >> (char)(z * 2);
+		return CString() >> (char)((z * 2) + 50);
 
 		case PLPROP_SPRITE:
 		return CString() >> (char)sprite;
@@ -627,11 +627,12 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 			case PLPROP_GMAPLEVELX:
 			{
 				gmaplevelx = pPacket.readGUChar();
-				TGMap* gmap = server->getLevelGMap(level);
-				levelName = gmap->getLevelAt(gmaplevelx, gmaplevely);
-				leaveLevel();
-				sendGMapLevel(gmap, gmaplevelx, gmaplevely, -1, true);
-				level = TLevel::findLevel(levelName, server);
+				if (gmap)
+				{
+					levelName = gmap->getLevelAt(gmaplevelx, gmaplevely);
+					leaveLevel();
+					setLevel(levelName, -1);
+				}
 				printf( "map level x: %d\n", gmaplevelx );
 				break;
 			}
@@ -639,11 +640,12 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 			case PLPROP_GMAPLEVELY:
 			{
 				gmaplevely = pPacket.readGUChar();
-				TGMap* gmap = server->getLevelGMap(level);
-				levelName = gmap->getLevelAt(gmaplevelx, gmaplevely);
-				leaveLevel();
-				sendGMapLevel(gmap, gmaplevelx, gmaplevely, -1, true);
-				level = TLevel::findLevel(levelName, server);
+				if (gmap)
+				{
+					levelName = gmap->getLevelAt(gmaplevelx, gmaplevely);
+					leaveLevel();
+					setLevel(levelName, -1);
+				}
 				printf( "gmap level y: %d\n", gmaplevely );
 				break;
 			}
@@ -675,7 +677,10 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 		if (globalBuff.length() > 0)
 			server->sendPacketToAll(CString() >> (char)PLO_OTHERPLPROPS >> (short)this->id << globalBuff, this);
 		if (levelBuff.length() > 0)
-			server->sendPacketToLevel(CString() >> (char)PLO_OTHERPLPROPS >> (short)this->id << (!PLE_POST22 ? levelBuff : levelBuff2) << (!PLE_POST22 ? levelBuff2 : levelBuff), getLevel(), this);
+		{
+			if (gmap) server->sendPacketToLevel(CString() >> (char)PLO_OTHERPLPROPS >> (short)this->id << (!PLE_POST22 ? levelBuff : levelBuff2) << (!PLE_POST22 ? levelBuff2 : levelBuff), gmap, this, false);
+			else server->sendPacketToLevel(CString() >> (char)PLO_OTHERPLPROPS >> (short)this->id << (!PLE_POST22 ? levelBuff : levelBuff2) << (!PLE_POST22 ? levelBuff2 : levelBuff), getLevel(), this);
+		}
 		if (selfBuff.length() > 0)
 			this->sendPacket(CString() >> (char)PLO_PLAYERPROPS << selfBuff);
 		sendCompress();

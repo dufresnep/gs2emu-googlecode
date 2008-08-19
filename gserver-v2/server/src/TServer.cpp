@@ -304,6 +304,26 @@ void TServer::sendPacketToLevel(CString pPacket, TLevel *pLevel, TPlayer *pPlaye
 	}
 }
 
+void TServer::sendPacketToLevel(CString pPacket, TGMap *pLevel, TPlayer *pPlayer, bool sendToSelf) const
+{
+	for (std::vector<TPlayer *>::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
+	{
+		if ((*i)->getType() != CLIENTTYPE_CLIENT) continue;
+		if ((*i) == pPlayer)
+		{
+			if (sendToSelf) pPlayer->sendPacket(pPacket);
+			continue;
+		}
+		if ((*i)->getGMap() == pLevel)
+		{
+			int ogmap[2] = { (*i)->getProp(PLPROP_GMAPLEVELX).readGUChar(), (*i)->getProp(PLPROP_GMAPLEVELY).readGUChar() };
+			int sgmap[2] = { pPlayer->getProp(PLPROP_GMAPLEVELX).readGUChar(), pPlayer->getProp(PLPROP_GMAPLEVELY).readGUChar() };
+			if (abs(ogmap[0] - sgmap[0]) < 2 && abs(ogmap[1] - sgmap[1]) < 2)
+				(*i)->sendPacket(pPacket);
+		}
+	}
+}
+
 void TServer::sendPacketTo(int who, CString pPacket) const
 {
 	for (std::vector<TPlayer *>::const_iterator i = playerList.begin(); i != playerList.end(); ++i)

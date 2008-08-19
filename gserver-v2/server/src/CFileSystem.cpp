@@ -1,4 +1,5 @@
 #include <sys/stat.h>
+#include <dirent.h>
 #include <map>
 #include "ICommon.h"
 #include "CString.h"
@@ -96,7 +97,7 @@ void loadAllDirectories(std::map<CString, CString>& fileList, const CString& dir
 	struct dirent *ent;
 
 	// Try to open the directory.
-	if ((dir = opendir(pDir)) == 0)
+	if ((dir = opendir(directory)) == 0)
 		return;
 
 	// Read everything in it now.

@@ -59,6 +59,7 @@ class TServer
 		void sendPacketToAll(CString pPacket, TPlayer *pPlayer) const;
 		void sendPacketToLevel(CString pPacket, TLevel *pLevel) const;
 		void sendPacketToLevel(CString pPacket, TLevel *pLevel, TPlayer *pPlayer) const;
+		void sendPacketToLevel(CString pPacket, TGMap *pLevel, TPlayer *pPlayer, bool sendToSelf = false) const;
 		void sendPacketTo(int who, CString pPacket) const;
 		void sendPacketTo(int who, CString pPacket, TPlayer* pPlayer) const;
 
