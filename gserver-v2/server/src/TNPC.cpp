@@ -39,6 +39,7 @@ level(pLevel)
 	{
 		gmaplevelx = gmap->getLevelX(level->getLevelName());
 		gmaplevely = gmap->getLevelY(level->getLevelName());
+		printf("gmapx: %d, gmapy: %d\n", gmaplevelx, gmaplevely);
 	}
 
 	// We need to alter the modTime of the following props as they should be always sent.

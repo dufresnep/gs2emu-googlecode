@@ -87,11 +87,13 @@ class TLevel
 		char removeItem(float pX, float pY);
 
 		//! Adds a new horse to the level.
+		//! \param pImage The image of the horse.
 		//! \param pX X location of the horse.
 		//! \param pY Y location of the horse.
-		//! \param pImage The image of the horse.
+		//! \param pDir The direction of the horse.
+		//! \param pBushes The bushes the horse has eaten.
 		//! \return Returns true if it succeeds.
-		bool addHorse(float pX, float pY, CString& pImage);
+		bool addHorse(CString& pImage, float pX, float pY, char pDir, char pBushes);
 
 		//! Removes a horse from the level.
 		//! \param pX X location of the horse to remove.

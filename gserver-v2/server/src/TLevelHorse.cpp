@@ -2,5 +2,6 @@
 
 CString TLevelHorse::getHorseStr() const
 {
-	return CString() >> (char)x >> (char)y << image;
+	char dir_bush = (bushes << 2) | (dir & 0x03);
+	return CString() >> (char)x >> (char)y >> (char)dir_bush << image;
 }

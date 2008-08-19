@@ -458,9 +458,9 @@ char TLevel::removeItem(float pX, float pY)
 	return -1;
 }
 
-bool TLevel::addHorse(float pX, float pY, CString& pImage)
+bool TLevel::addHorse(CString& pImage, float pX, float pY, char pDir, char pBushes)
 {
-	levelHorses.push_back(new TLevelHorse(pImage, pX, pY));
+	levelHorses.push_back(new TLevelHorse(pImage, pX, pY, pDir, pBushes));
 	return true;
 }
 

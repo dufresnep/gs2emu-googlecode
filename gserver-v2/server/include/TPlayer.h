@@ -93,9 +93,10 @@ enum
 	PLO_NEWWORLDTIME	= 42,
 	PLO_DEFAULTWEAPON	= 43,
 	PLO_LISTPROCESSES	= 44,	// Requests a list of running processes.
+	PLO_FILEUPTODATE	= 45,
 	PLO_STAFFGUILDS		= 47,
 	PLO_TRIGGERACTION	= 48,
-	PLO_PLAYERWARPGMAP	= 49,	// Bytes 1-3 may be x/y/z. 4 = level x in gmap, 5 = level y in gmap.
+	PLO_PLAYERWARPGMAP	= 49,	// Bytes 1-3 are x/y/z. 4 = level x in gmap, 5 = level y in gmap.
 	PLO_ADDPLAYER		= 55,
 	PLO_DELPLAYER		= 56,
 	PLO_LARGEFILESTART	= 68,
@@ -136,6 +137,7 @@ struct SCachedLevel
 	time_t modTime;
 };
 
+class TGMap;
 class TPlayer : public TAccount
 {
 	public:
@@ -156,7 +158,11 @@ class TPlayer : public TAccount
 		void setId(int pId);
 
 		// Level manipulation
-		bool setLevel(const CString& pLevelName, float x, float y, time_t modTime = 0);
+		bool warp(const CString& pLevelName, float pX, float pY, time_t modTime = 0);
+		bool setLevel(const CString& pLevelName, float pX, float pY, time_t modTime = 0);
+		bool setLevelGMap(const CString& pLevelName, float pX, float pY, time_t modTime = 0);
+		bool sendGMapLevel(TGMap* gmap, int gmapx, int gmapy, time_t modTime = 0, bool leader = false);
+		bool leaveLevel();
 		time_t getCachedLevelModTime(const TLevel* level) const;
 
 		// Prop-Manipulation

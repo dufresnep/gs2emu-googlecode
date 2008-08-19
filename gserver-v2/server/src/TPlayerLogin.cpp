@@ -86,16 +86,12 @@ bool TPlayer::sendLoginClient()
 	sendProps(__sendLogin, sizeof(__sendLogin) / sizeof(bool));
 
 	// Send the level to the player.
-	// setLevel will call sendCompress() for us.
-	if (!setLevel(this->levelName, this->x, this->y, 0))
+	// warp will call sendCompress() for us.
+	if (warp(levelName, x, y) == false)
 	{
-		sendPacket(CString() >> (char)PLO_WARPFAILED);
-		if (!setLevel(settings->getStr("unstickmelevel"), settings->getFloat("unstickmex"), settings->getFloat("unstickmey"), 0))
-		{
-			sendPacket(CString() >> (char)PLO_DISCMESSAGE << "No level available.");
-			serverlog.out(CString() << "Cannot find level for " << accountName << "\n");
-			return false;
-		}
+		sendPacket(CString() >> (char)PLO_DISCMESSAGE << "No level available.");
+		serverlog.out(CString() << "Cannot find level for " << accountName << "\n");
+		return false;
 	}
 
 	// Recalculate player spar deviation.

@@ -256,6 +256,7 @@ TNPC* TServer::addNewNPC(const CString& pImage, const CString& pScript, float pX
 
 TGMap* TServer::getLevelGMap(const TLevel* pLevel) const
 {
+	if (pLevel == 0) return 0;
 	for (std::vector<TGMap*>::const_iterator i = gmapList.begin(); i != gmapList.end(); ++i)
 	{
 		TGMap* gmap = *i;

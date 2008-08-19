@@ -181,6 +181,14 @@ CString TPlayer::getProp(int pPropId)
 			return CString().writeGShort((short)val);
 		}
 
+		case PLPROP_Z2:
+		{
+			unsigned short val = (z2 < 0 ? -z2 : z2);
+			val <<= 1;
+			if (z2 < 0) val |= 0x0001;
+			return CString().writeGShort(val);
+		}
+
 		case PLPROP_GMAPLEVELX:
 		return CString() >> (char)gmaplevelx;
 
@@ -387,10 +395,10 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 				{
 					power = clip((ap < 20 ? 3 : (ap < 40 ? 5 : maxPower)), 0.0f, maxPower);
 
-					// If we are the leader of the level, call setLevel().  This will fix NPCs not
+					// If we are the leader of the level, call warp().  This will fix NPCs not
 					// working again after we respawn.
 					if (level->getPlayer(0) == this)
-						setLevel(levelName, x, y, time(0));
+						warp(levelName, x, y, time(0));
 				}
 
 				// When they die, increase deaths and make somebody else level leader.
@@ -562,8 +570,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 			// OS type.
 			// Windows: wind
 			case PLPROP_OSTYPE:
-				len = pPacket.readGUChar();
-				os = pPacket.readChars(len);
+				os = pPacket.readChars(pPacket.readGUChar());
 				break;
 
 			// Text codepage.
@@ -618,14 +625,28 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 				break;
 
 			case PLPROP_GMAPLEVELX:
+			{
 				gmaplevelx = pPacket.readGUChar();
-				printf( "gmap level x: %d\n", gmaplevelx );
+				TGMap* gmap = server->getLevelGMap(level);
+				levelName = gmap->getLevelAt(gmaplevelx, gmaplevely);
+				leaveLevel();
+				sendGMapLevel(gmap, gmaplevelx, gmaplevely, -1, true);
+				level = TLevel::findLevel(levelName, server);
+				printf( "map level x: %d\n", gmaplevelx );
 				break;
+			}
 
 			case PLPROP_GMAPLEVELY:
+			{
 				gmaplevely = pPacket.readGUChar();
+				TGMap* gmap = server->getLevelGMap(level);
+				levelName = gmap->getLevelAt(gmaplevelx, gmaplevely);
+				leaveLevel();
+				sendGMapLevel(gmap, gmaplevelx, gmaplevely, -1, true);
+				level = TLevel::findLevel(levelName, server);
 				printf( "gmap level y: %d\n", gmaplevely );
 				break;
+			}
 
 			case PLPROP_COMMUNITYNAME:
 				pPacket.readChars(pPacket.readGUChar());
