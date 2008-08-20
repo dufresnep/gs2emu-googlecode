@@ -48,7 +48,7 @@ class TServer
 		CLog& getRCLog()						{ return rclog; }
 		
 		TWeapon* getWeapon(const CString& name);
-		TPlayer* getPlayer(const unsigned int id);
+		TPlayer* getPlayer(const unsigned short id);
 		TNPC* getNPC(const unsigned int id);
 
 		TNPC* addNewNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC = true);

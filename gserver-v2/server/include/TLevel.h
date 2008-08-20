@@ -138,6 +138,10 @@ class TLevel
 		//! \return The gmap this level belongs to.
 		TMap* getMap() const;
 
+		//! Removes an NPC from the level.
+		//! \param npc The NPC to remove.
+		void removeNPC(TNPC* npc);
+
 		//! Does special events that should happen every second.
 		//! \return Currently, it always returns true.
 		bool doTimedEvents();

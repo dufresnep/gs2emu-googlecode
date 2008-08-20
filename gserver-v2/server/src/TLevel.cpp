@@ -546,6 +546,17 @@ TMap* TLevel::getMap() const
 	return server->getLevelMap(this);
 }
 
+void TLevel::removeNPC(TNPC* npc)
+{
+	for (std::vector<TNPC*>::iterator i = levelNPCs.begin(); i != levelNPCs.end(); )
+	{
+		TNPC* search = *i;
+		if (npc == search)
+			i = levelNPCs.erase(i);
+		else ++i;
+	}
+}
+
 bool TLevel::doTimedEvents()
 {
 	// Check if we should revert any board changes.

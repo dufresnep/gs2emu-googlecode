@@ -238,9 +238,9 @@ TWeapon* TServer::getWeapon(const CString& name)
 	return 0;
 }
 
-TPlayer* TServer::getPlayer(const unsigned int id)
+TPlayer* TServer::getPlayer(const unsigned short id)
 {
-	if (id >= playerIds.size()) return 0;
+	if (id >= (unsigned short)playerIds.size()) return 0;
 	return playerIds[id];
 }
 

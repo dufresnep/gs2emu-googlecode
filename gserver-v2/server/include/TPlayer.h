@@ -40,7 +40,8 @@ enum
 	PLI_FLAGSET			= 18,
 	PLI_FLAGDEL			= 19,
 	PLI_OPENCHEST		= 20,
-
+	PLI_NPCADD			= 21,
+	PLI_NPCDEL			= 22,
 	PLI_WANTFILE		= 23,
 	PLI_SHOWIMG			= 24,
 	PLI_EMPTY25			= 25,
@@ -92,7 +93,7 @@ enum
 	PLO_SIGNATURE		= 25,
 	PLO_BADDYHURT		= 27,
 	PLO_FLAGSET			= 28,
-
+	PLO_NPCDEL			= 29,
 	PLO_FILESENDFAILED	= 30,
 
 	PLO_FLAGDEL			= 31,
@@ -220,8 +221,8 @@ class TPlayer : public TAccount
 		bool msgPLI_FLAGSET(CString& pPacket);
 		bool msgPLI_FLAGDEL(CString& pPacket);
 		bool msgPLI_OPENCHEST(CString& pPacket);
-		// PLI_NPCADD
-		// PLI_NPCDEL
+		bool msgPLI_NPCADD(CString& pPacket);
+		bool msgPLI_NPCDEL(CString& pPacket);
 		bool msgPLI_WANTFILE(CString& pPacket);
 		bool msgPLI_SHOWIMG(CString& pPacket);
 		// PLI_EMPTY25

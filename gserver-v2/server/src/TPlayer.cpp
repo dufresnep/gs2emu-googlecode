@@ -126,7 +126,8 @@ void createPLFunctions()
 	TPLFunc[PLI_FLAGSET] = &TPlayer::msgPLI_FLAGSET;
 	TPLFunc[PLI_FLAGDEL] = &TPlayer::msgPLI_FLAGDEL;
 	TPLFunc[PLI_OPENCHEST] = &TPlayer::msgPLI_OPENCHEST;
-
+	TPLFunc[PLI_NPCADD] = &TPlayer::msgPLI_NPCADD;
+	TPLFunc[PLI_NPCDEL] = &TPlayer::msgPLI_NPCDEL;
 	TPLFunc[PLI_WANTFILE] = &TPlayer::msgPLI_WANTFILE;
 	TPLFunc[PLI_SHOWIMG] = &TPlayer::msgPLI_SHOWIMG;
 	TPLFunc[PLI_HURTPLAYER] = &TPlayer::msgPLI_HURTPLAYER;
@@ -376,12 +377,13 @@ void TPlayer::sendPacket(CString pPacket)
 	if (pPacket[pPacket.length()-1] != '\n')
 		pPacket.writeChar('\n');
 
+	// Send the stored buffer if the new packet will put it over 64KB.
+	// We don't want to keep compressing packets over and over if we can avoid it.
+	if (sBuffer.length() + pPacket.length() > 0x10000)
+		sendCompress();
+
 	// append buffer
 	sBuffer.write(pPacket.text(), pPacket.length());
-
-	// Send Data
-	if (sBuffer.length() > 4096)
-		sendCompress();
 }
 
 void TPlayer::sendCompress()
@@ -716,8 +718,6 @@ bool TPlayer::msgPLI_LOGIN(CString& pPacket)
 			break;
 	}
 
-	printf("Test: %i\n", PLE_POST22);
-
 	// Get Iterator-Key
 	if (type == CLIENTTYPE_CLIENT)
 	{
@@ -832,7 +832,7 @@ bool TPlayer::msgPLI_PLAYERPROPS(CString& pPacket)
 
 bool TPlayer::msgPLI_NPCPROPS(CString& pPacket)
 {
-	int npcId = pPacket.readGUInt();
+	unsigned int npcId = pPacket.readGUInt();
 	CString npcProps = pPacket.readString("");
 
 	//printf( "npcId: %d\n", npcId );
@@ -965,7 +965,7 @@ bool TPlayer::msgPLI_ITEMDEL(CString& pPacket)
 bool TPlayer::msgPLI_CLAIMPKER(CString& pPacket)
 {
 	// Get the player who killed us.
-	int pId = pPacket.readGShort();
+	unsigned int pId = pPacket.readGUShort();
 	TPlayer* player = server->getPlayer(pId);
 	if (player == 0 || player == this) return true;
 
@@ -976,7 +976,7 @@ bool TPlayer::msgPLI_CLAIMPKER(CString& pPacket)
 	{
 		// Get some stats we are going to use.
 		// Need to parse the other player's PLPROP_RATING.
-		int otherRating = player->getProp(PLPROP_RATING).readGInt();
+		unsigned int otherRating = player->getProp(PLPROP_RATING).readGUInt();
 		float oldStats[4] = { rating, deviation, (float)((otherRating >> 9) & 0xFFF), (float)(otherRating & 0x1FF) };
 
 		// If the IPs are the same, don't update the rating to prevent cheating.
@@ -1048,7 +1048,7 @@ bool TPlayer::msgPLI_CLAIMPKER(CString& pPacket)
 
 bool TPlayer::msgPLI_BADDYPROPS(CString& pPacket)
 {
-	char id = pPacket.readGChar();
+	unsigned char id = pPacket.readGUChar();
 	CString props = pPacket.readString("");
 
 	// Get the baddy.
@@ -1073,9 +1073,9 @@ bool TPlayer::msgPLI_BADDYADD(CString& pPacket)
 {
 	float bX = (float)pPacket.readGChar() / 2.0f;
 	float bY = (float)pPacket.readGChar() / 2.0f;
-	char bType = pPacket.readGChar();
+	unsigned char bType = pPacket.readGUChar();
 	CString bImage = pPacket.readChars(pPacket.bytesLeft() - 1);
-	char bPower = pPacket.readGChar();
+	unsigned char bPower = pPacket.readGUChar();
 	bPower = min(bPower, 12);		// Hard-limit to 6 hearts.
 
 	// Add the baddy.
@@ -1208,6 +1208,63 @@ bool TPlayer::msgPLI_OPENCHEST(CString& pPacket)
 	return true;
 }
 
+bool TPlayer::msgPLI_NPCADD(CString& pPacket)
+{
+	CSettings* settings = server->getSettings();
+
+	CString nimage = pPacket.readChars(pPacket.readGUChar());
+	CString ncode = pPacket.readChars(pPacket.readGUChar());
+	float nx = (float)pPacket.readGChar() / 2.0f;
+	float ny = (float)pPacket.readGChar() / 2.0f;
+
+	// See if putnpc is allowed.
+	if (settings->getBool("putnpcenabled") == false)
+		return true;
+
+	// Add NPC to level
+	TNPC* npc = server->addNewNPC(nimage, ncode, nx, ny, level, false);
+
+	// Send the NPC's props to everybody in range.
+	if (pmap && pmap->getType() == MAPTYPE_GMAP)
+		server->sendPacketToLevel(CString() >> (char)PLO_NPCPROPS >> (int)npc->getId() << npc->getProps(0), pmap, this, true);
+	else server->sendPacketToLevel(CString() >> (char)PLO_NPCPROPS >> (int)npc->getId() << npc->getProps(0), level);
+
+	return true;
+}
+
+bool TPlayer::msgPLI_NPCDEL(CString& pPacket)
+{
+	std::vector<TNPC*>* npcIdList = server->getNPCIdList();
+	std::vector<TNPC*>* npcList = server->getNPCList();
+
+	unsigned int nid = pPacket.readGUInt();
+
+	// Grab the NPC.
+	TNPC* npc = server->getNPC(nid);
+	if (npc == 0) return true;
+
+	// Remove the NPC from all the lists.
+	level->removeNPC(npc);
+	(*npcIdList)[nid] = 0;
+	for (std::vector<TNPC*>::iterator i = npcList->begin(); i != npcList->end(); )
+	{
+		if ((*i) == npc)
+			i = npcList->erase(i);
+		else ++i;
+	}
+
+	// Tell the client to delete the NPC.
+	server->sendPacketTo(CLIENTTYPE_CLIENT, CString() >> (char)PLO_NPCPROPS >> (int)npc->getId()
+		>> (short)NPCPROP_SCRIPT >> (char)0 >> (char)NPCPROP_VISFLAGS >> (char)0
+		>> (char)NPCPROP_BLOCKFLAGS >> (char)0 >> (char)NPCPROP_MESSAGE >> (char)0);
+	server->sendPacketTo(CLIENTTYPE_CLIENT, CString() >> (char)PLO_NPCDEL >> (int)npc->getId());
+
+	// Delete the NPC from memory.
+	delete npc;
+
+	return true;
+}
+
 bool TPlayer::msgPLI_WANTFILE(CString& pPacket)
 {
 	CFileSystem* fileSystem = server->getFileSystem();
@@ -1261,8 +1318,8 @@ bool TPlayer::msgPLI_HURTPLAYER(CString& pPacket)
 	unsigned short pId = pPacket.readGUShort();
 	char hurtdx = pPacket.readGChar();
 	char hurtdy = pPacket.readGChar();
-	char power = pPacket.readGChar();
-	int npc = pPacket.readGInt();
+	unsigned char power = pPacket.readGUChar();
+	unsigned int npc = pPacket.readGUInt();
 
 	// Get the victim.
 	TPlayer* victim = server->getPlayer(pId);
@@ -1352,7 +1409,7 @@ bool TPlayer::msgPLI_PRIVATEMESSAGE(CString& pPacket)
 
 bool TPlayer::msgPLI_SHOOT(CString& pPacket)
 {
-	int unknown = pPacket.readGInt();
+	int unknown = pPacket.readGInt();				// May be a shoot id for the npc-server.
 	float sx = (float)pPacket.readGUChar() / 2.0f;
 	float sy = (float)pPacket.readGUChar() / 2.0f;
 	float sz = (float)pPacket.readGUChar() / 2.0f;
@@ -1386,7 +1443,7 @@ bool TPlayer::msgPLI_NPCWEAPONDEL(CString& pPacket)
 bool TPlayer::msgPLI_WEAPONADD(CString& pPacket)
 {
 	CSettings* settings = server->getSettings();
-	char type = pPacket.readGChar();
+	unsigned char type = pPacket.readGUChar();
 
 	// Type 0 means it is a default weapon.
 	if (type == 0)
@@ -1418,8 +1475,8 @@ bool TPlayer::msgPLI_WEAPONADD(CString& pPacket)
 		std::vector<TWeapon*>* weaponList = server->getWeaponList();
 
 		// Get the NPC id.
-		int npcId = pPacket.readGInt();
-		TNPC* npc = (*npcIds)[npcId];
+		unsigned int npcId = pPacket.readGUInt();
+		TNPC* npc = server->getNPC(npcId);
 		if (npc == 0)
 			return true;
 
@@ -1525,14 +1582,14 @@ bool TPlayer::msgPLI_LANGUAGE(CString& pPacket)
 
 bool TPlayer::msgPLI_TRIGGERACTION(CString& pPacket)
 {
-	int npcId = pPacket.readGInt();
+	unsigned int npcId = pPacket.readGUInt();
 	float x = (float)pPacket.readGChar() / 2.0f;
 	float y = (float)pPacket.readGChar() / 2.0f;
 	CString action = pPacket.readString("");
 
 	// We don't have an NPCserver, so, for now, just pass it along.
 	CString packet;
-	packet >> (char)PLO_TRIGGERACTION >> (short)this->id << pPacket.text()+1;
+	packet >> (char)PLO_TRIGGERACTION >> (short)id << pPacket.text() + 1;
 	server->sendPacketToLevel(packet, this->level, this);
 	return true;
 }
