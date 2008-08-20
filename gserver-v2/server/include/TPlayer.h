@@ -39,11 +39,14 @@ enum
 	PLI_BADDYADD		= 17,
 	PLI_FLAGSET			= 18,
 	PLI_FLAGDEL			= 19,
-
 	PLI_OPENCHEST		= 20,
+
 	PLI_WANTFILE		= 23,
 	PLI_SHOWIMG			= 24,
-
+	PLI_EMPTY25			= 25,
+	PLI_HURTPLAYER		= 26,
+	PLI_EXPLOSION		= 27,
+	PLI_PRIVATEMESSAGE	= 28,
 	PLI_NPCWEAPONDEL	= 29,
 	PLI_LEVELWARPMOD	= 30,
 	PLI_PACKETCOUNT		= 31,
@@ -51,10 +54,12 @@ enum
 	PLI_WEAPONADD		= 33,
 	PLI_UPDATEFILE		= 34,
 	PLI_ADJACENTLEVEL	= 35,
+	PLI_HITOBJECTS		= 36,	// TODO
 	PLI_LANGUAGE		= 37,
 	PLI_TRIGGERACTION	= 38,
 	PLI_MAPINFO			= 39,
-	PLI_UNKNOWN46		= 46,		// Always is 1.  Might be a player count for the gmap level.
+	PLI_SHOOT			= 40,
+	PLI_UNKNOWN46		= 46,	// Always is 1.  Might be a player count for the gmap level.
 };
 
 enum
@@ -94,7 +99,11 @@ enum
 	PLO_SHOWIMG			= 32,
 	PLO_NPCWEAPONADD	= 33,
 	PLO_NPCWEAPONDEL	= 34,
+	PLO_ADMINMESSAGE	= 35,
+	PLO_EXPLOSION		= 36,
+	PLO_PRIVATEMESSAGE	= 37,
 	PLO_LEVELMODTIME	= 39,
+	PLO_HURTPLAYER		= 40,
 	PLO_NEWWORLDTIME	= 42,
 	PLO_DEFAULTWEAPON	= 43,
 	PLO_LISTPROCESSES	= 44,	// Requests a list of running processes.
@@ -115,6 +124,7 @@ enum
 	PLO_SETACTIVELEVEL	= 156,	// Sets the level to receive chests, baddies, NPCs, etc.
 	PLO_BIGMAP			= 172,	// [172] zodiacminimap.txt,zodiacworldminimap3.png,10,10
 	PLO_GHOSTICON		= 174,	// Pass 1 to enable the ghost icon
+	PLO_SHOOT			= 175,
 	PLO_RPGWINDOW		= 179,
 	PLO_STATUSLIST		= 180,
 	PLO_EMPTY190		= 190,	// Was blank.  Sent before weapon list.
@@ -124,7 +134,8 @@ enum
 
 enum
 {
-	PLFLAG_NOTOALL		= 0x04,
+	PLFLAG_NOMASSMESSAGE	= 0x01,
+	PLFLAG_NOTOALL			= 0x04,
 };
 
 enum
@@ -208,11 +219,17 @@ class TPlayer : public TAccount
 		bool msgPLI_BADDYADD(CString& pPacket);
 		bool msgPLI_FLAGSET(CString& pPacket);
 		bool msgPLI_FLAGDEL(CString& pPacket);
-
 		bool msgPLI_OPENCHEST(CString& pPacket);
-
+		// PLI_NPCADD
+		// PLI_NPCDEL
 		bool msgPLI_WANTFILE(CString& pPacket);
 		bool msgPLI_SHOWIMG(CString& pPacket);
+		// PLI_EMPTY25
+		bool msgPLI_HURTPLAYER(CString& pPacket);
+		bool msgPLI_EXPLOSION(CString& pPacket);
+		bool msgPLI_PRIVATEMESSAGE(CString& pPacket);
+		bool msgPLI_SHOOT(CString& pPacket);
+
 		bool msgPLI_NPCWEAPONDEL(CString& pPacket);
 		bool msgPLI_WEAPONADD(CString& pPacket);
 		bool msgPLI_UPDATEFILE(CString& pPacket);

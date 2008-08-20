@@ -70,7 +70,7 @@ CString TPlayer::getProp(int pPropId)
 		return CString() >> (char)(y * 2);
 
 		case PLPROP_Z:
-		return CString() >> (char)((z * 2) + 50);
+		return CString() >> (char)(((z + 25) * 2)/* + 50*/);
 
 		case PLPROP_SPRITE:
 		return CString() >> (char)sprite;

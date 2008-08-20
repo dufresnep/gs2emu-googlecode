@@ -125,11 +125,15 @@ void createPLFunctions()
 	TPLFunc[PLI_BADDYADD] = &TPlayer::msgPLI_BADDYADD;
 	TPLFunc[PLI_FLAGSET] = &TPlayer::msgPLI_FLAGSET;
 	TPLFunc[PLI_FLAGDEL] = &TPlayer::msgPLI_FLAGDEL;
-
 	TPLFunc[PLI_OPENCHEST] = &TPlayer::msgPLI_OPENCHEST;
 
 	TPLFunc[PLI_WANTFILE] = &TPlayer::msgPLI_WANTFILE;
 	TPLFunc[PLI_SHOWIMG] = &TPlayer::msgPLI_SHOWIMG;
+	TPLFunc[PLI_HURTPLAYER] = &TPlayer::msgPLI_HURTPLAYER;
+	TPLFunc[PLI_EXPLOSION] = &TPlayer::msgPLI_EXPLOSION;
+	TPLFunc[PLI_PRIVATEMESSAGE] = &TPlayer::msgPLI_PRIVATEMESSAGE;
+	TPLFunc[PLI_SHOOT] = &TPlayer::msgPLI_SHOOT;
+
 	TPLFunc[PLI_NPCWEAPONDEL] = &TPlayer::msgPLI_NPCWEAPONDEL;
 	TPLFunc[PLI_LEVELWARPMOD] = &TPlayer::msgPLI_LEVELWARP;	// Shared with PLI_LEVELWARP
 	TPLFunc[PLI_WEAPONADD] = &TPlayer::msgPLI_WEAPONADD;
@@ -1249,6 +1253,121 @@ bool TPlayer::msgPLI_WANTFILE(CString& pPacket)
 bool TPlayer::msgPLI_SHOWIMG(CString& pPacket)
 {
 	server->sendPacketToLevel(CString() >> (char)PLO_SHOWIMG >> (short)id << pPacket.text() + 1, level, this);
+	return true;
+}
+
+bool TPlayer::msgPLI_HURTPLAYER(CString& pPacket)
+{
+	unsigned short pId = pPacket.readGUShort();
+	char hurtdx = pPacket.readGChar();
+	char hurtdy = pPacket.readGChar();
+	char power = pPacket.readGChar();
+	int npc = pPacket.readGInt();
+
+	// Get the victim.
+	TPlayer* victim = server->getPlayer(pId);
+	if (victim == 0) return true;
+
+	// If they are paused, they don't get hurt.
+	if (victim->getProp(PLPROP_STATUS).readGChar() & PLSTATUS_PAUSED) return true;
+
+	// Send the packet.
+	victim->sendPacket(CString() >> (char)PLO_HURTPLAYER >> (short)id >> (char)hurtdx >> (char)hurtdy >> (char)power >> (int)npc);
+
+	return true;
+}
+
+bool TPlayer::msgPLI_EXPLOSION(CString& pPacket)
+{
+	CSettings* settings = server->getSettings();
+	if (settings->getBool("noexplosions", false) == true) return true;
+
+	unsigned char eradius = pPacket.readGUChar();
+	float ex = (float)pPacket.readGUChar() / 2.0f;
+	float ey = (float)pPacket.readGUChar() / 2.0f;
+	unsigned char epower = pPacket.readGUChar();
+
+	// Send the packet out.
+	CString packet = CString() >> (char)PLO_EXPLOSION >> (short)id >> (char)eradius >> (char)(ex * 2) >> (char)(ey * 2) >> (char)epower;
+	if (pmap) server->sendPacketToLevel(packet, pmap, this, false);
+	else server->sendPacketToLevel(packet, level, this);
+
+	return true;
+}
+
+bool TPlayer::msgPLI_PRIVATEMESSAGE(CString& pPacket)
+{
+	int sendLimit = 4;
+	if ((int)difftime(time(0), lastMessage) <= 4)
+	{
+		sendPacket(CString() >> (char)PLO_ADMINMESSAGE <<
+			"Server message:\xa7You can only send messages once every " << CString((int)sendLimit) << " seconds.");
+		return true;
+	}
+	lastMessage = time(0);
+
+	// TODO: jailed levels.
+
+	// Get the players this message was addressed to.
+	std::vector<unsigned short> pmPlayers;
+	unsigned short pmPlayerCount = pPacket.readGUShort();
+	for (int i = 0; i < pmPlayerCount; ++i)
+		pmPlayers.push_back(pPacket.readGUShort());
+
+	// Start constructing the message based on if it is a mass message or a private message.
+	CString pmMessageType("\"\",");
+	if (pmPlayerCount > 1) pmMessageType << "\"Mass message:\",";
+	else pmMessageType << "\"Private message:\",";
+
+	// Grab the message.
+	CString pmMessage = pPacket.readString("");
+	int messageLimit = 1024;
+	if (pmMessage.length() > messageLimit)
+	{
+		sendPacket(CString() >> (char)PLO_ADMINMESSAGE <<
+			"Server message:\xa7There is a message limit of " << CString((int)messageLimit) << " characters.");
+		return true;
+	}
+
+	// TODO: word filter.
+
+	// Send the message out.
+	for (std::vector<unsigned short>::iterator i = pmPlayers.begin(); i != pmPlayers.end(); ++i)
+	{
+		TPlayer* pmPlayer = server->getPlayer(*i);
+		if (pmPlayer == 0 || pmPlayer == this) continue;
+
+		// Don't send to people who don't want mass messages.
+		if (pmPlayerCount != 1 && (pmPlayer->getProp(PLPROP_ADDITFLAGS).readGUChar() & PLFLAG_NOMASSMESSAGE))
+			continue;
+
+		// TODO: jailed people.
+
+		// Send the message.
+		sendPacket(CString() >> (char)PLO_PRIVATEMESSAGE >> (short)id << pmMessageType << pmMessage);
+	}
+
+	return true;
+}
+
+bool TPlayer::msgPLI_SHOOT(CString& pPacket)
+{
+	int unknown = pPacket.readGInt();
+	float sx = (float)pPacket.readGUChar() / 2.0f;
+	float sy = (float)pPacket.readGUChar() / 2.0f;
+	float sz = (float)pPacket.readGUChar() / 2.0f;
+	unsigned char sangle = pPacket.readGUChar();	// 0-pi = 0-220
+	unsigned char sanglez = pPacket.readGUChar();	// 0-pi = 0-220
+	unsigned char sspeed = pPacket.readGUChar();	// speed = pixels per 0.05 seconds.  In gscript, each value of 1 translates to 44 pixels.
+	CString sgani = pPacket.readChars(pPacket.readGUChar());
+	unsigned char unknown2 = pPacket.readGUChar();
+
+	// Send data now.
+	if (pmap) server->sendPacketToLevel(CString() >> (char)PLO_SHOOT >> (short)id << pPacket.text() + 1, pmap, this, false);
+	else server->sendPacketToLevel(CString() >> (char)PLO_SHOOT >> (short)id << pPacket.text() + 1, level, this);
+
+//	printf("shoot: %s\n", pPacket.text());
+//	for (int i = 0; i < pPacket.length(); ++i) printf("%02x ", (unsigned char)pPacket[i]); printf("\n");
 	return true;
 }
 
