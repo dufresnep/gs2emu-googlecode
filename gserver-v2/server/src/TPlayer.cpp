@@ -444,7 +444,7 @@ bool TPlayer::warp(const CString& pLevelName, float pX, float pY, time_t modTime
 	float unstickY = settings->getFloat("unstickmey", 35.0f);
 
 	// See if the new level is on a gmap.
-	pmap = server->getLevelMap(newLevel);
+	pmap = server->getMap(newLevel);
 
 	// Leave our current level.
 	leaveLevel();
@@ -1093,8 +1093,6 @@ bool TPlayer::msgPLI_BADDYADD(CString& pPacket)
 
 bool TPlayer::msgPLI_FLAGSET(CString& pPacket)
 {
-	CSettings* settings = server->getSettings();
-
 	CString flagPacket = pPacket.readString("");
 	CString flagName = flagPacket.readString("=").trim();
 	CString flagValue = flagPacket.readString("").trim();
@@ -1109,41 +1107,33 @@ bool TPlayer::msgPLI_FLAGSET(CString& pPacket)
 	if (flagName.find("serverr.") != -1) return true;
 
 	// Server flags are handled differently than client flags.
-	bool isServer = false;
-	std::vector<CString>* tflags = 0;
 	if (flagName.find("server.") != -1)
 	{
-		if (settings->getBool("dontaddserverflags", false) == true) return true;
-		tflags = server->getServerFlags();
-		isServer = true;
+		server->addFlag(flagNew);
+		return true;
 	}
-	else tflags = &flagList;
 
 	// Loop for flags now.
-	for (std::vector<CString>::iterator i = tflags->begin(); i != tflags->end(); )
+	for (std::vector<CString>::iterator i = flagList.begin(); i != flagList.end(); )
 	{
-		CString tflag = *i;
-		CString tflagName = tflag.readString("=").trim();
+		CString tflagName = i->readString("=").trim();
 		if (tflagName == flagName)
 		{
 			// A flag with a value of 0 means we should unset it.
 			if (flagValue.length() == 0)
 			{
-				if (isServer) server->sendPacketToAll(CString() >> (char)PLO_FLAGDEL << flagName);
-				tflags->erase(i);
+				flagList.erase(i);
 				return true;
 			}
 
 			// If we didn't unset it, alter the existing flag.
-			if (isServer) server->sendPacketToAll(CString() >> (char)PLO_FLAGSET << flagNew);
 			*i = flagNew;
 			return true;
 		}
 	}
 
 	// We didn't find a pre-existing flag so let's create a new one.
-	if (isServer) server->sendPacketToAll(CString() >> (char)PLO_FLAGSET << flagNew);
-	tflags->push_back(flagNew);
+	flagList.push_back(flagNew);
 	return true;
 }
 
@@ -1162,25 +1152,19 @@ bool TPlayer::msgPLI_FLAGDEL(CString& pPacket)
 	if (flagName.find("serverr.") != -1) return true;
 
 	// Server flags are handled differently than client flags.
-	bool isServer = false;
-	std::vector<CString>* tflags = 0;
 	if (flagName.find("server.") != -1)
 	{
-		if (settings->getBool("dontaddserverflags", false) == true) return true;
-		tflags = server->getServerFlags();
-		isServer = true;
+		server->deleteFlag(flagName);
+		return true;
 	}
-	else tflags = &flagList;
 
 	// Loop for flags now.
-	for (std::vector<CString>::iterator i = tflags->begin(); i != tflags->end(); )
+	for (std::vector<CString>::iterator i = flagList.begin(); i != flagList.end(); )
 	{
-		CString tflag = *i;
-		CString tflagName = tflag.readString("=").trim();
+		CString tflagName = i->readString("=").trim();
 		if (tflagName == flagName)
 		{
-			if (isServer) server->sendPacketToAll(CString() >> (char)PLO_FLAGDEL << flagName);
-			tflags->erase(i);
+			flagList.erase(i);
 			return true;
 		}
 	}
@@ -1222,46 +1206,17 @@ bool TPlayer::msgPLI_NPCADD(CString& pPacket)
 		return true;
 
 	// Add NPC to level
-	TNPC* npc = server->addNewNPC(nimage, ncode, nx, ny, level, false);
-
-	// Send the NPC's props to everybody in range.
-	if (pmap && pmap->getType() == MAPTYPE_GMAP)
-		server->sendPacketToLevel(CString() >> (char)PLO_NPCPROPS >> (int)npc->getId() << npc->getProps(0), pmap, this, true);
-	else server->sendPacketToLevel(CString() >> (char)PLO_NPCPROPS >> (int)npc->getId() << npc->getProps(0), level);
+	TNPC* npc = server->addNPC(nimage, ncode, nx, ny, level, false);
 
 	return true;
 }
 
 bool TPlayer::msgPLI_NPCDEL(CString& pPacket)
 {
-	std::vector<TNPC*>* npcIdList = server->getNPCIdList();
-	std::vector<TNPC*>* npcList = server->getNPCList();
-
 	unsigned int nid = pPacket.readGUInt();
 
-	// Grab the NPC.
-	TNPC* npc = server->getNPC(nid);
-	if (npc == 0) return true;
-
-	// Remove the NPC from all the lists.
-	level->removeNPC(npc);
-	(*npcIdList)[nid] = 0;
-	for (std::vector<TNPC*>::iterator i = npcList->begin(); i != npcList->end(); )
-	{
-		if ((*i) == npc)
-			i = npcList->erase(i);
-		else ++i;
-	}
-
-	// Tell the client to delete the NPC.
-	server->sendPacketTo(CLIENTTYPE_CLIENT, CString() >> (char)PLO_NPCPROPS >> (int)npc->getId()
-		>> (short)NPCPROP_SCRIPT >> (char)0 >> (char)NPCPROP_VISFLAGS >> (char)0
-		>> (char)NPCPROP_BLOCKFLAGS >> (char)0 >> (char)NPCPROP_MESSAGE >> (char)0);
-	server->sendPacketTo(CLIENTTYPE_CLIENT, CString() >> (char)PLO_NPCDEL >> (int)npc->getId());
-
-	// Delete the NPC from memory.
-	delete npc;
-
+	// Remove the NPC.
+	server->deleteNPC(nid, level);
 	return true;
 }
 

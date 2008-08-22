@@ -16,8 +16,8 @@
 
 enum // Socket Type
 {
-	SOCK_PLAYER,
-	SOCK_SERVER,
+	SOCK_PLAYER = 0,
+	SOCK_SERVER = 1,
 };
 
 //class TPlayer;
@@ -46,24 +46,30 @@ class TServer
 		CString getServerPath()					{ return serverpath; }
 		CLog& getServerLog()					{ return serverlog; }
 		CLog& getRCLog()						{ return rclog; }
-		
-		TWeapon* getWeapon(const CString& name);
-		TPlayer* getPlayer(const unsigned short id);
-		TNPC* getNPC(const unsigned int id);
 
-		TNPC* addNewNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC = true);
+		TPlayer* getPlayer(const unsigned short id) const;
+		TNPC* getNPC(const unsigned int id) const;
+		TLevel* getLevel(const CString& pLevel);
+		TMap* getMap(const CString& name) const;
+		TMap* getMap(const TLevel* pLevel) const;
+		TWeapon* getWeapon(const CString& name) const;
+		CString getFlag(const CString& pName) const;
 
-		TMap* getLevelMap(const TLevel* pLevel) const;
+		TNPC* addNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC, bool sendToPlayers = false);
+		bool deleteNPC(const unsigned int pId, TLevel* pLevel = 0);
+		bool deleteNPC(TNPC* npc, TLevel* pLevel = 0);
+		bool addFlag(const CString& pFlag);
+		bool deleteFlag(const CString& pFlag);
 
 		// Packet sending.
 		void sendPacketToAll(CString pPacket) const;
 		void sendPacketToAll(CString pPacket, TPlayer *pPlayer) const;
 		void sendPacketToLevel(CString pPacket, TLevel *pLevel) const;
 		void sendPacketToLevel(CString pPacket, TLevel *pLevel, TPlayer *pPlayer) const;
+		void sendPacketToLevel(CString pPacket, TMap* pMap, TLevel* pLevel) const;
 		void sendPacketToLevel(CString pPacket, TMap* pMap, TPlayer* pPlayer, bool sendToSelf = false) const;
 		void sendPacketTo(int who, CString pPacket) const;
 		void sendPacketTo(int who, CString pPacket, TPlayer* pPlayer) const;
-
 
 	private:
 		bool doTimedEvents();

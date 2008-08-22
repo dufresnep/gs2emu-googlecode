@@ -227,53 +227,37 @@ void TServer::acceptSock(CSocket& pSocket)
 	playerIds.push_back(newPlayer);
 }
 
-TWeapon* TServer::getWeapon(const CString& name)
-{
-	for (std::vector<TWeapon*>::iterator i = weaponList.begin(); i != weaponList.end(); ++i)
-	{
-		TWeapon* weapon = *i;
-		if (weapon->getName() == name)
-			return weapon;
-	}
-	return 0;
-}
+/////////////////////////////////////////////////////
 
-TPlayer* TServer::getPlayer(const unsigned short id)
+TPlayer* TServer::getPlayer(const unsigned short id) const
 {
 	if (id >= (unsigned short)playerIds.size()) return 0;
 	return playerIds[id];
 }
 
-TNPC* TServer::getNPC(const unsigned int id)
+TNPC* TServer::getNPC(const unsigned int id) const
 {
 	if (id >= npcIds.size()) return 0;
 	return npcIds[id];
 }
 
-TNPC* TServer::addNewNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC)
+TLevel* TServer::getLevel(const CString& pLevel)
 {
-	// New Npc
-	TNPC* newNPC = new TNPC(pImage, pScript, pX, pY, pLevel, pLevelNPC);
-	npcList.push_back(newNPC);
-
-	// Assign NPC Id
-	for (unsigned int i = 1; i < npcIds.size(); ++i)
-	{
-		if (npcIds[i] == 0)
-		{
-			npcIds[i] = newNPC;
-			newNPC->setId(i);
-			return newNPC;
-		}
-	}
-
-	newNPC->setId(npcIds.size());
-	npcIds.push_back(newNPC);
-
-	return newNPC;
+	return TLevel::findLevel(pLevel, this);
 }
 
-TMap* TServer::getLevelMap(const TLevel* pLevel) const
+TMap* TServer::getMap(const CString& name) const
+{
+	for (std::vector<TMap*>::const_iterator i = mapList.begin(); i != mapList.end(); ++i)
+	{
+		TMap* map = *i;
+		if (map->getMapName() == name)
+			return map;
+	}
+	return 0;
+}
+
+TMap* TServer::getMap(const TLevel* pLevel) const
 {
 	if (pLevel == 0) return 0;
 	for (std::vector<TMap*>::const_iterator i = mapList.begin(); i != mapList.end(); ++i)
@@ -283,6 +267,162 @@ TMap* TServer::getLevelMap(const TLevel* pLevel) const
 			return pMap;
 	}
 	return 0;
+}
+
+TWeapon* TServer::getWeapon(const CString& name) const
+{
+	for (std::vector<TWeapon*>::const_iterator i = weaponList.begin(); i != weaponList.end(); ++i)
+	{
+		TWeapon* weapon = *i;
+		if (weapon->getName() == name)
+			return weapon;
+	}
+	return 0;
+}
+
+CString TServer::getFlag(const CString& pName) const
+{
+	for (std::vector<CString>::const_iterator i = serverFlags.begin(); i != serverFlags.end(); ++i)
+	{
+		if (*i == pName)
+			return *i;
+	}
+	return CString();
+}
+
+TNPC* TServer::addNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC, bool sendToPlayers)
+{
+	// New Npc
+	TNPC* newNPC = new TNPC(pImage, pScript, pX, pY, pLevel, pLevelNPC);
+	npcList.push_back(newNPC);
+
+	// Assign NPC Id
+	bool assignedId = false;
+	for (unsigned int i = 1; i < npcIds.size(); ++i)
+	{
+		if (npcIds[i] == 0)
+		{
+			npcIds[i] = newNPC;
+			newNPC->setId(i);
+			assignedId = true;
+		}
+	}
+
+	// Assign NPC Id
+	if (assignedId == false)
+	{
+		newNPC->setId(npcIds.size());
+		npcIds.push_back(newNPC);
+	}
+
+	// Send the NPC's props to everybody in range.
+	if (sendToPlayers)
+	{
+		TMap* map = getMap(pLevel);
+		if (map && map->getType() == MAPTYPE_GMAP)
+			sendPacketToLevel(CString() >> (char)PLO_NPCPROPS >> (int)newNPC->getId() << newNPC->getProps(0), map, pLevel);
+		else sendPacketToLevel(CString() >> (char)PLO_NPCPROPS >> (int)newNPC->getId() << newNPC->getProps(0), pLevel);
+	}
+
+	return newNPC;
+}
+
+bool TServer::deleteNPC(const unsigned int pId, TLevel* pLevel)
+{
+	// Grab the NPC.
+	TNPC* npc = getNPC(pId);
+	if (npc == 0) return false;
+
+	return deleteNPC(npc, pLevel);
+}
+
+bool TServer::deleteNPC(TNPC* npc, TLevel* pLevel)
+{
+	if (npc == 0) return false;
+	if (npc->getId() >= npcIds.size()) return false;
+
+	// If pLevel == 0, then it is an npc-server NPC.
+	// Not currently supported so just exit.
+	if (pLevel == 0) return false;
+
+	// Remove the NPC from all the lists.
+	pLevel->removeNPC(npc);
+	npcIds[npc->getId()] = 0;
+	for (std::vector<TNPC*>::iterator i = npcList.begin(); i != npcList.end(); )
+	{
+		if ((*i) == npc)
+			i = npcList.erase(i);
+		else ++i;
+	}
+
+	// Tell the client to delete the NPC.
+	sendPacketTo(CLIENTTYPE_CLIENT, CString() >> (char)PLO_NPCPROPS >> (int)npc->getId()
+		>> (short)NPCPROP_SCRIPT >> (char)0 >> (char)NPCPROP_VISFLAGS >> (char)0
+		>> (char)NPCPROP_BLOCKFLAGS >> (char)0 >> (char)NPCPROP_MESSAGE >> (char)0);
+	sendPacketTo(CLIENTTYPE_CLIENT, CString() >> (char)PLO_NPCDEL >> (int)npc->getId());
+
+	// Delete the NPC from memory.
+	delete npc;
+
+	return true;
+}
+
+bool TServer::addFlag(const CString& pFlag)
+{
+	if (settings.getBool("dontaddserverflags", false) == true)
+		return false;
+
+	CString flag(pFlag);
+	CString flagName = flag.readString("=").trim();
+	CString flagValue = flag.readString("").trim();
+	CString flagNew = CString() << flagName << "=" << flagValue;
+
+	for (std::vector<CString>::iterator i = serverFlags.begin(); i != serverFlags.end(); ++i)
+	{
+		CString tflagName = i->readString("=").trim();
+		if (tflagName == flagName)
+		{
+			// A flag with a value of 0 means we should unset it.
+			if (flagValue.length() == 0)
+			{
+				sendPacketToAll(CString() >> (char)PLO_FLAGDEL << flagName);
+				serverFlags.erase(i);
+				return true;
+			}
+
+			// If we didn't unset it, alter the existing flag.
+			sendPacketToAll(CString() >> (char)PLO_FLAGSET << flagNew);
+			*i = flagNew;
+			return true;
+		}
+	}
+
+	// We didn't find a pre-existing flag so let's create a new one.
+	sendPacketToAll(CString() >> (char)PLO_FLAGSET << flagNew);
+	serverFlags.push_back(flagNew);
+	return true;
+}
+
+bool TServer::deleteFlag(const CString& pFlag)
+{
+	if (settings.getBool("dontaddserverflags", false) == true)
+		return false;
+
+	CString flag(pFlag);
+	CString flagName = flag.readString("=").trim();
+
+	// Loop for flags now.
+	for (std::vector<CString>::iterator i = serverFlags.begin(); i != serverFlags.end(); )
+	{
+		CString tflagName = i->readString("=").trim();
+		if (tflagName == flagName)
+		{
+			sendPacketToAll(CString() >> (char)PLO_FLAGDEL << flagName);
+			serverFlags.erase(i);
+			return true;
+		}
+	}
+	return false;
 }
 
 /*
@@ -320,6 +460,35 @@ void TServer::sendPacketToLevel(CString pPacket, TLevel *pLevel, TPlayer *pPlaye
 		if ((*i) == pPlayer || (*i)->getType() != CLIENTTYPE_CLIENT) continue;
 		if ((*i)->getLevel() == pLevel)
 			(*i)->sendPacket(pPacket);
+	}
+}
+
+void TServer::sendPacketToLevel(CString pPacket, TMap* pMap, TLevel* pLevel) const
+{
+	for (std::vector<TPlayer *>::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
+	{
+		if ((*i)->getType() != CLIENTTYPE_CLIENT) continue;
+		if ((*i)->getMap() == pMap)
+		{
+			int sgmap[2] = {pMap->getLevelX(pLevel->getLevelName()), pMap->getLevelY(pLevel->getLevelName())};
+			int ogmap[2];
+			switch (pMap->getType())
+			{
+				case MAPTYPE_GMAP:
+					ogmap[0] = (*i)->getProp(PLPROP_GMAPLEVELX).readGUChar();
+					ogmap[1] = (*i)->getProp(PLPROP_GMAPLEVELY).readGUChar();
+					break;
+
+				default:
+				case MAPTYPE_BIGMAP:
+					ogmap[0] = pMap->getLevelX((*i)->getLevel()->getLevelName());
+					ogmap[1] = pMap->getLevelY((*i)->getLevel()->getLevelName());
+					break;
+			}
+
+			if (abs(ogmap[0] - sgmap[0]) < 2 && abs(ogmap[1] - sgmap[1]) < 2)
+				(*i)->sendPacket(pPacket);
+		}
 	}
 }
 

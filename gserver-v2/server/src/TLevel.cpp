@@ -239,7 +239,7 @@ bool TLevel::loadNW(const CString& pLevelName)
 			}
 			//printf( "image: %s, x: %.2f, y: %.2f, code: %s\n", image.text(), x, y, code.text() );
 			// Add the new NPC.
-			TNPC* npc = server->addNewNPC(image, code, x, y, this, true);
+			TNPC* npc = server->addNPC(image, code, x, y, this, true, false);
 			levelNPCs.push_back(npc);
 		}
 		else if (curLine[0] == "SIGN")
@@ -543,7 +543,7 @@ TPlayer* TLevel::getPlayer(unsigned int id)
 
 TMap* TLevel::getMap() const
 {
-	return server->getLevelMap(this);
+	return server->getMap(this);
 }
 
 void TLevel::removeNPC(TNPC* npc)

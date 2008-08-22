@@ -100,10 +100,10 @@ class TNPC
 		void setProps(CString& pProps);
 
 		// set functions
-		void setId(int pId)			{ id = pId; }
+		void setId(unsigned int pId)	{ id = pId; }
 
 		// get functions
-		int getId() const				{ return id; }
+		unsigned int getId() const		{ return id; }
 		TLevel* getLevel()				{ return level; }
 		CString getWeaponName() const	{ return weaponName; }
 		CString getServerCode() const	{ return serverCode; }
@@ -115,7 +115,8 @@ class TNPC
 		float x, y, hurtX, hurtY;
 		int x2, y2;
 		int gmaplevelx, gmaplevely;
-		int id, rupees;
+		unsigned int id;
+		int rupees;
 		unsigned char darts, bombs, glovePower, bombPower, swordPower, shieldPower;
 		unsigned char visFlags, blockFlags, sprite, colors[5], power, ap;
 		CString gAttribs[30];
