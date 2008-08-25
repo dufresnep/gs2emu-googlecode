@@ -83,11 +83,15 @@ enum
 	NPCPROP_Y2				= 76,
 };
 
-#define npcpropcount 48
-//#define npcpropcount 69
+//#define npcpropcount 48
+#define npcpropcount 77
+
+enum
+{
+	NPCSTATUS_DRAWOVERPLAYER	= 0x02,
+};
 
 class TLevel;
-
 class TNPC
 {
 	public:

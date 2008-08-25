@@ -89,6 +89,7 @@ enum
 	PLPROP_X2				= 78,
 	PLPROP_Y2				= 79,
 	PLPROP_Z2				= 80,
+	PLPROP_UNKNOWN81		= 81,
 
 	// In Graal v5, where players have the Graal######## accounts, this is their chosen account alias (community name.)
 	PLPROP_COMMUNITYNAME	= 82,

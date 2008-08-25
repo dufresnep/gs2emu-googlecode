@@ -26,8 +26,9 @@ bool TPlayer::sendLogin()
 	// players will be playing.
 	sendPacket(CString() >> (char)PLO_SIGNATURE >> (char)73);
 
-	// List processes.
-	sendPacket(CString() >> (char)PLO_LISTPROCESSES);
+	// If we have an NPC Server, send this to prevent clients from sending
+	// npc props it modifies.
+	//sendPacket(CString() >> (char)PLO_HASNPCSERVER);
 
 	// Check if the account is already in use.
 	printf("TODO: TPlayer::sendLogin, Check if account is in use.\n");

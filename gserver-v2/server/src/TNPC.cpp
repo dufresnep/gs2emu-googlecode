@@ -44,7 +44,7 @@ level(pLevel)
 	// We need to alter the modTime of the following props as they should be always sent.
 	// If we don't, they won't be sent until the prop gets modified.
 	modTime[NPCPROP_IMAGE] = modTime[NPCPROP_SCRIPT] = modTime[NPCPROP_X] = modTime[NPCPROP_Y]
-		= modTime[NPCPROP_VISFLAGS] = modTime[NPCPROP_SPRITE]
+		= modTime[NPCPROP_VISFLAGS] = modTime[NPCPROP_ID] = modTime[NPCPROP_SPRITE]
 		= modTime[NPCPROP_GMAPLEVELX] = modTime[NPCPROP_GMAPLEVELY]
 		= modTime[NPCPROP_X2] = modTime[NPCPROP_Y2] = time(0);
 

@@ -29,7 +29,7 @@ bool __sendLogin[propscount] =
 	false, true,  true,  true,  false, false, // 24-29
 	false, false, true,  false, false, true,  // 30-35
 	true,  true,  true,  true,  true,  true,  // 36-41
-	false, false, false, true,  false, false, // 42-47
+	false, true,  true,  true,  false, false, // 42-47
 	false, false, false, false, false, false, // 48-53
 	true,  true,  true,  true,  true,  true,  // 54-59
 	true,  true,  true,  true,  true,  true,  // 60-65
@@ -47,7 +47,7 @@ bool __getLogin[propscount] =
 	true,  false, false, false, false, false, // 24-29
 	true,  true,  true,  false, true,  true,  // 30-35
 	true,  true,  true,  true,  true,  true,  // 36-41
-	false, false, false, true,  false, false, // 42-47
+	false, true,  true,  true,  false, false, // 42-47
 	false, false, true,  false, false, true,  // 48-53
 	false, false, false, false, false, false, // 54-59
 	false, false, false, false, false, false, // 60-65
@@ -84,7 +84,7 @@ bool __sendLocal[propscount] =
 	false, true,  false, false, false, false, // 24-29
 	true,  false, true,  false, true,  true,  // 30-35
 	true,  true,  true,  true,  true,  true,  // 36-41
-	false, false, false, true,  false, false, // 42-47
+	false, true,  true, true,  false, false, // 42-47
 	false, false, true,  false, false, false, // 48-53
 	true,  true,  true,  true,  true,  true,  // 54-59
 	true,  true,  true,  true,  true,  true,  // 60-65
@@ -654,14 +654,17 @@ bool TPlayer::leaveLevel()
 	if (leader != 0) leader->sendPacket(CString() >> (char)PLO_ISLEADER);
 
 	// Tell everyone I left.
-	server->sendPacketToLevel(this->getProps(0, 0) >> (char)PLPROP_JOINLEAVELVL >> (char)0, level, this);
-	for (std::vector<TPlayer*>::iterator i = playerList->begin(); i != playerList->end(); ++i)
-	{
-		TPlayer* player = (TPlayer*)*i;
-		if (player == this) continue;
-		if (player->getLevel() != level) continue;
-		this->sendPacket(player->getProps(0, 0) >> (char)PLPROP_JOINLEAVELVL >> (char)0);
-	}
+//	if (pmap && pmap->getType() != MAPTYPE_GMAP)
+//	{
+		server->sendPacketToLevel(this->getProps(0, 0) >> (char)PLPROP_JOINLEAVELVL >> (char)0, level, this);
+		for (std::vector<TPlayer*>::iterator i = playerList->begin(); i != playerList->end(); ++i)
+		{
+			TPlayer* player = (TPlayer*)*i;
+			if (player == this) continue;
+			if (player->getLevel() != level) continue;
+			this->sendPacket(player->getProps(0, 0) >> (char)PLPROP_JOINLEAVELVL >> (char)0);
+		}
+//	}
 
 	// Set the level pointer to 0.
 	level = 0;
@@ -814,10 +817,11 @@ bool TPlayer::msgPLI_BOARDMODIFY(CString& pPacket)
 	// TODO: Make this a more generic function.
 	if (dropItem >= 0)
 	{
-		CString packet;
-		packet >> (char)(loc[0] * 2) >> (char)(loc[1] * 2) >> (char)dropItem;
+		CString packet = CString() >> (char)(loc[0] * 2) >> (char)(loc[1] * 2) >> (char)dropItem;
+		CString packet2 = CString() >> (char)PLI_ITEMADD << packet;
+		packet2.readGChar();		// So msgPLI_ITEMADD works.
 
-		msgPLI_ITEMADD(CString() << packet);
+		msgPLI_ITEMADD(packet2);
 		sendPacket(CString() >> (char)PLO_ITEMADD << packet);
 	}
 
@@ -858,6 +862,7 @@ bool TPlayer::msgPLI_NPCPROPS(CString& pPacket)
 
 bool TPlayer::msgPLI_BOMBADD(CString& pPacket)
 {
+	for (int i = 0; i < pPacket.length(); ++i) printf( "%02x ", (unsigned char)pPacket[i] ); printf( "\n" );
 	server->sendPacketToLevel(CString() >> (char)PLO_BOMBADD >> (short)id << pPacket.text() + 1, level, this);
 	return true;
 }
@@ -1560,7 +1565,6 @@ bool TPlayer::msgPLI_UNKNOWN46(CString& pPacket)
 {
 	printf("TODO: TPlayer::msgPLI_UNKNOWN46: ");
 	CString packet = pPacket.readString("");
-	for (int i = 0; i < packet.length(); ++i) printf( "%02x ", (unsigned char)packet[i] );
-	printf( "\n" );
+	for (int i = 0; i < packet.length(); ++i) printf( "%02x ", (unsigned char)packet[i] ); printf( "\n" );
 	return true;
 }

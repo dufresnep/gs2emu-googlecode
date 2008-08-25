@@ -516,6 +516,14 @@ CString CString::guntokenize() const
 			continue;
 		}
 
+		// ,"", blank lines.
+		if (pos[0] - pos[1] == 1 && nData[pos[1]] == '\"')
+		{
+			pos[1] += 2;
+			temp.push_back(CString("\r"));
+			continue;
+		}
+
 		// Check for ,,"""blah"
 		if (nData[pos[1]] == '\"' && nData[pos[1]+1] != '\"')
 		{

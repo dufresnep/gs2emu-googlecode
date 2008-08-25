@@ -107,7 +107,7 @@ enum
 	PLO_HURTPLAYER		= 40,
 	PLO_NEWWORLDTIME	= 42,
 	PLO_DEFAULTWEAPON	= 43,
-	PLO_LISTPROCESSES	= 44,	// Requests a list of running processes.
+	PLO_HASNPCSERVER	= 44,	// If sent, the client won't update npc props.
 	PLO_FILEUPTODATE	= 45,
 	PLO_STAFFGUILDS		= 47,
 	PLO_TRIGGERACTION	= 48,
@@ -122,6 +122,10 @@ enum
 	PLO_BOARDPACKET		= 101,
 	PLO_FILE			= 102,
 	PLO_NPCBYTECODE		= 131,	// Compiled Torque-script for an NPC.
+	PLO_NPCDEL2			= 150,	// {150}{CHAR len}{level}{INT3 npcid}
+	PLO_SAY				= 153,	// {153}{text}
+	PLO_FREEZEPLAYER2	= 154,	// Blank.
+	PLO_UNFREEZEPLAYER	= 155,	// Blank.
 	PLO_SETACTIVELEVEL	= 156,	// Sets the level to receive chests, baddies, NPCs, etc.
 	PLO_BIGMAP			= 172,	// [172] zodiacminimap.txt,zodiacworldminimap3.png,10,10
 	PLO_GHOSTICON		= 174,	// Pass 1 to enable the ghost icon
@@ -141,10 +145,11 @@ enum
 
 enum
 {
-	PLSTATUS_PAUSED		= 0x01,
-	PLSTATUS_MALE		= 0x04,
-	PLSTATUS_DEAD		= 0x08,
-	PLSTATUS_HASSPIN	= 0x40,
+	PLSTATUS_PAUSED			= 0x01,
+	PLSTATUS_MALE			= 0x04,
+	PLSTATUS_DEAD			= 0x08,
+	PLSTATUS_ALLOWWEAPONS	= 0x10,
+	PLSTATUS_HASSPIN		= 0x40,
 };
 
 struct SCachedLevel
