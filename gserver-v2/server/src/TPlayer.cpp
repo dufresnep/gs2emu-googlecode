@@ -962,7 +962,10 @@ bool TPlayer::msgPLI_ITEMDEL(CString& pPacket)
 
 	// If this is a PLI_ITEMTAKE packet, give the item to the player.
 	if (pPacket[0] - 32 == PLI_ITEMTAKE)
-		this->setProps(TLevelItem::getItemPlayerProp(item, this), true, true);
+	{
+		CString itemProp(TLevelItem::getItemPlayerProp(item, this));
+		this->setProps(itemProp, true, true);
+	}
 
 	return true;
 }
@@ -1189,7 +1192,8 @@ bool TPlayer::msgPLI_OPENCHEST(CString& pPacket)
 		if (chest->getX() == cX && chest->getY() == cY)
 		{
 			int chestItem = chest->getItemIndex();
-			this->setProps(TLevelItem::getItemPlayerProp((char)chestItem, this), true, true);
+			CString chestProp(TLevelItem::getItemPlayerProp((char)chestItem, this));
+			this->setProps(chestProp, true, true);
 			sendPacket(CString() >> (char)PLO_LEVELCHEST >> (char)1 >> (char)cX >> (char)cY);
 			// TODO: save chest to player.
 		}
