@@ -7,8 +7,8 @@
 #include "TLevel.h"
 #include "TMap.h"
 
-char __savePackets[10] = { 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
-char __attrPackets[30] = { 36, 37, 38, 39, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68 };
+char __nSavePackets[10] = { 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
+char __nAttrPackets[30] = { 36, 37, 38, 39, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68 };
 
 static CString toWeaponName(const CString& code);
 static std::vector<CString> removeComments(const CString& code);
@@ -19,7 +19,7 @@ levelNPC(pLevelNPC),
 x(pX), y(pY), hurtX(32.0f), hurtY(32.0f),
 x2((int)(pX*16)), y2((int)(pY*16)),
 gmaplevelx(0), gmaplevely(0),
-id(-1), rupees(0),
+id(0), rupees(0),
 darts(0), bombs(0), glovePower(0), bombPower(0), swordPower(0), shieldPower(0),
 visFlags(1), blockFlags(0), sprite(2), power(0), ap(50),
 image(pImage), gani("idle"),
@@ -197,9 +197,9 @@ CString TNPC::getProp(int pId) const
 	// Saves.
 	if (inrange(pId, 23, 32))
 	{
-		for (unsigned int i = 0; i < sizeof(__savePackets); i++)
+		for (unsigned int i = 0; i < sizeof(__nSavePackets); i++)
 		{
-			if (__savePackets[i] == pId)
+			if (__nSavePackets[i] == pId)
 				return CString() >> (char)saves[i];
 		}
 	}
@@ -207,9 +207,9 @@ CString TNPC::getProp(int pId) const
 	// Gani attributes.
 	if (inrange(pId, 36, 40) || inrange(pId, 44, 68))
 	{
-		for (unsigned int i = 0; i < sizeof(__attrPackets); i++)
+		for (unsigned int i = 0; i < sizeof(__nAttrPackets); i++)
 		{
-			if (__attrPackets[i] == pId)
+			if (__nAttrPackets[i] == pId)
 				return CString() >> (char)gAttribs[i].length() << gAttribs[i];
 		}
 	}
@@ -475,9 +475,9 @@ void TNPC::setProps(CString& pProps)
 		}
 
 		// If a prop changed, adjust its mod time.
-		if ( propId >= 0 && propId < npcpropcount )
+		if (propId < npcpropcount)
 		{
-			if ( oldProp != getProp(propId) )
+			if (oldProp != getProp(propId))
 				modTime[propId] = time(0);
 		}
 	}

@@ -94,7 +94,7 @@ bool TPlayer::sendLoginClient()
 		{
 			TMap* map = *i;
 			if (map->getType() == MAPTYPE_BIGMAP)
-				msgPLI_WANTFILE(map->getMapName());
+				msgPLI_WANTFILE(CString() << map->getMapName());
 		}
 	}
 

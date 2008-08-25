@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
 			if (server->doMain() == false)
 			{
 				delete server;
-				i = serverList.erase(i);
+				serverList.erase(i++);
 			}
 			else ++i;
 		}
@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
 	for (std::map<CString, TServer*>::iterator i = serverList.begin(); i != serverList.end(); )
 	{
 		delete i->second;
-		i = serverList.erase(i);
+		serverList.erase(i++);
 	}
 
 	// Destroy the sockets.
