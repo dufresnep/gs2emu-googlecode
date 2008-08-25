@@ -436,18 +436,17 @@ bool TPlayer::warp(const CString& pLevelName, float pX, float pY, time_t modTime
 
 	// Find the level.
 	TLevel* newLevel = TLevel::findLevel(pLevelName, server);
-	if (newLevel == 0) return false;
 
 	// Find the unstickme level.
 	TLevel* unstickLevel = TLevel::findLevel(settings->getStr("unstickmelevel", "onlinestartlocal.nw"), server);
 	float unstickX = settings->getFloat("unstickmex", 30.0f);
 	float unstickY = settings->getFloat("unstickmey", 35.0f);
 
-	// See if the new level is on a gmap.
-	pmap = server->getMap(newLevel);
-
 	// Leave our current level.
 	leaveLevel();
+
+	// See if the new level is on a gmap.
+	pmap = server->getMap(newLevel);
 
 	// Try warping to the new level.
 	if (setLevel(pLevelName, modTime) == false)
@@ -455,11 +454,18 @@ bool TPlayer::warp(const CString& pLevelName, float pX, float pY, time_t modTime
 		// Failed, so try warping back to our old level.
 		bool warped = true;
 		if (currentLevel == 0) warped = false;
-		else warped = setLevel(currentLevel->getLevelName());
+		else
+		{
+			pmap = server->getMap(currentLevel);
+			warped = setLevel(currentLevel->getLevelName());
+		}
 		if (warped == false)
 		{
 			// Failed, so try warping to the unstick level.  If that fails, we disconnect.
 			if (unstickLevel == 0) return false;
+
+			// Try to warp to the unstick me level.
+			pmap = server->getMap(unstickLevel);
 			if (setLevel(unstickLevel->getLevelName()) == false)
 				return false;
 

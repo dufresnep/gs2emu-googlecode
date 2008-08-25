@@ -118,7 +118,7 @@ class TNPC
 		time_t modTime[npcpropcount];
 		float x, y, hurtX, hurtY;
 		int x2, y2;
-		int gmaplevelx, gmaplevely;
+		unsigned char gmaplevelx, gmaplevely;
 		unsigned int id;
 		int rupees;
 		unsigned char darts, bombs, glovePower, bombPower, swordPower, shieldPower;

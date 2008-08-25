@@ -61,6 +61,7 @@ enum
 	PLI_MAPINFO			= 39,
 	PLI_SHOOT			= 40,
 	PLI_UNKNOWN46		= 46,	// Always is 1.  Might be a player count for the gmap level.
+	PLI_UNKNOWN157		= 157,	// Something to do with ganis.
 };
 
 enum

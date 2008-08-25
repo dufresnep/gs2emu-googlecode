@@ -37,8 +37,8 @@ level(pLevel)
 	TMap* gmap = level->getMap();
 	if (gmap && gmap->getType() == MAPTYPE_GMAP)
 	{
-		gmaplevelx = gmap->getLevelX(level->getLevelName());
-		gmaplevely = gmap->getLevelY(level->getLevelName());
+		gmaplevelx = (unsigned char)gmap->getLevelX(level->getLevelName());
+		gmaplevely = (unsigned char)gmap->getLevelY(level->getLevelName());
 	}
 
 	// We need to alter the modTime of the following props as they should be always sent.
@@ -386,11 +386,11 @@ void TNPC::setProps(CString& pProps)
 			break;
 
 			case NPCPROP_GMAPLEVELX:
-				pProps.readGChar();
+				gmaplevelx = pProps.readGUChar();
 			break;
 
 			case NPCPROP_GMAPLEVELY:
-				pProps.readGChar();
+				gmaplevely = pProps.readGUChar();
 			break;
 
 			case NPCPROP_CLASS:
@@ -442,7 +442,7 @@ void TNPC::setProps(CString& pProps)
 			case NPCPROP_GATTRIB7:  gAttribs[6]  = pProps.readChars(pProps.readGUChar()); break;
 			case NPCPROP_GATTRIB8:  gAttribs[7]  = pProps.readChars(pProps.readGUChar()); break;
 			case NPCPROP_GATTRIB9:  gAttribs[8]  = pProps.readChars(pProps.readGUChar()); break;
-/*			case NPCPROP_GATTRIB10: gAttribs[9]  = pProps.readChars(pProps.readGUChar()); break;
+			case NPCPROP_GATTRIB10: gAttribs[9]  = pProps.readChars(pProps.readGUChar()); break;
 			case NPCPROP_GATTRIB11: gAttribs[10] = pProps.readChars(pProps.readGUChar()); break;
 			case NPCPROP_GATTRIB12: gAttribs[11] = pProps.readChars(pProps.readGUChar()); break;
 			case NPCPROP_GATTRIB13: gAttribs[12] = pProps.readChars(pProps.readGUChar()); break;
@@ -463,7 +463,7 @@ void TNPC::setProps(CString& pProps)
 			case NPCPROP_GATTRIB28: gAttribs[27] = pProps.readChars(pProps.readGUChar()); break;
 			case NPCPROP_GATTRIB29: gAttribs[28] = pProps.readChars(pProps.readGUChar()); break;
 			case NPCPROP_GATTRIB30: gAttribs[29] = pProps.readChars(pProps.readGUChar()); break;
-*/
+
 			default:
 			{
 				printf("Unidentified NPCPROP: %i, readPos: %d\n", propId, pProps.readPos());
