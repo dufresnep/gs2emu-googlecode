@@ -9,13 +9,11 @@
 #include "bzlib.h"
 #include "zlib.h"
 
-#ifndef max
-	#define max(a, b)	((a) > (b) ? (a) : (b))
+#ifndef MAX
+	#define MAX(a, b)	((a) > (b) ? (a) : (b))
+	#define MIN(a, b)	((a) < (b) ? (a) : (b))
 #endif
-#ifndef min
-	#define min(a, b)	((a) < (b) ? (a) : (b))
-#endif
-#define clip(a, b, c) max(min((a), (c)), (b))
+#define clip(a, b, c) MAX(MIN((a), (c)), (b))
 #define in(a, b, c) ((a) >= (b) && (a) <= (c))
 
 #define strtofloat(a) atof(a.text())
@@ -212,7 +210,7 @@ inline const char * CString::text() const
 
 inline int CString::bytesLeft() const
 {
-	return max(0, length()-readPos());
+	return MAX(0, length()-readPos());
 }
 
 inline int CString::length() const
@@ -237,7 +235,7 @@ inline void CString::setRead(int pRead)
 
 inline void CString::setSize(int pSize)
 {
-	sizec = max(0, pSize);
+	sizec = MAX(0, pSize);
 }
 
 inline void CString::setWrite(int pWrite)

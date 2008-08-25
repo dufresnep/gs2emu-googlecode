@@ -115,7 +115,7 @@ bool TPlayer::sendLoginClient()
 		float t = (float)(time(0) - lastSparTime)/86400.0f; // Convert seconds to days: 60/60/24
 
 		// Find the new deviation.
-		float deviate = min( sqrt((oldDeviation*oldDeviation) + (c*c) * t), 350.0f );
+		float deviate = MIN( sqrt((oldDeviation*oldDeviation) + (c*c) * t), 350.0f );
 
 		// Save the old rating and set the new one.
 		deviation = deviate;

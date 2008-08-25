@@ -1081,7 +1081,7 @@ bool TPlayer::msgPLI_BADDYADD(CString& pPacket)
 	unsigned char bType = pPacket.readGUChar();
 	CString bImage = pPacket.readChars(pPacket.bytesLeft() - 1);
 	unsigned char bPower = pPacket.readGUChar();
-	bPower = min(bPower, 12);		// Hard-limit to 6 hearts.
+	bPower = MIN(bPower, 12);		// Hard-limit to 6 hearts.
 
 	// Add the baddy.
 	TLevelBaddy* baddy = level->addBaddy(bX, bY, bType);
