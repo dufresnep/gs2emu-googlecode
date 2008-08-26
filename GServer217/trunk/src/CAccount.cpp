@@ -199,7 +199,7 @@ void CAccount::saveAccount(bool pAttributes)
 	newFile << "LASTSPARTIME " << toString((unsigned long)lastSparTime) << "\n";
 //	newFile << "PLATFORM " << platform << "\n";
 //	newFile << "CODEPAGE " << name << "\n";
-	for (int i = 0; i < (int)(sizeof((pAttributes ? oldAccount.myAttr : myAttr)) / 20); i++)
+	for (int i = 0; i < 30; i++)
 		if ((pAttributes ? oldAccount.myAttr[i] : myAttr[i]).length() > 0) newFile << "ATTR" << toString(i + 1) << " " << (pAttributes ? oldAccount.myAttr[i] : myAttr[i]) << "\n";
 	for (int i = 0; i < (pAttributes ? oldAccount.myChests : myChests).count(); i++)
 		newFile << "CHEST " << (pAttributes ? oldAccount.myChests[i] : myChests[i]) << "\n";
