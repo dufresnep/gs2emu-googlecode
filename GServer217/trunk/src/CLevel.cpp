@@ -713,7 +713,7 @@ void CLevel::reset()
 		for(int ii = 0; ii < playerList.count(); ii++)
 		{
 			CPlayer* player = (CPlayer*)playerList[ii];
-
+/*
 			// Terrible hack to fix the destroy; command on putnpc npcs.
 			if ( npc->levelNPC == false )
 			{
@@ -723,6 +723,8 @@ void CLevel::reset()
 					(char)BLOCKFLAGS << (char)0 << (char)NPCMESSAGE << (char)0 );
 			}
 			player->sendPacket(CPacket() << (char)SDELNPC << (int)npc->id);
+*/
+			player->sendPacket(CPacket() << (char)SDELNPC2 << (char)fileName.length() << fileName << (int)npc->id);
 			player->compressAndSend();
 		}
 		delete npc;

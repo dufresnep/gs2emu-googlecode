@@ -1360,6 +1360,16 @@ bool CPlayer::loadAccount()
 		}
 	}
 
+	// Allow normal clients to be ip locked too if the ip isn't 0.0.0.0
+	if (!(adminIp == "0.0.0.0"))
+	{
+		if (!ip.match(adminIp.text()))
+		{
+			sendPacket(CPacket() << (char)DISMESSAGE << "Your IP doesn't match the allowed IP for the account.");
+			return false;
+		}
+	}
+
 	if (loadOnly || !createNew)
 		return loadWorldPropsIni();
 
@@ -3215,11 +3225,14 @@ void CPlayer::msgDELNPC(CPacket& pPacket)
 	for (int i = 0; i < playerList.count(); i++)
 	{
 		// SDELNPC doesn't work, so this terrible hack will do.
+		/*
 		((CPlayer*)playerList[i])->sendPacket(
 			CPacket() << (char)SNPCPROPS << (int)npc->id <<
 			(char)ACTIONSCRIPT << (short)0 << (char)VISFLAGS << (char)0 <<
 			(char)BLOCKFLAGS << (char)0 << (char)NPCMESSAGE << (char)0 );
 		((CPlayer*)playerList[i])->sendPacket(CPacket() << (char)SDELNPC << (int)npc->id);
+		*/
+		((CPlayer*)playerList[i])->sendPacket(CPacket() << (char)SDELNPC2 << (char)levelName.length() << levelName << (int)npc->id);
 	}
 	level->npcs.remove(npc);
 	delete npc;

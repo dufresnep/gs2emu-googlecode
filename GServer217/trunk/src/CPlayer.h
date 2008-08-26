@@ -120,6 +120,7 @@ enum {
 	EMPTY91,
 	EMPTY92,
 	EMPTY93,
+	SDELNPC2 = 150,
 	SSHOOT = 175
  };
 
@@ -227,11 +228,11 @@ enum {
 	SFREEZE = 154,   // 154 Freeze Player
 	SUNFREEZE = 155, // 155 Unfreeze Player
 	SGHOST = 170,  // Turns into ghost
-	SGHOSTICON, // 174 Ghost icon - shows when a ghost is in your level
-	EMPTY175,   // 175 Hides GUI / Disables Weapons / Disables Movement
-	EMPTY176,   // 176 Hides GUI / Disables Weapons / Disables Movement
-	EMPTY177,   // 177 Hides GUI / Disables Weapons / Disables Movement
-	EMPTY178,   // 178
+	SGHOSTICON = 171, // 174 Ghost icon - shows when a ghost is in your level
+	EMPTY175 = 175,   // 175 Hides GUI / Disables Weapons / Disables Movement
+	EMPTY176 = 176,   // 176 Hides GUI / Disables Weapons / Disables Movement
+	EMPTY177 = 177,   // 177 Hides GUI / Disables Weapons / Disables Movement
+	EMPTY178 = 178,   // 178
 	SRPGWINDOW = 179, // 179 RPG Window
 	SSTATUSLIST = 180, // 180 Client status list
 	SPROCCESSES = 182 // use for hack-detection?

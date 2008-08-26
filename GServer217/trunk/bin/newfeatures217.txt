@@ -1,5 +1,21 @@
 --------------------------------------------
-New features/bug fixes in v2.171 build 59 (pre-release)
+New features/bug fixes in v2.171 build 60 (pre-release)
+--------------------------------------------
+
+Additions:
+- Large file support added.  You no longer need to split files into
+  64KB chunks.
+
+Changes:
+- RC IP mask now also locks the client to the specified IP address.
+  Only works if the IP mask is changed from 0.0.0.0.
+
+Fixes:
+- NPCs are now properly deleted on the client if destroy is called.
+
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 59
 --------------------------------------------
 
 Maintenance:
