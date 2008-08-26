@@ -16,6 +16,14 @@
 /*
 	Global Definitions
 */
+const char* __defaultfiles[] = {
+	"carried.gani", "carry.gani", "carrystill.gani", "carrypeople.gani", "dead.gani", "def.gani", "ghostani.gani", "grab.gani", "gralats.gani", "hatoff.gani", "haton.gani", "hidden.gani", "hiddenstill.gani", "hurt.gani", "idle.gani", "kick.gani", "lava.gani", "lift.gani", "maps1.gani", "maps2.gani", "maps3.gani", "pull.gani", "push.gani", "ride.gani", "rideeat.gani", "ridefire.gani", "ridehurt.gani", "ridejump.gani", "ridestill.gani", "ridesword.gani", "shoot.gani", "sit.gani", "skip.gani", "sleep.gani", "spin.gani", "swim.gani", "sword.gani", "walk.gani", "walkslow.gani",
+	"sword?.png",
+	"shield?.png",
+	"body.png", "body?.png", "body??.png",
+	"head.png", "head?.png", "head??.png", "head???.png", "head????.png"
+};
+
 // Enum per Attr
 int __attrPackets[30] = { 37, 38, 39, 40, 41, 46, 47, 48, 49, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74 };
 
@@ -1504,12 +1512,16 @@ bool TPlayer::msgPLI_UPDATEFILE(CString& pPacket)
 	CString file = pPacket.readString("");
 	time_t fModTime = fileSystem->getModTime(file);
 
+	// Make sure it isn't one of the default files.
+	bool isDefault = false;
+	for (unsigned int i = 0; i < sizeof(__defaultfiles) / sizeof(char*); ++i)
+		if (file.match(CString(__defaultfiles[i])) == true) isDefault = true;
+
 	// If the file on disk is different, send it to the player.
-	if (fModTime > modTime)
+	if (isDefault == false && fModTime > modTime)
 		return msgPLI_WANTFILE(file);
 
 	sendPacket(CString() >> (char)PLO_FILEUPTODATE << file);
-	//sendPacket(CString() >> (char)PLO_FILESENDFAILED << file);
 	return true;
 }
 

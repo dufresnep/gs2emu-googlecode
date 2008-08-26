@@ -60,7 +60,7 @@ class CString
 		CString escape() const;
 		CString left(int pLength) const;
 		CString right(int pLength) const;
-		CString remove(int pStart, int pLength) const;
+		CString remove(int pStart, int pLength = -1) const;
 		CString removeAll(const CString& pString) const;
 		CString subString(int pStart, int pLength = -1) const;
 		CString toLower() const;
@@ -80,10 +80,11 @@ class CString
 		CString replaceAll(const CString& pString, const CString& pNewString) const;
 		CString gtokenize() const;
 		CString guntokenize() const;
+		bool match(const CString& pMask) const;
 
 		/* In-Functions */
 		inline CString& escapeI();
-		inline CString& removeI(int pStart, int pLength);
+		inline CString& removeI(int pStart, int pLength = -1);
 		inline CString& removeAllI(const CString& pString);
 		inline CString& toLowerI();
 		inline CString& toUpperI();
