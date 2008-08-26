@@ -12,6 +12,9 @@ Changes:
 
 Fixes:
 - NPCs are now properly deleted on the client if destroy is called.
+- If the client requests a file and has the current version of it, the
+  gserver correctly informs the client it has an up-to-date copy
+  instead of telling the client it failed to send it.
 
 
 --------------------------------------------

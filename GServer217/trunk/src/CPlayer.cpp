@@ -1661,7 +1661,7 @@ void CPlayer::sendFiles()
 			else
 			{
 				modTime = getFileModTime(longName.text());
-				if (modTime != file->modTime)
+				if (modTime > file->modTime)
 				{
 					if (fileData.load(longName.text()))
 					{
@@ -1690,6 +1690,7 @@ void CPlayer::sendFiles()
 							sendPacket(CPacket() << (char)SLARGEFILEEND << shortName);
 					}
 				}
+				else sendPacket(CPacket() << (char)SFILEUPTODATE << shortName);
 			}
 		}
 
