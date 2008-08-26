@@ -15,6 +15,8 @@ Fixes:
 - If the client requests a file and has the current version of it, the
   gserver correctly informs the client it has an up-to-date copy
   instead of telling the client it failed to send it.
+- Horses correctly save its image, direction, and bush count when you
+  dismount.
 
 
 --------------------------------------------

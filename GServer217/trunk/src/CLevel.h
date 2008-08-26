@@ -128,11 +128,14 @@ public:
 	float x, y;
 	CString imageName;
 	int dir, counter;
-	CHorse(CString& pImageName, float pX, float pY)
+	int bushes;
+	CHorse(CString& pImageName, float pX, float pY, int pDir, int pBushes)
 	{
 		imageName = pImageName;
 		x = pX;
 		y = pY;
+		dir = pDir;
+		bushes = pBushes;
 		counter = horseLife;
 	}
 };

@@ -1458,7 +1458,8 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	for ( int i = 0; i < level->horses.count(); i++ )
 	{
 		CHorse* horse = (CHorse*)level->horses[i];
-		sendPacket(CPacket() << (char)SADDHORSE << (char)horse->x << (char)horse->y << horse->imageName);
+		char dir_bush = (horse->bushes << 2) | (horse->dir & 0x03);
+		sendPacket(CPacket() << (char)SADDHORSE << (char)horse->x << (char)horse->y << (char)dir_bush << horse->imageName);
 	}
 
 	//send baddies
@@ -2877,10 +2878,13 @@ void CPlayer::msgADDHORSE(CPacket& pPacket)
 			other->sendPacket(horseData);
 	}
 
-	float hX = (float)(pPacket.readByte1())/2;
-	float hY = (float)(pPacket.readByte1())/2;
-	CString image = pPacket.readChars(pPacket.readByte1());
-	level->horses.add(new CHorse(image, hX, hY));
+	float hX = (float)(pPacket.readByte1())/2.0f;
+	float hY = (float)(pPacket.readByte1())/2.0f;
+	unsigned char dir_bush = (unsigned char)pPacket.readByte1();
+	char hdir = dir_bush & 0x03;
+	char hbushes = dir_bush >> 2;
+	CString image = pPacket.readString("");
+	level->horses.add(new CHorse(image, hX, hY, hdir, hbushes));
 }
 
 void CPlayer::msgDELHORSE(CPacket& pPacket)
@@ -2894,8 +2898,8 @@ void CPlayer::msgDELHORSE(CPacket& pPacket)
 			other->sendPacket(horseData);
 	}
 
-	float hX = (float)(pPacket.readByte1()/2);
-	float hY = (float)(pPacket.readByte1()/2);
+	float hX = (float)pPacket.readByte1()/2.0f;
+	float hY = (float)pPacket.readByte1()/2.0f;
 	level->removeHorse(hX, hY);
 }
 void CPlayer::msgADDARROW(CPacket& pPacket)
