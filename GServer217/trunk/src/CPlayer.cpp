@@ -1361,7 +1361,7 @@ bool CPlayer::loadAccount()
 	}
 
 	// Allow normal clients to be ip locked too if the ip isn't 0.0.0.0
-	if (!(adminIp == "0.0.0.0"))
+	if (adminIp.trim() != "0.0.0.0")
 	{
 		if (!ip.match(adminIp.text()))
 		{
