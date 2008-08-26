@@ -217,7 +217,7 @@ bool TAccount::saveAccount(bool pOnlyAccount)
 		newFile << "LASTSPARTIME " << CString((unsigned long)lastSparTime) << "\r\n";
 
 		// Attributes
-		for (unsigned int i = 0; i < sizeof(attrList) / sizeof(CString); i++)
+		for (unsigned int i = 0; i < 30; i++)
 		{
 			if (attrList[i].length() > 0)
 				newFile << "ATTR" << CString(i+1) << " " << attrList[i] << "\r\n";

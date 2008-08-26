@@ -868,6 +868,13 @@ bool TPlayer::msgPLI_NPCPROPS(CString& pPacket)
 
 bool TPlayer::msgPLI_BOMBADD(CString& pPacket)
 {
+	float bx = (float)pPacket.readGChar() / 2.0f;
+	float by = (float)pPacket.readGChar() / 2.0f;
+	unsigned char player_power = pPacket.readGUChar();
+	unsigned char player = player_power >> 2;
+	unsigned char power = player_power & 0x03;
+	unsigned char timeToExplode = pPacket.readGUChar();		// How many 0.05 sec increments until it explodes.  Defaults to 55 (2.75 seconds.)
+
 	for (int i = 0; i < pPacket.length(); ++i) printf( "%02x ", (unsigned char)pPacket[i] ); printf( "\n" );
 	server->sendPacketToLevel(CString() >> (char)PLO_BOMBADD >> (short)id << pPacket.text() + 1, level, this);
 	return true;
