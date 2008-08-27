@@ -12,7 +12,7 @@ char __nAttrPackets[30] = { 36, 37, 38, 39, 40, 44, 45, 46, 47, 48, 49, 50, 51, 
 
 static CString toWeaponName(const CString& code);
 
-TNPC::TNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC)
+TNPC::TNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC, bool trimCode)
 :
 levelNPC(pLevelNPC),
 x(pX), y(pY), hurtX(32.0f), hurtY(32.0f),
@@ -51,7 +51,7 @@ level(pLevel)
 	if (pScript.subString(0, 12) == "sparringzone") pLevel->setSparringZone(true);
 
 	// Remove comments and separate clientside and serverside scripts.
-	std::vector<CString> parsedCode = removeComments(pScript);
+	std::vector<CString> parsedCode = TNPC::removeComments(pScript, trimCode);
 	if (parsedCode.size() == 1) clientScript = parsedCode[0];
 	else if (parsedCode.size() > 1)
 	{
@@ -480,7 +480,7 @@ void TNPC::setProps(CString& pProps)
 	}
 }
 
-std::vector<CString> TNPC::removeComments(const CString& code)
+std::vector<CString> TNPC::removeComments(const CString& code, bool trimCode)
 {
 	CString outLine;
 	std::vector<CString> retVal;
@@ -555,7 +555,7 @@ std::vector<CString> TNPC::removeComments(const CString& code)
 
 		// If line has any data left in it, add it to the retVal;
 		if (line.length() != 0)
-			outLine << line.trimI() << "\xa7";
+			outLine << (trimCode ? line.trimI() : line) << "\xa7";
 	}
 
 	// Add our code to the vector.  If serverside code was added, the size should now be 2.

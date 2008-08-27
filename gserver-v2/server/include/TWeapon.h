@@ -10,7 +10,7 @@ class TWeapon
 {
 public:
 	TWeapon(const char id) : modTime(0), defaultWeapon(true), defaultWeaponId(id) {}
-	TWeapon(const CString& pName, const CString& pImage, const CString& pScript, const time_t pModTime = 0);
+	TWeapon(const CString& pName, const CString& pImage, const CString& pScript, const time_t pModTime = 0, bool trimCode = false);
 
 	static TWeapon* loadWeapon(const CString& pWeapon, TServer* server);
 	bool saveWeapon(TServer* server);

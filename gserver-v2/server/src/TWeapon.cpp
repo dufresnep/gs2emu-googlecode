@@ -3,13 +3,13 @@
 #include "TPlayer.h"
 #include "TServer.h"
 
-TWeapon::TWeapon(const CString& pName, const CString& pImage, const CString& pScript, const time_t pModTime)
+TWeapon::TWeapon(const CString& pName, const CString& pImage, const CString& pScript, const time_t pModTime, bool trimCode)
 : name(pName), image(pImage), modTime(pModTime), defaultWeapon(false), defaultWeaponId(-1)
 {
 	if (pModTime == 0) modTime = time(0);
 
 	// Remove comments.
-	std::vector<CString> parsedCode = TNPC::removeComments(pScript);
+	std::vector<CString> parsedCode = TNPC::removeComments(pScript, trimCode);
 	if (parsedCode.size() == 1) clientScript = parsedCode[0];
 	else if (parsedCode.size() > 1)
 	{
@@ -52,7 +52,8 @@ TWeapon* TWeapon::loadWeapon(const CString& pWeapon, TServer* server)
 		script << line << "\xa7";
 	}
 
-	return new TWeapon(name, image, script, modTime);
+	CSettings* settings = server->getSettings();
+	return new TWeapon(name, image, script, modTime, settings->getBool("trimnpccode", false));
 }
 
 bool TWeapon::saveWeapon(TServer* server)

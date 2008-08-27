@@ -95,9 +95,15 @@ clientsidepushpull = true
 # If false, it will prevent the player from obtaining items like bomb, bow, superbomb, etc.
 defaultweapons = true
 
+# If true, it will trim NPC code to try to save space.
+trimnpccode = false
+
 # List of bigmap.txt type maps used by the server.  It lets the server know the level layout
 # so you can see players move and talk in adjacent levels.
 maps = newmainmap.txt
+
+# List of gmaps to be used by the server.
+gmaps = 
 
 # The head used by RCs on the server.
 staffhead = head25.png
@@ -120,7 +126,7 @@ onlystaff = false
 underconstruction = false
 
 # Set to true to disable the folder configuration.
-nofoldersconfig = false
+nofoldersconfig = true
 
 # If folders config is disabled, put additional search directories besides "world" here.
 # Comma delimited array.
