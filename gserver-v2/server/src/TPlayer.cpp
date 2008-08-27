@@ -782,7 +782,7 @@ bool TPlayer::msgPLI_LEVELWARP(CString& pPacket)
 	if (pPacket[0] - 32 == PLI_LEVELWARPMOD)
 		modTime = (time_t)pPacket.readGUInt5();
 
-	float loc[2] = {(float)(pPacket.readGChar() / 2), (float)(pPacket.readGChar() / 2)};
+	float loc[2] = {(float)(pPacket.readGChar() / 2.0f), (float)(pPacket.readGChar() / 2.0f)};
 	CString newLevel = pPacket.readString("");
 	warp(newLevel, loc[0], loc[1], modTime);
 
@@ -876,8 +876,7 @@ bool TPlayer::msgPLI_NPCPROPS(CString& pPacket)
 
 bool TPlayer::msgPLI_BOMBADD(CString& pPacket)
 {
-	float bx = (float)pPacket.readGChar() / 2.0f;
-	float by = (float)pPacket.readGChar() / 2.0f;
+	float loc[2] = {(float)pPacket.readGChar() / 2.0f, (float)pPacket.readGChar() / 2.0f};
 	unsigned char player_power = pPacket.readGUChar();
 	unsigned char player = player_power >> 2;
 	unsigned char power = player_power & 0x03;
@@ -919,14 +918,13 @@ bool TPlayer::msgPLI_HORSEADD(CString& pPacket)
 {
 	server->sendPacketToLevel(CString() >> (char)PLO_HORSEADD << pPacket.text() + 1, level, this);
 
-	float hx = (float)pPacket.readGUChar() / 2.0f;
-	float hy = (float)pPacket.readGUChar() / 2.0f;
+	float loc[2] = {(float)pPacket.readGUChar() / 2.0f, (float)pPacket.readGUChar() / 2.0f};
 	unsigned char dir_bush = pPacket.readGUChar();
 	char hdir = dir_bush & 0x03;
 	char hbushes = dir_bush >> 2;
 	CString image = pPacket.readString("");
 
-	level->addHorse(image, hx, hy, hdir, hbushes);
+	level->addHorse(image, loc[0], loc[1], hdir, hbushes);
 	return true;
 }
 
@@ -934,10 +932,9 @@ bool TPlayer::msgPLI_HORSEDEL(CString& pPacket)
 {
 	server->sendPacketToLevel(CString() >> (char)PLO_HORSEDEL << pPacket.text() + 1, level, this);
 
-	float hx = (float)pPacket.readGUChar() / 2.0f;
-	float hy = (float)pPacket.readGUChar() / 2.0f;
+	float loc[2] = {(float)pPacket.readGUChar() / 2.0f, (float)pPacket.readGUChar() / 2.0f};
 
-	level->removeHorse(hx, hy);
+	level->removeHorse(loc[0], loc[1]);
 	return true;
 }
 
@@ -961,11 +958,10 @@ bool TPlayer::msgPLI_THROWCARRIED(CString& pPacket)
 
 bool TPlayer::msgPLI_ITEMADD(CString& pPacket)
 {
-	float iX = (float)pPacket.readGUChar() / 2.0f;
-	float iY = (float)pPacket.readGUChar() / 2.0f;
+	float loc[2] = {(float)pPacket.readGUChar() / 2.0f, (float)pPacket.readGUChar() / 2.0f};
 	unsigned char item = pPacket.readGUChar();
 
-	level->addItem(iX, iY, item);
+	level->addItem(loc[0], loc[1], item);
 	server->sendPacketToLevel(CString() >> (char)PLO_ITEMADD << pPacket.text() + 1, level, this);
 	return true;
 }
@@ -974,11 +970,10 @@ bool TPlayer::msgPLI_ITEMDEL(CString& pPacket)
 {
 	server->sendPacketToLevel(CString() >> (char)PLO_ITEMDEL << pPacket.text() + 1, level, this);
 
-	float iX = (float)pPacket.readGUChar() / 2.0f;
-	float iY = (float)pPacket.readGUChar() / 2.0f;
+	float loc[2] = {(float)pPacket.readGUChar() / 2.0f, (float)pPacket.readGUChar() / 2.0f};
 
 	// Remove the item from the level, getting the type of the item in the process.
-	char item = level->removeItem(iX, iY);
+	char item = level->removeItem(loc[0], loc[1]);
 	if (item == -1) return true;
 
 	// If this is a PLI_ITEMTAKE packet, give the item to the player.
@@ -1097,15 +1092,14 @@ bool TPlayer::msgPLI_BADDYHURT(CString& pPacket)
 
 bool TPlayer::msgPLI_BADDYADD(CString& pPacket)
 {
-	float bX = (float)pPacket.readGChar() / 2.0f;
-	float bY = (float)pPacket.readGChar() / 2.0f;
+	float loc[2] = {(float)pPacket.readGUChar() / 2.0f, (float)pPacket.readGUChar() / 2.0f};
 	unsigned char bType = pPacket.readGUChar();
 	CString bImage = pPacket.readChars(pPacket.bytesLeft() - 1);
 	unsigned char bPower = pPacket.readGUChar();
 	bPower = MIN(bPower, 12);		// Hard-limit to 6 hearts.
 
 	// Add the baddy.
-	TLevelBaddy* baddy = level->addBaddy(bX, bY, bType);
+	TLevelBaddy* baddy = level->addBaddy(loc[0], loc[1], bType);
 	if (baddy == 0) return true;
 
 	// Set the baddy props.
@@ -1224,15 +1218,14 @@ bool TPlayer::msgPLI_NPCADD(CString& pPacket)
 
 	CString nimage = pPacket.readChars(pPacket.readGUChar());
 	CString ncode = pPacket.readChars(pPacket.readGUChar());
-	float nx = (float)pPacket.readGChar() / 2.0f;
-	float ny = (float)pPacket.readGChar() / 2.0f;
+	float loc[2] = {(float)pPacket.readGUChar() / 2.0f, (float)pPacket.readGUChar() / 2.0f};
 
 	// See if putnpc is allowed.
 	if (settings->getBool("putnpcenabled") == false)
 		return true;
 
 	// Add NPC to level
-	TNPC* npc = server->addNPC(nimage, ncode, nx, ny, level, false);
+	TNPC* npc = server->addNPC(nimage, ncode, loc[0], loc[1], level, false);
 
 	return true;
 }
@@ -1321,12 +1314,11 @@ bool TPlayer::msgPLI_EXPLOSION(CString& pPacket)
 	if (settings->getBool("noexplosions", false) == true) return true;
 
 	unsigned char eradius = pPacket.readGUChar();
-	float ex = (float)pPacket.readGUChar() / 2.0f;
-	float ey = (float)pPacket.readGUChar() / 2.0f;
+	float loc[2] = {(float)pPacket.readGUChar() / 2.0f, (float)pPacket.readGUChar() / 2.0f};
 	unsigned char epower = pPacket.readGUChar();
 
 	// Send the packet out.
-	CString packet = CString() >> (char)PLO_EXPLOSION >> (short)id >> (char)eradius >> (char)(ex * 2) >> (char)(ey * 2) >> (char)epower;
+	CString packet = CString() >> (char)PLO_EXPLOSION >> (short)id >> (char)eradius >> (char)(loc[0] * 2) >> (char)(loc[1] * 2) >> (char)epower;
 	if (pmap) server->sendPacketToLevel(packet, pmap, this, false);
 	else server->sendPacketToLevel(packet, level, this);
 
@@ -1391,9 +1383,7 @@ bool TPlayer::msgPLI_PRIVATEMESSAGE(CString& pPacket)
 bool TPlayer::msgPLI_SHOOT(CString& pPacket)
 {
 	int unknown = pPacket.readGInt();				// May be a shoot id for the npc-server.
-	float sx = (float)pPacket.readGUChar() / 2.0f;
-	float sy = (float)pPacket.readGUChar() / 2.0f;
-	float sz = (float)pPacket.readGUChar() / 2.0f;
+	float loc[3] = {(float)pPacket.readGUChar() / 2.0f, (float)pPacket.readGUChar() / 2.0f, (float)pPacket.readGUChar() / 2.0f};
 	unsigned char sangle = pPacket.readGUChar();	// 0-pi = 0-220
 	unsigned char sanglez = pPacket.readGUChar();	// 0-pi = 0-220
 	unsigned char sspeed = pPacket.readGUChar();	// speed = pixels per 0.05 seconds.  In gscript, each value of 1 translates to 44 pixels.
@@ -1577,8 +1567,7 @@ bool TPlayer::msgPLI_LANGUAGE(CString& pPacket)
 bool TPlayer::msgPLI_TRIGGERACTION(CString& pPacket)
 {
 	unsigned int npcId = pPacket.readGUInt();
-	float x = (float)pPacket.readGChar() / 2.0f;
-	float y = (float)pPacket.readGChar() / 2.0f;
+	float loc[2] = {(float)pPacket.readGUChar() / 2.0f, (float)pPacket.readGUChar() / 2.0f};
 	CString action = pPacket.readString("");
 
 	// We don't have an NPCserver, so, for now, just pass it along.

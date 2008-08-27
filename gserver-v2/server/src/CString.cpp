@@ -729,8 +729,12 @@ bool operator!=(const CString& pString1, const CString& pString2)
 
 bool operator<(const CString& pString1, const CString& pString2)
 {
+	if (strcmp(pString1.text(), pString2.text()) < 0) return true;
+	return false;
+	/*
 	int len = (pString1.length() > pString2.length() ? pString2.length() : pString1.length());
 	return memcmp(pString1.text(), pString2.text(), len) < 0;
+	*/
 }
 
 bool operator>(const CString& pString1, const CString& pString2)
