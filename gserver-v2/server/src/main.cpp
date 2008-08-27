@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 	}
 
 	// Load servers.
-	for (int i = 0; i < serversettings.getInt("servercount"); ++i)
+	for (int i = 1; i <= serversettings.getInt("servercount"); ++i)
 	{
 		CString name = serversettings.getStr(CString() << "server_" << CString(i), "default");
 		TServer* server = new TServer(name);
