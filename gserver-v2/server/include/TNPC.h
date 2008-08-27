@@ -98,8 +98,10 @@ class TNPC
 		TNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC = true);
 		~TNPC();
 
+		static std::vector<CString> removeComments(const CString& code);
+
 		// prop functions
-		CString getProp(int pId) const;
+		CString getProp(unsigned char pId) const;
 		CString getProps(time_t newTime) const;
 		void setProps(CString& pProps);
 
@@ -110,8 +112,9 @@ class TNPC
 		unsigned int getId() const		{ return id; }
 		TLevel* getLevel()				{ return level; }
 		CString getWeaponName() const	{ return weaponName; }
-		CString getServerCode() const	{ return serverCode; }
-		CString getClientCode() const	{ return clientCode; }
+		CString getServerScript() const	{ return serverScript; }
+		CString getClientScript() const	{ return clientScript; }
+		time_t getPropModTime(unsigned char pId);
 
 	private:
 		bool levelNPC;
@@ -126,9 +129,16 @@ class TNPC
 		CString gAttribs[30];
 		CString image, swordImage, shieldImage, headImage, bodyImage, horseImage, gani;
 		CString nickName, imagePart, chatMsg, weaponName;
-		CString serverCode, clientCode;
+		CString serverScript, clientScript;
 		unsigned char saves[10];
 		TLevel* level;
 };
+
+inline
+time_t TNPC::getPropModTime(unsigned char pId)
+{
+	if (pId < npcpropcount) return modTime[pId];
+	return 0;
+}
 
 #endif

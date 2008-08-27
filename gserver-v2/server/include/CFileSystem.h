@@ -13,12 +13,13 @@ class CFileSystem
 		CFileSystem(TServer* pServer);
 
 		void setServer(TServer* pServer) { server = pServer; }
-		void init();
+		void init(const CString& dir);
 
 		CString find(const CString& file) const;
 		CString load(const CString& file) const;
 		time_t getModTime(const CString& file) const;
 		int getFileSize(const CString& file) const;
+		std::map<CString, CString>* getFileList()	{ return &fileList; }
 
 	private:
 		TServer* server;

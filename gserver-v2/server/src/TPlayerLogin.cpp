@@ -155,7 +155,8 @@ bool TPlayer::sendLoginClient()
 			int wId = TLevelItem::getItemId(*i);
 			if (wId != -1)
 			{
-				CString defWeapPacket = CString() >> (char)0 >> (char)wId;
+				CString defWeapPacket = CString() >> (char)PLI_WEAPONADD >> (char)0 >> (char)wId;
+				defWeapPacket.readGChar();
 				msgPLI_WEAPONADD(defWeapPacket);
 				continue;
 			}

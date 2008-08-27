@@ -70,7 +70,20 @@ int TServer::init()
 	}
 
 	// Load file system.
-	filesystem.init();
+	filesystem.init("world");
+
+	// Load weapons.
+	{
+		CFileSystem weaponFS(this);
+		weaponFS.init("weapons");
+		std::map<CString, CString>* weaponFileList = weaponFS.getFileList();
+		for (std::map<CString, CString>::iterator i = weaponFileList->begin(); i != weaponFileList->end(); ++i)
+		{
+			TWeapon* weapon = TWeapon::loadWeapon(i->first.removeAll(".txt"), this);
+			if (weapon != 0)
+				weaponList.push_back(weapon);
+		}
+	}
 
 	// Load gmaps.
 	std::vector<CString> gmaps = settings.getStr("gmaps").guntokenize().tokenize("\n");

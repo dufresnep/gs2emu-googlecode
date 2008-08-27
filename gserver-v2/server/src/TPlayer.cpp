@@ -1452,8 +1452,7 @@ bool TPlayer::msgPLI_WEAPONADD(CString& pPacket)
 	// NPC weapons.
 	else
 	{
-		std::vector<TNPC*>* npcIds = server->getNPCIdList();
-		std::vector<TWeapon*>* weaponList = server->getWeaponList();
+		// TODO: If NPC-Server is running, don't allow any of this.
 
 		// Get the NPC id.
 		unsigned int npcId = pPacket.readGUInt();
@@ -1470,17 +1469,22 @@ bool TPlayer::msgPLI_WEAPONADD(CString& pPacket)
 		TWeapon* weapon = server->getWeapon(name);
 
 		// If weapon is 0, that means the NPC was not found.  Add the NPC to the list.
+		bool newWeapon = false;
+		std::vector<TWeapon*>* sweaponList = server->getWeaponList();
 		if (weapon == 0)
 		{
-			weapon = new TWeapon(npc);
-			weaponList->push_back(weapon);
+			newWeapon = true;
+			weapon = new TWeapon(name, npc->getProp(NPCPROP_IMAGE).subString(1), npc->getProp(NPCPROP_SCRIPT).subString(2), npc->getPropModTime(NPCPROP_SCRIPT));
+			sweaponList->push_back(weapon);
 		}
 
 		// Check and see if the weapon has changed recently.  If it has, we should
-		// send the new NPC to everybody on the server.
+		// send the new NPC to everybody on the server.  After updating the script, of course.
 		bool foundThis = false;
-		if (weapon->getModTime() != npc->getLevel()->getModTime())
+		if (weapon->getModTime() < npc->getPropModTime(NPCPROP_SCRIPT))
 		{
+			newWeapon = true;		// Lets the new code get saved.
+			weapon->setClientScript(npc->getClientScript());
 			std::vector<TPlayer*>* playerList = server->getPlayerList();
 			for (std::vector<TPlayer*>::iterator i = playerList->begin(); i != playerList->end(); ++i)
 			{
@@ -1496,9 +1500,14 @@ bool TPlayer::msgPLI_WEAPONADD(CString& pPacket)
 
 		// Send the weapon to the player now.
 		if (foundThis == false)
+		{
+			weaponList.push_back(weapon->getName());
 			sendPacket(CString() << weapon->getWeaponPacket());
+		}
 
-		// TODO: saving weapons
+		// Save weapon.
+		if (newWeapon)
+			weapon->saveWeapon(server);
 	}
 	return true;
 }

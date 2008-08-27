@@ -19,10 +19,9 @@ static void loadAllDirectories(std::map<CString, CString>& fileList, const CStri
 CFileSystem::CFileSystem(TServer* pServer)
 : server(pServer)
 {
-	init();
 }
 
-void CFileSystem::init()
+void CFileSystem::init(const CString& dir)
 {
 	if (server == 0) return;
 	CSettings* settings = server->getSettings();
@@ -31,7 +30,7 @@ void CFileSystem::init()
 	if (settings->getBool("nofoldersconfig", false) == true)
 	{
 		fileList.clear();
-		loadAllDirectories(fileList, CString() << server->getServerPath() << "world" << fSep);
+		loadAllDirectories(fileList, CString() << server->getServerPath() << dir << fSep);
 
 		// Load extra folders.
 		if (settings->getStr("sharefolder").length() > 0)

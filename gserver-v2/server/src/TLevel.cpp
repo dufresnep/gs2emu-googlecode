@@ -159,7 +159,7 @@ bool TLevel::loadNW(const CString& pLevelName)
 
 	// Load File
 	std::vector<CString> fileData = CString::loadToken(fileName);
-	if (fileData.size() < 1)
+	if (fileData.size() == 0)
 		return false;
 
 	// Grab File Version

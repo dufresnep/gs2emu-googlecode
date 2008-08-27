@@ -11,7 +11,6 @@ char __nSavePackets[10] = { 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
 char __nAttrPackets[30] = { 36, 37, 38, 39, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68 };
 
 static CString toWeaponName(const CString& code);
-static std::vector<CString> removeComments(const CString& code);
 
 TNPC::TNPC(const CString& pImage, const CString& pScript, float pX, float pY, TLevel* pLevel, bool pLevelNPC)
 :
@@ -53,21 +52,19 @@ level(pLevel)
 
 	// Remove comments and separate clientside and serverside scripts.
 	std::vector<CString> parsedCode = removeComments(pScript);
-	if (parsedCode.size() == 1) clientCode = parsedCode[0];
+	if (parsedCode.size() == 1) clientScript = parsedCode[0];
 	else if (parsedCode.size() > 1)
 	{
-		serverCode = parsedCode[0];
+		serverScript = parsedCode[0];
 		for (unsigned int i = 1; i < parsedCode.size(); ++i)
-			clientCode << parsedCode[i];
+			clientScript << parsedCode[i];
 	}
-	//if (serverCode.length() > 0) printf("serverCode: %s\n", serverCode.text());
-	//if (clientCode.length() > 0) printf("clientCode: %s\n", clientCode.text());
 
 	// Search for toweapons in the clientside code and extract the name of the weapon.
-	weaponName = toWeaponName(clientCode);
+	weaponName = toWeaponName(clientScript);
 
 	// Just a little warning for people who don't know.
-	if (clientCode.length() > 0x3FFF)
+	if (clientScript.length() > 0x3FFF)
 		printf("WARNING: Clientside script of NPC (%s) exceeds the limit of 16383 bytes.\n", (weaponName.length() != 0 ? weaponName.text() : image.text()));
 
 	// TODO: Create plugin hook so NPCServer can acquire/format code.
@@ -78,7 +75,7 @@ TNPC::~TNPC()
 	// TODO: Remove from npcIds
 }
 
-CString TNPC::getProp(int pId) const
+CString TNPC::getProp(unsigned char pId) const
 {
 	switch(pId)
 	{
@@ -86,7 +83,7 @@ CString TNPC::getProp(int pId) const
 		return CString() >> (char)image.length() << image;
 
 		case NPCPROP_SCRIPT:
-		return CString() >> (short)clientCode.length() << clientCode;
+		return CString() >> (short)clientScript.length() << clientScript;
 
 		case NPCPROP_X:
 		return CString() >> (char)(x * 2);
@@ -243,7 +240,7 @@ void TNPC::setProps(CString& pProps)
 			break;
 
 			case NPCPROP_SCRIPT:
-				clientCode = pProps.readChars(pProps.readGUShort());
+				clientScript = pProps.readChars(pProps.readGUShort());
 			break;
 
 			case NPCPROP_X:
@@ -483,19 +480,7 @@ void TNPC::setProps(CString& pProps)
 	}
 }
 
-CString toWeaponName(const CString& code)
-{
-	int name_start = code.find("toweapons ");
-	if (name_start == -1) return CString();
-	name_start += 10;	// 10 = strlen("toweapons ")
-
-	int name_end = code.find(";", name_start);
-	if (name_end == -1) return CString();
-
-	return code.subString(name_start, name_end - name_start).trim();
-}
-
-std::vector<CString> removeComments(const CString& code)
+std::vector<CString> TNPC::removeComments(const CString& code)
 {
 	CString outLine;
 	std::vector<CString> retVal;
@@ -576,4 +561,16 @@ std::vector<CString> removeComments(const CString& code)
 	// Add our code to the vector.  If serverside code was added, the size should now be 2.
 	retVal.push_back(outLine);
 	return retVal;
+}
+
+CString toWeaponName(const CString& code)
+{
+	int name_start = code.find("toweapons ");
+	if (name_start == -1) return CString();
+	name_start += 10;	// 10 = strlen("toweapons ")
+
+	int name_end = code.find(";", name_start);
+	if (name_end == -1) return CString();
+
+	return code.subString(name_start, name_end - name_start).trim();
 }
