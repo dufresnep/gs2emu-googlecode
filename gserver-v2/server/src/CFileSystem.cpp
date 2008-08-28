@@ -78,11 +78,7 @@ void loadAllDirectories(std::map<CString, CString>& fileList, const CString& dir
 			{
 				// Grab the file name.
 				CString file(filedata.cFileName);
-				//int pos = file.findl('/');
-				//if (pos == -1) pos = file.findl('\\');
-				//if (pos != -1) file.removeI(pos, file.length());
 				fileList[file] = CString() << directory << filedata.cFileName;
-				//printf( "file: %s, fullpath: %s\n", file.text(), fileList[file].text() );
 			}
 		} while (FindNextFileA(hFind, &filedata));
 	}
@@ -104,7 +100,7 @@ void loadAllDirectories(std::map<CString, CString>& fileList, const CString& dir
 	{
 		if (ent->d_name[0] != '.')
 		{
-			CString dir = CString() << directory << ent->d_name << fSep;
+			CString dir = CString() << directory << ent->d_name;
 			stat(dir.text(), &statx);
 			if (statx.st_mode & S_IFDIR)
 			{
@@ -112,6 +108,7 @@ void loadAllDirectories(std::map<CString, CString>& fileList, const CString& dir
 				continue;
 			}
 		}
+		else continue;
 
 		// Grab the file name.
 		CString file(ent->d_name);
