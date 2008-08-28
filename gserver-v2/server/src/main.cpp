@@ -58,11 +58,15 @@ int main(int argc, char* argv[])
 
 		// Make sure doubles don't exist.
 		if (serverList.find(name) != serverList.end())
+		{
+			serverlog.out("[WARNING] Duplicate server found, deleting old server.\n");
 			delete serverList[name];
+		}
 
 		// Initialize the server.
 		if (server->init() != 0)
 		{
+			serverlog.out("[WARNING] server->init() failed.  Deleting server.\n");
 			delete server;
 			continue;
 		}
@@ -84,6 +88,7 @@ int main(int argc, char* argv[])
 			TServer* server = (TServer*)i->second;
 			if (server->doMain() == false)
 			{
+				serverlog.out("[WARNING] server->doMain() failed.  Deleting server.\n");
 				delete server;
 				serverList.erase(i++);
 			}
