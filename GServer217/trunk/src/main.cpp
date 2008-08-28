@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
 
 			// Was moved so it can process faster. - Joey
 			ListServer_Main();
-			wait(100);
+			wait(10);
 		}
 
 		doTimer();

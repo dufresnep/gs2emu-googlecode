@@ -1670,16 +1670,17 @@ void CPlayer::sendFiles()
 						failed = false;
 
 						// If it is a large file, send the large file packet.
-						if (fileData.length() > 64500)
+						if (fileData.length() > 32000)
 						{
 							isLargeFile = true;
 							sendPacket(CPacket() << (char)SLARGEFILESTART << shortName);
+							sendPacket(CPacket() << (char)SLARGEFILESIZE << (long long)fileData.length());
 						}
 
 						// Send the entire file.
 						while (fileData.length() > 0)
 						{
-							int fileLen = CLIP(fileData.length(), 0, 64500);
+							int fileLen = CLIP(fileData.length(), 0, 32000);
 							int len = 1 + 5 + 1 + shortName.length() + fileLen + 1;
 							sendPacket(CPacket() << (char)100 << (int)len);
 							sendPacket(CPacket() << (char)102 << (long long)modTime << (char)shortName.length() << shortName << fileData.copy(0, fileLen) << "\n");
