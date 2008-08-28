@@ -47,6 +47,7 @@ class TServer
 		CLog& getServerLog()					{ return serverlog; }
 		CLog& getRCLog()						{ return rclog; }
 		CString* getServerMessage()				{ return &servermessage; }
+		unsigned int getNWTime();
 
 		TPlayer* getPlayer(const unsigned short id) const;
 		TNPC* getNPC(const unsigned int id) const;
@@ -93,7 +94,7 @@ class TServer
 		CLog serverlog;//("logs/serverlog.txt");
 		CLog rclog;//("logs/rclog.txt");
 
-		time_t lastTimer;
+		time_t lastTimer, lastNWTimer;
 };
 
 #endif

@@ -7,7 +7,7 @@
 extern CString homepath;
 
 TServer::TServer(CString pName)
-: name(pName), lastTimer(time(0))
+: name(pName), lastTimer(time(0)), lastNWTimer(time(0))
 {
 	// Player ids 0 and 1 break things.  NPC id 0 breaks things.
 	// Don't allow anything to have one of those ids.
@@ -218,6 +218,13 @@ bool TServer::doTimedEvents()
 			continue;
 
 		level->doTimedEvents();
+	}
+
+	// Send NW time.
+	if ((int)difftime(lastTimer, lastNWTimer) >= 5)
+	{
+		lastNWTimer = lastTimer;
+		sendPacketToAll(CString() >> (char)PLO_NEWWORLDTIME << CString().writeGInt4(getNWTime()));
 	}
 
 	return true;
@@ -446,6 +453,11 @@ bool TServer::deleteFlag(const CString& pFlag)
 		}
 	}
 	return false;
+}
+
+unsigned int TServer::getNWTime()
+{
+	return ((unsigned int)time(0) - 11078 * 24 * 60 * 60) * 2 / 10;
 }
 
 /*

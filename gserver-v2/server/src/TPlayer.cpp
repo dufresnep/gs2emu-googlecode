@@ -166,7 +166,6 @@ PLE_POST22(false), os("wind"), codepage(1252), level(0),
 id(0), type(CLIENTTYPE_AWAIT), server(pServer), allowBomb(false), hadBomb(false),
 pmap(0)
 {
-	// TODO: lastChat and lastMessage
 	lastData = lastMovement = lastChat = lastMessage = lastSave = time(0);
 	printf("Created for: %s\n", playerSock->tcpIp());
 }
@@ -175,8 +174,6 @@ TPlayer::~TPlayer()
 {
 	if (id >= 0)
 	{
-		// TODO: save pending weapons.
-
 		// Save account.
 		if (type == CLIENTTYPE_CLIENT)
 			saveAccount();
@@ -596,7 +593,8 @@ bool TPlayer::sendLevel(TLevel* pLevel, time_t modTime, bool skipActors)
 	if (pmap && pmap->getType() == MAPTYPE_GMAP)
 		sendPacket(CString() >> (char)PLO_LEVELNAME << pmap->getMapName());
 
-	// TODO: Send new world time.
+	// Send new world time.
+	sendPacket(CString() >> (char)PLO_NEWWORLDTIME << CString().writeGInt4(server->getNWTime()));
 
 	if (skipActors == false)
 	{
@@ -788,10 +786,6 @@ bool TPlayer::msgPLI_LOGIN(CString& pPacket)
 		>> (short)id >> (char)type
 		);
 	return true;
-
-	// Process Login
-	// TODO: This should be sent only when the serverlist verifies the login.
-//	return sendLogin();
 }
 
 bool TPlayer::msgPLI_LEVELWARP(CString& pPacket)
@@ -1222,10 +1216,13 @@ bool TPlayer::msgPLI_OPENCHEST(CString& pPacket)
 		TLevelChest* chest = *i;
 		if (chest->getX() == cX && chest->getY() == cY)
 		{
-			int chestItem = chest->getItemIndex();
-			this->setProps(CString() << TLevelItem::getItemPlayerProp((char)chestItem, this), true, true);
-			sendPacket(CString() >> (char)PLO_LEVELCHEST >> (char)1 >> (char)cX >> (char)cY);
-			// TODO: save chest to player.
+			if (!hasChest(chest))
+			{
+				int chestItem = chest->getItemIndex();
+				this->setProps(CString() << TLevelItem::getItemPlayerProp((char)chestItem, this), true, true);
+				sendPacket(CString() >> (char)PLO_LEVELCHEST >> (char)1 >> (char)cX >> (char)cY);
+				chestList.push_back(chest->getChestStr(levelName));
+			}
 		}
 	}
 	return true;
