@@ -232,7 +232,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 			case PLPROP_NICKNAME:
 				len = pPacket.readGUChar();
 				len = clip(len, 0, 224);
-				setNick(pPacket.readChars(len));
+				setNick(CString() << pPacket.readChars(len));
 				globalBuff >> (char)propId << getProp(propId);
 				if (!pForwardToSelf) selfBuff >> (char)propId << getProp(propId);
 			break;
