@@ -90,13 +90,13 @@ enum
 	PLO_THROWCARRIED	= 21,
 	PLO_ITEMADD			= 22,
 	PLO_ITEMDEL			= 23,
-
+	PLO_NPCMOVED		= 24,	// What does this do?
 	PLO_SIGNATURE		= 25,
+	PLO_NPCACTION		= 26,	// What does this do?
 	PLO_BADDYHURT		= 27,
 	PLO_FLAGSET			= 28,
 	PLO_NPCDEL			= 29,
 	PLO_FILESENDFAILED	= 30,
-
 	PLO_FLAGDEL			= 31,
 	PLO_SHOWIMG			= 32,
 	PLO_NPCWEAPONADD	= 33,
@@ -104,12 +104,15 @@ enum
 	PLO_ADMINMESSAGE	= 35,
 	PLO_EXPLOSION		= 36,
 	PLO_PRIVATEMESSAGE	= 37,
+	PLO_PUSHAWAY		= 38,	// What does this do?
 	PLO_LEVELMODTIME	= 39,
 	PLO_HURTPLAYER		= 40,
+	PLO_STARTMESSAGE	= 41,
 	PLO_NEWWORLDTIME	= 42,
 	PLO_DEFAULTWEAPON	= 43,
 	PLO_HASNPCSERVER	= 44,	// If sent, the client won't update npc props.
 	PLO_FILEUPTODATE	= 45,
+
 	PLO_STAFFGUILDS		= 47,
 	PLO_TRIGGERACTION	= 48,
 	PLO_PLAYERWARP2		= 49,	// Bytes 1-3 are x/y/z. 4 = level x in gmap, 5 = level y in gmap.
@@ -173,12 +176,14 @@ class TPlayer : public TAccount
 
 		// Manage Account
 		inline bool isLoggedIn();
+		bool sendLogin();
 
 		// Get Properties
 		TLevel* getLevel()		{ return level; }
 		TMap* getMap()			{ return pmap; }
 		int getId() const;
 		int getType() const;
+		time_t getLastData() const	{ return lastData; }
 
 		// Set Properties
 		void setNick(const CString& pNickName);
@@ -204,6 +209,7 @@ class TPlayer : public TAccount
 
 		// Misc functions.
 		bool doTimedEvents();
+		void disconnect();
 
 		// Packet-Functions
 		bool msgPLI_NULL(CString& pPacket);
@@ -251,7 +257,6 @@ class TPlayer : public TAccount
 
 	private:
 		// Login functions.
-		bool sendLogin();
 		bool sendLoginClient();
 		bool sendLoginRC();
 

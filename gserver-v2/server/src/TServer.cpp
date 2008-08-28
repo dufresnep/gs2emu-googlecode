@@ -73,6 +73,11 @@ int TServer::init()
 	// Load file system.
 	filesystem.init("world");
 
+	// Load server message.
+	servermessage.load(CString() << serverpath << "config/servermessage.html");
+	servermessage.removeAllI("\r");
+	servermessage.replaceAllI("\n", " ");
+
 	// Load weapons.
 	{
 		CFileSystem weaponFS(this);
@@ -167,7 +172,10 @@ bool TServer::doMain()
 	{
 		TPlayer *player = (TPlayer*)*i;
 		if (player == 0)
+		{
+			i = playerList.erase(i);
 			continue;
+		}
 
 		if (!player->doMain())
 		{

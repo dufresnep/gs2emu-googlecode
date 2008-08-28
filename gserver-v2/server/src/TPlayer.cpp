@@ -313,6 +313,12 @@ bool TPlayer::doTimedEvents()
 	return true;
 }
 
+void TPlayer::disconnect()
+{
+	delete playerSock;
+	playerSock = 0;
+}
+
 bool TPlayer::parsePacket(CString& pPacket)
 {
 	// first packet.. maybe
@@ -750,17 +756,17 @@ bool TPlayer::msgPLI_LOGIN(CString& pPacket)
 	accountName = pPacket.readChars(pPacket.readGUChar());
 	CString password = pPacket.readChars(pPacket.readGUChar());
 
-	serverlog.out("Key: %d\n", key);
+	//serverlog.out("Key: %d\n", key);
 	serverlog.out("Version: %s\n", version.text());
 	serverlog.out("Account: %s\n", accountName.text());
-	serverlog.out("Password: %s\n", password.text());
-	//printf("Key: %d\n", key);
-	//printf("Version: %s\n", version.text());
-	//printf("Account: %s\n", accountName.text());
-	//printf("Password: %s\n", password.text());
+	//serverlog.out("Password: %s\n", password.text());
 
 	// Check for available slots on the server.
-	printf("TODO: TPlayer::msgPLI_LOGIN(), Check for available slots.\n");
+	if (server->getPlayerList()->size() >= (unsigned int)server->getSettings()->getInt("maxplayers", 128))
+	{
+		sendPacket(CString() >> (char)PLO_DISCMESSAGE << "This server has reached its player limit.");
+		return false;
+	}
 
 	// Check if they are ip-banned or not.
 	printf("TODO: TPlayer::msgPLI_LOGIN(), Check if player is ip-banned.\n");
@@ -768,11 +774,21 @@ bool TPlayer::msgPLI_LOGIN(CString& pPacket)
 	// Verify login details with the serverlist.
 	// TODO: Don't forget localhost mode.  Need to global-ify the serverlist
 	// class to do this.
-	printf("TODO: TPlayer::msgPLI_LOGIN(), Verify login information.\n");
+	if (server->getServerList()->getConnected() == false)
+	{
+		sendPacket(CString() >> (char)PLO_DISCMESSAGE << "The login server is offline.  Try again later.");
+		return false;
+	}
+	server->getServerList()->sendPacket(CString() >> (char)SVO_VERIACC2
+		>> (char)accountName.length() << accountName
+		>> (char)password.length() << password
+		>> (short)id >> (char)type
+		);
+	return true;
 
 	// Process Login
 	// TODO: This should be sent only when the serverlist verifies the login.
-	return sendLogin();
+//	return sendLogin();
 }
 
 bool TPlayer::msgPLI_LEVELWARP(CString& pPacket)

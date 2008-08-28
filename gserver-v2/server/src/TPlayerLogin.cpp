@@ -31,7 +31,26 @@ bool TPlayer::sendLogin()
 	//sendPacket(CString() >> (char)PLO_HASNPCSERVER);
 
 	// Check if the account is already in use.
-	printf("TODO: TPlayer::sendLogin, Check if account is in use.\n");
+	std::vector<TPlayer*>* playerList = server->getPlayerList();
+	for (std::vector<TPlayer*>::iterator i = playerList->begin(); i != playerList->end(); ++i)
+	{
+		TPlayer* player = *i;
+		CString oacc = player->getProp(PLPROP_ACCOUNTNAME).subString(1);
+		unsigned short oid = player->getProp(PLPROP_ID).readGUShort();
+		if (oacc == accountName && player->getType() == type && oid != id)
+		{
+			if ((int)difftime(time(0), player->getLastData()) > 30)
+			{
+				player->sendPacket(CString() >> (char)PLO_DISCMESSAGE << "Someone else has logged into your account.");
+				player->disconnect();
+			}
+			else
+			{
+				sendPacket(CString() >> (char)PLO_DISCMESSAGE << "Account is already in use.");
+				return false;
+			}
+		}
+	}
 
 	// Player's load different than RCs.
 	bool failed = false;
@@ -40,7 +59,6 @@ bool TPlayer::sendLogin()
 	if (failed) return false;
 
 	// Exchange props with everybody on the server.
-	std::vector<TPlayer*>* playerList = server->getPlayerList();
 	for (std::vector<TPlayer*>::iterator i = playerList->begin(); i != playerList->end(); ++i)
 	{
 		TPlayer* player = (TPlayer*)*i;
@@ -139,7 +157,7 @@ bool TPlayer::sendLoginClient()
 	sendPacket(CString() >> (char)PLO_RPGWINDOW << "\"Welcome to " << settings->getStr("name") << ".\",\"Graal Reborn GServer programmed by Joey and Nalin.\"" );
 
 	// Send the start message to the player.
-	printf("TODO: TPlayer::sendLoginClient, Send the start message to the player.\n");
+	sendPacket(CString() >> (char)PLO_STARTMESSAGE << *(server->getServerMessage()));
 
 	// Delete the bomb.  It gets automagically added by the client for
 	// God knows which reason.  Bomb must be capitalized.
@@ -165,10 +183,13 @@ bool TPlayer::sendLoginClient()
 	}
 
 	// Send the player's flags.
-	printf("TODO: TPlayer::sendLoginClient, Send flags to the player.\n");
+	for (std::vector<CString>::iterator i = flagList.begin(); i != flagList.end(); ++i)
+		sendPacket(CString() >> (char)PLO_FLAGSET << *i);
 
 	// Send the server's flags to the player.
-	printf("TODO: TPlayer::sendLoginClient, Send the server's flags to the player.\n");
+	std::vector<CString>* serverFlags = server->getServerFlags();
+	for (std::vector<CString>::iterator i = serverFlags->begin(); i != serverFlags->end(); ++i)
+		sendPacket(CString() >> (char)PLO_FLAGSET << *i);
 
 	//sendPacket(CString() >> (char)195 >> (char)4 << "idle" << "\"SETBACKTO \"");
 	//sendPacket(CString() >> (char)195 >> (char)4 << "walk" << "\"SETBACKTO \"");
@@ -184,11 +205,12 @@ bool TPlayer::sendLoginRC()
 		nickName = accountName;
 
 	// Set the head to the server's set staff head.
-	printf("TODO: TPlayer::sendLoginRC, Set the RC head to the staff head.\n");
+	headImg = server->getSettings()->getStr("staffhead", "head25.png");
 
 	// Send the RC join message to the RC.
-	server->sendPacketTo(CLIENTTYPE_RC, CString() >> (char)PLO_RCMESSAGE << "New RC: " << this->nickName << " (" << this->accountName << ")");
-	this->sendPacket(CString() >> (char)PLO_RCMESSAGE << "Welcome to RC.");
+	// TODO: Custom RC join message (rcmessage.txt)
+	sendPacket(CString() >> (char)PLO_RCMESSAGE << "Welcome to RC.");
+	server->sendPacketTo(CLIENTTYPE_RC, CString() >> (char)PLO_RCMESSAGE << "New RC: " << nickName << " (" << accountName << ")");
 
 	return true;
 }

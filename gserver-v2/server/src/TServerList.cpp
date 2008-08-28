@@ -6,8 +6,6 @@
 #include "TServerList.h"
 #include "TPlayer.h"
 
-extern CLog serverlog;
-
 /*
 	Pointer-Functions for Packets
 */
@@ -29,6 +27,7 @@ void createSLFunctions()
 	TSLFunc[SVI_VERSIONCURRENT] = &TServerList::msgSVI_VERSIONCURRENT;
 	TSLFunc[SVI_PROFILE] = &TServerList::msgSVI_PROFILE;
 	TSLFunc[SVI_ERRMSG] = &TServerList::msgSVI_ERRMSG;
+	TSLFunc[SVI_VERIACC2] = &TServerList::msgSVI_VERIACC2;
 	TSLFunc[SVI_PING] = &TServerList::msgSVI_PING;
 }
 
@@ -114,7 +113,7 @@ bool TServerList::doTimedEvents()
 	if ((int)difftime(lastTimer, lastPing) >= 30)
 	{
 		lastPing = lastTimer;
-		sendPacket(CString() >> (char)SVO_SVRPING);
+		sendPacket(CString() >> (char)SVO_PING);
 	}
 
 	return true;
@@ -142,7 +141,7 @@ bool TServerList::connectServer()
 	else
 		return false;
 
-	printf("%s - Connected.\n", sock.getDescription());
+	server->getServerLog().out("%s - Connected.\n", sock.getDescription());
 
 	// Set Some Stuff
 	setName(settings->getStr("name"));
@@ -289,37 +288,37 @@ void TServerList::sendCompress()
 void TServerList::msgSVI_NULL(CString& pPacket)
 {
 	pPacket.setRead(0);
-	printf("Unknown Serverlist Packet: %i (%s)\n", pPacket.readGUChar(), pPacket.text()+1);
+	server->getServerLog().out("Unknown Serverlist Packet: %i (%s)\n", pPacket.readGUChar(), pPacket.text()+1);
 }
 
 void TServerList::msgSVI_VERIACC(CString& pPacket)
 {
-	printf("TODO: TServerList::msgSVI_VERIACC\n");
+	server->getServerLog().out("** SVI_VERIACC is deprecated.  It should not be used.\n");
 }
 
 void TServerList::msgSVI_VERIGUILD(CString& pPacket)
 {
-	printf("TODO: TServerList::msgSVI_VERIGUILD\n");
+	server->getServerLog().out("TODO: TServerList::msgSVI_VERIGUILD\n");
 }
 
 void TServerList::msgSVI_FILESTART(CString& pPacket)
 {
-	printf("TODO: TServerList::msgSVI_FILESTART\n");
+	server->getServerLog().out("TODO: TServerList::msgSVI_FILESTART\n");
 }
 
 void TServerList::msgSVI_FILEDATA(CString& pPacket)
 {
-	printf("TODO: TServerList::msgSVI_FILEDATA\n");
+	server->getServerLog().out("TODO: TServerList::msgSVI_FILEDATA\n");
 }
 
 void TServerList::msgSVI_FILEEND(CString& pPacket)
 {
-	printf("TODO: TServerList::msgSVI_FILEEND\n");
+	server->getServerLog().out("TODO: TServerList::msgSVI_FILEEND\n");
 }
 
 void TServerList::msgSVI_VERSIONOLD(CString& pPacket)
 {
-	serverlog.out(":: You are running an old version of the Graal Reborn gserver.\n"
+	server->getServerLog().out(":: You are running an old version of the Graal Reborn gserver.\n"
 		":: An updated version is available online.\n");
 }
 
@@ -330,12 +329,40 @@ void TServerList::msgSVI_VERSIONCURRENT(CString& pPacket)
 
 void TServerList::msgSVI_PROFILE(CString& pPacket)
 {
-	printf("TODO: TServerList::msgSVI_PROFILE\n");
+	server->getServerLog().out("TODO: TServerList::msgSVI_PROFILE\n");
 }
 
 void TServerList::msgSVI_ERRMSG(CString& pPacket)
 {
-	serverlog.out("%s\n", pPacket.readString("").text());
+	server->getServerLog().out("%s\n", pPacket.readString("").text());
+}
+
+void TServerList::msgSVI_VERIACC2(CString& pPacket)
+{
+	CString account = pPacket.readChars(pPacket.readGUChar());
+	unsigned short id = pPacket.readGUShort();
+	unsigned char type = pPacket.readGUChar();
+	CString message = pPacket.readString("");
+
+	// Get the player.
+	TPlayer* player = server->getPlayer(id);
+	if (player == 0) return;
+
+	// If we did not get the success message, inform the client of his failure.
+	if (message != "SUCCESS")
+	{
+		player->sendPacket(CString() >> (char)PLO_DISCMESSAGE << message);
+		player->sendCompress();
+		player->disconnect();
+		return;
+	}
+
+	// Send the player his account.  If it fails, disconnect him.
+	if (player->sendLogin() == false)
+	{
+		player->sendPacket(CString() >> (char)PLO_DISCMESSAGE << "Failed to send login information.");
+		player->disconnect();
+	}
 }
 
 void TServerList::msgSVI_PING(CString& pPacket)

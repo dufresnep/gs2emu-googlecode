@@ -46,6 +46,7 @@ class TServer
 		CString getServerPath()					{ return serverpath; }
 		CLog& getServerLog()					{ return serverlog; }
 		CLog& getRCLog()						{ return rclog; }
+		CString* getServerMessage()				{ return &servermessage; }
 
 		TPlayer* getPlayer(const unsigned short id) const;
 		TNPC* getNPC(const unsigned int id) const;
@@ -87,6 +88,7 @@ class TServer
 		CFileSystem filesystem;
 		CString name;
 		CString serverpath;
+		CString servermessage;
 
 		CLog serverlog;//("logs/serverlog.txt");
 		CLog rclog;//("logs/rclog.txt");
