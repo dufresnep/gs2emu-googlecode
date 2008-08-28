@@ -32,7 +32,10 @@ bool CSettings::loadFile(const CString& pStr)
 
 	// Load File
 	if (!fileData.load(pStr))
+	{
+		opened = false;
 		return false;
+	}
 
 	// Parse Data
 	fileData.removeAllI("\r");
@@ -60,6 +63,7 @@ bool CSettings::loadFile(const CString& pStr)
 			key->value << "," << line[1];
 	}
 
+	opened = true;
 	return true;
 }
 
