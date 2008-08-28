@@ -21,7 +21,8 @@ const char* __defaultfiles[] = {
 	"sword?.png",
 	"shield?.png",
 	"body.png", "body?.png", "body??.png",
-	"head.png", "head?.png", "head??.png", "head???.png", "head????.png"
+	"head.png", "head?.png", "head??.png", "head???.png", "head????.png",
+	// TODO: sounds
 };
 
 // Enum per Attr

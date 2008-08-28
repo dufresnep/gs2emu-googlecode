@@ -4,7 +4,7 @@
 #include "TLevel.h"
 
 const int baddytypes = 10;
-char* baddyImages[baddytypes] = {
+const char* baddyImages[baddytypes] = {
 	"baddygray.png", "baddyblue.png", "baddyred.png", "baddyblue.png", "baddygray.png",
 	"baddyhare.png", "baddyoctopus.png", "baddygold.png", "baddylizardon.png", "baddydragon.png"
 };

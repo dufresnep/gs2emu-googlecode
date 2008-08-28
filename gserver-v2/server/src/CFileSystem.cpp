@@ -96,7 +96,7 @@ void loadAllDirectories(std::map<CString, CString>& fileList, const CString& dir
 	struct dirent *ent;
 
 	// Try to open the directory.
-	if ((dir = opendir(directory)) == 0)
+	if ((dir = opendir(directory.text())) == 0)
 		return;
 
 	// Read everything in it now.
