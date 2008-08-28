@@ -197,8 +197,11 @@ TPlayer::~TPlayer()
 		i = cachedLevels.erase(i);
 	}
 
-	printf("Destroyed for: %s\n", playerSock->tcpIp());
-	delete playerSock;
+	if (playerSock)
+	{
+		printf("Destroyed for: %s\n", playerSock->tcpIp());
+		delete playerSock;
+	}
 }
 
 

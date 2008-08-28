@@ -53,10 +53,10 @@ bool TPlayer::sendLogin()
 	}
 
 	// Player's load different than RCs.
-	bool failed = false;
-	if (type == CLIENTTYPE_CLIENT) failed = sendLoginClient();
-	else if (type == CLIENTTYPE_RC) failed = sendLoginRC();
-	if (failed) return false;
+	bool succeeded = false;
+	if (type == CLIENTTYPE_CLIENT) succeeded = sendLoginClient();
+	else if (type == CLIENTTYPE_RC) succeeded = sendLoginRC();
+	if (succeeded == false) return false;
 
 	// Exchange props with everybody on the server.
 	for (std::vector<TPlayer*>::iterator i = playerList->begin(); i != playerList->end(); ++i)
