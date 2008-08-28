@@ -52,10 +52,11 @@ level(pLevel)
 
 	// Remove comments and separate clientside and serverside scripts.
 	std::vector<CString> parsedCode = TNPC::removeComments(pScript, trimCode);
-	if (parsedCode.size() == 1) clientScript = parsedCode[0];
+	if (parsedCode.size() == 1) clientScript = CString("//#CLIENTSIDE\xa7") << parsedCode[0];
 	else if (parsedCode.size() > 1)
 	{
 		serverScript = parsedCode[0];
+		clientScript = "//#CLIENTSIDE\xa7";
 		for (unsigned int i = 1; i < parsedCode.size(); ++i)
 			clientScript << parsedCode[i];
 	}

@@ -711,6 +711,7 @@ bool TPlayer::sendLevel(TLevel* pLevel, time_t modTime, bool skipActors)
 			}
 			else if (pmap->getType() == MAPTYPE_BIGMAP)
 			{
+				if (player->getLevel() == 0) continue;
 				int ogmap[2] = {pmap->getLevelX(player->getLevel()->getLevelName()), pmap->getLevelY(player->getLevel()->getLevelName())};
 				int sgmap[2] = {pmap->getLevelX(pLevel->getLevelName()), pmap->getLevelY(pLevel->getLevelName())};
 				if (abs(ogmap[0] - sgmap[0]) < 2 && abs(ogmap[1] - sgmap[1]) < 2)
@@ -1379,17 +1380,20 @@ bool TPlayer::msgPLI_WANTFILE(CString& pPacket)
 	// 1 (PLO_FILE) + 5 (modTime) + 1 (file.length()) + file.length() + 1 (\n)
 	bool isBigFile = false;
 	int packetLength = 1 + 5 + 1 + file.length() + 1;
-	if (fileData.length() > (0xFFFF - 0x20 - packetLength))
+	if (fileData.length() > 32000)
 		isBigFile = true;
 
 	// If we are sending a big file, let the client know now.
-	if (isBigFile) sendPacket(CString() >> (char)PLO_LARGEFILESTART << file);
+	if (isBigFile)
+	{
+		sendPacket(CString() >> (char)PLO_LARGEFILESTART << file);
+		sendPacket(CString() >> (char)PLO_LARGEFILESIZE >> (long long)fileData.length());
+	}
 
 	// Send the file now.
 	while (fileData.length() != 0)
 	{
-		int sendSize = 0xFFFF - 0x20 - packetLength;
-		sendSize = clip(sendSize, 0, fileData.length());
+		int sendSize = clip(32000, 0, fileData.length());
 		sendPacket(CString() >> (char)PLO_RAWDATA >> (int)(packetLength + sendSize));
 		sendPacket(CString() >> (char)PLO_FILE >> (long long)modTime >> (char)file.length() << file << fileData.subString(0, sendSize));
 		fileData.removeI(0, sendSize);
