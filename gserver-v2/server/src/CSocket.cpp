@@ -112,7 +112,10 @@ int CSocket::init(const CString& host, const CString& port)
 
 	// Make sure a TCP socket is disconnected.
 	if (properties.protocol == SOCKET_PROTOCOL_TCP && properties.state != SOCKET_STATE_DISCONNECTED)
+	{
+		serverlog.out(CString() << "[ERROR] Socket " << properties.description << " is already connected.\n");
 		return SOCKET_ALREADY_CONNECTED;
+	}
 
 	// Start creating the hints.
 	memset((struct sockaddr_storage*)&properties.address, 0, sizeof(struct sockaddr_storage));
@@ -131,7 +134,10 @@ int CSocket::init(const CString& host, const CString& port)
 		error = getaddrinfo(0, port.text(), &hints, &res);
 	}
 	else
+	{
+		serverlog.out(CString() << "[ERROR] Socket " << properties.description << "'s properties.type is invalid.\n");
 		return SOCKET_ERROR;
+	}
 
 	// Check for errors.
 	if (error)

@@ -122,7 +122,7 @@ bool TServerList::doTimedEvents()
 bool TServerList::init(const CString& pServerIp, const CString& pServerPort)
 {
 	// Initialize the socket.
-	if (sock.init(pServerIp, pServerPort))
+	if (sock.init(pServerIp, pServerPort) != 0)
 		return false;
 
 	return true;
