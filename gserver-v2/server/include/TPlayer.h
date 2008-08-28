@@ -186,7 +186,7 @@ class TPlayer : public TAccount
 		time_t getLastData() const	{ return lastData; }
 
 		// Set Properties
-		void setNick(const CString& pNickName);
+		void setNick(CString& pNickName);
 		void setId(int pId);
 
 		// Level manipulation
@@ -210,6 +210,7 @@ class TPlayer : public TAccount
 		// Misc functions.
 		bool doTimedEvents();
 		void disconnect();
+		void processChat(CString& pChat);
 
 		// Packet-Functions
 		bool msgPLI_NULL(CString& pPacket);

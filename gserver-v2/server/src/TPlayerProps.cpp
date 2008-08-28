@@ -234,6 +234,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 				len = clip(len, 0, 224);
 				setNick(pPacket.readChars(len));
 				globalBuff >> (char)propId << getProp(propId);
+				if (!pForwardToSelf) selfBuff >> (char)propId << getProp(propId);
 			break;
 
 			case PLPROP_MAXPOWER:
@@ -336,7 +337,7 @@ void TPlayer::setProps(CString& pPacket, bool pForward, bool pForwardToSelf)
 				len = pPacket.readGUChar();
 				len = clip(len, 0, 220);
 				chatMsg = pPacket.readChars(len);
-				//processChat(chatMsg);
+				processChat(chatMsg);
 			break;
 
 			case PLPROP_COLORS:

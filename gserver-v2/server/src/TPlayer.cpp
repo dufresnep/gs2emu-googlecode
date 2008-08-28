@@ -437,6 +437,92 @@ void TPlayer::sendCompress()
 	sBuffer.clear();
 }
 
+void TPlayer::processChat(CString& pChat)
+{
+	std::vector<CString> chatParse = pChat.tokenize();
+	if (chatParse.size() == 0) return;
+
+	if (chatParse[0] == "setnick")
+	{
+		// TODO: nick change timeout.
+		CString newName = pChat.subString(8).trim();
+		setProps(CString() >> (char)PLPROP_NICKNAME >> (char)newName.length() << newName, true, true);
+	}
+	else if (chatParse[0] == "sethead" && chatParse.size() == 2)
+	{
+		setProps(CString() >> (char)PLPROP_HEADGIF >> (char)(chatParse[1].length() + 100) << chatParse[1], true, true);
+	}
+	else if (chatParse[0] == "setsword" && chatParse.size() == 2)
+	{
+		setProps(CString() >> (char)PLPROP_SWORDPOWER >> (char)(swordPower + 30) >> (char)chatParse[1].length() << chatParse[1], true, true);
+	}
+	else if (chatParse[0] == "setshield" && chatParse.size() == 2)
+	{
+		setProps(CString() >> (char)PLPROP_SHIELDPOWER >> (char)(shieldPower + 10) >> (char)chatParse[1].length() << chatParse[1], true, true);
+	}
+	else if (chatParse[0] == "setbody" && chatParse.size() == 2)
+	{
+		setProps(CString() >> (char)PLPROP_BODYIMG >> (char)chatParse[1].length() << chatParse[1], true, true);
+	}
+	else if (chatParse[0] == "setsleeves" && chatParse.size() == 2)
+	{
+	}
+	else if (chatParse[0] == "setcoat" && chatParse.size() == 2)
+	{
+	}
+	else if (chatParse[0] == "setshoes" && chatParse.size() == 2)
+	{
+	}
+	else if (chatParse[0] == "setskin" && chatParse.size() == 2)
+	{
+	}
+	else if (chatParse[0] == "setbelt" && chatParse.size() == 2)
+	{
+	}
+	else if (chatParse[0] == "warpto")
+	{
+		// TODO: warp permission check.
+		// To player
+		if (chatParse.size() == 2)
+		{
+			std::vector<TPlayer*>* playerList = server->getPlayerList();
+			for (std::vector<TPlayer*>::iterator i = playerList->begin(); i != playerList->end(); ++i)
+			{
+				TPlayer* player = *i;
+				if (player == this) continue;
+				if (player->getProp(PLPROP_ACCOUNTNAME).subString(1) == chatParse[1])
+				{
+					warp(player->getLevel()->getLevelName(), (float)(player->getProp(PLPROP_X).readGChar()) / 2.0f, (float)(player->getProp(PLPROP_Y).readGChar()) / 2.0f);
+					break;
+				}
+			}
+		}
+		// To x/y location
+		else if (chatParse.size() == 3)
+		{
+			setProps(CString() >> (char)PLPROP_X >> (char)(strtoint(chatParse[1]) * 2) >> (char)PLPROP_Y >> (char)(strtoint(chatParse[2]) * 2), true, true);
+		}
+		// To x/y level
+		else if (chatParse.size() == 4)
+		{
+			warp(chatParse[3], (float)strtofloat(chatParse[1]), (float)strtofloat(chatParse[2]));
+		}
+	}
+	else if (chatParse[0] == "updatelevel")
+	{
+	}
+	else if (chatParse[0] == "unstick" || chatParse[0] == "unstuck")
+	{
+		// TODO: unstickme timeout
+		if (chatParse.size() == 2 && chatParse[1] == "me")
+		{
+			CString unstickLevel = server->getSettings()->getStr("unstickmelevel", "onlinestartlocal.nw");
+			float unstickX = server->getSettings()->getFloat("unstickmex", 30.0f);
+			float unstickY = server->getSettings()->getFloat("unstickmey", 30.5f);
+			warp(unstickLevel, unstickX, unstickY);
+		}
+	}
+}
 
 /*
 	TPlayer: Set Properties
@@ -462,6 +548,11 @@ bool TPlayer::warp(const CString& pLevelName, float pX, float pY, time_t modTime
 	// See if the new level is on a gmap.
 	pmap = server->getMap(newLevel);
 
+	// Set x/y location.
+	float oldX = x, oldY = y;
+	x = pX;
+	y =	pY;
+
 	// Try warping to the new level.
 	if (setLevel(pLevelName, modTime) == false)
 	{
@@ -470,6 +561,8 @@ bool TPlayer::warp(const CString& pLevelName, float pX, float pY, time_t modTime
 		if (currentLevel == 0) warped = false;
 		else
 		{
+			x = oldX;
+			y = oldY;
 			pmap = server->getMap(currentLevel);
 			warped = setLevel(currentLevel->getLevelName());
 		}
@@ -479,20 +572,12 @@ bool TPlayer::warp(const CString& pLevelName, float pX, float pY, time_t modTime
 			if (unstickLevel == 0) return false;
 
 			// Try to warp to the unstick me level.
+			x = unstickX;
+			y =	unstickY;
 			pmap = server->getMap(unstickLevel);
 			if (setLevel(unstickLevel->getLevelName()) == false)
 				return false;
-
-			// Set x/y location.
-			x = unstickX;
-			y =	unstickY;
 		}
-	}
-	else
-	{
-		// Set x/y location.
-		x = pX;
-		y =	pY;
 	}
 	return true;
 }
@@ -704,9 +789,29 @@ time_t TPlayer::getCachedLevelModTime(const TLevel* level) const
 	return 0;
 }
 
-void TPlayer::setNick(const CString& pNickName)
+void TPlayer::setNick(CString& pNickName)
 {
-	nickName = pNickName;
+	CString newNick;
+	CString nick = pNickName.readString("(").trim();
+	CString guild = CString("(") << pNickName.readString(")") << ")";
+
+	// If a player has put a * before his nick, remove it.
+	if (nick[0] == '*') nick.removeI(0,1);
+
+	// If the nickname is equal to the account name, add the *.
+	if (nick == accountName)
+		newNick = CString("*");
+
+	// Add the nick name.
+	newNick << nick;
+
+	// If a guild was specified, add the guild.
+	// TODO: guild verification.
+	if (guild.length() > 2)
+		newNick << " " << guild;
+
+	// Save it.
+	nickName = newNick;
 }
 
 
@@ -857,7 +962,7 @@ bool TPlayer::msgPLI_BOARDMODIFY(CString& pPacket)
 
 bool TPlayer::msgPLI_PLAYERPROPS(CString& pPacket)
 {
-	this->setProps(pPacket, true);
+	setProps(pPacket, true);
 	return true;
 }
 
