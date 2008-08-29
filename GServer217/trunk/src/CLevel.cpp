@@ -18,7 +18,7 @@ CString signSymbols = "ABXYudlrhxyz#4.";
 int ctablen[] = {1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1};
 int ctabindex[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 16};
 int ctab[] = {91, 92, 93, 94, 77, 78, 79, 80, 74, 75, 71, 72, 73, 86, 87, 88, 67};
-extern char* itemNames[];
+extern const char* itemNames[];
 
 // Store join command stuff.
 CList joinList;

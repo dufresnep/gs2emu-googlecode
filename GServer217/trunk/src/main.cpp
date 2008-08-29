@@ -43,16 +43,18 @@ char fSep[] = "/";
 const char* __admin[]   = {"description", "detailedconsole", "language", "listport", "listip", "maxplayers", "myip", "name", "nofoldersconfig", "onlystaff", "serverport", "sharefolder", "showconsolepackets", "underconstruction", "url", "worldname"};
 const char* __colours[] = {"white", "yellow", "orange", "pink", "red", "darkred", "lightgreen", "green", "darkgreen", "lightblue", "blue", "darkblue", "brown", "cynober", "purple", "darkpurple", "lightgray", "gray", "black", "transparent"};
 const char* __cloths[]  = {"setskin", "setcoat", "setsleeve", "setshoe", "setbelt", "setsleeves", "setshoes"};
-const char* __defaultgani[] = {"carried","carry","carrystill","carrypeople","dead","def","ghostani","grab","gralats","hatoff","haton","hidden","hiddenstill","hurt","idle","kick","lava","lift","maps1","maps2","maps3","pull","push","ride","rideeat","ridefire","ridehurt","ridejump","ridestill","ridesword","shoot","sit","skip","sleep","spin","swim","sword","walk","walkslow"};
-const char* __defaultsword[] = {"sword1.png", "sword2.png", "sword3.png", "sword4.png"};
-const char* __defaultshield[] = {"shield1.png", "shield2.png", "shield3.png"};
+const char* __defaultfiles[] = {
+	"carried.gani", "carry.gani", "carrystill.gani", "carrypeople.gani", "dead.gani", "def.gani", "ghostani.gani", "grab.gani", "gralats.gani", "hatoff.gani", "haton.gani", "hidden.gani", "hiddenstill.gani", "hurt.gani", "idle.gani", "kick.gani", "lava.gani", "lift.gani", "maps1.gani", "maps2.gani", "maps3.gani", "pull.gani", "push.gani", "ride.gani", "rideeat.gani", "ridefire.gani", "ridehurt.gani", "ridejump.gani", "ridestill.gani", "ridesword.gani", "shoot.gani", "sit.gani", "skip.gani", "sleep.gani", "spin.gani", "swim.gani", "sword.gani", "walk.gani", "walkslow.gani",
+	"sword1.png", "sword2.png", "sword3.png", "sword4.png",
+	"shield1.png", "shield2.png", "shield3.png",
+};
 CLevel* NOLEVEL = new CLevel();
 CList newPlayers, playerList, playerIds, settingList, weaponList, npcList, npcIds, levelList;
 CSocket responseSock, serverSock;
 CString dataDir, listServerFields[6], listServerIp, serverMessage, shareFolder, staffHead, worldName, unstickmeLevel;
 CString programDir;
 CStringList adminNames, cheatwindows, clothCommands, colourNames, globalGuildList, jailLevels, mapNames, profileList, RCBans, RCMessage, RCHelpMessage, serverFlags, staffGuilds, staffList, statusList, subDirs;
-CStringList folderConfig, defaultGaniNames, defaultSwordNames, defaultShieldNames;
+CStringList folderConfig, defaultFiles;
 CWordFilter WordFilter;
 float unstickmeX, unstickmeY;
 int aptime[5], baddyRespawn, cheatwindowstime, gameTime = 1, heartLimit, horseLife, idleDisconnect, listServerPort, maxNoMovement, maxPlayers, nwTime, serverTime = 0, shieldLimit, swordLimit, tileRespawn;
@@ -111,9 +113,7 @@ int main(int argc, char *argv[])
 	adminNames.load( __admin, sizeof(__admin) / sizeof(const char*) );
 	colourNames.load( __colours, sizeof(__colours) / sizeof(const char*) );
 	clothCommands.load( __cloths, sizeof(__cloths) / sizeof(const char*) );
-	defaultGaniNames.load( __defaultgani, sizeof(__defaultgani) / sizeof(const char*) );
-	defaultSwordNames.load( __defaultsword, sizeof(__defaultsword) / sizeof(const char*) );
-	defaultShieldNames.load( __defaultshield, sizeof(__defaultshield) / sizeof(const char*) );
+	defaultFiles.load( __defaultfiles, sizeof(__defaultfiles) / sizeof(const char*) );
 	playerIds.add(0);
 	playerIds.add(0);
 	npcIds.add(0);
@@ -867,26 +867,14 @@ bool isValidFile(CBuffer& file, int type)
 
 			case 8:		// SWORDPOWER
 				if ( ftype == "sword" )
-				{
-					int j = 0;
-					while ( j < defaultSwordNames.count() &&
-						file.find( defaultSwordNames[j].text() ) == -1 ) ++j;
-					if ( j != defaultSwordNames.count() ) return false;
 					if ( file.match( fmask.text() ) )
 						return true;
-				}
 			break;
 
 			case 9:		// SHIELDPOWER
 				if ( ftype == "shield" )
-				{
-					int j = 0;
-					while ( j < defaultShieldNames.count() &&
-						file.find( defaultShieldNames[j].text() ) == -1 ) ++j;
-					if ( j != defaultShieldNames.count() ) return false;
 					if ( file.match( fmask.text() ) )
 						return true;
-				}
 			break;
 
 			case 1:		// level

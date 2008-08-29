@@ -165,7 +165,7 @@ bool sendRcProps[propscount] =
 	false, false, false, false, false, false  // 48-53
 };
 
-char* itemNames[] = {
+const char* itemNames[] = {
 	"greenrupee","bluerupee","redrupee","bombs","darts","heart","glove1",
 	"bow","bomb","shield","sword","fullheart","superbomb","battleaxe","goldensword",
 	"mirrorshield", "glove2","lizardshield","lizardsword","goldrupee","fireball",
@@ -1648,52 +1648,40 @@ void CPlayer::sendFiles()
 		CString shortName = file->fileName;
 		CString longName = (file->longName.length() > 0 ? file->longName : getDataFile(shortName.text()));
 
-		if(longName.length())
+		if (longName.length() != 0)
 		{
-			// Don't send default files!
-			if ( defaultGaniNames.find( shortName ) != -1 ||
-				defaultGaniNames.find( (CString() << shortName << ".gani") ) != -1 ||
-				defaultSwordNames.find( shortName ) != -1 ||
-				defaultShieldNames.find( shortName ) != -1 )
+			modTime = getFileModTime(longName.text());
+			if (modTime > file->modTime)
 			{
-				failed = true;
-				modTime = 0;		// Just in case the compiler tries to optimize this out.
-			}
-			else
-			{
-				modTime = getFileModTime(longName.text());
-				if (modTime > file->modTime)
+				if (fileData.load(longName.text()))
 				{
-					if (fileData.load(longName.text()))
+					bool isLargeFile = false;
+					failed = false;
+
+					// If it is a large file, send the large file packet.
+					if (fileData.length() > 32000)
 					{
-						bool isLargeFile = false;
-						failed = false;
-
-						// If it is a large file, send the large file packet.
-						if (fileData.length() > 32000)
-						{
-							isLargeFile = true;
-							sendPacket(CPacket() << (char)SLARGEFILESTART << shortName);
-							sendPacket(CPacket() << (char)SLARGEFILESIZE << (long long)fileData.length());
-						}
-
-						// Send the entire file.
-						while (fileData.length() > 0)
-						{
-							int fileLen = CLIP(fileData.length(), 0, 32000);
-							int len = 1 + 5 + 1 + shortName.length() + fileLen + 1;
-							sendPacket(CPacket() << (char)100 << (int)len);
-							sendPacket(CPacket() << (char)102 << (long long)modTime << (char)shortName.length() << shortName << fileData.copy(0, fileLen) << "\n");
-							fileData.remove(0, fileLen);
-						}
-
-						// If we had sent a large file, tell the client we are now finished.
-						if (isLargeFile)
-							sendPacket(CPacket() << (char)SLARGEFILEEND << shortName);
+						isLargeFile = true;
+						sendPacket(CPacket() << (char)SLARGEFILESTART << shortName);
+						sendPacket(CPacket() << (char)SLARGEFILESIZE << (long long)fileData.length());
 					}
+
+					// Send the entire file.
+					while (fileData.length() > 0)
+					{
+						int fileLen = CLIP(fileData.length(), 0, 32000);
+						int len = 1 + 5 + 1 + shortName.length() + fileLen + 1;
+						sendPacket(CPacket() << (char)100 << (int)len);
+						sendPacket(CPacket() << (char)102 << (long long)modTime << (char)shortName.length() << shortName << fileData.copy(0, fileLen) << "\n");
+						fileData.remove(0, fileLen);
+					}
+
+					// If we had sent a large file, tell the client we are now finished.
+					if (isLargeFile)
+						sendPacket(CPacket() << (char)SLARGEFILEEND << shortName);
 				}
-				else sendPacket(CPacket() << (char)SFILEUPTODATE << shortName);
 			}
+			else sendPacket(CPacket() << (char)SFILEUPTODATE << shortName);
 		}
 
 		if(failed)
@@ -3421,6 +3409,16 @@ void CPlayer::msgUPDATEFILE(CPacket& pPacket)
 {
 	long long modTime = pPacket.readByte5();
 	CString fileName = pPacket.readString("");
+
+	for (int i = 0; i < defaultFiles.size(); ++i)
+	{
+		if (fileName == defaultFiles[i])
+		{
+			sendPacket(CPacket() << (char)SFILEUPTODATE << fileName);
+			return;
+		}
+	}
+
 	if(fileList.count() <= 50)
 		fileList.add(new COutFile(fileName, modTime));
 	else

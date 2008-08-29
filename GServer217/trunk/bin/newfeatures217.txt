@@ -17,6 +17,8 @@ Fixes:
   instead of telling the client it failed to send it.
 - Horses correctly save its image, direction, and bush count when you
   dismount.
+- Fixed the protection against sending default files.  For sure this
+  time.  Really.
 
 
 --------------------------------------------
