@@ -83,7 +83,12 @@ CString TPlayer::getProp(int pPropId)
 
 		case PLPROP_CURLEVEL:
 		if (type == CLIENTTYPE_CLIENT)
-			return CString() >> (char)levelName.length() << levelName;
+		{
+			if (pmap && pmap->getType() == MAPTYPE_GMAP)
+				return CString() >> (char)pmap->getMapName().length() << pmap->getMapName();
+			else
+				return CString() >> (char)levelName.length() << levelName;
+		}
 		else
 			return CString() >> (char)1 << " ";
 

@@ -89,9 +89,9 @@ bool __sendLocal[propscount] =
 	true,  true,  false, true,  true,  true,  // 12-17
 	true,  true,  true,  true,  false, false, // 18-23
 	false, true,  false, false, false, false, // 24-29
-	true,  false, true,  false, true,  true,  // 30-35
+	true,  true,  true,  false, true,  true,  // 30-35
 	true,  true,  true,  true,  true,  true,  // 36-41
-	false, true,  true, true,  false, false, // 42-47
+	false, true,  true,  true,  false, false, // 42-47
 	false, false, true,  false, false, false, // 48-53
 	true,  true,  true,  true,  true,  true,  // 54-59
 	true,  true,  true,  true,  true,  true,  // 60-65
@@ -651,9 +651,9 @@ bool TPlayer::sendLevel(TLevel* pLevel, time_t modTime, bool skipActors)
 		sendCompress();
 
 		// Send links, signs, and mod time.
+		sendPacket(CString() >> (char)PLO_LEVELMODTIME >> (long long)pLevel->getModTime());
 		sendPacket(CString() << pLevel->getLinksPacket());
 		sendPacket(CString() << pLevel->getSignsPacket());
-		sendPacket(CString() >> (char)PLO_LEVELMODTIME >> (long long)pLevel->getModTime());
 	}
 
 	// Send board changes, chests, horses, and baddies.
@@ -663,19 +663,22 @@ bool TPlayer::sendLevel(TLevel* pLevel, time_t modTime, bool skipActors)
 		sendPacket(CString() << pLevel->getChestPacket(this));
 		sendPacket(CString() << pLevel->getHorsePacket());
 		sendPacket(CString() << pLevel->getBaddyPacket());
-
-		// If we are the leader, send it now.
-		if (pLevel->getPlayer(0) == this)
-			sendPacket(CString() >> (char)PLO_ISLEADER);
 	}
-
-	// Tell the client if there are any ghost players in the level.
-	// Graal Reborn doesn't support trial accounts so pass 0 (no ghosts) instead of 1 (ghosts present).
-	//sendPacket(CString() >> (char)PLO_GHOSTICON >> (char)0);
 
 	// If we are on a gmap, change our level back to the gmap.
 	if (pmap && pmap->getType() == MAPTYPE_GMAP)
 		sendPacket(CString() >> (char)PLO_LEVELNAME << pmap->getMapName());
+
+	// Tell the client if there are any ghost players in the level.
+	// Graal Reborn doesn't support trial accounts so pass 0 (no ghosts) instead of 1 (ghosts present).
+	sendPacket(CString() >> (char)PLO_GHOSTICON >> (char)0);
+
+	if (skipActors == false)
+	{
+		// If we are the leader, send it now.
+		if (pLevel->getPlayer(0) == this)
+			sendPacket(CString() >> (char)PLO_ISLEADER);
+	}
 
 	// Send new world time.
 	sendPacket(CString() >> (char)PLO_NEWWORLDTIME << CString().writeGInt4(server->getNWTime()));
