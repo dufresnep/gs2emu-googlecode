@@ -3410,7 +3410,7 @@ void CPlayer::msgUPDATEFILE(CPacket& pPacket)
 	long long modTime = pPacket.readByte5();
 	CString fileName = pPacket.readString("");
 
-	for (int i = 0; i < defaultFiles.size(); ++i)
+	for (int i = 0; i < defaultFiles.count(); ++i)
 	{
 		if (fileName == defaultFiles.item(i))
 		{
