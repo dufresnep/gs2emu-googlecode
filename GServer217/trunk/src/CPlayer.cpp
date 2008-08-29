@@ -3412,7 +3412,7 @@ void CPlayer::msgUPDATEFILE(CPacket& pPacket)
 
 	for (int i = 0; i < defaultFiles.size(); ++i)
 	{
-		if (fileName == defaultFiles[i])
+		if (fileName == defaultFiles.item(i))
 		{
 			sendPacket(CPacket() << (char)SFILEUPTODATE << fileName);
 			return;
