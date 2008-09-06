@@ -1,5 +1,5 @@
 --------------------------------------------
-New features/bug fixes in v2.171 build 60 (pre-release)
+New features/bug fixes in v2.171 build 60
 --------------------------------------------
 
 Additions:

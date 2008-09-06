@@ -251,7 +251,7 @@ void CPlayer::main()
 	// Get data.
 	if ( playerSock->getData() == -1 )
 	{
-		errorOut("errorlog.txt", CString() << "Client " << accountName << " disconnected with sock error." );
+		//errorOut("errorlog.txt", CString() << "Client " << accountName << " disconnected." );
 		deleteMe = true;
 		return;
 	}

@@ -481,7 +481,7 @@ int CSocket::getData()
 				case ETIMEDOUT:
 				case ESHUTDOWN:
 					// Destroy the bad socket and create a new one.
-					errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!  Reason: " << errorMessage(intError) );
+					if (intError != ECONNRESET) errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!  Reason: " << errorMessage(intError) );
 					disconnect();
 					break;
 				default:
@@ -493,7 +493,7 @@ int CSocket::getData()
 	// If size is 0, the socket was disconnected.
 	if ( size == 0 )
 	{
-		errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!" );
+		//errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!" );
 		disconnect();
 	}
 
@@ -648,7 +648,7 @@ const char* CSocket::tcpIp()
 	memset( (void*)host, 0, 1025 );
 
 	// Grab the IP address.
-	int error = getnameinfo( (struct sockaddr*)&properties.address, sizeof( struct sockaddr ), host, 1025, 0, 0, NI_NUMERICHOST );
+	int error = getnameinfo( (struct sockaddr*)&properties.address, sizeof( struct sockaddr_storage ), host, 1025, 0, 0, NI_NUMERICHOST );
 	if ( error ) return 0;
 	hostret = host;
 	return hostret;
