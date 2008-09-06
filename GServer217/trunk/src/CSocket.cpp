@@ -33,6 +33,7 @@
 	#define ENOTSOCK			WSAENOTSOCK
 	#define ETIMEDOUT			WSAETIMEDOUT
 	#define EWOULDBLOCK			WSAEWOULDBLOCK
+	#define EAGAIN				WSAEWOULDBLOCK
 	#define EACCES				WSAEACCES
 	#define ENOTCONN			WSAENOTCONN
 	#define ENETRESET			WSAENETRESET
@@ -403,7 +404,7 @@ int CSocket::sendData( CPacket& data )
 					return intError;
 					break;
 			}
-			if ( intError == EWOULDBLOCK || intError == EINPROGRESS ) return size;
+			if ( intError == EAGAIN || intError == EWOULDBLOCK || intError == EINPROGRESS ) return size;
 			disconnect();
 			return intError;
 		}
