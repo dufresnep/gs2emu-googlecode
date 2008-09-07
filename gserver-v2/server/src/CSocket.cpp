@@ -29,6 +29,7 @@
 	#define ENOTSOCK			WSAENOTSOCK
 	#define ETIMEDOUT			WSAETIMEDOUT
 	#define EWOULDBLOCK			WSAEWOULDBLOCK
+	#define EAGAIN				WSAEWOULDBLOCK
 	#define EACCES				WSAEACCES
 	#define ENOTCONN			WSAENOTCONN
 	#define ENETRESET			WSAENETRESET
@@ -428,7 +429,7 @@ int CSocket::sendData(CString& data)
 					return intError;
 					break;
 			}
-			if (intError == EWOULDBLOCK || intError == EINPROGRESS) return size;
+			if (intError == EAGAIN || intError == EWOULDBLOCK || intError == EINPROGRESS) return size;
 			disconnect();
 			return intError;
 		}
@@ -673,7 +674,7 @@ const char* CSocket::tcpIp()
 	memset((void*)host, 0, 1025);
 
 	// Grab the IP address.
-	int error = getnameinfo((struct sockaddr*)&properties.address, sizeof(struct sockaddr), host, 1025, 0, 0, NI_NUMERICHOST);
+	int error = getnameinfo((struct sockaddr*)&properties.address, sizeof(struct sockaddr_storage), host, 1025, 0, 0, NI_NUMERICHOST);
 	if (error) return 0;
 	hostret = host;
 	return hostret;

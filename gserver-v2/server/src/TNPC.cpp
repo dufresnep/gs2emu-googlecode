@@ -464,7 +464,8 @@ void TNPC::setProps(CString& pProps)
 
 			default:
 			{
-				printf("Unidentified NPCPROP: %i, readPos: %d\n", propId, pProps.readPos());
+				printf("NPC %d (%.2f, %.2f): ", id, x, y);
+				printf("Unknown prop: %ud, readPos: %d\n", propId, pProps.readPos());
 				for (int i = 0; i < pProps.length(); ++i)
 					printf("%02x ", (unsigned char)pProps[i]);
 				printf("\n");
@@ -537,7 +538,19 @@ std::vector<CString> TNPC::removeComments(const CString& code, bool trimCode)
 			}
 
 			// Check for a single line comment.
-			int slc_start = line.find("//");
+			int slc_start = -1;
+			int slc_loop = 0;
+			bool slc_doloop = true;
+			do
+			{
+				slc_start = line.find("//", slc_loop);
+				if (slc_start != -1 && line.find("http:") == slc_start - 5)
+				{
+					slc_loop = slc_start + 1;
+					slc_start = 0;
+				}
+				else slc_doloop = false;
+			} while (slc_doloop);
 			if (slc_start != -1)
 			{
 				// If //#CLIENTSIDE is found, add the current code read as serverside script.

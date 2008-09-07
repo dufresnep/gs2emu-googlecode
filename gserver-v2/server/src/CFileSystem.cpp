@@ -1,5 +1,7 @@
 #include <sys/stat.h>
-#include <dirent.h>
+#if !defined(_WIN32) && !defined(_WIN64)
+	#include <dirent.h>
+#endif
 #include <map>
 #include "ICommon.h"
 #include "CString.h"
