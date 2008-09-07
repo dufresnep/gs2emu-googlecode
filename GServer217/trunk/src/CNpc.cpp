@@ -101,57 +101,46 @@ void CNpc::removeComments()
 CPacket CNpc::getProperty(int pId)
 {
 	CPacket retVal;
-	con_print( "CNpc::getProperty - id: %d\n", id );
 	switch(pId)
 	{
 		case NPCGIF:
 			retVal << (char)image.length() << image;
-			con_print( "NPCGIF\n" );
 		break;
 
 		case ACTIONSCRIPT:
 			retVal << (short)clientCode.length() << clientCode;
-			con_print( "ACTIONSCRIPT\n" );
 		break;
 
 		case NPCX:
 			retVal << (char)(x*2);
-			con_print( "NPCX\n" );
 		break;
 
 		case NPCY:
 			retVal << (char)(y*2);
-			con_print( "NPCY\n" );
 		break;
 
 		case NPCPOWER:
 			retVal << (char)power;
-			con_print( "NPCPOWER\n" );
 		break;
 
 		case NPCRUPEES:
 			retVal.writeByte3(rupees);
-			con_print( "NPCRUPEES\n" );
 		break;
 
 		case NPCARROWS:
 			retVal << (char)darts;
-			con_print( "NPCARROWS\n" );
 		break;
 
 		case NPCBOMBS:
 			retVal << (char)bombs;
-			con_print( "NPCBOMBS\n" );
 		break;
 
 		case NGLOVEPOWER:
 			retVal << (char)glovePower;
-			con_print( "NGLOVEPOWER\n" );
 		break;
 
 		case NBOMBPOWER:
 			retVal << (char)bombPower;
-			con_print( "NBOMBPOWER\n" );
 		break;
 
 		case NSWORDGIF:
@@ -161,8 +150,6 @@ CPacket CNpc::getProperty(int pId)
 			retVal << (char)sp;
 			if ( sp > 30 )
 				retVal << (char)swordImage.length() << swordImage;
-
-			con_print( "NSWORDGIF\n" );
 		}
 		break;
 
@@ -173,71 +160,57 @@ CPacket CNpc::getProperty(int pId)
 			retVal << (char)sp;
 			if ( sp > 10 )
 				retVal << (char)shieldImage.length() << shieldImage;
-
-			con_print( "NSHIELDGIF\n" );
 		}
 		break;
 
 		case NPCANI:
 			retVal << (char)gAni.length() << gAni;
-			con_print( "NPCANI\n" );
 		break;
 
 		case VISFLAGS:
 			retVal << (char)visFlags;
-			con_print( "VISFLAGS\n" );
 		break;
 
 		case BLOCKFLAGS:
 			retVal << (char)blockFlags;
-			con_print( "BLOCKFLAGS\n" );
 		break;
 
 		case NPCMESSAGE:
 			if ( chatMsg.length() > 200 )
 				chatMsg = chatMsg.copy(0,200);
 			retVal << (char)chatMsg.length() << chatMsg;
-			con_print( "NPCMESSAGE\n" );
 		break;
 
 		case NPCHURTDXDY:
 			retVal << (char)(hurtX*32)+32 << (char)(hurtY*32)+32;
-			con_print( "NPCHURTDXDY\n" );
 		break;
 
 		case NPCID:
 			retVal.writeByte3(id);
-			con_print( "NPCID\n" );
 		break;
 
 		case NPCSPRITE:
 			retVal << (char)(sprite % 4);
-			con_print( "NPCSPRITE\n" );
 		break;
 
 		case NPCCOLORS:
 			retVal << (char)colors[0] << (char)colors[1] << (char)colors[2] << (char)colors[3] << (char)colors[4];// << (char)colors[5];
-			con_print( "NPCCOLORS\n" );
 		break;
 
 		case NPCNICKNAME:
 			retVal << (char)nickName.length() << nickName;
-			con_print( "NPCNICKNAME\n" );
 		break;
 
 		case NPCHORSEGIF:
 			retVal << (char)horseImage.length() << horseImage;
-			con_print( "NPCHORSEGIF\n" );
 		break;
 
 		case NPCHEADGIF:
 			retVal << (char)(headImage.length()+100) << headImage;
-			con_print( "NPCHEADGIF\n" );
 		break;
 
 		case NALIGNMENT:
 			retVal.writeByte1(ap);
-			con_print( "NALIGNMENT\n" );
 		break;
 
 		case NPCSAVE0:
@@ -251,17 +224,14 @@ CPacket CNpc::getProperty(int pId)
 		case NPCSAVE8:
 		case NPCSAVE9:
 			retVal << saves[pId-NPCSAVE0];
-			con_print( "NPCSAVE%d\n", pId-NPCSAVE0 );
 		break;
 
 		case NPCGIFPART:
 			retVal << imagePart;
-			con_print( "NPCGIFPART\n" );
 		break;
 
 		case NPCBODY:
 			retVal << (char)bodyImage.length() << bodyImage;
-			con_print( "NPCBODY\n" );
 		break;
 
 		case NGATTRIB1:
@@ -272,12 +242,17 @@ CPacket CNpc::getProperty(int pId)
 		{
 			int index = pId - NGATTRIB1;
 			retVal << (char)gAttribs[index].length() << gAttribs[index];
-			con_print( "NGATTRIB%d\n", index );
 		}
 		break;
 
-		case NEMPTY41:
-		case NEMPTY42:
+		case NGMAPLEVELX:
+			retVal << (char)0;
+			break;
+
+		case NGMAPLEVELY:
+			retVal << (char)0;
+			break;
+
 		case NEMPTY43:
 			errorOut( "debuglog.txt", CString() << "CNpc::getProperty() requested NEMPTY" << toString(pId) );
 			CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "\"CNpc::getProperty() requested NEMPTY" << toString(pId) << "\"" );
@@ -313,7 +288,6 @@ CPacket CNpc::getProperty(int pId)
 		{
 			int index = 6 + pId - NGATTRIB6;
 			retVal << (char)gAttribs[index].length() << gAttribs[index];
-			con_print( "NGATTRIB%d\n", index );
 		}
 		break;
 
@@ -323,7 +297,6 @@ CPacket CNpc::getProperty(int pId)
 			break;
 
 	}
-	con_print( "Packet: %s\n\n", retVal.text() );
 	return retVal;
 }
 
@@ -331,7 +304,6 @@ void CNpc::setProps(CPacket& pProps)
 {
 	int len;
 	int previousMessage = 0;
-	con_print( "CNpc::setProps - id: %d\nPacket: %s\n", id, pProps.text() );
 	while(pProps.bytesLeft())
 	{
 		int index = pProps.readByte1();
@@ -339,72 +311,56 @@ void CNpc::setProps(CPacket& pProps)
 		switch(index)
 		{
 			case NPCGIF:
-				len = pProps.readByte1();
-				con_print( "NPCGIF: len: %d ", len );
-				if(len >= 0)
-					image = pProps.readChars(len);
-				con_print( "image: %s\n", image.text() );
+				len = (unsigned char)pProps.readByte1();
+				image = pProps.readChars(len);
 			break;
 
 			case ACTIONSCRIPT:
-				len = pProps.readByte2();
-				con_print( "ACTIONSCRIPT: len: %d\n", len );
-				if(len >= 0)
-					clientCode = pProps.readChars(len);
+				len = (unsigned int)pProps.readByte2();
+				clientCode = pProps.readChars(len);
 			break;
 
 			case NPCX:
 				x = (float)(pProps.readByte1())/2;
-				con_print( "NPCX: %d\n", x );
 			break;
 
 			case NPCY:
 				y = (float)(pProps.readByte1())/2;
-				con_print( "NPCY: %d\n", y );
 			break;
 
 			case NPCPOWER:
-				power = pProps.readByte1();
-				con_print( "NPCPOWER: %d\n", power );
+				power = (unsigned char)pProps.readByte1();
 			break;
 
 			case NPCRUPEES:
-				rupees = pProps.readByte3();
-				con_print( "NPCRUPEES: %d\n", rupees );
+				rupees = (unsigned int)pProps.readByte3();
 			break;
 
 			case NPCARROWS:
-				darts = pProps.readByte1();
-				con_print( "NPCARROWS: %d\n", darts );
+				darts = (unsigned char)pProps.readByte1();
 			break;
 
 			case NPCBOMBS:
-				bombs = pProps.readByte1();
-				con_print( "NPCBOMBS: %d\n", bombs );
+				bombs = (unsigned char)pProps.readByte1();
 			break;
 
 			case NGLOVEPOWER:
-				glovePower = pProps.readByte1();
-				con_print( "NGLOVEPOWER: %d\n", glovePower );
+				glovePower = (unsigned char)pProps.readByte1();
 			break;
 
 			case NBOMBPOWER:
-				bombPower = pProps.readByte1();
-				con_print( "NBOMBPOWER: %d\n", bombPower );
+				bombPower = (unsigned char)pProps.readByte1();
 			break;
 
 			case NSWORDGIF:
 			{
-				con_print( "NSWORDGIF: " );
-				int sp = pProps.readByte1();
-				con_print( "sp: %d, ", sp );
+				int sp = (unsigned char)pProps.readByte1();
 				if ( sp >= 30 )
 				{
 					sp -= 30;
-					len = pProps.readByte1();
+					len = (unsigned char)pProps.readByte1();
 					if ( len >= 0 )
 						swordImage = pProps.readChars(len);
-					con_print( "image: %s\n", swordImage.text() );
 				}
 				else
 				{
@@ -420,15 +376,12 @@ void CNpc::setProps(CPacket& pProps)
 
 			case NSHIELDGIF:
 			{
-				con_print( "NSHIELDGIF: " );
-				int sp = pProps.readByte1();
-				con_print( "sp: %d, ", sp );
+				int sp = (unsigned char)pProps.readByte1();
 				if(sp >= 10)
 				{
-					len = pProps.readByte1();
+					len = (unsigned char)pProps.readByte1();
 					if(len >= 0)
 						shieldImage = pProps.readChars(len);
-					con_print( "image: %s\n", shieldImage.text() );
 				} else
 				{
 					if(sp >= 1 && sp <= 3)
@@ -440,83 +393,58 @@ void CNpc::setProps(CPacket& pProps)
 			break;
 
 			case NPCANI:
-				len = pProps.readByte1();
-				if(len >= 0)
-					gAni = pProps.readChars(len);
-				con_print( "NPCANI: len: %d, gani: %s\n", len, gAni.text() );
+				len = (unsigned char)pProps.readByte1();
+				gAni = pProps.readChars(len);
 			break;
 
 			case VISFLAGS:
-				visFlags = pProps.readByte1();
-				con_print( "VISFLAGS: %d\n", visFlags );
+				visFlags = (unsigned char)pProps.readByte1();
 			break;
 
 			case BLOCKFLAGS:
-				blockFlags = pProps.readByte1();
-				con_print( "BLOCKFLAGS %d\n", blockFlags );
-			break;
+				blockFlags = (unsigned char)pProps.readByte1();
+		break;
 
 			case NPCMESSAGE:
-				len = pProps.readByte1();
-				if(len >= 0)
-					chatMsg = pProps.readChars(len);
-				con_print( "NPCMESSAGE: len: %d, chatMsg: %s\n", len, chatMsg.text() );
+				len = (unsigned char)pProps.readByte1();
+				chatMsg = pProps.readChars(len);
 			break;
 
 			case NPCHURTDXDY:
 				hurtX = ((float)(pProps.readByte1()-32))/32;
 				hurtY = ((float)(pProps.readByte1()-32))/32;
-				con_print( "NPCHURTDXDY: hurtX: %d hurtY: %d\n", hurtX, hurtY );
 			break;
 
 			case NPCID:
 				pProps.readByte3();
-				con_print( "NPCID: %d\n", len );
 			break;
 
 			case NPCSPRITE:
-				sprite = pProps.readByte1();
-				if ( sprite < 0 || sprite >= 132 ) sprite = 0;
-				con_print( "NPCSPRITE: %d\n", sprite );
+				sprite = (unsigned char)pProps.readByte1();
+				if ( sprite >= 132 ) sprite = 0;
 			break;
 
 			case NPCCOLORS:
-				con_print( "NPCCOLORS: " );
 				for (int i = 0; i < 5; i++)
-				{
-					colors[i] = pProps.readByte1();
-					con_print( "%d, ", colors[i] );
-				}
-				con_print( "\n" );
+					colors[i] = (unsigned char)pProps.readByte1();
 			break;
 
 			case NPCNICKNAME:
-				len = pProps.readByte1();
-				if(len >= 0)
-					nickName = pProps.readChars(len);
-				con_print( "NPCNICKNAME: len: %d name: %s\n", len, nickName.text() );
+				len = (unsigned char)pProps.readByte1();
+				nickName = pProps.readChars(len);
 			break;
 
 			case NPCHORSEGIF:
-				len = pProps.readByte1();
-				if(len >= 0)
-					horseImage = pProps.readChars(len);
-				con_print( "NPCHORSEGIF: len: %d image: %s\n", len, horseImage.text() );
+				len = (unsigned char)pProps.readByte1();
+				horseImage = pProps.readChars(len);
 			break;
 
 			case NPCHEADGIF:
-				len = pProps.readByte1();
+				len = (unsigned char)pProps.readByte1();
 				if (len < 100)
-				{
-					if (len >= 0)
-						headImage = CString() << "head" << toString(len) << ".png";
-				}
+					headImage = CString() << "head" << toString(len) << ".png";
 				else
-				{
-					if (len > 100)
-						headImage = pProps.readChars(len-100);
-				}
-				con_print( "NPCHEADGIF: len: %d image: %s\n", len, headImage.text() );
+					headImage = pProps.readChars(len-100);
 			break;
 
 			case NPCSAVE0:
@@ -529,25 +457,20 @@ void CNpc::setProps(CPacket& pProps)
 			case NPCSAVE7:
 			case NPCSAVE8:
 			case NPCSAVE9:
-				saves[index-NPCSAVE0] = pProps.readByte1();
-				con_print( "NPCSAVE%d: %d\n", index-NPCSAVE0, saves[index-NPCSAVE0] );
+				saves[index-NPCSAVE0] = (unsigned char)pProps.readByte1();
 			break;
 
 			case NALIGNMENT:
 				ap = CLIP(pProps.readByte1(), 0, 100);
-				con_print( "NALIGNMENT: %d\n", ap );
 			break;
 
 			case NPCGIFPART:
 				imagePart = pProps.readChars(6);
-				con_print( "NPCGIFPART:\n" );
 			break;
 
 			case NPCBODY:
-				len = pProps.readByte1();
-				if(len >= 0)
-					bodyImage = pProps.readChars(len);
-				con_print( "NPCBODY: len: %d image: %s\n", len, bodyImage.text() );
+				len = (unsigned char)pProps.readByte1();
+				bodyImage = pProps.readChars(len);
 			break;
 
 			case NGATTRIB1:
@@ -555,14 +478,18 @@ void CNpc::setProps(CPacket& pProps)
 			case NGATTRIB3:
 			case NGATTRIB4:
 			case NGATTRIB5:
-				len = pProps.readByte1();
-				if(len >= 0)
-					gAttribs[index-NGATTRIB1] = pProps.readChars(len);
-				con_print( "NGATTRIB%d: len: %d attrib: %s\n", index-NGATTRIB1, len, gAttribs[index-NGATTRIB1].text() );
+				len = (unsigned char)pProps.readByte1();
+				gAttribs[index-NGATTRIB1] = pProps.readChars(len);
 			break;
 
-			case NEMPTY41:
-			case NEMPTY42:
+			case NGMAPLEVELX:
+				pProps.readByte1();
+				break;
+
+			case NGMAPLEVELY:
+				pProps.readByte1();
+				break;
+
 			case NEMPTY43:
 				errorOut( "debuglog.txt", CString() << "CNpc::setProps() tried to set NEMPTY" << toString(index) );
 				CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "\"CNpc::setProps tried to set NEMPTY" << toString(index) << "\"" );
@@ -595,17 +522,22 @@ void CNpc::setProps(CPacket& pProps)
 			case NGATTRIB29:
 			case NGATTRIB30:
 */
-				len = pProps.readByte1();
+				len = (unsigned char)pProps.readByte1();
 				if(len >= 0)
 					gAttribs[6+index-NGATTRIB6] = pProps.readChars(len);
-				con_print( "NGATTRIB%d: len: %d attrib: %s\n", 6+index-NGATTRIB6, len, gAttribs[6+index-NGATTRIB6].text() );
 			break;
 
 			default:
-				errorOut( "debuglog.txt", CString() << "CNpc::setProps() tried to set unknown " << toString(index) );
-				CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "\"CNpc::setProps tried to set unknown " << toString(index) << "\"" );
-				if ( detailedconsole )
-					printf("[%s] UNKNOWN NPC PROP: %i, Prev: %i, Value: %s\n", getTimeStr(1).text(), index, previousMessage, (pProps.text() + pProps.getRead()));
+//				errorOut( "debuglog.txt", CString() << "CNpc::setProps() tried to set unknown " << toString(index) );
+//				CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "\"CNpc::setProps tried to set unknown " << toString(index) << "\"" );
+				printf("NPC %d (%.2f, %.2f): ", id, x, y);
+				printf("Unknown prop: %ud, readPos: %d\n", index, pProps.getRead());
+				for (int i = 0; i < pProps.length(); ++i)
+					printf("%02x ", (unsigned char)pProps[i]);
+				printf("\n");
+
+//				if ( detailedconsole )
+//					printf("[%s] UNKNOWN NPC PROP: %i, Prev: %i, Value: %s\n", getTimeStr(1).text(), index, previousMessage, (pProps.text() + pProps.getRead()));
 			return;
 		}
 		previousMessage = index;
@@ -617,16 +549,4 @@ void CNpc::setProps(CPacket& pProps)
 				modTime[index] = getSysTime();
 		}
 	}
-	con_print( "\n" );
-}
-
-void CNpc::con_print( const char* format, ... )
-{
-	//if ( !showConsolePackets )// || (id != 1 && id != 2 && id != 5 && id != 32) )
-		return;
-
-	va_list args;
-	va_start( args, format );
-	vprintf( format, args );
-	va_end( args );
 }

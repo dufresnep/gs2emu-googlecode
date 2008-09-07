@@ -52,8 +52,8 @@ enum {
 	NGATTRIB3,		// 38
 	NGATTRIB4,		// 39
 	NGATTRIB5,		// 40
-	NEMPTY41,		// 41
-	NEMPTY42,		// 42
+	NGMAPLEVELX,	// 41
+	NGMAPLEVELY,	// 42
 	NEMPTY43,		// 43
 	NGATTRIB6,		// 44
 	NGATTRIB7,		// 45
@@ -89,9 +89,6 @@ enum {
 //#define npcpropcount 69
 class CNpc
 {
-	private:
-		void con_print( const char* format, ... );
-
 	public:
 		time_t modTime[npcpropcount];
 		CNpc(CString& pImage, CString& pCode, float pX, float pY, CLevel* pLevel);

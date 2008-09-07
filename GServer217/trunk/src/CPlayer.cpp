@@ -2079,8 +2079,8 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 		{
 			case NICKNAME:
 			{
-				len = pProps.readByte1();
-				if (len <= 0 || len > 224)
+				len = (unsigned char)pProps.readByte1();
+				if (len > 224)
 					break;
 
 				setNick(CString() << pProps.readChars(len), true);
@@ -2104,33 +2104,33 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 				if ( rc != 0 )
 				{
 					if ( adminCanChangeGralat == true || (rc->type == CLIENTRC && rc->hasStaff() && rc->hasRight(CANCHANGESTAFFACC)) )
-						rubins = CLIP(pProps.readByte3(), 0, 9999999);
+						rubins = CLIP((unsigned int)pProps.readByte3(), 0, 9999999);
 					else
 						pProps.readByte3();
 				}
-				else rubins = CLIP(pProps.readByte3(), 0, 9999999);
+				else rubins = CLIP((unsigned int)pProps.readByte3(), 0, 9999999);
 				break;
 
 			case ARROWSCOUNT:
-				darts = CLIP(pProps.readByte1(), 0, 99);
+				darts = CLIP((unsigned char)pProps.readByte1(), 0, 99);
 				break;
 
 			case BOMBSCOUNT:
-				bombs = CLIP(pProps.readByte1(), 0, 99);
+				bombs = CLIP((unsigned char)pProps.readByte1(), 0, 99);
 				break;
 
 			case GLOVEPOWER:
-				glovePower = CLIP(pProps.readByte1(), 0, 3);
+				glovePower = CLIP((unsigned char)pProps.readByte1(), 0, 3);
 				//is 3 maximum??
 				break;
 
 			case BOMBPOWER:
-				bombPower = CLIP(pProps.readByte1(), 0, 3);
+				bombPower = CLIP((unsigned char)pProps.readByte1(), 0, 3);
 				break;
 
 			case SWORDPOWER:
 			{
-				int sp = pProps.readByte1();
+				int sp = (unsigned char)pProps.readByte1();
 				if ( sp <= 4 )
 					swordImage = CString() << "sword" << toString(sp) << ".png";
 				else
@@ -2152,11 +2152,11 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 
 			case SHIELDPOWER:
 			{
-				int sp = pProps.readByte1();
+				int sp = (unsigned char)pProps.readByte1();
 				if ( sp >= 10 )
 				{
 					sp -= 10;
-					len = pProps.readByte1();
+					len = (unsigned char)pProps.readByte1();
 					if ( len >= 0 )
 					{
 						CString temp( pProps.readChars(len) );
@@ -2173,7 +2173,7 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 			}
 
 			case PLAYERANI:
-				len = pProps.readByte1();
+				len = (unsigned char)pProps.readByte1();
 				if (len >= 0)
 				{
 					CString temp( pProps.readChars(len) );
@@ -2182,24 +2182,18 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 				break;
 
 			case HEADGIF:
-				len = pProps.readByte1();
+				len = (unsigned char)pProps.readByte1();
 				if (len < 100)
 				{
-					if (len >= 0)
-					{
-						headImage = CString() << "head" << toString(len) << ".png";
-						forwardBuff2 << (char)index << getProp( index );
-					}
+					headImage = CString() << "head" << toString(len) << ".png";
+					forwardBuff2 << (char)index << getProp( index );
 				} else
 				{
-					if (len > 100)
+					CString temp( pProps.readChars(len-100) );
+					if ( noFoldersConfig || isValidFile( temp, HEADGIF ) )
 					{
-						CString temp( pProps.readChars(len-100) );
-						if ( noFoldersConfig || isValidFile( temp, HEADGIF ) )
-						{
-							headImage = temp;
-							forwardBuff2 << (char)index << getProp( index );
-						}
+						headImage = temp;
+						forwardBuff2 << (char)index << getProp( index );
 					}
 				}
 				break;
@@ -2217,7 +2211,7 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 
 			case PLAYERCOLORS:
 				for (int i = 0; i < 5; i ++)
-					colors[i] = pProps.readByte1();
+					colors[i] = (unsigned char)pProps.readByte1();
 				break;
 
 			case PLAYERID:
@@ -2225,28 +2219,28 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 				break;
 
 			case PLAYERX:
-				x = (float)pProps.readByte1() / 2;
+				x = (float)pProps.readByte1() / 2.0f;
 				status &= (-1-1);
 				lastMovement = getTime();
 				//TO DO: add hack check;
 				break;
 
 			case PLAYERY:
-				y = (float)pProps.readByte1() / 2;
+				y = (float)pProps.readByte1() / 2.0f;
 				status &= (-1-1);
 				lastMovement = getTime();
 				//TO DO: add hack check;
 				break;
 
 			case PLAYERSPRITE:
-				sprite = pProps.readByte1();
+				sprite = (unsigned char)pProps.readByte1();
 				//TO DO: add hack check;
 				break;
 
 			case STATUS:
 			{
 				int oldStatus = status;
-				status = pProps.readByte1();
+				status = (unsigned char)pProps.readByte1();
 
 				if ( id == -1 ) break;
 
@@ -2275,35 +2269,33 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 			break;
 
 			case CARRYSPRITE:
-				carrySprite = pProps.readByte1();
+				carrySprite = (unsigned char)pProps.readByte1();
 				//TO DO: packet format may be outdated
 				break;
 
 			case CURLEVEL:
-				len = pProps.readByte1();
-				if(len >= 0)
-					levelName = pProps.readChars(len);
+				len = (unsigned char)pProps.readByte1();
+				levelName = pProps.readChars(len);
 				//TO DO: add hack check
 				break;
 
 			case HORSEGIF:
-				len = pProps.readByte1();
-				if(len >= 0)
-				{
-					CString temp( pProps.readChars(len) );
-					if ( noFoldersConfig || isValidFile( temp, -1 ) )
-						horseImage = temp;
-				}
+			{
+				len = (unsigned char)pProps.readByte1();
+				CString temp( pProps.readChars(len) );
+				if ( noFoldersConfig || isValidFile( temp, -1 ) )
+					horseImage = temp;
 				//TO DO: add hack check
-				break;
+			}
+			break;
 
 			case HORSEBUSHES:
-				horseBushes = pProps.readByte1();
+				horseBushes = (unsigned char)pProps.readByte1();
 				//TO DO: add hack check
 				break;
 
 			case EFFECTCOLORS:
-				len = pProps.readByte1();
+				len = (unsigned char)pProps.readByte1();
 				if ( len > 0 )
 					pProps.readByte4();
 	//			pProps.readByte5();
@@ -2316,12 +2308,12 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 				break;
 
 			case APCOUNTER:
-				apCounter = pProps.readByte2();
+				apCounter = (unsigned int)pProps.readByte2();
 				//TO DO: add hack check
 				break;
 
 			case MAGICPOINTS:
-				magicPoints = CLIP(pProps.readByte1(), 0, 100);
+				magicPoints = CLIP((unsigned char)pProps.readByte1(), 0, 100);
 				//TO DO: add hack check
 				break;
 
@@ -2350,7 +2342,7 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 				break;
 
 			case UDPPORT:
-				udpPort = pProps.readByte3();
+				udpPort = (unsigned int)pProps.readByte3();
 				if(udpPort > 0)
 				{
 					sendPacket(CPacket() << (char)DISMESSAGE <<
@@ -2377,27 +2369,25 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 				break;
 
 			case PADDITFLAGS:
-				additionalFlags = pProps.readByte1();
+				additionalFlags = (unsigned char)pProps.readByte1();
 				//TO DO: add hack check
 				break;
 
 			case PACCOUNTNAME:
-				len = pProps.readByte1();
-				if (len >= 0)
-					pProps.readChars(len);
+				len = (unsigned char)pProps.readByte1();
+				pProps.readChars(len);
 				//Do not allow account name change
 				break;
 
 			case BODYIMG:
-				len = pProps.readByte1();
-				if (len >= 0)
-				{
-					CString temp( pProps.readChars(len) );
-					if ( noFoldersConfig || isValidFile( temp, BODYIMG ) )
-						bodyImage = temp;
-				}
+			{
+				len = (unsigned char)pProps.readByte1();
+				CString temp( pProps.readChars(len) );
+				if ( noFoldersConfig || isValidFile( temp, BODYIMG ) )
+					bodyImage = temp;
 				//TO DO: add hack check
-				break;
+			}
+			break;
 
 			case RATING:
 			{
@@ -2441,9 +2431,8 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 				break;
 
 			case PLANGUAGE:
-				len = pProps.readByte1();
-				if(len >= 0)
-					language = pProps.readChars(len);
+				len = (unsigned char)pProps.readByte1();
+				language = pProps.readChars(len);
 				break;
 
 			case PSTATUSMSG:

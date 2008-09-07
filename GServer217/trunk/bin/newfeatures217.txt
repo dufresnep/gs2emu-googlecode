@@ -1,4 +1,16 @@
 --------------------------------------------
+New features/bug fixes in v2.171 build 61
+--------------------------------------------
+Changes:
+- Accounts now use Windows line endings.
+
+Fixes:
+- Fixed a bug that broke admin rights.
+- Fixed a bunch of NPC/player prop bugs.  This caused problems where,
+  for example, head file names over 27 characters would break.
+
+
+--------------------------------------------
 New features/bug fixes in v2.171 build 60
 --------------------------------------------
 

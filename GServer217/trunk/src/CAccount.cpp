@@ -52,7 +52,7 @@ bool CAccount::loadDBAccount(CString pAccount, bool fromAccount)
 	{
 		int sep = file[i].find(' ');
 		CBuffer section = file[i].copy(0, sep);
-		CBuffer val = file[i].copy(sep + 1);
+		CBuffer val = file[i].copy(sep + 1).removeAll("\r");
 		section.trim();
 		val.trim();
 
@@ -163,59 +163,59 @@ void CAccount::saveAccount(bool pAttributes)
 		if ( oldAccount.loadDBAccount(accountName) == false )
 			return;
 
-	newFile << "GRACC001\n";
-	newFile << "NAME " << accountName << "\n";
-	newFile << "NICK " << nickName << "\n";
-	newFile << "LEVEL " << (pAttributes ? oldAccount.levelName : levelName) << "\n";
-	newFile << "X " << toString((pAttributes ? oldAccount.x : x)) << "\n";
-	newFile << "Y " << toString((pAttributes ? oldAccount.y : y)) << "\n";
-	newFile << "MAXHP " << toString((pAttributes ? oldAccount.maxPower : maxPower)) << "\n";
-	newFile << "HP " << toString((pAttributes ? oldAccount.power : power)) << "\n";
-	newFile << "RUPEES " << toString((pAttributes ? oldAccount.rubins : rubins)) << "\n";
-	newFile << "ANI " << (pAttributes ? oldAccount.gAni : gAni) << "\n";
-	newFile << "ARROWS " << toString((pAttributes ? oldAccount.darts : darts)) << "\n";
-	newFile << "BOMBS " << toString((pAttributes ? oldAccount.bombs : bombs)) << "\n";
-	newFile << "GLOVEP " << toString((pAttributes ? oldAccount.glovePower : glovePower)) << "\n";
-	newFile << "SHIELDP " << toString((pAttributes ? oldAccount.shieldPower : shieldPower)) << "\n";
-	newFile << "SWORDP " << toString((pAttributes ? oldAccount.swordPower : swordPower)) << "\n";
-	newFile << "HEAD " << (pAttributes ? oldAccount.headImage : headImage) << "\n";
-	newFile << "BODY " << (pAttributes ? oldAccount.bodyImage : bodyImage) << "\n";
-	newFile << "SWORD " << (pAttributes ? oldAccount.swordImage : swordImage) << "\n";
-	newFile << "SHIELD " << (pAttributes ? oldAccount.shieldImage : shieldImage) << "\n";
-	newFile << "COLORS " << toString((pAttributes ? oldAccount.colors[0] : colors[0])) << "," << toString((pAttributes ? oldAccount.colors[1] : colors[1])) << "," << toString((pAttributes ? oldAccount.colors[2] : colors[2])) << "," << toString((pAttributes ? oldAccount.colors[3] : colors[3])) << "," << toString((pAttributes ? oldAccount.colors[4] : colors[4])) << "\n";
-	newFile << "SPRITE " << toString((pAttributes ? oldAccount.sprite : sprite)) << "\n";
-	newFile << "STATUS " << toString((pAttributes ? oldAccount.status : status)) << "\n";
-	newFile << "MP " << toString((pAttributes ? oldAccount.magicPoints : magicPoints)) << "\n";
-	newFile << "AP " << toString((pAttributes ? oldAccount.ap : ap)) << "\n";
-	newFile << "APCOUNTER " << toString((pAttributes ? oldAccount.apCounter : apCounter)) << "\n";
-	newFile << "ONSECS " << toString((pAttributes ? oldAccount.onlineSecs : onlineSecs)) << "\n";
-	newFile << "IP " << toString(lastIp) << "\n";
-	newFile << "LANGUAGE " << (pAttributes ? oldAccount.language : language) << "\n";
-	newFile << "KILLS " << toString(kills) << "\n";
-	newFile << "DEATHS " << toString(deaths) << "\n";
-	newFile << "RATING " << toString(rating) << "\n";
-	newFile << "DEVIATION " << toString(deviation) << "\n";
-	newFile << "OLDDEVIATION " << toString(oldDeviation) << "\n";
-	newFile << "LASTSPARTIME " << toString((unsigned long)lastSparTime) << "\n";
+	newFile << "GRACC001\r\n";
+	newFile << "NAME " << accountName << "\r\n";
+	newFile << "NICK " << nickName << "\r\n";
+	newFile << "LEVEL " << (pAttributes ? oldAccount.levelName : levelName) << "\r\n";
+	newFile << "X " << toString((pAttributes ? oldAccount.x : x)) << "\r\n";
+	newFile << "Y " << toString((pAttributes ? oldAccount.y : y)) << "\r\n";
+	newFile << "MAXHP " << toString((pAttributes ? oldAccount.maxPower : maxPower)) << "\r\n";
+	newFile << "HP " << toString((pAttributes ? oldAccount.power : power)) << "\r\n";
+	newFile << "RUPEES " << toString((pAttributes ? oldAccount.rubins : rubins)) << "\r\n";
+	newFile << "ANI " << (pAttributes ? oldAccount.gAni : gAni) << "\r\n";
+	newFile << "ARROWS " << toString((pAttributes ? oldAccount.darts : darts)) << "\r\n";
+	newFile << "BOMBS " << toString((pAttributes ? oldAccount.bombs : bombs)) << "\r\n";
+	newFile << "GLOVEP " << toString((pAttributes ? oldAccount.glovePower : glovePower)) << "\r\n";
+	newFile << "SHIELDP " << toString((pAttributes ? oldAccount.shieldPower : shieldPower)) << "\r\n";
+	newFile << "SWORDP " << toString((pAttributes ? oldAccount.swordPower : swordPower)) << "\r\n";
+	newFile << "HEAD " << (pAttributes ? oldAccount.headImage : headImage) << "\r\n";
+	newFile << "BODY " << (pAttributes ? oldAccount.bodyImage : bodyImage) << "\r\n";
+	newFile << "SWORD " << (pAttributes ? oldAccount.swordImage : swordImage) << "\r\n";
+	newFile << "SHIELD " << (pAttributes ? oldAccount.shieldImage : shieldImage) << "\r\n";
+	newFile << "COLORS " << toString((pAttributes ? oldAccount.colors[0] : colors[0])) << "," << toString((pAttributes ? oldAccount.colors[1] : colors[1])) << "," << toString((pAttributes ? oldAccount.colors[2] : colors[2])) << "," << toString((pAttributes ? oldAccount.colors[3] : colors[3])) << "," << toString((pAttributes ? oldAccount.colors[4] : colors[4])) << "\r\n";
+	newFile << "SPRITE " << toString((pAttributes ? oldAccount.sprite : sprite)) << "\r\n";
+	newFile << "STATUS " << toString((pAttributes ? oldAccount.status : status)) << "\r\n";
+	newFile << "MP " << toString((pAttributes ? oldAccount.magicPoints : magicPoints)) << "\r\n";
+	newFile << "AP " << toString((pAttributes ? oldAccount.ap : ap)) << "\r\n";
+	newFile << "APCOUNTER " << toString((pAttributes ? oldAccount.apCounter : apCounter)) << "\r\n";
+	newFile << "ONSECS " << toString((pAttributes ? oldAccount.onlineSecs : onlineSecs)) << "\r\n";
+	newFile << "IP " << toString(lastIp) << "\r\n";
+	newFile << "LANGUAGE " << (pAttributes ? oldAccount.language : language) << "\r\n";
+	newFile << "KILLS " << toString(kills) << "\r\n";
+	newFile << "DEATHS " << toString(deaths) << "\r\n";
+	newFile << "RATING " << toString(rating) << "\r\n";
+	newFile << "DEVIATION " << toString(deviation) << "\r\n";
+	newFile << "OLDDEVIATION " << toString(oldDeviation) << "\r\n";
+	newFile << "LASTSPARTIME " << toString((unsigned long)lastSparTime) << "\r\n";
 //	newFile << "PLATFORM " << platform << "\n";
 //	newFile << "CODEPAGE " << name << "\n";
 	for (int i = 0; i < 30; i++)
-		if ((pAttributes ? oldAccount.myAttr[i] : myAttr[i]).length() > 0) newFile << "ATTR" << toString(i + 1) << " " << (pAttributes ? oldAccount.myAttr[i] : myAttr[i]) << "\n";
+		if ((pAttributes ? oldAccount.myAttr[i] : myAttr[i]).length() > 0) newFile << "ATTR" << toString(i + 1) << " " << (pAttributes ? oldAccount.myAttr[i] : myAttr[i]) << "\r\n";
 	for (int i = 0; i < (pAttributes ? oldAccount.myChests : myChests).count(); i++)
-		newFile << "CHEST " << (pAttributes ? oldAccount.myChests[i] : myChests[i]) << "\n";
+		newFile << "CHEST " << (pAttributes ? oldAccount.myChests[i] : myChests[i]) << "\r\n";
 	for (int i = 0; i < (pAttributes ? oldAccount.myWeapons : myWeapons).count(); i++)
-		newFile << "WEAPON " << (pAttributes ? oldAccount.myWeapons[i] : myWeapons[i]) << "\n";
+		newFile << "WEAPON " << (pAttributes ? oldAccount.myWeapons[i] : myWeapons[i]) << "\r\n";
 	for (int i = 0; i < (pAttributes ? oldAccount.myFlags : myFlags).count(); i++)
-		newFile << "FLAG " << (pAttributes ? oldAccount.myFlags[i] : myFlags[i]) << "\n";
-	newFile << "\n";
-	newFile << "BANNED " << toString(banned) << "\n";
-	newFile << "BANREASON " << banReason << "\n";
-	newFile << "COMMENTS " << comments << "\n";
-	newFile << "LOCALRIGHTS " << toString(adminRights) << "\n";
-	newFile << "IPRANGE " << adminIp << "\n";
+		newFile << "FLAG " << (pAttributes ? oldAccount.myFlags[i] : myFlags[i]) << "\r\n";
+	newFile << "\r\n";
+	newFile << "BANNED " << toString(banned) << "\r\n";
+	newFile << "BANREASON " << banReason << "\r\n";
+	newFile << "COMMENTS " << comments << "\r\n";
+	newFile << "LOCALRIGHTS " << toString(adminRights) << "\r\n";
+	newFile << "IPRANGE " << adminIp << "\r\n";
 	for (int i = 0; i < myFolders.count(); i++)
-		newFile << "FOLDERRIGHT " << myFolders[i] << "\n";
-	newFile << "LASTFOLDER " << lastFolder << "\n";
+		newFile << "FOLDERRIGHT " << myFolders[i] << "\r\n";
+	newFile << "LASTFOLDER " << lastFolder << "\r\n";
 	newFile.save(fileName.text());
 	return;
 }
@@ -244,7 +244,7 @@ bool CAccount::meetsConditions( CString pAccount, CString conditions )
 	{
 		int sep = file[i].find(' ');
 		CBuffer section = file[i].copy(0, sep);
-		CBuffer val = file[i].copy(sep + 1);
+		CBuffer val = file[i].copy(sep + 1).removeAll("\r");
 		section.trim();
 		val.trim();
 
