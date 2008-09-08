@@ -2174,11 +2174,7 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 
 			case PLAYERANI:
 				len = (unsigned char)pProps.readByte1();
-				if (len >= 0)
-				{
-					CString temp( pProps.readChars(len) );
-					gAni = temp;
-				}
+				gAni = pProps.readChars(len);
 				break;
 
 			case HEADGIF:
