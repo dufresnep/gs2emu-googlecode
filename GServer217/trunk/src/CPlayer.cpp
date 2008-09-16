@@ -745,16 +745,14 @@ void CPlayer::sendOutGoing()
 	while ( sendBuff.length() > 0 )
 	{
 		int len = 0;
-		if ( (len = playerSock->sendData( sendBuff )) > 0 )
-			sendBuff.remove( 0, len );
+		if ( (len = playerSock->sendData( sendBuff )) == 0 )
+			break;
 		else if ( len != 0 )
 		{
 			errorOut( "errorlog.txt", CString() << "Send error to " << accountName );
 			deleteMe = true;
 			return;
 		}
-		else
-			break;
 	}
 }
 

@@ -1,4 +1,11 @@
 --------------------------------------------
+New features/bug fixes in v2.171 build 62
+--------------------------------------------
+Fixes:
+- Fixed the evil decompression errors.
+
+
+--------------------------------------------
 New features/bug fixes in v2.171 build 61
 --------------------------------------------
 Changes:
