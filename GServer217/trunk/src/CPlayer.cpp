@@ -747,7 +747,7 @@ void CPlayer::sendOutGoing()
 		int len = 0;
 		if ( (len = playerSock->sendData( sendBuff )) == 0 )
 			break;
-		else if ( len != 0 )
+		else if ( len < 0 )
 		{
 			errorOut( "errorlog.txt", CString() << "Send error to " << accountName );
 			deleteMe = true;
