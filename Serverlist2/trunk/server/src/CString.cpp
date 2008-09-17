@@ -70,12 +70,30 @@ CString::CString(unsigned int pUInteger)
 	*this = tempBuff;
 }
 
-CString::CString(unsigned long int pUInteger)
+CString::CString(unsigned long int pLUInteger)
 {
 	buffer = 0;
 
 	char tempBuff[32];
-	sprintf(tempBuff, "%lu", pUInteger);
+	sprintf(tempBuff, "%lu", pLUInteger);
+	*this = tempBuff;
+}
+
+CString::CString(long long pLLInteger)
+{
+	buffer = 0;
+
+	char tempBuff[64];
+	sprintf(tempBuff, "%lld", pLLInteger);
+	*this = tempBuff;
+}
+
+CString::CString(unsigned long long pLLUInteger)
+{
+	buffer = 0;
+
+	char tempBuff[64];
+	sprintf(tempBuff, "%llu", pLLUInteger);
 	*this = tempBuff;
 }
 

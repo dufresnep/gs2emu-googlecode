@@ -537,8 +537,11 @@ bool TServer::msgSVI_SVRPING(CString& pPacket)
 	return true;
 }
 
+// Secure login password:
+//	{transaction}{CHAR \xa7}{password}
 bool TServer::msgSVI_VERIACC2(CString& pPacket)
 {
+#ifndef NO_MYSQL
 	// definitions
 	CString account = pPacket.readChars(pPacket.readGUChar());
 	CString password = pPacket.readChars(pPacket.readGUChar());
@@ -560,10 +563,10 @@ bool TServer::msgSVI_VERIACC2(CString& pPacket)
 		mySQL->query(query, &result);
 		if (result.size() != 0)
 		{
-			// Grab the transaction salt and try our password again.
+			// Grab the transaction salt and try our password.
 			CString transactionSalt = result[0];
 			result.clear();
-			query = CString() << "SELECT password, salt, activated, banned FROM `" << settings->getStr("userlist") << "` WHERE account='" << account.escape() << "' AND password=" << "MD5(CONCAT(MD5(CONCAT(MD5('" << password.escape() << "'), `salt`)), '" << transactionSalt.escape() << "')) LIMIT 1";
+			query = CString() << "SELECT password, salt, activated, banned FROM `" << settings->getStr("userlist") << "` WHERE account='" << account.escape() << "' AND MD5(CONCAT(password, '" << transactionSalt.escape() << "'))='" << password.escape() << "')) LIMIT 1";
 			mySQL->query(query, &result);
 
 			// account/password correct?
@@ -584,5 +587,7 @@ bool TServer::msgSVI_VERIACC2(CString& pPacket)
 		>> (char)account.length() << account
 		>> (short)id >> (char)type
 		<< getAccountError(ret));
+#endif
+
 	return true;
 }

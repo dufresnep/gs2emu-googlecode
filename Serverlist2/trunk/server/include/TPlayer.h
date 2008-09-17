@@ -9,22 +9,24 @@ enum
 	PLI_SERVERLIST		= 1,
 	PLI_V2SERVERLISTRC	= 5,
 	PLI_V2ENCRYPTKEYCL	= 7,
+	PLI_GRSECURELOGIN	= 223		// GR created function.
 };
 
 enum
 {
-	PLO_SVRLIST		= 0,
-	PLO_NULL		= 1,
-	PLO_STATUS		= 2,
-	PLO_SITEURL		= 3,
-	PLO_ERROR		= 4,
-	PLO_UPGURL		= 5,
+	PLO_SVRLIST			= 0,
+	PLO_NULL			= 1,
+	PLO_STATUS			= 2,
+	PLO_SITEURL			= 3,
+	PLO_ERROR			= 4,
+	PLO_UPGURL			= 5,
+	PLO_GRSECURELOGIN	= 223
 };
 
 enum
 {
-	PLV_PRE22		= 0,
-	PLV_POST22		= 1,
+	PLV_PRE22			= 0,
+	PLV_POST22			= 1,
 };
 
 class TPlayer;
@@ -52,6 +54,7 @@ class TPlayer
 		bool msgPLI_SERVERLIST(CString& pPacket);
 		bool msgPLI_V2SERVERLISTRC(CString& pPacket);
 		bool msgPLI_V2ENCRYPTKEYCL(CString& pPacket);
+		bool msgPLI_GRSECURELOGIN(CString& pPacket);
 
 private:
 		CSocket *sock;

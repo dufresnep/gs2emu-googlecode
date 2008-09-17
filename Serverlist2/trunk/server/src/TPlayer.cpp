@@ -1,7 +1,11 @@
 #include "main.h"
 #include "TPlayer.h"
 #include "CLog.h"
+#include <time.h>
 
+#ifndef NO_MYSQL
+	extern CMySQL *mySQL;
+#endif
 extern CSettings *settings;
 extern std::vector<TPlayer *> playerList;
 extern CLog clientlog;
@@ -14,7 +18,7 @@ std::vector<TPLSock> plfunc;
 void createPLFunctions()
 {
 	// kinda like a memset-ish thing y'know
-	for (int i = 0; i < 256; i++)
+	for (int i = 0; i < 224; i++)
 		plfunc.push_back(&TPlayer::msgPLI_NULL);
 
 	// now set non-nulls
@@ -22,6 +26,7 @@ void createPLFunctions()
 	plfunc[PLI_SERVERLIST] = &TPlayer::msgPLI_SERVERLIST;
 	plfunc[PLI_V2SERVERLISTRC] = &TPlayer::msgPLI_V2SERVERLISTRC;
 	plfunc[PLI_V2ENCRYPTKEYCL] = &TPlayer::msgPLI_V2ENCRYPTKEYCL;
+	plfunc[PLI_GRSECURELOGIN] = &TPlayer::msgPLI_GRSECURELOGIN;
 }
 
 /*
@@ -275,5 +280,66 @@ bool TPlayer::msgPLI_V2ENCRYPTKEYCL(CString& pPacket)
 	key = pPacket.readGChar();
 	in_codec.reset(key);
 	out_codec.reset(key);
+	return true;
+}
+
+/*
+Incoming format:
+	{CHAR PLI_GRSECURELOGIN}{account_name}
+
+Outgoing format:
+	{CHAR PLO_GRSECURELOGIN}{INT5 transaction}{3xCHAR salt}{account_password}
+*/
+bool TPlayer::msgPLI_GRSECURELOGIN(CString& pPacket)
+{
+#ifndef NO_MYSQL
+	static int transaction = 0;
+
+	// Grab the packet values.
+	CString account = pPacket.readString();
+
+	// Grab the password for the account.
+	std::vector<CString> result;
+	CString query;
+	query << "SELECT password FROM `" << settings->getStr("userlist") << "` WHERE account='" << account.escape() << "' LIMIT 1";
+	mySQL->query(query, &result);
+	if (result.size() == 0)
+	{
+		// A blank packet means an invalid account was sent.
+		sendPacket(CString() >> (char)PLO_GRSECURELOGIN);
+		return true;
+	}
+
+	// Grab the password.
+	CString password = result[0];
+
+	// Get our transaction id.
+	++transaction;
+	if (transaction < 0) transaction = 0;
+
+	// Construct the salt out of ascii values 32 - 125.
+	CString salt;
+	salt << (char)(((unsigned char)rand() % 0x5E) + 0x20);
+	salt << (char)(((unsigned char)rand() % 0x5E) + 0x20);
+	salt << (char)(((unsigned char)rand() % 0x5E) + 0x20);
+
+	// Set it to expire 1 minute from now.
+	time_t expire = time(0) + 60;
+
+	// Add the transaction to the database.
+	query.clear();
+	query << "INSERT INTO `" << settings->getStr("securelogin") << "` ";
+	query << "(transaction, salt, expire) ";
+	query << "VALUES ('"
+		<< CString((int)transaction) << "','"
+		<< salt << "','"
+		<< CString((long long)expire) << "'"
+		<< ")";
+	mySQL->query(query);
+
+	// Send the secure login info back to the player.
+	sendPacket(CString() >> (char)PLO_GRSECURELOGIN >> (long long)transaction << salt << password);
+#endif
+
 	return true;
 }
