@@ -403,7 +403,12 @@ void TPlayer::sendCompress()
 {
 	// empty buffer?
 	if (sBuffer.isEmpty())
+	{
+		// If we still have some data in the out buffer, try sending it again.
+		if (oBuffer.isEmpty() == false)
+			playerSock->sendData(oBuffer);
 		return;
+	}
 
 	// compress buffer
 	if (PLE_POST22)
@@ -421,18 +426,25 @@ void TPlayer::sendCompress()
 			sBuffer.zcompressI();
 		}
 
-		// Encrypt the packet and send it out.
+		// Encrypt the packet and add it to the out buffer.
 		out_codec.limitfromtype(compressionType);
 		out_codec.apply(reinterpret_cast<uint8_t*>(sBuffer.text()), sBuffer.length());
-		playerSock->sendData(CString() << (short)(sBuffer.length()+1) << (char)compressionType << sBuffer);
+		oBuffer << (short)(sBuffer.length() + 1) << (char)compressionType << sBuffer;
+
+		// Send oBuffer.
+		playerSock->sendData(oBuffer);
 	}
 	else
 	{
+		// Compress the packet and add it to the out buffer.
 		sBuffer.zcompressI();
-		playerSock->sendData(CString() << (short)sBuffer.length() << sBuffer);
+		oBuffer << (short)sBuffer.length() << sBuffer;
+
+		// Send oBuffer.
+		playerSock->sendData(oBuffer);
 	}
 
-	// clear buffer
+	// Clear the send buffer.
 	sBuffer.clear();
 }
 

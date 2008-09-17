@@ -268,7 +268,7 @@ class TPlayer : public TAccount
 
 		// Socket Variables
 		CSocket *playerSock;
-		CString rBuffer, sBuffer;
+		CString rBuffer, sBuffer, oBuffer;
 
 		// Pre 2.2 encryption.
 		int iterator;
