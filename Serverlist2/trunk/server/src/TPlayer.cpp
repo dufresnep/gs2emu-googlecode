@@ -320,7 +320,7 @@ bool TPlayer::msgPLI_GRSECURELOGIN(CString& pPacket)
 	time_t expire = time(0) + 60;
 
 	// Add the transaction to the database.
-	query.clear();
+	CString query;
 	query << "INSERT INTO `" << settings->getStr("securelogin") << "` ";
 	query << "(transaction, salt, password, expire) ";
 	query << "VALUES ("
