@@ -50,31 +50,31 @@ int main(int argc, char *argv[]);
 */
 enum // Return-Errors
 {
-	ERR_SUCCESS = 0,
-	ERR_SETTINGS = -1,
-	ERR_SOCKETS = -2,
-	ERR_MYSQL = -3,
-	ERR_LISTEN = -4,
+	ERR_SUCCESS			= 0,
+	ERR_SETTINGS		= -1,
+	ERR_SOCKETS			= -2,
+	ERR_MYSQL			= -3,
+	ERR_LISTEN			= -4,
 };
 
 enum // Socket Type
 {
-	SOCK_PLAYER,
-	SOCK_SERVER,
+	SOCK_PLAYER			= 0,
+	SOCK_SERVER			= 1,
 };
 
 enum // Account Status
 {
-	ACCSTAT_NORMAL,
-	ACCSTAT_NONREG,
-	ACCSTAT_BANNED,
-	ACCSTAT_INVALID,
+	ACCSTAT_NORMAL		= 0,
+	ACCSTAT_NONREG		= 1,
+	ACCSTAT_BANNED		= 2,
+	ACCSTAT_INVALID		= 3,
 };
 
 enum // Guild Status
 {
-	GUILDSTAT_DISALLOWED,
-	GUILDSTAT_ALLOWED,
+	GUILDSTAT_DISALLOWED	= 0,
+	GUILDSTAT_ALLOWED		= 1,
 };
 
 #endif // MAIN_H
