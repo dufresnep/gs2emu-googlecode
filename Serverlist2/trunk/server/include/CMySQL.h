@@ -1,8 +1,6 @@
 #ifndef HCMYSQL
 #define HCMYSQL
 
-#include "LS2CompileConfig.h"
-
 #ifndef NO_MYSQL
 
 #include <vector>

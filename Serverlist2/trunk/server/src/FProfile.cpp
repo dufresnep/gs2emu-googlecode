@@ -1,4 +1,3 @@
-#include "LS2CompileConfig.h"
 #include "main.h"
 #include "FProfile.h"
 #include "CString.h"

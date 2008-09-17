@@ -1,5 +1,3 @@
-#include "LS2CompileConfig.h"
-
 #ifndef NO_MYSQL
 #include <vector>
 #include "CString.h"

@@ -1,5 +1,3 @@
-#include "LS2CompileConfig.h"
-
 #include <stdlib.h>
 #include <time.h>
 

@@ -4,7 +4,6 @@
 /*
 	Header-Includes
 */
-#include "LS2CompileConfig.h"
 #include <math.h>
 #include <stdio.h>
 #include <algorithm>

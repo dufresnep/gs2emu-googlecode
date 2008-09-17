@@ -1,4 +1,3 @@
-#include "LS2CompileConfig.h"
 #include <stdlib.h>
 #include <signal.h>
 #include "main.h"
