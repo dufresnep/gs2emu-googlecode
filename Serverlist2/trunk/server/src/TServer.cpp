@@ -549,38 +549,7 @@ bool TServer::msgSVI_VERIACC2(CString& pPacket)
 	unsigned char type = pPacket.readGUChar();
 
 	// Verify the account.
-	// See if the password contains \xa7.  If so, do a secure login.
-	int ret = ACCSTAT_INVALID;
-	if (password.find("\xa7") != -1)
-	{
-		CString transaction = password.readString("\xa7");
-		CString md5password = password.readString("");
-
-		// Find the transaction salt.
-		CString query;
-		std::vector<CString> result;
-		query = CString() << "SELECT password FROM `" << settings->getStr("securelogin") << "` WHERE transaction='" << transaction.escape() << "'";
-		mySQL->query(query, &result);
-		if (result.size() != 0)
-		{
-			// Grab the transaction salt and try our password.
-			CString transactionPass = result[0];
-			result.clear();
-			query = CString() << "SELECT password, salt, activated, banned FROM `" << settings->getStr("userlist") << "` WHERE account='" << account.escape() << "' AND '" << transactionPass.escape() << "' = '" << md5password.escape() << "')) LIMIT 1";
-			mySQL->query(query, &result);
-
-			// account/password correct?
-			if (result.size() < 1)
-				ret = ACCSTAT_INVALID;
-			else if (result.size() < 3 || result[2] == "0")
-				ret = ACCSTAT_NONREG;
-			else if (result.size() > 3 && result[3] == "1")
-				ret = ACCSTAT_BANNED;
-			else
-				ret = ACCSTAT_NORMAL;
-		}
-	}
-	else ret = verifyAccount(account, password);
+	int ret = verifyAccount(account, password);
 
 	// send verification
 	sendPacket(CString() >> (char)SVO_VERIACC2

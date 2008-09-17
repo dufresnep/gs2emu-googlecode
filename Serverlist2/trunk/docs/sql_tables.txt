@@ -11,6 +11,9 @@ CREATE TABLE graal_users (
 	account varchar(100) UNIQUE NOT NULL,
 	password varchar(32) NOT NULL,
 	salt char(3) NOT NULL,
+	password2 varchar(32) NOT NULL,
+	salt2 char(3) NOT NULL,
+	transaction int NOT NULL,
 	activated tinyint NOT NULL,
 	banned tinyint NOT NULL,
 	profile_name varchar(100) NOT NULL default '(unknown)',
@@ -84,12 +87,4 @@ CREATE TABLE graal_guilds_members (
 	PRIMARY KEY (id),
 	FOREIGN KEY account REFERENCES graal_users(account) ON DELETE CASCADE,
 	FOREIGN KEY guild REFERENCES graal_guilds(name) ON DELETE CASCADE
-);
-
-CREATE TABLE graal_securelogin (
-	transaction int UNIQUE NOT NULL,
-	salt char(3) NOT NULL,
-	password varchar(32) NOT NULL,
-	expire bigint NOT NULL,
-	PRIMARY KEY (transaction)
 );

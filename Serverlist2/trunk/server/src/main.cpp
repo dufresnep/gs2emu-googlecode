@@ -269,28 +269,59 @@ int verifyAccount(const CString& pAccount, const CString& pPassword)
 	// definitions
 	CString query;
 	std::vector<CString> result;
+	CString password(pPassword);
 
 	// make sure its not empty.
-	if (pAccount.length() < 1)
+	if (pAccount.length() == 0)
 		return ACCSTAT_INVALID;
 
-	query = CString() << "SELECT password, salt, activated, banned FROM `" << settings->getStr("userlist") << "` WHERE account='" << pAccount.escape() << "' AND password=" << "MD5(CONCAT(MD5('" << pPassword.escape() << "'), `salt`)) LIMIT 1";
-	mySQL->query(query, &result);
+	// See if we should try a secure login.
+	int ret = ACCSTAT_INVALID;
+	if (password.find("\xa7") != -1)
+	{
+		CString transaction = password.readString("\xa7");
+		CString md5password = password.readString("");
 
-	// account/password correct?
-	if (result.size() < 1)
-		return ACCSTAT_INVALID;
+		// Try our password.
+		result.clear();
+		query = CString() << "SELECT activated, banned FROM `" << settings->getStr("userlist") << "` WHERE account='" << pAccount.escape() << "' AND transaction='" << transaction.escape() << "' AND password2='" << md5password.escape() << "' LIMIT 1";
+		mySQL->query(query, &result);
 
-	// activated?
-	if (result.size() < 3 || result[2] == "0")
-		return ACCSTAT_NONREG;
+		// account/password correct?
+		if (result.size() == 0)
+			ret = ACCSTAT_INVALID;
+		else if (result.size() == 1 || result[0] == "0")
+			ret = ACCSTAT_NONREG;
+		else if (result.size() == 2 && result[1] == "1")
+			ret = ACCSTAT_BANNED;
+		else
+			ret = ACCSTAT_NORMAL;
+	}
 
-	// banned?
-	if (result.size() > 3 && result[3] == "1")
-		return ACCSTAT_BANNED;
+	// Either the secure login failed or we didn't try a secure login.
+	// Try the old login method.
+	if (ret == ACCSTAT_INVALID)
+	{
+		result.clear();
+		query = CString() << "SELECT password, salt, activated, banned FROM `" << settings->getStr("userlist") << "` WHERE account='" << pAccount.escape() << "' AND password=" << "MD5(CONCAT(MD5('" << pPassword.escape() << "'), `salt`)) LIMIT 1";
+		mySQL->query(query, &result);
 
-	// passed all tests :)
-	return ACCSTAT_NORMAL;
+		// account/password correct?
+		if (result.size() < 1)
+			return ACCSTAT_INVALID;
+
+		// activated?
+		if (result.size() < 3 || result[2] == "0")
+			return ACCSTAT_NONREG;
+
+		// banned?
+		if (result.size() > 3 && result[3] == "1")
+			return ACCSTAT_BANNED;
+
+		// passed all tests :)
+		return ACCSTAT_NORMAL;
+	}
+	else return ret;
 #endif
 }
 

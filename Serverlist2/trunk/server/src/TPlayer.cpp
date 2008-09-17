@@ -293,8 +293,6 @@ Outgoing format:
 bool TPlayer::msgPLI_GRSECURELOGIN(CString& pPacket)
 {
 #ifndef NO_MYSQL
-	static int transaction = 0;
-
 	// Grab the packet values.
 	CString account = pPacket.readChars(pPacket.readGUChar());
 	CString password = pPacket.readChars(pPacket.readGUChar());
@@ -307,8 +305,7 @@ bool TPlayer::msgPLI_GRSECURELOGIN(CString& pPacket)
 	}
 
 	// Get our transaction id.
-	++transaction;
-	if (transaction < 0) transaction = 0;
+	int transaction = abs(rand() & rand());
 
 	// Construct the salt out of ascii values 32 - 125.
 	CString salt;
@@ -316,19 +313,13 @@ bool TPlayer::msgPLI_GRSECURELOGIN(CString& pPacket)
 	salt << (char)(((unsigned char)rand() % 0x5E) + 0x20);
 	salt << (char)(((unsigned char)rand() % 0x5E) + 0x20);
 
-	// Set it to expire 1 minute from now.
-	time_t expire = time(0) + 60;
-
 	// Add the transaction to the database.
 	CString query;
-	query << "INSERT INTO `" << settings->getStr("securelogin") << "` ";
-	query << "(transaction, salt, password, expire) ";
-	query << "VALUES ("
-		<< "'" << CString((int)transaction) << "',"
-		<< "'" << salt << "',"
-		<< "MD5(CONCAT('" << password << "', '" << salt << "')),"
-		<< "'" << CString((long long)expire) << "'"
-		<< ")";
+	query << "UPDATE `" << settings->getStr("userlist") << "` SET "
+		<< "transaction='" << CString((int)transaction).escape() << "',"
+		<< "salt2='" << salt.escape() << "',"
+		<< "password2=MD5(CONCAT(MD5('" << password.escape() << "'), '" << salt.escape() << "')) "
+		<< "WHERE account='" << account.escape() << "'";
 	mySQL->query(query);
 
 	// Send the secure login info back to the player.
