@@ -470,9 +470,7 @@ bool TServer::msgSVI_GETPROF(CString& pPacket)
 
 	CString replyPacket;
 	if ( getProfile( accountName, replyPacket ) )
-		sendPacket(CString() >> (char)SVO_PROFILE >> (short)playerid >> (char)accountName.length() << accountName.text() << replyPacket.text());
-	else
-		sendPacket(CString() >> (char)SVO_PROFILE >> (short)playerid >> (char)accountName.length() << accountName >> (char)0 >> (char)0 >> (char)0 >> (char)0 >> (char)0 >> (char)0 >> (char)0 >> (char)0 >> (char)0);
+		sendPacket(CString() >> (char)SVO_PROFILE >> (short)playerid >> (char)accountName.length() << accountName << replyPacket);
 	return true;
 }
 

@@ -321,7 +321,7 @@ void shutdownServer( int signal )
 
 void getBasePath()
 {
-	#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	// Get the path.
 	char path[ MAX_PATH ];
 	GetModuleFileNameA(0, path, MAX_PATH);

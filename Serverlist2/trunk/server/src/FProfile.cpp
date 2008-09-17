@@ -39,7 +39,11 @@ bool getProfile( const CString& pAccountName, CString &pPacket)
 		return true;
 	}
 
-	return false;
+	// Blank profile.
+	for (unsigned int i = 0; i < 9; ++i)
+		pPacket >> (char)0;
+
+	return true;
 #endif
 }
 

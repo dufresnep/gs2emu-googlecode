@@ -170,12 +170,9 @@ void TPlayer::sendPacket(CString pPacket, bool pSendNow)
 	if (pPacket.isEmpty())
 		return;
 
-	// remove trailing \n so we can encrypt.
-	if (pPacket[pPacket.length()-1] == '\n')
-		pPacket.removeI( pPacket.length() - 1, 1 );
-
 	// append '\n'
-	pPacket.writeChar('\n');
+	if (pPacket[pPacket.length()-1] != '\n')
+		pPacket.writeChar('\n');
 
 	// append buffer
 	sendBuffer.write(pPacket);
