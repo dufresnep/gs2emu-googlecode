@@ -89,6 +89,7 @@ CREATE TABLE graal_guilds_members (
 CREATE TABLE graal_securelogin (
 	transaction int UNIQUE NOT NULL,
 	salt char(3) NOT NULL,
+	password varchar(32) NOT NULL,
 	expire bigint NOT NULL,
 	PRIMARY KEY (transaction)
 );

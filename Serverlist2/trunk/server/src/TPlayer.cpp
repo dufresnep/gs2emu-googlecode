@@ -296,22 +296,15 @@ bool TPlayer::msgPLI_GRSECURELOGIN(CString& pPacket)
 	static int transaction = 0;
 
 	// Grab the packet values.
-	CString account = pPacket.readString();
+	CString account = pPacket.readChars(pPacket.readGUChar());
+	CString password = pPacket.readChars(pPacket.readGUChar());
 
-	// Grab the password for the account.
-	std::vector<CString> result;
-	CString query;
-	query << "SELECT password FROM `" << settings->getStr("userlist") << "` WHERE account='" << account.escape() << "' LIMIT 1";
-	mySQL->query(query, &result);
-	if (result.size() == 0)
+	// Try a normal login.  If it fails, send back an empty packet.
+	if (verifyAccount(account, password) != ACCSTAT_NORMAL)
 	{
-		// A blank packet means an invalid account was sent.
 		sendPacket(CString() >> (char)PLO_GRSECURELOGIN);
 		return true;
 	}
-
-	// Grab the password.
-	CString password = result[0];
 
 	// Get our transaction id.
 	++transaction;
@@ -329,16 +322,17 @@ bool TPlayer::msgPLI_GRSECURELOGIN(CString& pPacket)
 	// Add the transaction to the database.
 	query.clear();
 	query << "INSERT INTO `" << settings->getStr("securelogin") << "` ";
-	query << "(transaction, salt, expire) ";
-	query << "VALUES ('"
-		<< CString((int)transaction) << "','"
-		<< salt << "','"
-		<< CString((long long)expire) << "'"
+	query << "(transaction, salt, password, expire) ";
+	query << "VALUES ("
+		<< "'" << CString((int)transaction) << "',"
+		<< "'" << salt << "',"
+		<< "MD5(CONCAT('" << password << "', '" << salt << "')),"
+		<< "'" << CString((long long)expire) << "'"
 		<< ")";
 	mySQL->query(query);
 
 	// Send the secure login info back to the player.
-	sendPacket(CString() >> (char)PLO_GRSECURELOGIN >> (long long)transaction << salt << password);
+	sendPacket(CString() >> (char)PLO_GRSECURELOGIN >> (long long)transaction << salt);
 #endif
 
 	return true;

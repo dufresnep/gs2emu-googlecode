@@ -559,14 +559,14 @@ bool TServer::msgSVI_VERIACC2(CString& pPacket)
 		// Find the transaction salt.
 		CString query;
 		std::vector<CString> result;
-		query = CString() << "SELECT salt FROM `" << settings->getStr("securelogin") << "` WHERE transaction='" << transaction.escape() << "'";
+		query = CString() << "SELECT password FROM `" << settings->getStr("securelogin") << "` WHERE transaction='" << transaction.escape() << "'";
 		mySQL->query(query, &result);
 		if (result.size() != 0)
 		{
 			// Grab the transaction salt and try our password.
-			CString transactionSalt = result[0];
+			CString transactionPass = result[0];
 			result.clear();
-			query = CString() << "SELECT password, salt, activated, banned FROM `" << settings->getStr("userlist") << "` WHERE account='" << account.escape() << "' AND MD5(CONCAT(password, '" << transactionSalt.escape() << "'))='" << password.escape() << "')) LIMIT 1";
+			query = CString() << "SELECT password, salt, activated, banned FROM `" << settings->getStr("userlist") << "` WHERE account='" << account.escape() << "' AND '" << transactionPass.escape() << "' = '" << md5password.escape() << "')) LIMIT 1";
 			mySQL->query(query, &result);
 
 			// account/password correct?
