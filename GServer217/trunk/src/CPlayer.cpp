@@ -1407,6 +1407,7 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 			packet.clear();
 			packet.writeByte1(101);
 			packet.writeBytes((char*)level->tiles, 64*64*2);
+			packet.writeChar('\n');
 			sendPacket(packet);
 		}
 		compressAndSend();

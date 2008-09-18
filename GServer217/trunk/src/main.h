@@ -13,7 +13,7 @@
 #include "CWordFilter.h"
 #include <time.h>
 
-#define GSERVER_BUILD 62
+#define GSERVER_BUILD 63
 
 #ifdef PSPSDK
 	#define printf pspDebugScreenPrintf

@@ -1,4 +1,11 @@
 --------------------------------------------
+New features/bug fixes in v2.171 build 63
+--------------------------------------------
+Fixes:
+- Fixed a rare bug which caused a level to lock up the client when loading.
+
+
+--------------------------------------------
 New features/bug fixes in v2.171 build 62
 --------------------------------------------
 Fixes:
