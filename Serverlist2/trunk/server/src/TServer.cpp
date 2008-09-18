@@ -318,7 +318,7 @@ bool TServer::msgSVI_SETVERS(CString& pPacket)
 	else if (verNum <= 52)
 		version = CString("Revision ") << CString(abs(verNum));
 	else
-		version = CString("Build ") << verNum;
+		version = CString("Build ") << CString(verNum);
 	return true;
 }
 
