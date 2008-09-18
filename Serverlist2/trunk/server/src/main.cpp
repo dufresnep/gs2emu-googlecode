@@ -291,11 +291,11 @@ int verifyAccount(const CString& pAccount, const CString& pPassword)
 		if (result.size() == 0)
 			ret = ACCSTAT_INVALID;
 		else if (result.size() == 1 || result[0] == "0")
-			ret = ACCSTAT_NONREG;
+			return ACCSTAT_NONREG;
 		else if (result.size() == 2 && result[1] == "1")
-			ret = ACCSTAT_BANNED;
+			return ACCSTAT_BANNED;
 		else
-			ret = ACCSTAT_NORMAL;
+			return ACCSTAT_NORMAL;
 	}
 
 	// Either the secure login failed or we didn't try a secure login.
@@ -321,7 +321,8 @@ int verifyAccount(const CString& pAccount, const CString& pPassword)
 		// passed all tests :)
 		return ACCSTAT_NORMAL;
 	}
-	else return ret;
+
+	return ACCSTAT_INVALID;
 #endif
 }
 

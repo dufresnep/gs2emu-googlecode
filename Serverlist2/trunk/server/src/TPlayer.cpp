@@ -132,7 +132,7 @@ void TPlayer::sendCompress()
 	}
 
 	// compress buffer
-	if (PLV_POST22)
+	if (version == PLV_POST22)
 	{
 		// Choose which compression to use and apply it.
 		int compressionType = ENCRYPT22_UNCOMPRESSED;
@@ -152,7 +152,7 @@ void TPlayer::sendCompress()
 		out_codec.apply(reinterpret_cast<uint8_t*>(sendBuffer.text()), sendBuffer.length());
 		outBuffer << (short)(sendBuffer.length() + 1) << (char)compressionType << sendBuffer;
 
-		// Send oBuffer.
+		// Send outBuffer.
 		sock->sendData(outBuffer);
 	}
 	else
@@ -161,7 +161,7 @@ void TPlayer::sendCompress()
 		sendBuffer.zcompressI();
 		outBuffer << (short)sendBuffer.length() << sendBuffer;
 
-		// Send oBuffer.
+		// Send outBuffer.
 		sock->sendData(outBuffer);
 	}
 
