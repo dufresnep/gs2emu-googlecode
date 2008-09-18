@@ -53,7 +53,7 @@ CREATE TABLE graal_servers_hq (
 	server_langage varchar(255) NOT NULL,
 	server_type char(2) NOT NULL,
 	server_maxplayers int NOT NULL,
-	PRIMARY KEY (id),
+	PRIMARY KEY (id)
 );
 
 CREATE TABLE graal_servers_hq_members (
@@ -61,8 +61,8 @@ CREATE TABLE graal_servers_hq_members (
 	account varchar(100) NOT NULL,
 	owner tinyint NOT NULL,
 	permissions int NOT NULL,
-	FOREIGN KEY id REFERENCES graal_servers_hq(id) ON DELETE CASCADE,
-	FOREIGN KEY account REFERENCES graal_users(account) ON DELETE CASCADE
+	FOREIGN KEY (id) REFERENCES graal_servers_hq(id) ON DELETE CASCADE,
+	FOREIGN KEY (account) REFERENCES graal_users(account) ON DELETE CASCADE
 );
 
 CREATE TABLE graal_ipban (
@@ -85,6 +85,6 @@ CREATE TABLE graal_guilds_members (
 	nickname varchar(200) NOT NULL,
 	rank int NOT NULL default '1',
 	PRIMARY KEY (id),
-	FOREIGN KEY account REFERENCES graal_users(account) ON DELETE CASCADE,
-	FOREIGN KEY guild REFERENCES graal_guilds(name) ON DELETE CASCADE
+	FOREIGN KEY (account) REFERENCES graal_users(account) ON DELETE CASCADE,
+	FOREIGN KEY (guild) REFERENCES graal_guilds(name) ON DELETE CASCADE
 );
