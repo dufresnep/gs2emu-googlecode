@@ -67,7 +67,7 @@ CREATE TABLE graal_servers_hq_members (
 
 CREATE TABLE graal_ipban (
 	id int NOT NULL auto_increment,
-	server_ip varchar(24) NOT NULL
+	server_ip varchar(24) NOT NULL,
 	PRIMARY KEY (id)
 );
 
