@@ -1,3 +1,2 @@
 #!/bin/bash
-premake --target gnu --file gserver.lua
-
+premake --target gnu

@@ -1,2 +1,2 @@
-premake --file gserver.lua --target cb-gcc
+premake --target cb-gcc
 pause

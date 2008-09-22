@@ -1,2 +1,2 @@
-premake --file gserver.lua --target vs2008
+premake --target vs2008
 pause

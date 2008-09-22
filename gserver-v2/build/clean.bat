@@ -1,2 +1,2 @@
-premake --file gserver.lua --clean
+premake --clean
 pause

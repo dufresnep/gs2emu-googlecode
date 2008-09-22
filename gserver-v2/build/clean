@@ -1,2 +1,2 @@
 #!/bin/bash
-premake --file gserver.lua --clean
+premake --clean

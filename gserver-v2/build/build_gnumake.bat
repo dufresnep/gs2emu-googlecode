@@ -1,2 +1,2 @@
-premake --file gserver.lua --target gnu
+premake --target gnu
 pause
