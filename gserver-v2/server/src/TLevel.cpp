@@ -53,6 +53,7 @@ CString TLevel::getBoardPacket()
 	CString retVal;
 	retVal.writeGChar(PLO_BOARDPACKET);
 	retVal.write((char *)levelTiles, sizeof(levelTiles));
+	retVal << "\n";
 	return retVal;
 }
 
@@ -179,10 +180,11 @@ bool TLevel::loadNW(const CString& pLevelName)
 			if (curLine.size() != 6)
 				continue;
 
-			int x, y, w;
+			int x, y, w, layer;
 			x = strtoint(curLine[1]);
 			y = strtoint(curLine[2]);
 			w = strtoint(curLine[3]);
+			layer = strtoint(curLine[4]);
 
 			if (!inrange(x, 0, 64) || !inrange(y, 0, 64) || w <= 0 || x + w > 64)
 				continue;
