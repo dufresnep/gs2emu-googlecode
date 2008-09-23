@@ -243,7 +243,7 @@ bool TPlayer::msgPLI_SERVERLIST(CString& pPacket)
 	account  = pPacket.readChars(pPacket.readGUChar());
 	password = pPacket.readChars(pPacket.readGUChar());
 	printf("Account: %s\n", account.text());
-	printf("Password: %s\n", password.text());
+	//printf("Password: %s\n", password.text());
 
 	// verify account
 	res = verifyAccount(account, password);
@@ -285,7 +285,7 @@ bool TPlayer::msgPLI_V2ENCRYPTKEYCL(CString& pPacket)
 
 /*
 Incoming format:
-	{CHAR PLI_GRSECURELOGIN}{CHAR account length}{account}{CHAR password length}{password}
+	{CHAR PLI_GRSECURELOGIN}{CHAR account length}{account}{CHAR password length}{password}{CHAR login_type}
 
 Outgoing format:
 	{CHAR PLO_GRSECURELOGIN}{INT5 transaction}{salt}
@@ -296,6 +296,7 @@ bool TPlayer::msgPLI_GRSECURELOGIN(CString& pPacket)
 	// Grab the packet values.
 	CString account = pPacket.readChars(pPacket.readGUChar());
 	CString password = pPacket.readChars(pPacket.readGUChar());
+	unsigned char login_type = pPacket.readGUChar();
 
 	// Try a normal login.  If it fails, send back an empty packet.
 	if (verifyAccount(account, password) != ACCSTAT_NORMAL)
@@ -306,6 +307,9 @@ bool TPlayer::msgPLI_GRSECURELOGIN(CString& pPacket)
 
 	// Get our transaction id.
 	int transaction = abs(rand() & rand());
+
+	// Encode our login type inside the transaction id.
+	transaction = (transaction << 8) | login_type;
 
 	// Construct the salt out of ascii values 32 - 125.
 	CString salt;

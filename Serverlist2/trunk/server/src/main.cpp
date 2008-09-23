@@ -291,11 +291,31 @@ int verifyAccount(const CString& pAccount, const CString& pPassword)
 		if (result.size() == 0)
 			ret = ACCSTAT_INVALID;
 		else if (result.size() == 1 || result[0] == "0")
-			return ACCSTAT_NONREG;
+			ret = ACCSTAT_NONREG;
 		else if (result.size() == 2 && result[1] == "1")
-			return ACCSTAT_BANNED;
+			ret = ACCSTAT_BANNED;
 		else
-			return ACCSTAT_NORMAL;
+			ret = ACCSTAT_NORMAL;
+
+		// Should we expire the password now?
+		if (ret != ACCSTAT_INVALID)
+		{
+			unsigned char login_type = (char)(atoi(transaction.text()) & 0xFF);
+
+			// Password expires after one use.  Remove it.
+			if (login_type == SECURELOGIN_ONEUSE)
+			{
+				query.clear();
+				query << "UPDATE `" << settings->getStr("userlist") << "` SET "
+					<< "transaction='0',"
+					<< "salt2='',"
+					<< "password2='' "
+					<< "WHERE account='" << pAccount.escape() << "'";
+				mySQL->query(query);
+			}
+		}
+
+		return ret;
 	}
 
 	// Either the secure login failed or we didn't try a secure login.

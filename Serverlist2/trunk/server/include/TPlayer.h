@@ -29,6 +29,12 @@ enum
 	PLV_POST22			= 1,
 };
 
+enum
+{
+	SECURELOGIN_NOEXPIRE	= 0,
+	SECURELOGIN_ONEUSE		= 1,
+};
+
 class TPlayer;
 void createPLFunctions();
 typedef bool (TPlayer::*TPLSock)(CString&);
