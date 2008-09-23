@@ -1,7 +1,7 @@
 #ifndef TPLAYER_H
 #define TPLAYER_H
 
-#include "crypt.h"
+#include "codec.h"
 
 enum
 {

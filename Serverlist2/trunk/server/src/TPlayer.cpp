@@ -285,10 +285,10 @@ bool TPlayer::msgPLI_V2ENCRYPTKEYCL(CString& pPacket)
 
 /*
 Incoming format:
-	{CHAR PLI_GRSECURELOGIN}{account_name}
+	{CHAR PLI_GRSECURELOGIN}{CHAR account length}{account}{CHAR password length}{password}
 
 Outgoing format:
-	{CHAR PLO_GRSECURELOGIN}{INT5 transaction}{3xCHAR salt}{account_password}
+	{CHAR PLO_GRSECURELOGIN}{INT5 transaction}{salt}
 */
 bool TPlayer::msgPLI_GRSECURELOGIN(CString& pPacket)
 {
