@@ -20,6 +20,7 @@ CLog clientlog("grsecurelogin.log.txt");
 CSocket sock;
 CString rBuffer, sBuffer, oBuffer;
 CString account, password;
+CSettings settings;
 
 int main(int argc, char* argv[])
 {
@@ -33,7 +34,8 @@ int main(int argc, char* argv[])
 	clientlog.out("Simple Graal Reborn secure login client.\n");
 
 	// Load Server Settings
-	CSettings settings(CString() << "grsecurelogin.ini");
+	settings.setSeparator("=");
+	settings.loadFile("grsecurelogin.ini");
 	if (!settings.isOpened())
 	{
 		clientlog.out("[Error] Could not open grsecurelogin.ini.\n");
@@ -101,9 +103,11 @@ int main(int argc, char* argv[])
 
 void doConnect()
 {
+	unsigned char security = (unsigned char)settings.getInt("security", 0);
 	sendPacket(CString() >> (char)SVO_SECURELOGIN
 		>> (char)account.length() << account
-		>> (char)password.length() << password );
+		>> (char)password.length() << password
+		>> (char)security );
 	sendCompress();
 }
 
