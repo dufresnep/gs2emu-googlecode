@@ -402,7 +402,7 @@ bool TServer::msgSVI_VERIACC(CString& pPacket)
 	CString password = pPacket.readChars(pPacket.readGUChar());
 
 	// send verification
-	sendPacket(CString() >> (char)SVO_VERIACC >> (char)account.length() << account << getAccountError(verifyAccount(account, password)));
+	sendPacket(CString() >> (char)SVO_VERIACC >> (char)account.length() << account << getAccountError(verifyAccount(account, password, true)));
 	return true;
 }
 
@@ -549,7 +549,7 @@ bool TServer::msgSVI_VERIACC2(CString& pPacket)
 	unsigned char type = pPacket.readGUChar();
 
 	// Verify the account.
-	int ret = verifyAccount(account, password);
+	int ret = verifyAccount(account, password, true);
 
 	// send verification
 	sendPacket(CString() >> (char)SVO_VERIACC2

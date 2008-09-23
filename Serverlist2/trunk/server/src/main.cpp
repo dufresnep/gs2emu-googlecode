@@ -261,7 +261,7 @@ int getServerCount()
 	return (int)serverList.size();
 }
 
-int verifyAccount(const CString& pAccount, const CString& pPassword)
+int verifyAccount(const CString& pAccount, const CString& pPassword, bool fromServer)
 {
 #ifdef NO_MYSQL
 	return ACCSTAT_NORMAL;
@@ -302,8 +302,8 @@ int verifyAccount(const CString& pAccount, const CString& pPassword)
 		{
 			unsigned char login_type = (char)(atoi(transaction.text()) & 0xFF);
 
-			// Password expires after one use.  Remove it.
-			if (login_type == SECURELOGIN_ONEUSE)
+			// Password expires after one server login.  Remove it.
+			if (login_type == SECURELOGIN_ONEUSE && fromServer == true)
 			{
 				query.clear();
 				query << "UPDATE `" << settings->getStr("userlist") << "` SET "
