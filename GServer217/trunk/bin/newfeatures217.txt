@@ -3,6 +3,7 @@ New features/bug fixes in v2.171 build 63
 --------------------------------------------
 Fixes:
 - Fixed a rare bug which caused a level to lock up the client when loading.
+- Fixed a bug that would cause servers to fall into an infinite loop.
 
 
 --------------------------------------------

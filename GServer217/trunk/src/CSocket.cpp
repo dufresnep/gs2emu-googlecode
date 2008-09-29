@@ -369,7 +369,7 @@ int CSocket::sendData( CPacket& data )
 
 	// Make sure the socket is connected!
 	if ( properties.state == SOCKET_STATE_DISCONNECTED )
-		return SOCKET_INVALID;
+		return -1;
 
 	do
 	{
@@ -401,12 +401,12 @@ int CSocket::sendData( CPacket& data )
 					// Destroy the bad socket and create a new one.
 					errorOut( "errorlog.txt", CString() << properties.description << " - Connection lost!  Reason: " << errorMessage(intError) );
 					disconnect();
-					return intError;
+					return -1;
 					break;
 			}
 			if ( intError == EAGAIN || intError == EWOULDBLOCK || intError == EINPROGRESS ) return size;
 			disconnect();
-			return intError;
+			return -1;
 		}
 
 		// Remove what we sent.
