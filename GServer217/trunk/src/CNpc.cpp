@@ -403,7 +403,7 @@ void CNpc::setProps(CPacket& pProps)
 
 			case BLOCKFLAGS:
 				blockFlags = (unsigned char)pProps.readByte1();
-		break;
+			break;
 
 			case NPCMESSAGE:
 				len = (unsigned char)pProps.readByte1();

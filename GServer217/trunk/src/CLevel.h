@@ -53,7 +53,7 @@ class CLevel
 	void reset();
 	void animate();
 	void saveNpcs();
-	void addNewNpc(CString& pImage, CString& pCodeFile, float pX, float pY);
+	int addNewNpc(CString& pImage, CString& pCodeFile, float pX, float pY);
 	void addHorse(CHorse* pHorse);
 	void removeHorse(float pX, float pY);
 	CString getSignCode(CString& pText);

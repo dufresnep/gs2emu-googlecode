@@ -13,6 +13,7 @@
 #include <sys/stat.h>
 #include "zlib.h"
 #include <math.h>
+#include "CNpc.h"
 
 pt2func CPlayer::msgFuncs[] = {
 			&CPlayer::msgLEVELWARP, &CPlayer::msgBOARDMODIFY,
@@ -73,7 +74,7 @@ bool sendInit[] =
 	true , true,  true,  true,  true,  true,  // 6-11
 	false, true,  false, true,  true,  true,  // 12-17
 	true , true,  true,  true,  true,  false, // 18-23
-	false, true,  true,  true,  false, false, // 24-29
+	true, true,  true,  true,  false, false,  // 24-29
 	false, false, true,  false, false, true,  // 30-35
 	true,  true,  true,  true,  true,  true,  // 36-41
 	false, false, false, false, false, false, // 42-47
@@ -123,7 +124,7 @@ bool forwardLocal[propscount + 3] =
 	false, false, true,  true,  true,  true,  // 6-11
 	true,  true,  false, true,  true,  true,  // 12-17
 	true,  true,  true,  true,  false, false, // 18-23
-	false, true,  false, false, false, false, // 24-29
+	true,  true,  false, false, false, false, // 24-29
 	true,  false, true,  false, true,  true,  // 30-35
 	true,  true,  true,  true,  true,  true,  // 36-41
 	false, false, false, false, false, false, // 42-47
@@ -145,7 +146,7 @@ bool sendOthersInit[propscount + 3] =
 	true,  true,  true,  false, true,  true,  // 30-35
 	true,  true,  true,  true,  true,  true,  // 36-41
 	false, false, false, false, false, false, // 42-47
-	false, false, false, false, false, true, // 48-53
+	false, false, false, false, false, true,  // 48-53
 	false, false, false, false, false, false, // 54-59
 	false, false, false, false, false, false, // 60-65
 	false, false, false, false, false, false, // 66-71
@@ -178,7 +179,8 @@ CPlayer::CPlayer(CSocket* pSocket)
 : additionalFlags(0), carrySprite(-1), failAttempts(0), key(0), iterator(0),
 id(-1), packCount(0), udpPort(0), lastNick(0), statusMsg(0),
 firstPacket(true), firstLevel(true), deleteMe(false), allowBomb(false),
-level(NOLEVEL), playerSock(pSocket)
+level(NOLEVEL), playerSock(pSocket),
+carryNpcId(0), carryNpcThrown(false)
 {
 	lastData = lastChat = lastSave = loginTime = getSysTime();
 	lastMessage = lastMovement = getTime();
@@ -687,7 +689,6 @@ void CPlayer::parsePacket(CPacket& pPacket)
 		return;
 	}
 }
-
 
 void CPlayer::sendPacket(CPacket& pPacket)
 {
@@ -1475,8 +1476,7 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 		CPacket npcProps;
 		CNpc* npc = (CNpc*)level->npcs[i];
 		npcProps << (char)SNPCPROPS << (int)npc->id << npc->getPropertyList(l_time);
-		if (npcProps.length() > 3)
-			sendPacket(npcProps);
+		sendPacket(npcProps);
 	}
 
 	// Remove the player from the enteredLevels thingy.
@@ -1939,7 +1939,7 @@ CPacket CPlayer::getProp(int pProp)
 			break;
 
 		case CARRYNPC:
-			retVal.writeByte3(0);
+			retVal.writeByte3(carryNpcId);
 			break;
 
 		case APCOUNTER:
@@ -2297,9 +2297,18 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 				break;
 
 			case CARRYNPC:
-				pProps.readByte3();
-				//this doesnt work even when i add the correct code...:/
-				//TO DO: add hack check
+				// Find our NPC.
+				carryNpcId = pProps.readByte3();
+				for (int i = 0; i < level->npcs.count(); ++i)
+				{
+					CNpc* npc = (CNpc*)level->npcs[i];
+					if (npc->id == carryNpcId)
+					{
+						level->npcs.remove(i);
+						sendLocally(CPacket() << (char)SDELNPC2 << (char)levelName.length() << levelName << (int)npc->id);
+						break;
+					}
+				}
 				break;
 
 			case APCOUNTER:
@@ -2647,6 +2656,7 @@ void CPlayer::getItem(int pItem)
 		break;
 	}
 }
+
 void CPlayer::sendServerFlag(CString& pFlag)
 {
 	for (int i = 0; i < playerList.count(); i++)
@@ -2781,10 +2791,13 @@ void CPlayer::msgPLAYERPROPS(CPacket& pPacket)
 void CPlayer::msgNPCPROPS(CPacket& pPacket)
 {
 	CPacket packet;
-	CNpc* npc = (CNpc*)npcIds[pPacket.readByte3()];
+
+	// Get the NPC.
+	int npcid = pPacket.readByte3();
+	CNpc* npc = (CNpc*)npcIds[npcid];
+
+	// See if we found the NPC or not.
 	if (npc == NULL)
-		return;
-	if(npc->level != level)
 		return;
 
 	packet << (char)SNPCPROPS << pPacket.text() + 1;
@@ -2795,6 +2808,29 @@ void CPlayer::msgNPCPROPS(CPacket& pPacket)
 			other->sendPacket(packet);
 	}
 	npc->setProps(pPacket);
+
+	// If the NPC didn't originate in this level, add it to the level.
+	// This is the case with carryable NPCs.
+	if (npc->level != level)
+	{
+		npc->level = level;
+		bool foundNpc = false;
+		for (int i = 0; i < level->npcs.count(); ++i)
+		{
+			CNpc* lnpc = (CNpc*)level->npcs[i];
+			if (lnpc == npc) foundNpc = true;
+		}
+		if (foundNpc == false)
+			level->npcs.add(npc);
+		sendLocally(CPacket() << (char)SNPCPROPS << (int)npc->id << npc->getPropertyList(0));
+	}
+
+	// Correct visflags.
+	if (carryNpcThrown)
+	{
+		carryNpcThrown = false;
+		sendLocally(CPacket() << (char)SNPCPROPS << (int)npc->id << npc->getPropertyList(0));
+	}
 }
 
 void CPlayer::msgADDBOMB(CPacket& pPacket)
@@ -2900,6 +2936,25 @@ void CPlayer::msgFIRESPY(CPacket& pPacket)
 void CPlayer::msgCARRYTHROWN(CPacket& pPacket)
 {
 	if ( id == -1 ) return;
+	CNpc* npc = (CNpc*)npcIds[carryNpcId];
+	if (npc != 0)
+	{
+		carryNpcThrown = true;
+
+		// Add the NPC back to the level if it never left.
+		if (npc->level == level)
+		{
+			bool foundNpc = false;
+			for (int i = 0; i < level->npcs.count(); ++i)
+			{
+				CNpc* lnpc = (CNpc*)level->npcs[i];
+				if (lnpc == npc)
+					foundNpc = true;
+			}
+			if (foundNpc == false)
+				level->npcs.add(npc);
+		}
+	}
 	sendLocally(CPacket() << (char)SCARRYTHROWN << (short)id << pPacket.text()+1);
 }
 void CPlayer::msgADDEXTRA(CPacket& pPacket)

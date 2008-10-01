@@ -599,15 +599,15 @@ CString CLevel::getSignCode(CString& pText)
 	return retVal;
 }
 
-void CLevel::addNewNpc(CString& pImage, CString& pCodeFile, float pX, float pY)
+int CLevel::addNewNpc(CString& pImage, CString& pCodeFile, float pX, float pY)
 {
 	CStringList codeData;
 	CString code;
 	char* dataFile = getDataFile(pCodeFile.text());
 	if(!strlen(dataFile))
-		return;
+		return 0;
 	if(!codeData.load(dataFile))
-		return;
+		return 0;
 	for(int i = 0; i < codeData.count(); i++)
 		code << codeData[i] << "\xa7";
 
@@ -645,7 +645,7 @@ void CLevel::addNewNpc(CString& pImage, CString& pCodeFile, float pX, float pY)
 		}
 	}
 	joinList.clear();
-	npcs.add( npc );
+	npcs.add(npc);
 
 	for(int i = 0; i < players.count(); i++)
 	{
@@ -653,6 +653,8 @@ void CLevel::addNewNpc(CString& pImage, CString& pCodeFile, float pX, float pY)
 		player->sendPacket(CPacket() << (char)SNPCPROPS << (int)npc->id <<
 			npc->getPropertyList(0));
 	}
+
+	return npc->id;
 }
 
 void CLevel::updateLevel(CString& pFileName)
@@ -713,17 +715,6 @@ void CLevel::reset()
 		for(int ii = 0; ii < playerList.count(); ii++)
 		{
 			CPlayer* player = (CPlayer*)playerList[ii];
-/*
-			// Terrible hack to fix the destroy; command on putnpc npcs.
-			if ( npc->levelNPC == false )
-			{
-				// SDELNPC doesn't work, so this terrible hack will do.
-				player->sendPacket( CPacket() << (char)SNPCPROPS << (int)npc->id <<
-					(char)ACTIONSCRIPT << (short)0 << (char)VISFLAGS << (char)0 <<
-					(char)BLOCKFLAGS << (char)0 << (char)NPCMESSAGE << (char)0 );
-			}
-			player->sendPacket(CPacket() << (char)SDELNPC << (int)npc->id);
-*/
 			player->sendPacket(CPacket() << (char)SDELNPC2 << (char)fileName.length() << fileName << (int)npc->id);
 			player->compressAndSend();
 		}

@@ -1,14 +1,23 @@
 --------------------------------------------
 New features/bug fixes in v2.171 build 63
 --------------------------------------------
+
+Additions:
+- 'canbecarried' gscript command support has been improved.  Keep in
+  mind that 'canbecarried' has always been fundamentally broken in
+  pre-npcserver Graal.  Our implementation is good, but not perfect.
+  And it might differ from what people are used to.
+
 Fixes:
-- Fixed a rare bug which caused a level to lock up the client when loading.
+- Fixed a rare bug which caused a level to lock up the client when
+  loading.
 - Fixed a bug that would cause servers to fall into an infinite loop.
 
 
 --------------------------------------------
 New features/bug fixes in v2.171 build 62
 --------------------------------------------
+
 Fixes:
 - Fixed the evil decompression errors.
 
@@ -16,6 +25,7 @@ Fixes:
 --------------------------------------------
 New features/bug fixes in v2.171 build 61
 --------------------------------------------
+
 Changes:
 - Accounts now use Windows line endings.
 

@@ -349,6 +349,7 @@ enum {
 	CANNPCCONTROL		= 0x80000,
 };
 
+class CNpc;
 class CPlayer : public CAccount
 {
 	public:
@@ -363,6 +364,8 @@ class CPlayer : public CAccount
 		unsigned char statusMsg;
 		time_t lastCheck, lastData, lastSave, loginTime, lastChat;
 		int lastMessage, lastMovement, lastNick;
+		int carryNpcId;
+		bool carryNpcThrown;
 		#ifdef GSERV22
 			codec mcodec;
 		#endif
