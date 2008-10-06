@@ -1560,17 +1560,6 @@ void CPlayer::leaveLevel()
 	if ( found == false )
 		enteredLevels.add(new CEnteredLevel(level, getSysTime()));
 
-	// If the level was a sparring zone level, delete the sparringzone NPC from the player's cache.
-	if (level->sparZone == true)
-	{
-		for (int i = 0; i < level->npcs.count(); ++i)
-		{
-			CNpc* npc = (CNpc*)level->npcs[i];
-			if (npc->clientCode.length() < 20 && npc->clientCode.find("sparringzone") >= 0)
-				sendPacket(CPacket() << (char)SDELNPC2 << (char)level->fileName.length() << level->fileName << (int)npc->id);
-		}
-	}
-
 	// Leave the level.
 	level->players.remove(this);
 	if ( level->players.count() > 0 )
