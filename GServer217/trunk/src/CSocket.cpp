@@ -196,6 +196,10 @@ int CSocket::connect()
 	// Bind the socket if it is a server-type socket.
 	if ( properties.type == SOCKET_TYPE_SERVER )
 	{
+		// Let us reuse the address.  Freaking bind.
+		int value = 1;
+		setsockopt(properties.handle, SOL_SOCKET, SO_REUSEADDR, (char*)&value, sizeof(value));
+
 		//errorOut( "debuglog.txt", CString() << ":: " << properties.description << " - Binding socket..." );
 		if ( ::bind( properties.handle, (struct sockaddr *)&properties.address, sizeof(properties.address) ) == SOCKET_ERROR )
 		{
