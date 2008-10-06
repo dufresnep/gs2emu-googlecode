@@ -2309,7 +2309,7 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 					{
 						carryNpcId = 0;
 						sendPacket(CPacket() << (char)SPLAYERPROPS << (char)CARRYNPC << (int)0);
-						sendLocally(CPacket() << (char)PLAYERPROPS << (char)CARRYNPC << (int)0);
+						sendLocally(CPacket() << (char)OTHERPLPROPS << (short)id << (char)CARRYNPC << (int)0);
 						isOwner = false;
 						break;
 					}
