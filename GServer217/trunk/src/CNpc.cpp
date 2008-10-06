@@ -54,14 +54,22 @@ CPacket CNpc::getPropertyList(time_t newTime)
 
 	// Always send the full NPC if it is a sparring zone NPC.
 	// This ensures the client will always register the level as a sparring zone.
+	bool sparring = false;
 	if (clientCode.length() < 20 && clientCode.find("sparringzone") >= 0)
+	{
+		sparring = true;
 		newTime = 0;
+	}
 
 	for ( int i = 0; i < npcpropcount; i++ )
 	{
 		if ( modTime[i] >= newTime && modTime[i] > 0 )
 			retVal << (char)i << getProperty(i);
 	}
+
+	if (sparring == true)
+		retVal << "\n" << (char)SDELNPC2 << (char)level->fileName.length() << level->fileName << (int)id;
+
 	return retVal;
 }
 
