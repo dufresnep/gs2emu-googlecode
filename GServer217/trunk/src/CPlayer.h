@@ -349,7 +349,6 @@ enum {
 	CANNPCCONTROL		= 0x80000,
 };
 
-class CNpc;
 class CPlayer : public CAccount
 {
 	public:

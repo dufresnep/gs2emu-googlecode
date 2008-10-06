@@ -51,6 +51,12 @@ CNpc::~CNpc()
 CPacket CNpc::getPropertyList(time_t newTime)
 {
 	CPacket retVal;
+
+	// Always send the full NPC if it is a sparring zone NPC.
+	// This ensures the client will always register the level as a sparring zone.
+	if (clientCode.length() < 20 && clientCode.find("sparringzone") >= 0)
+		newTime = 0;
+
 	for ( int i = 0; i < npcpropcount; i++ )
 	{
 		if ( modTime[i] >= newTime && modTime[i] > 0 )

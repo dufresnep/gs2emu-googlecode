@@ -12,6 +12,8 @@ Fixes:
 - Fixed a rare bug which caused a level to lock up the client when
   loading.
 - Fixed a bug that would cause servers to fall into an infinite loop.
+- Always fully send sparringzone NPCs to prevent cached sparringzone
+  npcs from incorrectly registering the sparring zone.
 
 
 --------------------------------------------

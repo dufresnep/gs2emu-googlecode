@@ -2,6 +2,7 @@
 	$Id$
  (C) GraalReborn 2007 */
 
+#include "CNpc.h"
 #include "CBaddy.h"
 #include "CDatabase.h"
 #include "CIni.h"
@@ -13,7 +14,6 @@
 #include <sys/stat.h>
 #include "zlib.h"
 #include <math.h>
-#include "CNpc.h"
 
 pt2func CPlayer::msgFuncs[] = {
 			&CPlayer::msgLEVELWARP, &CPlayer::msgBOARDMODIFY,
@@ -310,7 +310,7 @@ void CPlayer::main()
 					int id = lines.readByte1();
 					lines.setRead(lines.getRead() - 1);
 
-					if (type == CLIENTRC && id == 93)
+					if (type == CLIENTRC && id == DFILEFTPUP)
 					{
 						parsePacket(CPacket() << lines.copy(lines.getRead()));
 						lines.setRead(lines.length());
@@ -2297,19 +2297,38 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 				break;
 
 			case CARRYNPC:
+			{
 				// Find our NPC.
 				carryNpcId = pProps.readByte3();
-				for (int i = 0; i < level->npcs.count(); ++i)
+				bool isOwner = true;
+				for (int j = 0; j < playerList.count(); ++j)
 				{
-					CNpc* npc = (CNpc*)level->npcs[i];
-					if (npc->id == carryNpcId)
+					CPlayer* other = (CPlayer*)playerList[j];
+					if (other == this) continue;
+					if (other->carryNpcId == carryNpcId)
 					{
-						level->npcs.remove(i);
-						sendLocally(CPacket() << (char)SDELNPC2 << (char)levelName.length() << levelName << (int)npc->id);
+						carryNpcId = 0;
+						sendPacket(CPacket() << (char)SPLAYERPROPS << (char)CARRYNPC << (int)0);
+						sendLocally(CPacket() << (char)PLAYERPROPS << (char)CARRYNPC << (int)0);
+						isOwner = false;
 						break;
 					}
 				}
-				break;
+				if (isOwner == true)
+				{
+					for (int i = 0; i < level->npcs.count(); ++i)
+					{
+						CNpc* npc = (CNpc*)level->npcs[i];
+						if (npc->id == carryNpcId)
+						{
+							level->npcs.remove(i);
+							sendLocally(CPacket() << (char)SDELNPC2 << (char)levelName.length() << levelName << (int)npc->id);
+							break;
+						}
+					}
+				}
+			}
+			break;
 
 			case APCOUNTER:
 				apCounter = (unsigned int)pProps.readByte2();
