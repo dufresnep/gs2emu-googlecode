@@ -150,7 +150,10 @@ void CSocket::destroy()
 {
 	// Shut down the socket.
 	if ( shutdown( properties.handle, SHUT_WR ) == SOCKET_ERROR )
-		errorOut( "errorlog.txt", CString() << "[CSocket::destroy] shutdown returned error: " << errorMessage(identifyError()) );
+	{
+		int err = identifyError();
+		if (err != ENOTCONN) errorOut( "errorlog.txt", CString() << "[CSocket::destroy] shutdown returned error: " << errorMessage(err) );
+	}
 
 	// Mark socket as terminating.
 	properties.state = SOCKET_STATE_TERMINATING;
