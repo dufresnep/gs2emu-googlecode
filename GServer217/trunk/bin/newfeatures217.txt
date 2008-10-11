@@ -1,4 +1,13 @@
 --------------------------------------------
+New features/bug fixes in v2.171 build 64
+--------------------------------------------
+
+Fixes:
+- Clicking the X to close the gserver will now cause it to correctly
+  shutdown and save all its data.
+
+
+--------------------------------------------
 New features/bug fixes in v2.171 build 63
 --------------------------------------------
 
