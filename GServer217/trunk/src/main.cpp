@@ -30,6 +30,10 @@
 #ifndef WIN32
 	#include <unistd.h>
 	#include <dirent.h>
+
+	#ifndef SIGBREAK
+		#define SIGBREAK SIGQUIT
+	#endif
 #endif
 
 // Function pointer for signal handling.
