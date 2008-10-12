@@ -1343,7 +1343,7 @@ bool CPlayer::loadAccount()
 	}
 
 	CString ip = playerSock->tcpIp();
-	if (staffList.findI(accountName) < 0 || !ip.match(adminIp.text()))
+	if (staffList.findI(accountName) == -1 || !ip.match(adminIp.text()))
 	{
 		if (staffOnly)
 		{

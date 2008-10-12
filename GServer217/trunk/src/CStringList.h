@@ -37,7 +37,7 @@ class CStringList:
 	void replace(const char* pOldString, const char* pNewString);
 	void replace(CString& pOldString, CString& pNewString);
 	bool load(const char* pFileName);
-	void load(const char* pInput, const char* pSep);
+	void load(const char* pInput, const char* pSep, bool trim = false);
 	void load(const char** pStrings, int pCount);
 	void save(const char* pFileName);
 	CString join(char* pSep);

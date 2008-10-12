@@ -89,7 +89,7 @@ bool CStringList::load(const char* pFileName)
 	return true;
 }
 
-void CStringList::load(const char* pInput, const char* pSep)
+void CStringList::load(const char* pInput, const char* pSep, bool trim)
 {
 	CString newString;
 	clear();
@@ -97,7 +97,12 @@ void CStringList::load(const char* pInput, const char* pSep)
 	char* line = strtok(newString.text(), pSep);
 	while(line != NULL)
 	{
-		add(line);
+		if (trim)
+		{
+			CString t(line);
+			add(t.trim());
+		}
+		else add(line);
 		line = strtok(NULL, pSep);
 	}
 }

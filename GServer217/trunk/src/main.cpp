@@ -405,7 +405,7 @@ bool loadSettings(char* pFile)
 	mapNames.load(findKey("maps"), ",");
 	profileList.load(findKey("profilevars", "Kills:=playerkills,Deaths:=playerdeaths,Maxpower:=playerfullhearts,Rating:=playerrating,Alignment:=playerap,Gralat:=playerrupees,Swordpower:=playerswordpower,Spin Attack:=canspin"), ",");
 	staffGuilds.load(findKey("staffguilds", "Server,Manager,Owner,Admin,FAQ,LAT,NAT,GAT,GP,GP Chief,Bugs Admin,NPC Admin,Gani Team,GFX Admin,Events Team,Events Admin,Guild Admin"), ",");
-	staffList.load(findKey("staff"), ",");
+	staffList.load(findKey("staff"), ",", true);
 	statusList.load(findKey("playerlisticons", "Online,Away,DND"), ",");
 
 	/* BOOL Server-Options */
