@@ -54,7 +54,7 @@ TServer::TServer(CSocket *pSocket)
 : sock( pSocket ), type( 0 )
 {
 	language = "English";
-	lastPing = time(0);
+	lastPing = lastPlayerCount = time(0);
 }
 
 TServer::~TServer()
@@ -121,6 +121,17 @@ bool TServer::doMain()
 	{
 		lastPing = time(0);
 		sendPacket( CString() >> (char)SVO_PING );
+	}
+
+	// Update the player count every three minutes.
+	if ((int)difftime(time(0), lastPlayerCount) >= 180)
+	{
+		lastPlayerCount = time(0);
+		CString query;
+		query << "UPDATE `" << settings->getStr("serverlist") << "` SET "
+			<< "playercount='" << CString((int)playerList.size()).escape() << "' "
+			<< "WHERE name='" << name.escape() << "'";
+		mySQL->query(query);
 	}
 
 	// send out buffer

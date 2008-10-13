@@ -120,7 +120,6 @@ int main(int argc, char *argv[])
 					<< "GServer port: " << CString(settings->getInt("gserverport")) << "\n" );
 
 	// Main Loop
-	time_t timerSecureLogin = time(0);
 	while (running)
 	{
 		// Make sure MySQL is active
@@ -163,18 +162,6 @@ int main(int argc, char *argv[])
 			else
 				++iter;
 		}
-
-		time_t curTime = time(0);
-
-		// Every minute, remove old transactions from the secure login table.
-#ifndef NO_MYSQL
-		if ((int)difftime(curTime, timerSecureLogin) > 60)
-		{
-			CString query;
-			query << "DELETE FROM " << settings->getStr("securelogin") << " WHERE expire < " << CString((long long)curTime);
-			mySQL->query(query);
-		}
-#endif
 
 		// Wait
 		wait(100);

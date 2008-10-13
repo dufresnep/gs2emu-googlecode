@@ -121,8 +121,7 @@ class TServer
 		CString description, ip, language, name, pcount, port, url, version;
 		int type;
 		std::vector<player *> playerList;
-		time_t lastPing;
-		time_t lastData;
+		time_t lastPing, lastData, lastPlayerCount;
 };
 
 #endif // TSERVER_H
