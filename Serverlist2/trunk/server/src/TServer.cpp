@@ -123,6 +123,7 @@ bool TServer::doMain()
 		sendPacket( CString() >> (char)SVO_PING );
 	}
 
+#ifndef NO_MYSQL
 	// Update the player count every three minutes.
 	if ((int)difftime(time(0), lastPlayerCount) >= 180)
 	{
@@ -133,6 +134,7 @@ bool TServer::doMain()
 			<< "WHERE name='" << name.escape() << "'";
 		mySQL->query(query);
 	}
+#endif
 
 	// send out buffer
 	sendCompress();
