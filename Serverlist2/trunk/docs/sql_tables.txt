@@ -4,6 +4,12 @@ MySQL NOTE:
 	your Web site to manually delete entries.  If you don't, you may potentially
 	have dead entries in your database.
 
+NOTE about graal_users:
+	On the Graal Reborn serverlist, the id field is the same as the forum account
+	id.  If you aren't linking your user database to a forum database, replace
+	the id declaration with:
+	id int NOT NULL auto_increment,
+
 ----------------------------------------
 
 CREATE TABLE graal_users (
