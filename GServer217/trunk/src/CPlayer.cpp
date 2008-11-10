@@ -352,8 +352,7 @@ void CPlayer::processLogin(CPacket& pPacket)
 	type = pPacket.readByte1();
 	if (type == CLIENTPLAYER)
 		key = pPacket.readByte1();
-	version = pPacket.readChars(7);
-	pPacket.readByte1();	//skip byte...?
+	version = pPacket.readChars(8);
 
 	#ifdef GSERV22
 	mcodec.reset(key);
