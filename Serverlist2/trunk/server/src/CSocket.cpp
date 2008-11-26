@@ -85,7 +85,7 @@ CSocket::CSocket()
 
 CSocket::CSocket(const CString& host, const CString& port, sock_properties* properties)
 {
-	this->port = strtofloat(port);
+	this->port = (unsigned short)strtoint(port);
 	if (CSocket::was_initiated == 0) CSocket::socketSystemInit();
 	if (properties != 0)
 		memcpy((void*)&this->properties, properties, sizeof(sock_properties));
