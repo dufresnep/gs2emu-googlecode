@@ -143,6 +143,9 @@ int CSocket::init(const CString& host, const CString& port)
 	else
 		memcpy((void*)&properties.address, res->ai_addr, res->ai_addrlen);
 
+	// Save port.
+	this->port = (unsigned short)strtoint(port);
+
 	return 0;
 }
 

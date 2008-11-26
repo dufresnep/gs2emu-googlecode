@@ -285,16 +285,22 @@ bool TServer::msgSVI_SETNAME(CString& pPacket)
 {
 	name = pPacket.readString("");
 
-	// make sure they don't have a Gold/Hosted type
-	while (name.subString(0, 2) == "P " || name.subString(0, 2) == "H " || name.subString(0, 2) == "3 ")
-		name.removeI(0, 2);
+	// Find out the server type.
+	CString sType = name.subString(0, 2);
+	if (sType == "P ") type = TYPE_GOLD;
+	if (sType == "H ") type = TYPE_HOSTED;
+	if (sType == "U ") type = TYPE_HIDDEN;
+	if (sType == "3 ") type = TYPE_3D;
 
-	// check for underconstruction
-	if (name.subString(0, 2) == "U ")
-	{
+	// Restrict what type a server can be.
+	// TODO: serverhq stuff.  Currently, Graal Reborn is hard-coded in.
+	if (!(sock->tcpIp() == "79.136.36.119" && sock->getPort() == 14900))
+		if (type != TYPE_HIDDEN)
+			type = TYPE_CLASSIC;
+
+	// Remove all server type strings from the name of the server.
+	while (name.subString(0, 2) == "U " || name.subString(0, 2) == "P " || name.subString(0, 2) == "H " || name.subString(0, 2) == "3 ")
 		name.removeI(0, 2);
-		type = TYPE_HIDDEN;
-	}
 
 	// check for duplicates
 	for (unsigned int i = 0; i < serverList.size(); i++)

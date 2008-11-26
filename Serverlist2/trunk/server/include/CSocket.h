@@ -59,6 +59,7 @@ class CSocket
 	private:
 		sock_properties properties;
 		CString buffer;
+		unsigned short port;
 		static int was_initiated;
 
 		static int socketSystemInit();
@@ -87,6 +88,7 @@ class CSocket
 		const char *getDescription();
 		int getState();
 		CString& getBuffer();
+		unsigned short getPort();
 
 		int setProtocol(int sock_proto);
 		int setType(int sock_type);
@@ -142,5 +144,10 @@ CString& CSocket::getBuffer()
 	return buffer;
 }
 
+inline
+unsigned short CSocket::getPort()
+{
+	return port;
+}
 
 #endif
