@@ -72,6 +72,7 @@ static int identifyError(int source = 0);
 
 // Class functions
 CSocket::CSocket()
+: port(0)
 {
 	if (CSocket::was_initiated == 0) CSocket::socketSystemInit();
 	properties.handle = 0;
@@ -84,6 +85,7 @@ CSocket::CSocket()
 
 CSocket::CSocket(const CString& host, const CString& port, sock_properties* properties)
 {
+	this->port = strtofloat(port);
 	if (CSocket::was_initiated == 0) CSocket::socketSystemInit();
 	if (properties != 0)
 		memcpy((void*)&this->properties, properties, sizeof(sock_properties));

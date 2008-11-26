@@ -294,7 +294,7 @@ bool TServer::msgSVI_SETNAME(CString& pPacket)
 
 	// Restrict what type a server can be.
 	// TODO: serverhq stuff.  Currently, Graal Reborn is hard-coded in.
-	if (!(CString(sock->tcpIp()) == "79.136.36.119" && sock->getPort() == 14900))
+	if (!(CString(sock->tcpIp()) == "79.136.36.119" && name.find("Graal Reborn") != -1))
 		if (type != TYPE_HIDDEN)
 			type = TYPE_CLASSIC;
 
