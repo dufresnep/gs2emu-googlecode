@@ -164,6 +164,7 @@ const CString& TServer::getDescription()
 
 const CString TServer::getIp(const CString& pIp)
 {
+	printf("Testing: %s = %s\n", pIp.text(), ip.text());
 	return (pIp == ip ? "127.0.0.1" : ip);
 }
 
