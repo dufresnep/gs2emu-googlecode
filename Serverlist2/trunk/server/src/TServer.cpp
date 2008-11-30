@@ -162,9 +162,9 @@ const CString& TServer::getDescription()
 	return description;
 }
 
-const CString& TServer::getIp()
+const CString TServer::getIp(const CString& pIp)
 {
-	return ip;
+	return (pIp == ip ? "127.0.0.1" : ip);
 }
 
 const CString& TServer::getLanguage()
@@ -215,9 +215,9 @@ const CString& TServer::getVersion()
 	return version;
 }
 
-const CString TServer::getServerPacket()
+const CString TServer::getServerPacket(const CString& pIp)
 {
-	return CString() >> (char)8 >> (char)(getName().length() + getType().length()) << getType() << getName() >> (char)getLanguage().length() << getLanguage() >> (char)getDescription().length() << getDescription() >> (char)getUrl().length() << getUrl() >> (char)getVersion().length() << getVersion() >> (char)getPCount().length() << getPCount() >> (char)getIp().length() << getIp() >> (char)getPort().length() << getPort();
+	return CString() >> (char)8 >> (char)(getName().length() + getType().length()) << getType() << getName() >> (char)getLanguage().length() << getLanguage() >> (char)getDescription().length() << getDescription() >> (char)getUrl().length() << getUrl() >> (char)getVersion().length() << getVersion() >> (char)getPCount().length() << getPCount() >> (char)getIp(pIp).length() << getIp(pIp) >> (char)getPort().length() << getPort();
 }
 
 /*

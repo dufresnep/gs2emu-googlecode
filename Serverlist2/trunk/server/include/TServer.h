@@ -77,7 +77,7 @@ class TServer
 
 		// get-value functions
 		const CString& getDescription();
-		const CString& getIp();
+		const CString getIp(const CString& pIp = "");
 		const CString& getLanguage();
 		const CString& getName();
 		const CString& getPCount();
@@ -85,7 +85,7 @@ class TServer
 		const CString getType();
 		const CString& getUrl();
 		const CString& getVersion();
-		const CString getServerPacket();
+		const CString getServerPacket(const CString& pIp = "");
 		double getLastData() { return difftime( time(0), lastData ); }
 
 		// send-packet functions

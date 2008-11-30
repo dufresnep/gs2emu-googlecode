@@ -253,7 +253,7 @@ bool TPlayer::msgPLI_SERVERLIST(CString& pPacket)
 	{
 		case ACCSTAT_NORMAL:
 			if (getServerCount() > 0)
-				sendPacket(CString() >> (char)PLO_SVRLIST << getServerList(), true);
+				sendPacket(CString() >> (char)PLO_SVRLIST << getServerList(sock->tcpIp()), true);
 			sendPacket(CString() >> (char)PLO_STATUS << "Welcome to " << settings->getStr("name") << ", " << account << "." << "\r" << "There are " << CString(getServerCount()) << " server(s) online.");
 			sendPacket(CString() >> (char)PLO_SITEURL << settings->getStr("url"));
 			sendPacket(CString() >> (char)PLO_UPGURL << settings->getStr("donateUrl"));

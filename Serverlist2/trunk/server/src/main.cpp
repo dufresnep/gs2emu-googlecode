@@ -224,7 +224,7 @@ CString getAccountError(int pErrorId)
 	}
 }
 
-CString getServerList()
+CString getServerList(const CString& pIp)
 {
 	// definitions
 	CString packet;
@@ -234,7 +234,7 @@ CString getServerList()
 
 	// get servers
 	for (unsigned int i = 0; i < serverList.size(); i++)
-		packet.write(serverList[i]->getServerPacket());
+		packet.write(serverList[i]->getServerPacket(pIp));
 	return packet;
 }
 
