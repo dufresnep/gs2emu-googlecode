@@ -36,9 +36,13 @@ void ListServer_Connect()
 		<< (char)SLSLANG << listServerFields[2] << "\n"
 		<< (char)SLSVER  << listServerFields[3] << "\n"
 		<< (char)SLSURL  << listServerFields[4] << "\n"
-		<< (char)SLSIP   << listServerFields[5] << "\n"
-		<< (char)SLSSETLOCALIP << listServer.getLocalIp() << "\n"
-		<< (char)SLSPORT << serverPort << "\n");
+		<< (char)SLSIP   << listServerFields[5] << "\n");
+	CString localip(listServer.getLocalIp());
+	if (localip == CString("127.0.1.1") || localip == CString("127.0.0.1"))
+		errorOut("serverlog.txt", CBuffer() << "[WARNING] Socket returned " << localip << " for its local ip!  Not sending local ip to serverlist.", true);
+	else
+		ListServer_Send(CPacket() << (char)SLSSETLOCALIP << listServer.getLocalIp() << "\n");
+	ListServer_Send(CPacket() << (char)SLSPORT << serverPort << "\n");
 
 	// send players to listserver
 	CPacket pPacket;
