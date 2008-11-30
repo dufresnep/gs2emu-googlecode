@@ -31,7 +31,14 @@ void ListServer_Connect()
 	errorOut("serverlog.txt", CBuffer() << "Connected to the list server successfully.", true);
 
 	// send gserver info to listserver
-	ListServer_Send(CPacket() << (char)SLSNAME << listServerFields[0]  << "\n" << (char)SLSDESC << listServerFields[1]  << "\n" << (char)SLSLANG << listServerFields[2]  << "\n" << (char)SLSVER  << listServerFields[3]  << "\n" << (char)SLSURL  << listServerFields[4]  << "\n" << (char)SLSIP   << listServerFields[5]  << "\n" << (char)SLSPORT << serverPort << "\n");
+	ListServer_Send(CPacket() << (char)SLSNAME << listServerFields[0] << "\n"
+		<< (char)SLSDESC << listServerFields[1] << "\n"
+		<< (char)SLSLANG << listServerFields[2] << "\n"
+		<< (char)SLSVER  << listServerFields[3] << "\n"
+		<< (char)SLSURL  << listServerFields[4] << "\n"
+		<< (char)SLSIP   << listServerFields[5] << "\n"
+		<< (char)SLSSETLOCALIP << listServer.getLocalIp() << "\n"
+		<< (char)SLSPORT << serverPort << "\n");
 
 	// send players to listserver
 	CPacket pPacket;
