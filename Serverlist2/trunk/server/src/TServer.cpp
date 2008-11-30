@@ -165,7 +165,12 @@ const CString& TServer::getDescription()
 
 const CString TServer::getIp(const CString& pIp)
 {
-	return ((pIp == ip && localip.length() != 0) ? localip : ip);
+	if (pIp == ip)
+	{
+		if (localip.length() != 0) return localip;
+		return "127.0.0.1";
+	}
+	return ip;
 }
 
 const CString& TServer::getLanguage()
