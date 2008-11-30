@@ -486,7 +486,12 @@ bool TServer::msgSVI_NICKNAME(CString& pPacket)
 bool TServer::msgSVI_GETPROF(CString& pPacket)
 {
 	unsigned short playerid = pPacket.readGUShort();
-	CString accountName = pPacket.readChars( pPacket.readGUChar() );
+
+	// Fix old gservers that sent an incorrect packet.
+	pPacket.readGUChar();
+
+	// Read the account name.
+	CString accountName = pPacket.readString("");
 
 	CString replyPacket;
 	if ( getProfile( accountName, replyPacket ) )
@@ -496,7 +501,10 @@ bool TServer::msgSVI_GETPROF(CString& pPacket)
 
 bool TServer::msgSVI_SETPROF(CString& pPacket)
 {
-	pPacket.readGUChar();		// Throwaway data.
+	// Fix old gservers that sent an incorrect packet.
+	pPacket.readGUChar();
+
+	// Read the account name in.
 	CString accountName = pPacket.readChars( pPacket.readGUChar() );
 
 	// Set profile.
