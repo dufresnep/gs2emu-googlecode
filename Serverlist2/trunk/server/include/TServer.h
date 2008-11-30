@@ -23,6 +23,7 @@ enum
 	SVI_PLYRREM		= 15,
 	SVI_SVRPING		= 16,
 	SVI_VERIACC2	= 17,
+	SVI_SETLOCALIP	= 18,
 };
 
 enum
@@ -113,12 +114,13 @@ class TServer
 		bool msgSVI_PLYRREM(CString& pPacket);
 		bool msgSVI_SVRPING(CString& pPacket);
 		bool msgSVI_VERIACC2(CString& pPacket);
+		bool msgSVI_SETLOCALIP(CString& pPacket);
 
 	private:
 		CSocket *sock;
 		CString sendBuffer, sockBuffer, outBuffer;
 
-		CString description, ip, language, name, pcount, port, url, version;
+		CString description, ip, language, name, pcount, port, url, version, localip;
 		int type;
 		std::vector<player *> playerList;
 		time_t lastPing, lastData, lastPlayerCount;

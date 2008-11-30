@@ -45,6 +45,7 @@ void createSVFunctions()
 	svfunc[SVI_PLYRREM] = &TServer::msgSVI_PLYRREM;
 	svfunc[SVI_SVRPING] = &TServer::msgSVI_SVRPING;
 	svfunc[SVI_VERIACC2] = &TServer::msgSVI_VERIACC2;
+	svfunc[SVI_SETLOCALIP] = &TServer::msgSVI_SETLOCALIP;
 }
 
 /*
@@ -164,7 +165,7 @@ const CString& TServer::getDescription()
 
 const CString TServer::getIp(const CString& pIp)
 {
-	return (pIp == ip ? "127.0.0.1" : ip);
+	return ((pIp == ip && localip.length() != 0) ? localip : ip);
 }
 
 const CString& TServer::getLanguage()
@@ -586,5 +587,11 @@ bool TServer::msgSVI_VERIACC2(CString& pPacket)
 		<< getAccountError(ret));
 #endif
 
+	return true;
+}
+
+bool TServer::msgSVI_SETLOCALIP(CString& pPacket)
+{
+	localip = pPacket.readString("");
 	return true;
 }
