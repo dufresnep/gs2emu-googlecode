@@ -6,11 +6,14 @@ Additions:
 - The gserver now sends its local IP address to the serverlist so the
   serverlist can help players connect to their own server when they
   have routing issues.  Should get rid of the need for a no-ip/dyndns
-  host name.
+  host name for simple network setups.
 
 Fixes:
 - Clicking the X to close the gserver will now cause it to correctly
   shutdown and save all its data.
+- GServer now correctly reads the client version string.  This causes
+  no changes in the operation of the GServer at all.  Just thought I
+  would document it.
 
 
 --------------------------------------------
