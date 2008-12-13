@@ -387,7 +387,7 @@ int CSocket::sendData( CPacket& data )
 		tm.tv_sec = tm.tv_usec = 0;
 		FD_ZERO( &set );
 		FD_SET( properties.handle, &set );
-		select( properties.handle + 1, 0, &set, 0, &tm );
+		select( (int)properties.handle + 1, 0, &set, 0, &tm );
 		if ( !FD_ISSET( properties.handle, &set ) )
 			return size;
 
@@ -456,7 +456,7 @@ int CSocket::getData()
 			tm.tv_sec = tm.tv_usec = 0;
 			FD_ZERO( &set );
 			FD_SET( properties.handle, &set );
-			select( properties.handle + 1, &set, 0, 0, &tm );
+			select( (int)properties.handle + 1, &set, 0, 0, &tm );
 			if ( !FD_ISSET( properties.handle, &set ) )
 				return temp.length();
 		}
@@ -686,7 +686,7 @@ const char* CSocket::getLocalIp()
 
 	// Translate into an IP address.
 	sa = res->ai_addr;
-	salen = res->ai_addrlen;
+	salen = (int)res->ai_addrlen;
 	error = getnameinfo(sa, salen, host, 1025, 0, 0, NI_NUMERICHOST);
 	if (error) return 0;
 
