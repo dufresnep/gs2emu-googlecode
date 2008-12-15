@@ -1470,6 +1470,7 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	}
 
 	//send npcs
+	sendPacket(CPacket() << (char)LEVELNAME << levelName);
 	for ( int i = 0; i < level->npcs.count(); i++ )
 	{
 		CPacket npcProps;
@@ -2707,8 +2708,8 @@ void CPlayer::msgLEVELWARP(CPacket& pPacket)
 		modTime = (int)pPacket.readByte5();
 
 	float x2 = 0, y2 = 0;
-	x2 = (float)(pPacket.readByte1()/2);
-	y2 = (float)(pPacket.readByte1()/2);
+	x2 = ((float)pPacket.readByte1())/2.0f;
+	y2 = ((float)pPacket.readByte1())/2.0f;
 	CString newLevel = pPacket.readString("");
 	warp(newLevel, x2, y2, modTime);
 }
