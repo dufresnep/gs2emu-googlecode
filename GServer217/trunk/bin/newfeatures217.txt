@@ -14,6 +14,10 @@ Fixes:
 - GServer now correctly reads the client version string.  This causes
   no changes in the operation of the GServer at all.  Just thought I
   would document it.
+- Maybe fixed the bug where NPCs sometimes appear in the water while on
+  land.
+- Maybe fixed a bug where warping wasn't working for fractional (0.5)
+  tile values.
 
 
 --------------------------------------------
