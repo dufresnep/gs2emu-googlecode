@@ -2841,14 +2841,24 @@ void CPlayer::msgNPCPROPS(CPacket& pPacket)
 		}
 		if (foundNpc == false)
 			level->npcs.add(npc);
-		sendLocally(CPacket() << (char)SNPCPROPS << (int)npc->id << npc->getPropertyList(0));
+		for (int i = 0; i < level->players.count(); i++)
+		{
+			CPlayer* other = (CPlayer*)level->players[i];
+			if (other != this)
+				other->sendPacket(CPacket() << (char)SNPCPROPS << (int)npc->id << npc->getPropertyList(0));
+		}
 	}
 
 	// Correct visflags.
 	if (carryNpcThrown)
 	{
 		carryNpcThrown = false;
-		sendLocally(CPacket() << (char)SNPCPROPS << (int)npc->id << npc->getPropertyList(0));
+		for (int i = 0; i < level->players.count(); i++)
+		{
+			CPlayer* other = (CPlayer*)level->players[i];
+			if (other != this)
+				other->sendPacket(CPacket() << (char)SNPCPROPS << (int)npc->id << npc->getPropertyList(0));
+		}
 	}
 }
 
