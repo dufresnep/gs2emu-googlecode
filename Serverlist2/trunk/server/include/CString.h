@@ -14,7 +14,7 @@
 	#define MIN(a, b)	((a) < (b) ? (a) : (b))
 #endif
 #define clip(a, b, c) MAX(MIN((a), (c)), (b))
-#define in(a, b, c) ((a) >= (b) && (a) <= (c))
+#define inrange(a, b, c) ((a) >= (b) && (a) <= (c))
 
 #define strtofloat(a) atof(a.text())
 #define strtoint(a) atoi(a.text())
@@ -78,11 +78,12 @@ class CString
 		int findi(const CString& pString, int pStart = 0) const;
 		int findl(char pChar) const;
 		std::vector<CString> tokenize(const CString& pString = " ") const;
-		static std::vector<CString> loadToken(const CString& pFile, const CString& pToken = "\n");
+		static std::vector<CString> loadToken(const CString& pFile, const CString& pToken = "\n", bool removeCR = false);
 		CString replaceAll(const CString& pString, const CString& pNewString) const;
 		CString gtokenize() const;
 		CString guntokenize() const;
 		bool match(const CString& pMask) const;
+		bool comparei(const CString& pOther) const;
 
 		/* In-Functions */
 		inline CString& escapeI();

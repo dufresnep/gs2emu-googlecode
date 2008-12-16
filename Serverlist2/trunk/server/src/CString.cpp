@@ -308,7 +308,7 @@ CString CString::toLower() const
 	CString retVal(*this);
 	for (int i = 0; i < retVal.length(); i++)
 	{
-		if (in(retVal[i], 'A', 'Z'))
+		if (inrange(retVal[i], 'A', 'Z'))
 			retVal[i] += 32;
 	}
 
@@ -320,7 +320,7 @@ CString CString::toUpper() const
 	CString retVal(*this);
 	for (int i = 0; i < retVal.length(); i++)
 	{
-		if (in(retVal[i], 'a', 'z'))
+		if (inrange(retVal[i], 'a', 'z'))
 			retVal[i] -= 32;
 	}
 
@@ -458,11 +458,12 @@ std::vector<CString> CString::tokenize(const CString& pString) const
 	return strList;
 }
 
-std::vector<CString> CString::loadToken(const CString& pFile, const CString& pToken)
+std::vector<CString> CString::loadToken(const CString& pFile, const CString& pToken, bool removeCR)
 {
 	CString fileData;
 	if (!fileData.load(pFile))
 		return std::vector<CString>();
+	if (removeCR) fileData.removeAllI("\r");
 	return fileData.tokenize(pToken);
 }
 
@@ -689,6 +690,13 @@ bool CString::match(const CString& pMask) const
 	search.removeAllI("*");
 	search.removeAllI("?");
 	if (search.length() == 0) return true;
+	return false;
+}
+
+bool CString::comparei(const CString& pOther) const
+{
+	if (strncasecmp(buffer, pOther.text(), MAX(sizec, pOther.length())) == 0)
+		return true;
 	return false;
 }
 

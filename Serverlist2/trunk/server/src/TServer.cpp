@@ -312,10 +312,20 @@ bool TServer::msgSVI_SETNAME(CString& pPacket)
 	// check for duplicates
 	for (unsigned int i = 0; i < serverList.size(); i++)
 	{
-		if (serverList[i]->getName() == name && serverList[i] != this)
+		if (serverList[i] != this && serverList[i]->getName() == name)
 		{
-			serverList[i]->sendPacket(CString() >> (char)SVO_ERRMSG << "Servername is already in use!");
-			return false;
+			// If the IP addresses are the same, something happened and this server is reconnecting.
+			// Delete the old server.
+			if (serverList[i]->getIp() == this->getIp())
+			{
+				serverList[i]->kill();
+				i = serverList.size();
+			}
+			else
+			{
+				serverList[i]->sendPacket(CString() >> (char)SVO_ERRMSG << "Servername is already in use!");
+				return false;
+			}
 		}
 	}
 

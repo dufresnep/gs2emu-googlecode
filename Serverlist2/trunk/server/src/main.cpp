@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 	getBasePath();
 
 	// Initialize data directory.
-	filesystem.init();
+	filesystem.addDir("global");
 
 	// Definitions
 	CSocket playerSock, serverSock;
@@ -120,6 +120,7 @@ int main(int argc, char *argv[])
 					<< "GServer port: " << CString(settings->getInt("gserverport")) << "\n" );
 
 	// Main Loop
+	time_t fsresync = time(0);
 	while (running)
 	{
 		// Make sure MySQL is active
@@ -161,6 +162,13 @@ int main(int argc, char *argv[])
 			}
 			else
 				++iter;
+		}
+
+		// Resync the file system every 5 minutes.
+		if ((int)difftime(fsresync, time(0)) > (5*60))
+		{
+			filesystem.resync();
+			fsresync = time(0);
 		}
 
 		// Wait
