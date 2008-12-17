@@ -111,7 +111,7 @@ CPacket CNpc::getProperty(int pId)
 		break;
 
 		case ACTIONSCRIPT:
-			retVal << (short)clientCode.length() << clientCode.copy(0, 0x3FFF);
+			retVal << (short)clientCode.length() << clientCode.copy(0, MIN(clientCode.length(),0x3FFF));
 		break;
 
 		case NPCX:
