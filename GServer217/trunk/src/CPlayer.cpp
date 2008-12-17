@@ -818,8 +818,9 @@ void CPlayer::warp(CString& pLevel, float pX, float pY, time_t pModTime)
 	}
 	else
 	{
-		updateProp(PLAYERX);
-		updateProp(PLAYERY);
+		CPacket props = CPacket() << (char)PLAYERX << getProp(PLAYERX) << (char)PLAYERY << getProp(PLAYERY);
+		setProps(props, true);
+		sendPacket(CPacket() << (char)SPLAYERPROPS << props);
 	}
 }
 

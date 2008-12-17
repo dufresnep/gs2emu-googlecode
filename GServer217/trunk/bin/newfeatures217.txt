@@ -28,6 +28,8 @@ Fixes:
   tile values.
 - Crop the NPC script to 16383 bytes as that is the max size a script
   can be.
+- When using 'warpto x y', you no longer change your x and y location
+  in sequence.  It is now a single move instead of two.
 
 
 --------------------------------------------
