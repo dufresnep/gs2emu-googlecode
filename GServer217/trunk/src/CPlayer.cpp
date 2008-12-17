@@ -379,6 +379,7 @@ void CPlayer::processLogin(CPacket& pPacket)
 	{
 		errorOut("serverlog.txt", CString() << "Player " << accountName << " tried logging in with client version: " << version);
 		sendPacket(CPacket() << (char)DISMESSAGE << "This server only accepts the 2.171 client.");
+		compressAndSend();
 		deleteMe = true;
 		return;
 	}
@@ -387,6 +388,7 @@ void CPlayer::processLogin(CPacket& pPacket)
 	{
 		errorOut("serverlog.txt", "Player limit reached");
 		sendPacket(CPacket() << (char)DISMESSAGE << "This server has reached its player limit.");
+		compressAndSend();
 		deleteMe = true;
 		return;
 	}
@@ -396,6 +398,7 @@ void CPlayer::processLogin(CPacket& pPacket)
 	{
 		errorOut("serverlog.txt", CString() << accountName << " is ip banned");
 		sendPacket(CPacket() << (char)DISMESSAGE << "Your ip has been banned from this server.");
+		compressAndSend();
 		deleteMe = true;
 		return;
 	}
@@ -422,6 +425,7 @@ void CPlayer::processLogin(CPacket& pPacket)
 		{
 			errorOut("errorlog.txt", "List server is unavailable");
 			sendPacket(CPacket() << (char)DISMESSAGE << "Unable to contact account server.");
+			compressAndSend();
 			deleteMe = true;
 		}
 	}
