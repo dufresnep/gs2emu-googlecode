@@ -23,7 +23,7 @@ std::vector<TSVSock> svfunc;
 void createSVFunctions()
 {
 	// kinda like a memset-ish thing y'know
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 21; i++)
 		svfunc.push_back(&TServer::msgSVI_NULL);
 
 	// now set non-nulls
@@ -46,6 +46,8 @@ void createSVFunctions()
 	svfunc[SVI_SVRPING] = &TServer::msgSVI_SVRPING;
 	svfunc[SVI_VERIACC2] = &TServer::msgSVI_VERIACC2;
 	svfunc[SVI_SETLOCALIP] = &TServer::msgSVI_SETLOCALIP;
+	svfunc[SVI_GETFILE2] = &TServer::msgSVI_GETFILE2;
+	svfunc[SVI_UPDATEFILE] = &TServer::msgSVI_UPDATEFILE;
 }
 
 /*
@@ -608,5 +610,62 @@ bool TServer::msgSVI_VERIACC2(CString& pPacket)
 bool TServer::msgSVI_SETLOCALIP(CString& pPacket)
 {
 	localip = pPacket.readString("");
+	return true;
+}
+
+bool TServer::msgSVI_GETFILE2(CString& pPacket)
+{
+	unsigned short pId = pPacket.readGUShort();
+	unsigned char pTy = pPacket.readGUChar();
+	CString shortName = pPacket.readChars(pPacket.readGUChar());
+	CString fileData = filesystem.load(shortName);
+	time_t modTime = filesystem.getModTime(shortName);
+
+	if (fileData.length() != 0)
+	{
+		int packetLength = 1 + 1 + shortName.length() + 1;
+
+		// Tell the server that it should expect a file.
+		sendPacket(CString() >> (char)SVO_FILESTART2 << shortName);
+
+		// Save the file length.
+		int fileLength = fileData.length();
+
+		// Compress the file.
+		// Don't compress .png files since they are already zlib compressed.
+		CString ext = shortName.subString(shortName.length() - 4, 4);
+		char doCompress = 0;
+		if (ext.comparei(".png") == false)
+		{
+			doCompress = 1;
+			fileData.zcompressI();
+		}
+
+		// Send the file to the server.
+		while (fileData.length() != 0)
+		{
+			int sendSize = clip(32000, 0, fileData.length());
+			sendPacket(CString() >> (char)SVO_RAWDATA >> (int)(packetLength + sendSize));
+			sendPacket(CString() >> (char)SVO_FILEDATA2 >> (char)shortName.length() << shortName << fileData.subString(0, sendSize));
+			fileData.removeI(0, sendSize);
+		}
+
+		// Tell the gserver that the file send is now finished.
+		sendPacket(CString() >> (char)SVO_FILEEND2 >> (short)pId >> (char)pTy >> (char)doCompress >> (long long)modTime >> (long long)fileLength << shortName);
+	}
+
+	return true;
+}
+
+bool TServer::msgSVI_UPDATEFILE(CString& pPacket)
+{
+	time_t modTime = pPacket.readGUInt5();
+	CString file = pPacket.readString("");
+
+	time_t modTime2 = filesystem.getModTime(file);
+	if (modTime2 != modTime)
+	{
+		return msgSVI_GETFILE2(CString() >> (short)0 >> (char)0 >> (char)file.length() << file);
+	}
 	return true;
 }

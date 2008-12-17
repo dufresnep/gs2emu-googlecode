@@ -5,42 +5,48 @@
 
 enum
 {
-	SVI_SETNAME		= 0,
-	SVI_SETDESC		= 1,
-	SVI_SETLANG		= 2,
-	SVI_SETVERS		= 3,
-	SVI_SETURL		= 4,
-	SVI_SETIP		= 5,
-	SVI_SETPORT		= 6,
-	SVI_SETPLYR		= 7,
-	SVI_VERIACC		= 8,
-	SVI_VERIGLD		= 9,
-	SVI_GETFILE		= 10,
-	SVI_NICKNAME	= 11,
-	SVI_GETPROF		= 12,
-	SVI_SETPROF		= 13,
-	SVI_PLYRADD		= 14,
-	SVI_PLYRREM		= 15,
-	SVI_SVRPING		= 16,
-	SVI_VERIACC2	= 17,
-	SVI_SETLOCALIP	= 18,
+	SVI_SETNAME			= 0,
+	SVI_SETDESC			= 1,
+	SVI_SETLANG			= 2,
+	SVI_SETVERS			= 3,
+	SVI_SETURL			= 4,
+	SVI_SETIP			= 5,
+	SVI_SETPORT			= 6,
+	SVI_SETPLYR			= 7,
+	SVI_VERIACC			= 8,
+	SVI_VERIGLD			= 9,
+	SVI_GETFILE			= 10,
+	SVI_NICKNAME		= 11,
+	SVI_GETPROF			= 12,
+	SVI_SETPROF			= 13,
+	SVI_PLYRADD			= 14,
+	SVI_PLYRREM			= 15,
+	SVI_SVRPING			= 16,
+	SVI_VERIACC2		= 17,
+	SVI_SETLOCALIP		= 18,
+	SVI_GETFILE2		= 19,
+	SVI_UPDATEFILE		= 20,
 };
 
 enum
 {
-	SVO_VERIACC		= 0,
-	SVO_VERIGLD		= 1,
-	SVO_FILESTART	= 2,
-	SVO_FILEEND		= 3,
-	SVO_FILEDATA	= 4,
-	SVO_NULL2		= 5,
-	SVO_NULL3		= 6,
-	SVO_PROFILE		= 7,
-	SVO_ERRMSG		= 8,
-	SVO_NULL4		= 9,
-	SVO_NULL5		= 10,
-	SVO_VERIACC2	= 11,
-	SVO_PING		= 99,
+	SVO_VERIACC			= 0,
+	SVO_VERIGLD			= 1,
+	SVO_FILESTART		= 2,
+	SVO_FILEEND			= 3,
+	SVO_FILEDATA		= 4,
+	SVO_NULL2			= 5,
+	SVO_NULL3			= 6,
+	SVO_PROFILE			= 7,
+	SVO_ERRMSG			= 8,
+	SVO_NULL4			= 9,
+	SVO_NULL5			= 10,
+	SVO_VERIACC2		= 11,
+	SVO_FILESTART2		= 12,
+	SVO_FILEDATA2		= 13,
+	SVO_FILEEND2		= 14,
+	SVO_PING			= 99,
+	SVO_RAWDATA			= 100,
 };
 
 enum
@@ -115,6 +121,8 @@ class TServer
 		bool msgSVI_SVRPING(CString& pPacket);
 		bool msgSVI_VERIACC2(CString& pPacket);
 		bool msgSVI_SETLOCALIP(CString& pPacket);
+		bool msgSVI_GETFILE2(CString& pPacket);
+		bool msgSVI_UPDATEFILE(CString& pPacket);
 
 	private:
 		CSocket *sock;
