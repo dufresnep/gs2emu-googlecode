@@ -2,6 +2,10 @@
 New features/bug fixes in v2.171 build 64
 --------------------------------------------
 
+Changes:
+- The gserver now restricts access to the 2.171 client.  If you use a
+  2.170 client, you will have to upgrade.
+
 Additions:
 - The gserver now sends its local IP address to the serverlist so the
   serverlist can help players connect to their own server when they

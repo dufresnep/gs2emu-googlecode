@@ -374,6 +374,15 @@ void CPlayer::processLogin(CPacket& pPacket)
 	else
 		errorOut( "serverlog.txt", CString() << "New " << ((type == CLIENTRC) ? "RC" : "player") << ": " << accountName, true );
 
+	// Only accept the 2.171 client.
+	if (type == CLIENTPLAYER && version != "GNW22122")
+	{
+		errorOut("serverlog.txt", CString() << "Player " << accountName << " tried logging in with client version: " << version);
+		sendPacket(CPacket() << (char)DISMESSAGE << "This server only accepts the 2.171 client.");
+		deleteMe = true;
+		return;
+	}
+
 	if (playerList.count() >= maxPlayers)
 	{
 		errorOut("serverlog.txt", "Player limit reached");
