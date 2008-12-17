@@ -50,6 +50,7 @@ int createPlayerId(CPlayer* pPlayer);
 int createNpcId(CNpc* pNpc);
 int getFileSize(char* pFile);
 time_t getFileModTime(char* pFile);
+bool setFileModTime(char* pFile, time_t modTime);
 void CalculateMD5(char *buffer, int length, char *checksum);
 void errorOut(char *pFile, CBuffer pError, bool pWrite = true);
 void getSubDirs();

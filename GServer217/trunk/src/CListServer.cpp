@@ -4,10 +4,13 @@
 
 #include "CListServer.h"
 #include "main.h"
+#include "zlib.h"
 
 extern bool serverRunning;
 CSocket listServer;
 bool setSock = false;
+bool nextIsRaw = false;
+int rawPacketSize = 0;
 
 void ListServer_Connect()
 {
@@ -84,22 +87,30 @@ void ListServer_Main()
 	listServer.getBuffer().clear();
 
 	// Search for a packet.  If none is found, break out of the loop.
-	int lineEnd = packetBuffer.findl( '\n' );
-	if ( lineEnd == -1 ) return;
-
-	// Copy the packet out and remove the \n
-	CBuffer line = packetBuffer.copy( 0, lineEnd + 1 );
-	packetBuffer.remove(0, line.length());
-
-	// Process the packet.
-	lines.load( line.text(), "\n" );
-	//lines.load(receiveBuff.text(), "\n");
-
-	for (int i = 0; i < lines.count(); i++)
+	while (packetBuffer.length() != 0)
 	{
-		CPacket line = CPacket() << lines[i];
-		int messageId = line.readByte1();
+		CPacket line;
+		if (!nextIsRaw)
+		{
+			int lineEnd = packetBuffer.find( '\n' );
+			if ( lineEnd == -1 ) return;
 
+			// Copy the packet out and remove the \n
+			line = packetBuffer.copy( 0, lineEnd + 1 );
+			packetBuffer.remove(0, line.length());
+			line.remove(line.length() - 1, 1);
+		}
+		else
+		{
+			if (packetBuffer.length() < rawPacketSize) return;
+			line.writeBytes(packetBuffer.readChars(rawPacketSize), rawPacketSize);
+			packetBuffer.remove(0, line.length());
+			line.remove(line.length() - 1, 1);
+			nextIsRaw = false;
+		}
+		packetBuffer.setRead(0);
+
+		int messageId = line.readByte1();
 		switch (messageId)
 		{
 			case GSVOLD:
@@ -168,38 +179,41 @@ void ListServer_Main()
 			{
 				CString fileData, fileName = CString() << dataDir << "global" << fSep << line.readChars(line.readByte1());
 				fileData.save(fileName.text());
-
 				break;
 			}
 
 			case GSVFILED:
 			{
-				CString fileName = line.readChars(line.readByte1());
+				CString shortName = line.readChars(line.readByte1());
+				CString fileName = CString() << dataDir << "global" << fSep << shortName.text();
 				CPlayer *player = (CPlayer *)playerIds[line.readByte2()];
 
-				switch (line.readByte1())
+				if (player)
 				{
-					case 0: // head
-						player->headImage = fileName;
-						player->updateProp(HEADGIF);
-					break;
+					player->fileList.add(new COutFile(shortName, 0));
+					switch (line.readByte1())
+					{
+						case 0: // head
+							player->headImage = shortName;
+							player->updateProp(HEADGIF);
+						break;
 
-					case 1: // body
-						player->bodyImage = fileName;
-						player->updateProp(BODYIMG);
-					break;
+						case 1: // body
+							player->bodyImage = shortName;
+							player->updateProp(BODYIMG);
+						break;
 
-					case 2: // sword
-						player->swordImage = fileName;
-						player->updateProp(SWORDPOWER);
-					break;
+						case 2: // sword
+							player->swordImage = shortName;
+							player->updateProp(SWORDPOWER);
+						break;
 
-					case 3: // shield
-						player->shieldImage = fileName;
-						player->updateProp(SHIELDPOWER);
-					break;
+						case 3: // shield
+							player->shieldImage = shortName;
+							player->updateProp(SHIELDPOWER);
+						break;
+					}
 				}
-
 				break;
 			}
 
@@ -207,27 +221,12 @@ void ListServer_Main()
 			{
 				CString fileData, fileName, newData, shortName;
 				shortName = line.readChars(line.readByte1());
-				int pos = shortName.find("Revision");
-
-				if (pos >= 0)
-				{
-					#ifdef WIN32
-						fileName = CString() << "GServer-NEW.exe";
-					#else
-						fileName = CString() << "GServer-NEW";
-					#endif
-					newData = line.readString("");
-				}
-				else
-				{
-					fileName = CString() << dataDir << "global" << fSep << shortName.text();
-					newData = line.readString("");
-				}
+				fileName = CString() << dataDir << "global" << fSep << shortName.text();
+				newData = line.readString("");
 
 				fileData.load(fileName.text());
 				fileData << newData.B64_Decode();
 				fileData.save(fileName.text());
-
 				break;
 			}
 
@@ -320,7 +319,6 @@ void ListServer_Main()
 				}
 
 				player1->sendPacket(CPacket() << (char)DPROFILE << profile);
-
 				break;
 			}
 
@@ -328,8 +326,97 @@ void ListServer_Main()
 				printf("[%s] %s\n", getTimeStr(1).text(), line.readString(""));
 			break;
 
+			case GSVFILESTART2:
+			{
+				CString fileData, fileName = CString() << dataDir << "global" << fSep << line.readString("");
+				fileData.save(fileName.text());
+				break;
+			}
+
+			case GSVFILEDATA2:
+			{
+				CString fileData, fileName, newData, shortName;
+				shortName = line.readChars(line.readByte1());
+				fileName = CString() << dataDir << "global" << fSep << shortName.text();
+				newData.writeBytes(line.readChars(line.bytesLeft()), line.bytesLeft());
+
+				fileData.load(fileName.text());
+				fileData << newData;
+				fileData.save(fileName.text());
+				break;
+			}
+
+			case GSVFILEEND2:
+			{
+				CPlayer *player = (CPlayer *)playerIds[line.readByte2()];
+				int type = line.readByte1();
+				char doCompress = line.readByte1();
+				time_t modTime = line.readByte5();
+				int fileLength = line.readByte5();
+				CString shortName = line.readString("");
+				CString fileName = CString() << dataDir << "global" << fSep << shortName.text();
+
+				// If the file was sent compressed, we need to uncompress it.
+				if (doCompress == 1)
+				{
+					// Open the file so we can uncompress it.
+					CString fileData;
+					fileData.load(fileName.text());
+
+					// Uncompress the file.
+					char* buffer = new char[fileLength];
+					memset((void*)buffer, 0, fileLength);
+					int cLen = fileLength;
+					int error = uncompress((Bytef*)buffer,(uLongf*)&cLen,(const Bytef*)fileData.text(), fileData.length());
+					if (error != Z_OK) printf("Failed to decompress file: %s\n", shortName.text());
+
+					// Save the file now.
+					fileData.clear();
+					fileData.writeBytes(buffer, cLen);
+					fileData.save(fileName.text());
+					delete [] buffer;
+				}
+
+				// Set the file mod time.
+				if (setFileModTime(fileName.text(), modTime) == false)
+					printf("** [WARNING] Could not set modification time on file %s\n", shortName.text());
+
+				if (player)
+				{
+					player->fileList.add(new COutFile(shortName, 0));
+					switch (type)
+					{
+						case 0: // head
+							player->headImage = shortName;
+							player->updateProp(HEADGIF);
+						break;
+
+						case 1: // body
+							player->bodyImage = shortName;
+							player->updateProp(BODYIMG);
+						break;
+
+						case 2: // sword
+							player->swordImage = shortName;
+							player->updateProp(SWORDPOWER);
+						break;
+
+						case 3: // shield
+							player->shieldImage = shortName;
+							player->updateProp(SHIELDPOWER);
+						break;
+					}
+				}
+				break;
+			}
+
 			case GSVPING:
 				// Sent every 60 seconds, do nothing.
+			break;
+
+			case GSVRAWDATA:
+				nextIsRaw = true;
+				rawPacketSize = line.readByte3();
 			break;
 
 			default:

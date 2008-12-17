@@ -20,6 +20,9 @@
 		#define WIN32_LEAN_AND_MEAN
 	#endif
 	#include <windows.h>
+	#include <sys/utime.h>
+	#define _utime utime
+	#define _utimbuf utimbuf;
 #elif defined(PSPSDK)
 	#include <pspkernel.h>
 	#include <pspdebug.h>
@@ -30,6 +33,7 @@
 #ifndef WIN32
 	#include <unistd.h>
 	#include <dirent.h>
+	#include <utime.h>
 
 	#ifndef SIGBREAK
 		#define SIGBREAK SIGQUIT
@@ -780,6 +784,21 @@ time_t getFileModTime(char* pFile)
 	if(stat(pFile, &fileStat) != -1)
 		return (time_t)fileStat.st_mtime;
 	return 0;
+}
+
+bool setFileModTime(char* pFile, time_t modTime)
+{
+	// Get the full path to the file.
+	if (pFile == 0) return false;
+
+	// Set the times.
+	struct utimbuf ut;
+	ut.actime = modTime;
+	ut.modtime = modTime;
+
+	// Change the file.
+	if (utime(pFile, &ut) == 0) return true;
+	return false;
 }
 
 int getFileSize(char* pFile)

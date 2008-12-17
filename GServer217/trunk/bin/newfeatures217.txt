@@ -11,6 +11,10 @@ Additions:
   serverlist can help players connect to their own server when they
   have routing issues.  Should get rid of the need for a no-ip/dyndns
   host name for simple network setups.
+- Added a new global file sending scheme.  The serverlist now doesn't
+  have to encode files in base64 and it can now send the files
+  compressed.  This should save on bandwidth when obtaining a global
+  file.
 
 Fixes:
 - Clicking the X to close the gserver will now cause it to correctly

@@ -1032,7 +1032,7 @@ void CPlayer::processChat(CString& pMessage)
 			}
 		}
 		else
-			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)0 << (char)words[1].length() << words[1] << "\n");
+			ListServer_Send(CPacket() << (char)SLSGETFILE2 << (short)id << (char)0 << (char)words[1].length() << words[1] << "\n");
 	}
 	else if (words[0] == "setbody")
 	{
@@ -1068,7 +1068,7 @@ void CPlayer::processChat(CString& pMessage)
 			}
 		}
 		else
-			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)1 << (char)words[1].length() << words[1] << "\n");
+			ListServer_Send(CPacket() << (char)SLSGETFILE2 << (short)id << (char)1 << (char)words[1].length() << words[1] << "\n");
 	}
 	else if(words[0] == "setsword")
 	{
@@ -1104,7 +1104,7 @@ void CPlayer::processChat(CString& pMessage)
 			}
 		}
 		else
-			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)2 << (char)words[1].length() << words[1] << "\n");
+			ListServer_Send(CPacket() << (char)SLSGETFILE2 << (short)id << (char)2 << (char)words[1].length() << words[1] << "\n");
 	}
 	else if(words[0] == "setshield")
 	{
@@ -1140,7 +1140,7 @@ void CPlayer::processChat(CString& pMessage)
 			}
 		}
 		else
-			ListServer_Send(CPacket() << (char)SLSFILE << (short)id << (char)3 << (char)words[1].length() << words[1] << "\n");
+			ListServer_Send(CPacket() << (char)SLSGETFILE2 << (short)id << (char)3 << (char)words[1].length() << words[1] << "\n");
 	}
 
 	//colour commands
