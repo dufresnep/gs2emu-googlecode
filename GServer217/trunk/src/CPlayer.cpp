@@ -1479,7 +1479,7 @@ bool CPlayer::sendLevel(CString& pLevel, float pX, float pY, time_t pModTime)
 	}
 
 	//send npcs
-	sendPacket(CPacket() << (char)LEVELNAME << levelName);
+	//sendPacket(CPacket() << (char)LEVELNAME << levelName);
 	for ( int i = 0; i < level->npcs.count(); i++ )
 	{
 		CPacket npcProps;
