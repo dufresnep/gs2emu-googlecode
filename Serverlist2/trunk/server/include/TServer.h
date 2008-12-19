@@ -93,7 +93,7 @@ class TServer
 		const CString& getUrl();
 		const CString& getVersion();
 		const CString getServerPacket(const CString& pIp = "");
-		double getLastData() { return difftime( time(0), lastData ); }
+		int getLastData() { return (int)difftime( time(0), lastData ); }
 
 		// send-packet functions
 		void sendCompress();

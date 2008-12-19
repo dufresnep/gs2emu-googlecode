@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
 		for ( std::vector<TServer*>::iterator iter = serverList.begin(); iter != serverList.end() ; )
 		{
 			TServer* server = (TServer*)*iter;
-			if ( server->doMain() == false || (int)server->getLastData() >= 300 )
+			if ((int)server->getLastData() >= 300 || server->doMain() == false)
 			{
 				server->sendCompress();
 				delete server;
