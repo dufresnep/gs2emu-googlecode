@@ -633,8 +633,11 @@ bool CString::match(const CString& pMask) const
 	}
 
 	// Check for a blank string.
-	if (buffer[sloc] == 0 && (pMask.text())[mloc] != '*') return false;
-	else return true;
+	if (buffer[sloc] == 0)
+	{
+		if ((pMask.text())[mloc] != '*') return false;
+		else return true;
+	}
 
 	// Check just for a single *.
 	if (pMask == "*") return true;
