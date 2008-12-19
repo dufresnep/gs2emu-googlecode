@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
 					<< "GServer port: " << CString(settings->getInt("gserverport")) << "\n" );
 
 	// Main Loop
-	time_t fsresync = time(0);
+	time_t t5min = time(0);
 	while (running)
 	{
 		// Make sure MySQL is active
@@ -175,11 +175,11 @@ int main(int argc, char *argv[])
 		// Every 5 minutes...
 		// Reload ip bans.
 		// Resync the file system.
-		if ((int)difftime(fsresync, time(0)) > (5*60))
+		if ((int)difftime(time(0), t5min) > (5*60))
 		{
 			ipBans = CString::loadToken("ipbans.txt", "\n", true);
 			filesystem.resync();
-			fsresync = time(0);
+			t5min = time(0);
 		}
 
 		// Wait
