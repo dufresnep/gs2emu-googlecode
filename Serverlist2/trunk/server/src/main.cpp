@@ -30,6 +30,8 @@ std::vector<TServer *> serverList;
 CLog serverlog( "serverlog.txt" );
 CLog clientlog( "clientlog.txt" );
 
+std::vector<CString> ipBans;
+
 // Home path of the serverlist.
 CString homepath;
 static void getBasePath();
@@ -61,6 +63,9 @@ int main(int argc, char *argv[])
 		serverlog.out( "[Error] Could not load settings.\n" );
 		return ERR_SETTINGS;
 	}
+
+	// Load ip bans.
+	ipBans = CString::loadToken("ipbans.txt", "\n", true);
 
 	// Server sock.
 	serverSock.setType( SOCKET_TYPE_SERVER );
@@ -164,9 +169,12 @@ int main(int argc, char *argv[])
 				++iter;
 		}
 
-		// Resync the file system every 5 minutes.
+		// Every 5 minutes...
+		// Reload ip bans.
+		// Resync the file system.
 		if ((int)difftime(fsresync, time(0)) > (5*60))
 		{
+			ipBans = CString::loadToken("ipbans.txt", "\n", true);
 			filesystem.resync();
 			fsresync = time(0);
 		}
@@ -192,17 +200,22 @@ void acceptSock(CSocket& pSocket, int pType)
 	CSocket* newSock = pSocket.accept();
 	if (newSock == 0)
 		return;
-/*
+
+	// Server ip bans.
 	if (pType == SOCK_SERVER)
 	{
-		CString valid = "156.34.159.139,72.89.94.53,127.0.0.1";
-		if (valid.find(newSock->tcpIp()) == -1)
+		CString ip(newSock->tcpIp());
+		for (std::vector<CString>::const_iterator i = ipBans.begin(); i != ipBans.end(); ++i)
 		{
-			printf("Rejected Server: %s\n", newSock->tcpIp());
-			return;
+			if (ip.match(*i))
+			{
+				newSock->disconnect();
+				delete newSock;
+				return;
+			}
 		}
 	}
-*/
+
 	//newSock->setOptions( SOCKET_OPTION_NONBLOCKING );
 	serverlog.out(CString() << "New Connection: " << CString(newSock->tcpIp()) << " -> " << ((pType == SOCK_PLAYER) ? "Player" : "Server") << "\n");
 	(pType == SOCK_PLAYER ? playerList.push_back(new TPlayer(newSock)) : serverList.push_back(new TServer(newSock)));
