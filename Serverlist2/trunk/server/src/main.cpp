@@ -212,6 +212,7 @@ void acceptSock(CSocket& pSocket, int pType)
 		{
 			if (ip.match(*i))
 			{
+				printf("Rejected server: %s matched ip ban %s\n", ip.text(), i->text());
 				newSock->disconnect();
 				delete newSock;
 				return;
