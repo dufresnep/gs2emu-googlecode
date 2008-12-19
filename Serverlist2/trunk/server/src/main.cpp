@@ -241,8 +241,12 @@ CString getServerList(const CString& pIp)
 	packet.writeGChar(serverList.size());
 
 	// get servers
-	for (unsigned int i = 0; i < serverList.size(); i++)
-		packet.write(serverList[i]->getServerPacket(pIp));
+	for (std::vector<TServer*>::iterator i = serverList.begin(); i != serverList.end(); ++i)
+	{
+		TServer* server = (TServer*)*i;
+		if (server->getName().length() != 0)
+			packet << server->getServerPacket(pIp);
+	}
 	return packet;
 }
 

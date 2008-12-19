@@ -301,9 +301,13 @@ bool TServer::msgSVI_SETNAME(CString& pPacket)
 	if (sType == "U ") type = TYPE_HIDDEN;
 	if (sType == "3 ") type = TYPE_3D;
 
+	// Prevent servers from trying to steal the Graal Reborn name.
+	if (name == "P Graal Reborn" && CString(sock->tcpIp()) != "79.136.36.119")
+		name = "Graal Reborn (unofficial)";
+
 	// Restrict what type a server can be.
 	// TODO: serverhq stuff.  Currently, Graal Reborn is hard-coded in.
-	if (!(CString(sock->tcpIp()) == "79.136.36.119" && name.find("Graal Reborn") != -1))
+	if (name != "P Graal Reborn")
 		if (type != TYPE_HIDDEN)
 			type = TYPE_CLASSIC;
 
@@ -312,6 +316,8 @@ bool TServer::msgSVI_SETNAME(CString& pPacket)
 		name.removeI(0, 2);
 
 	// check for duplicates
+	int dupCount = 0;
+dupCheck:
 	for (unsigned int i = 0; i < serverList.size(); i++)
 	{
 		if (serverList[i] != this && serverList[i]->getName() == name)
@@ -320,11 +326,19 @@ bool TServer::msgSVI_SETNAME(CString& pPacket)
 			// Delete the old server.
 			if (serverList[i]->getIp() == this->getIp())
 			{
+				name = serverList[i]->getName();
 				serverList[i]->kill();
 				i = serverList.size();
 			}
 			else
 			{
+				// Duplicate found.  Append a random number to the end and start over.
+				// Do this a max of 4 times.  If after 4 tries, fail.
+				if (dupCount++ < 5)
+				{
+					name << CString(rand() % 9);
+					goto dupCheck;
+				}
 				serverList[i]->sendPacket(CString() >> (char)SVO_ERRMSG << "Servername is already in use!");
 				return false;
 			}
