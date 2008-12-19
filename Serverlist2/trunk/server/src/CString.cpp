@@ -625,6 +625,13 @@ bool CString::match(const CString& pMask) const
 {
 	int sloc = 0, mloc = 0;
 
+	// Check to see if they are equal.
+	if (length() == pMask.length())
+	{
+		if (memcmp(buffer, pMask.text(), length()) == 0)
+			return true;
+	}
+
 	// Check for a blank string.
 	if (buffer[sloc] == 0 && (pMask.text())[mloc] != '*') return false;
 	else return true;

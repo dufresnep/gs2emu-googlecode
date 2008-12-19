@@ -66,6 +66,9 @@ int main(int argc, char *argv[])
 
 	// Load ip bans.
 	ipBans = CString::loadToken("ipbans.txt", "\n", true);
+	serverlog.out("Loaded following IP bans:\n");
+	for (std::vector<CString>::iterator i = ipBans.begin(); i != ipBans.end(); ++i)
+		serverlog.out("\t%s\n", i->text());
 
 	// Server sock.
 	serverSock.setType( SOCKET_TYPE_SERVER );
