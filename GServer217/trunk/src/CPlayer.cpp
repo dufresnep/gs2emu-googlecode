@@ -901,7 +901,7 @@ void CPlayer::processChat(CString& pMessage)
 	{
 		chatMsg = CString() << toString(onlineSecs % 60) << "s";
 		if (onlineSecs / 60 > 0) chatMsg = CString() << toString((onlineSecs / 60) % 60) << "m " << chatMsg;
-		if (onlineSecs / 60 > 0) chatMsg = CString() << toString((onlineSecs / 3600) % 60) << "h " << chatMsg;
+		if (onlineSecs / 3600 > 0) chatMsg = CString() << toString(onlineSecs / 3600) << "h " << chatMsg;
 		chatMsg = CString() << "onlinetime: " << chatMsg;
 		updateProp(CURCHAT);
 	}

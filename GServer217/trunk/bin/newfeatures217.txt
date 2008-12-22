@@ -30,6 +30,9 @@ Fixes:
   can be.
 - When using 'warpto x y', you no longer change your x and y location
   in sequence.  It is now a single move instead of two.
+- Fixed the 'showonlinetime' chat command.  It now will no longer say
+  0h when you haven't played for an hour, and it will no longer cap
+  your hours played at 60.
 
 
 --------------------------------------------
