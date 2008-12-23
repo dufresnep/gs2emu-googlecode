@@ -2830,7 +2830,7 @@ void CPlayer::msgNPCPROPS(CPacket& pPacket)
 	CNpc* npc = (CNpc*)npcIds[npcid];
 
 	// See if we found the NPC or not.
-	if (npc == NULL)
+	if (npc == NULL || (npc->level != level && carryNpcThrown == false))
 		return;
 
 	packet << (char)SNPCPROPS << pPacket.text() + 1;
@@ -2842,10 +2842,10 @@ void CPlayer::msgNPCPROPS(CPacket& pPacket)
 	}
 	npc->setProps(pPacket);
 
-	// If the NPC didn't originate in this level, add it to the level.
-	// This is the case with carryable NPCs.
-	if (npc->level != level)
+	// If a carried NPC was thrown, add it to the level and whatnot.
+	if (carryNpcThrown)
 	{
+		carryNpcThrown = false;
 		npc->level = level;
 		bool foundNpc = false;
 		for (int i = 0; i < level->npcs.count(); ++i)
@@ -2855,18 +2855,6 @@ void CPlayer::msgNPCPROPS(CPacket& pPacket)
 		}
 		if (foundNpc == false)
 			level->npcs.add(npc);
-		for (int i = 0; i < level->players.count(); i++)
-		{
-			CPlayer* other = (CPlayer*)level->players[i];
-			if (other != this)
-				other->sendPacket(CPacket() << (char)SNPCPROPS << (int)npc->id << npc->getPropertyList(0));
-		}
-	}
-
-	// Correct visflags.
-	if (carryNpcThrown)
-	{
-		carryNpcThrown = false;
 		for (int i = 0; i < level->players.count(); i++)
 		{
 			CPlayer* other = (CPlayer*)level->players[i];

@@ -33,6 +33,8 @@ Fixes:
 - Fixed the 'showonlinetime' chat command.  It now will no longer say
   0h when you haven't played for an hour, and it will no longer cap
   your hours played at 60.
+- Probably fixed a bug introduced in build 63 where moving NPCs would
+  occasionally leave the level.
 
 
 --------------------------------------------
