@@ -164,6 +164,7 @@ int main(int argc, char *argv[])
 			TServer* server = (TServer*)*iter;
 			if ((int)server->getLastData() >= 300 || server->doMain() == false)
 			{
+				serverlog.out("Server disconnected: %s\n", server->getName().text());
 				server->sendCompress();
 				delete server;
 				iter = serverList.erase( iter );

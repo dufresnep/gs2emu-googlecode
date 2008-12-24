@@ -57,7 +57,7 @@ TServer::TServer(CSocket *pSocket)
 : sock( pSocket ), type( 0 )
 {
 	language = "English";
-	lastPing = lastPlayerCount = time(0);
+	lastPing = lastPlayerCount = lastData = time(0);
 }
 
 TServer::~TServer()
