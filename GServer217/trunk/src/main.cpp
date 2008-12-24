@@ -240,7 +240,17 @@ int main(int argc, char *argv[])
 			serverFlags.save("serverflags.txt");
 		}
 
-		//Every 5 seconds?
+		// Every 5 seconds.
+		if (gameTime % 5 == 0)
+		{
+			/* Reconnect Listserver if Disconnected */
+			if ( !(listServerFields[5] == "localhost") )
+				if (!lsConnected)
+					ListServer_Connect();
+		}
+
+		// Send the current server time to the client.
+		// Happens every 5 seconds.
 		int current = getNWTime();
 		if (nwTime != current)
 		{
@@ -258,11 +268,6 @@ int main(int argc, char *argv[])
 
 void doTimer()
 {
-	/* Reconnect Listserver if Disconnected */
-	if ( !(listServerFields[5] == "localhost") )
-		if (!lsConnected)
-			ListServer_Connect();
-
 	/* Level-Animations */
 	for(int i = 0; i < levelList.count(); i++)
 	{

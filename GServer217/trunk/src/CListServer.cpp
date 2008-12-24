@@ -25,9 +25,13 @@ void ListServer_Connect()
 	}
 	CString ip(findKey("listip")), port(findKey("listport"));
 	listServer.init( ip, port );
-	if ( !(lsConnected = (listServer.connect() == 0 ? true : false)) )
+	int val = listServer.connect();
+	if (val == 0 || val == SOCKET_ALREADY_CONNECTED) lsConnected = true;
+	else lsConnected = false;
+	if ( !lsConnected )
 	{
 		errorOut("errorlog.txt", CBuffer() << "Unable to connect to list server.", true);
+		listServer.disconnect();
 		return;
 	}
 

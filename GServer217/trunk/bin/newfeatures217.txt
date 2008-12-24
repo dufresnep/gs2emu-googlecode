@@ -5,6 +5,8 @@ New features/bug fixes in v2.171 build 64
 Changes:
 - The gserver now restricts access to the 2.171 client.  If you use a
   2.170 client, you will have to upgrade.
+- If the gserver loses connection with the serverlist, it now tries to
+  reconnect once every 5 seconds instead of 10 times per second.
 
 Additions:
 - The gserver now sends its local IP address to the serverlist so the
@@ -33,7 +35,7 @@ Fixes:
 - Fixed the 'showonlinetime' chat command.  It now will no longer say
   0h when you haven't played for an hour, and it will no longer cap
   your hours played at 60.
-- Probably fixed a bug introduced in build 63 where moving NPCs would
+- Fixed a bug introduced in build 63 where moving NPCs would
   occasionally leave the level.
 
 
