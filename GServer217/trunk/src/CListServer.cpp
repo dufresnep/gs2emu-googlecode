@@ -138,8 +138,12 @@ void ListServer_Main()
 				{
 					CPlayer *player = (CPlayer *)newPlayers[i];
 
-					if (player->accountName == accountName)
+					if (player->accountName.comparei(accountName))
 					{
+						// The serverlist will return case sensitive account names.
+						// This helps case sensitive file systems open/save the correct
+						// acount.
+						player->accountName = accountName;
 						if (errorMsg == "SUCCESS")
 						{
 							player->sendAccount();

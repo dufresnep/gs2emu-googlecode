@@ -74,6 +74,8 @@ class CBuffer
 	void resize(int pSize);
 	int compare(const CBuffer& pBuffer);
 	int compare(const char* pStr);
+	int comparei(const CBuffer& pBuffer);
+	int comparei(const char* pStr);
 	int find(char pChar, int pStart = 0);
 	int find(const char* pString, int pStart = 0);
 	int findl(char pChar);
@@ -250,6 +252,20 @@ inline int CBuffer::compare(const CBuffer& pBuffer)
 inline int CBuffer::compare(const char* pStr)
 {
 	return strcmp(data, pStr);
+}
+
+inline int CBuffer::comparei(const CBuffer& pBuffer)
+{
+	if (count < pBuffer.count)
+		return -1;
+	if (count > pBuffer.count)
+		return 1;
+	return stricmp(data, pBuffer.data);
+}
+
+inline int CBuffer::comparei(const char* pStr)
+{
+	return stricmp(data, pStr);
 }
 
 inline bool CBuffer::operator==(const char* pStr)
