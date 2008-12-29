@@ -278,7 +278,7 @@ int getServerCount()
 	return (int)serverList.size();
 }
 
-int verifyAccount(const CString& pAccount, const CString& pPassword, bool fromServer)
+int verifyAccount(CString& pAccount, const CString& pPassword, bool fromServer)
 {
 #ifdef NO_MYSQL
 	return ACCSTAT_NORMAL;
@@ -301,15 +301,15 @@ int verifyAccount(const CString& pAccount, const CString& pPassword, bool fromSe
 
 		// Try our password.
 		result.clear();
-		query = CString() << "SELECT activated, banned FROM `" << settings->getStr("userlist") << "` WHERE account='" << pAccount.escape() << "' AND transaction='" << transaction.escape() << "' AND password2='" << md5password.escape() << "' LIMIT 1";
+		query = CString() << "SELECT activated, banned, account FROM `" << settings->getStr("userlist") << "` WHERE account='" << pAccount.escape() << "' AND transaction='" << transaction.escape() << "' AND password2='" << md5password.escape() << "' LIMIT 1";
 		mySQL->query(query, &result);
 
 		// account/password correct?
 		if (result.size() == 0)
 			ret = ACCSTAT_INVALID;
-		else if (result.size() == 1 || result[0] == "0")
+		else if (result.size() >= 1 || result[0] == "0")
 			ret = ACCSTAT_NONREG;
-		else if (result.size() == 2 && result[1] == "1")
+		else if (result.size() >= 2 && result[1] == "1")
 			ret = ACCSTAT_BANNED;
 		else
 			ret = ACCSTAT_NORMAL;
@@ -332,6 +332,10 @@ int verifyAccount(const CString& pAccount, const CString& pPassword, bool fromSe
 			}
 		}
 
+		// Get the correct account name.
+		if (result.size() == 3)
+			pAccount = result[2];
+
 		return ret;
 	}
 
@@ -340,11 +344,11 @@ int verifyAccount(const CString& pAccount, const CString& pPassword, bool fromSe
 	if (ret == ACCSTAT_INVALID)
 	{
 		result.clear();
-		query = CString() << "SELECT password, salt, activated, banned FROM `" << settings->getStr("userlist") << "` WHERE account='" << pAccount.escape() << "' AND password=" << "MD5(CONCAT(MD5('" << pPassword.escape() << "'), `salt`)) LIMIT 1";
+		query = CString() << "SELECT password, salt, activated, banned, account FROM `" << settings->getStr("userlist") << "` WHERE account='" << pAccount.escape() << "' AND password=" << "MD5(CONCAT(MD5('" << pPassword.escape() << "'), `salt`)) LIMIT 1";
 		mySQL->query(query, &result);
 
 		// account/password correct?
-		if (result.size() < 1)
+		if (result.size() == 0)
 			return ACCSTAT_INVALID;
 
 		// activated?
@@ -354,6 +358,10 @@ int verifyAccount(const CString& pAccount, const CString& pPassword, bool fromSe
 		// banned?
 		if (result.size() > 3 && result[3] == "1")
 			return ACCSTAT_BANNED;
+
+		// Get the case-sensitive account name.
+		if (result.size() > 4)
+			pAccount = result[4];
 
 		// passed all tests :)
 		return ACCSTAT_NORMAL;

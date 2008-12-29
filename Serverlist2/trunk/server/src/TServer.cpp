@@ -453,8 +453,12 @@ bool TServer::msgSVI_VERIACC(CString& pPacket)
 	CString account = pPacket.readChars(pPacket.readGUChar());
 	CString password = pPacket.readChars(pPacket.readGUChar());
 
+	// Get the login return code.
+	// This will overwrite "account" with the correct case sensitive account name.
+	int ret = verifyAccount(account, password, true);
+
 	// send verification
-	sendPacket(CString() >> (char)SVO_VERIACC >> (char)account.length() << account << getAccountError(verifyAccount(account, password, true)));
+	sendPacket(CString() >> (char)SVO_VERIACC >> (char)account.length() << account << getAccountError(ret));
 	return true;
 }
 

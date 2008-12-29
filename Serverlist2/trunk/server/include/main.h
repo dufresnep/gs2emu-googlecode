@@ -39,7 +39,7 @@ CString getAccountError(int pErrorId);
 CString getServerList(const CString& pIp = "");
 int getPlayerCount();
 int getServerCount();
-int verifyAccount(const CString& pAccount, const CString& pPassword, bool fromServer = false);
+int verifyAccount(CString& pAccount, const CString& pPassword, bool fromServer = false);
 int verifyGuild(const CString& pAccount, const CString& pNickname, const CString& pGuild);
 void acceptSock(CSocket& pSocket, int pType);
 void shutdownServer( int signal );
