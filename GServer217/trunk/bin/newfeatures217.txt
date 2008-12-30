@@ -6,6 +6,11 @@ Fixes:
 - The gserver now retrieves the case-sensitive account name of the
   player from the serverlist.  This should fix problems with gservers
   run on case-sensitive file systems.
+- If a level is updated on the server, it will no longer forget that it
+  was part of a map specified in the "maps" server option.  Just as a
+  reminder, the "maps" option specifies a comma-delimited list of
+  bigmap.txt type maps that the server uses.  If a level is on a map,
+  you will be able to see players move and talk in adjacent levels.
 
 
 --------------------------------------------

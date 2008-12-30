@@ -42,16 +42,6 @@ CLevel::CLevel(CString& pFileName)
 			return;
 	}
 
-	//Find our map id
-	for(int i = 0; i < CMap::mapList.count(); i++)
-	{
-		CMap* m = (CMap*)CMap::mapList[i];
-		if((levelIndex = m->getLevelpos(pFileName)) >= 0)
-		{
-			map = m;
-			break;
-		}
-	}
 	opened = true;
 }
 
@@ -218,6 +208,17 @@ bool CLevel::loadNW(CString& pFileName)
 		}
 	} else return false;
 
+	//Find our map id
+	for(int i = 0; i < CMap::mapList.count(); i++)
+	{
+		CMap* m = (CMap*)CMap::mapList[i];
+		if((levelIndex = m->getLevelpos(pFileName)) >= 0)
+		{
+			map = m;
+			break;
+		}
+	}
+
 	return true;
 }
 
@@ -326,6 +327,18 @@ bool CLevel::loadGraal(CString& pFileName)
 	}
 	//printf("Loading signs..\n");
 	loadSigns(levelData);
+
+	//Find our map id
+	for(int i = 0; i < CMap::mapList.count(); i++)
+	{
+		CMap* m = (CMap*)CMap::mapList[i];
+		if((levelIndex = m->getLevelpos(pFileName)) >= 0)
+		{
+			map = m;
+			break;
+		}
+	}
+
 	return true;
 }
 
