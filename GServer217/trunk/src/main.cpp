@@ -871,6 +871,21 @@ CPlayer* findPlayerId(CString pAccountName, bool pOnly)
 	return (pOnly ? NULL : rcFound);
 }
 
+CPlayer* findRCId(CString pAccountName)
+{
+	for(int i = 0; i < playerList.count(); i++)
+	{
+		CPlayer* other = (CPlayer*)playerList[i];
+		if(stricmp(other->accountName.text(), pAccountName.text()) == 0)
+		{
+			if(other->type == CLIENTRC)
+				return other;
+		}
+	}
+
+	return 0;
+}
+
 bool isValidFile(CBuffer& file, int type)
 {
 	for ( int i = 0; i < folderConfig.count(); ++i )

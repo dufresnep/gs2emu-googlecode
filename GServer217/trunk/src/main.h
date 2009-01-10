@@ -44,6 +44,7 @@ char *getDataFile(char* pFile);
 char *removeGifExtension(CString& pFileName);
 CPacket listFiles(char *pDir, char *pRights);
 CPlayer* findPlayerId(CString pAccountName, bool pOnly = false);
+CPlayer* findRCId(CString pAccountName);
 CString getFileExtension(CString& pFileName);
 CString getTimeStr(int pType = 0);
 int createPlayerId(CPlayer* pPlayer);

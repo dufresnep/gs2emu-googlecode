@@ -4437,6 +4437,20 @@ void CPlayer::msgDSETRIGHTS(CPacket& pPacket)
 
 	if ( player->type == CLIENTRC && player->ftpOn == true ) player->msgDWANTFTP(CPacket() << "");
 	player->saveAccount(true);
+
+	// If the player exists twice as both a player and RC, synchronize them.
+	CPlayer *po = (player->type == CLIENTRC ? findPlayerId(accname, true) : findRCId(accname));
+	if (po)
+	{
+		po->adminRights = player->adminRights;
+		po->adminIp = player->adminIp;
+		po->myFolders.clear();
+		for (int i = 0; i < player->myFolders.count(); i++)
+			po->myFolders.add(player->myFolders[i]);
+		po->saveAccount(true);
+		po->loadDBAccount(accname);
+	}
+
 	if (player->id == -1)
 	{
 		CPlayer *pl = findPlayerId(accname);

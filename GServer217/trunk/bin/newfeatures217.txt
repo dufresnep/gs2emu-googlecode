@@ -11,6 +11,9 @@ Fixes:
   reminder, the "maps" option specifies a comma-delimited list of
   bigmap.txt type maps that the server uses.  If a level is on a map,
   you will be able to see players move and talk in adjacent levels.
+- Altering a player's rights when they are logged in as both RC and
+  as a player should now synchronize the changes between both player
+  states.
 
 
 --------------------------------------------
