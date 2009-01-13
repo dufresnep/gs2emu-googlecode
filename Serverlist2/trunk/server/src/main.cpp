@@ -307,7 +307,7 @@ int verifyAccount(CString& pAccount, const CString& pPassword, bool fromServer)
 		// account/password correct?
 		if (result.size() == 0)
 			ret = ACCSTAT_INVALID;
-		else if (result.size() >= 1 || result[0] == "0")
+		else if (result.size() >= 1 && result[0] == "0")
 			ret = ACCSTAT_NONREG;
 		else if (result.size() >= 2 && result[1] == "1")
 			ret = ACCSTAT_BANNED;
