@@ -183,61 +183,6 @@ void ListServer_Main()
 				break;
 			}
 
-			case GSVFILEC:
-			{
-				CString fileData, fileName = CString() << dataDir << "global" << fSep << line.readChars(line.readByte1());
-				fileData.save(fileName.text());
-				break;
-			}
-
-			case GSVFILED:
-			{
-				CString shortName = line.readChars(line.readByte1());
-				CString fileName = CString() << dataDir << "global" << fSep << shortName.text();
-				CPlayer *player = (CPlayer *)playerIds[line.readByte2()];
-
-				if (player)
-				{
-					player->fileList.add(new COutFile(shortName, 0));
-					switch (line.readByte1())
-					{
-						case 0: // head
-							player->headImage = shortName;
-							player->updateProp(HEADGIF);
-						break;
-
-						case 1: // body
-							player->bodyImage = shortName;
-							player->updateProp(BODYIMG);
-						break;
-
-						case 2: // sword
-							player->swordImage = shortName;
-							player->updateProp(SWORDPOWER);
-						break;
-
-						case 3: // shield
-							player->shieldImage = shortName;
-							player->updateProp(SHIELDPOWER);
-						break;
-					}
-				}
-				break;
-			}
-
-			case GSVFILES:
-			{
-				CString fileData, fileName, newData, shortName;
-				shortName = line.readChars(line.readByte1());
-				fileName = CString() << dataDir << "global" << fSep << shortName.text();
-				newData = line.readString("");
-
-				fileData.load(fileName.text());
-				fileData << newData.B64_Decode();
-				fileData.save(fileName.text());
-				break;
-			}
-
 			case GSVPROFILE: /* Unsure if this works, temp */
 			{
 				CPacket profile;
@@ -334,18 +279,58 @@ void ListServer_Main()
 				printf("[%s] %s\n", getTimeStr(1).text(), line.readString(""));
 			break;
 
-			case GSVFILESTART2:
+			case GSVFILESTART3:
 			{
-				CString fileData, fileName = CString() << dataDir << "global" << fSep << line.readString("");
+				unsigned char pTy = (unsigned char)line.readByte1();
+				CString fileData, fileName = CString() << dataDir << "global" << fSep;
+				switch (pTy)
+				{
+					case 0: // head
+						fileName << "heads" << fSep;
+					break;
+
+					case 1: // body
+						fileName << "bodies" << fSep;
+					break;
+
+					case 2: // sword
+						fileName << "swords" << fSep;
+					break;
+
+					case 3: // shield
+						fileName << "shields" << fSep;
+					break;
+				}
+				fileName << line.readChars(line.readByte1());
 				fileData.save(fileName.text());
 				break;
 			}
 
-			case GSVFILEDATA2:
+			case GSVFILEDATA3:
 			{
+				unsigned char pTy = (unsigned char)line.readByte1();
 				CString fileData, fileName, newData, shortName;
 				shortName = line.readChars(line.readByte1());
-				fileName = CString() << dataDir << "global" << fSep << shortName.text();
+				fileName = CString() << dataDir << "global" << fSep;
+				switch (pTy)
+				{
+					case 0: // head
+						fileName << "heads" << fSep;
+					break;
+
+					case 1: // body
+						fileName << "bodies" << fSep;
+					break;
+
+					case 2: // sword
+						fileName << "swords" << fSep;
+					break;
+
+					case 3: // shield
+						fileName << "shields" << fSep;
+					break;
+				}
+				fileName << shortName.text();
 				newData.writeBytes(line.readChars(line.bytesLeft()), line.bytesLeft());
 
 				fileData.load(fileName.text());
@@ -354,7 +339,7 @@ void ListServer_Main()
 				break;
 			}
 
-			case GSVFILEEND2:
+			case GSVFILEEND3:
 			{
 				CPlayer *player = (CPlayer *)playerIds[line.readByte2()];
 				int type = line.readByte1();
@@ -362,7 +347,26 @@ void ListServer_Main()
 				time_t modTime = line.readByte5();
 				int fileLength = line.readByte5();
 				CString shortName = line.readString("");
-				CString fileName = CString() << dataDir << "global" << fSep << shortName.text();
+				CString fileName = CString() << dataDir << "global" << fSep;
+				switch (type)
+				{
+					case 0: // head
+						fileName << "heads" << fSep;
+					break;
+
+					case 1: // body
+						fileName << "bodies" << fSep;
+					break;
+
+					case 2: // sword
+						fileName << "swords" << fSep;
+					break;
+
+					case 3: // shield
+						fileName << "shields" << fSep;
+					break;
+				}
+				fileName << shortName.text();
 
 				// If the file was sent compressed, we need to uncompress it.
 				if (doCompress == 1)

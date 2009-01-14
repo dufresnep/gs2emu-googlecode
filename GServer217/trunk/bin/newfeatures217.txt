@@ -2,6 +2,14 @@
 New features/bug fixes in v2.171 build 65
 --------------------------------------------
 
+Changes:
+- Global files now save to their appropriate folder in the global
+  directory.  Heads are saved to global/heads/, swords to
+  global/swords/, and so on.  The default foldersconfig.txt was also
+  updated to take this change into account.  This lets you sort out,
+  for example, heads from swords in your foldersconfig.txt file so
+  people can't set their head to a global sword.
+
 Fixes:
 - The gserver now retrieves the case-sensitive account name of the
   player from the serverlist.  This should fix problems with gservers
