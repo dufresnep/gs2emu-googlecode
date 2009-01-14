@@ -23,7 +23,7 @@ std::vector<TSVSock> svfunc;
 void createSVFunctions()
 {
 	// kinda like a memset-ish thing y'know
-	for (int i = 0; i < 21; i++)
+	for (int i = 0; i < 22; i++)
 		svfunc.push_back(&TServer::msgSVI_NULL);
 
 	// now set non-nulls
@@ -48,6 +48,7 @@ void createSVFunctions()
 	svfunc[SVI_SETLOCALIP] = &TServer::msgSVI_SETLOCALIP;
 	svfunc[SVI_GETFILE2] = &TServer::msgSVI_GETFILE2;
 	svfunc[SVI_UPDATEFILE] = &TServer::msgSVI_UPDATEFILE;
+	svfunc[SVI_GETFILE3] = &TServer::msgSVI_GETFILE3;
 }
 
 /*
@@ -685,5 +686,50 @@ bool TServer::msgSVI_UPDATEFILE(CString& pPacket)
 	{
 		return msgSVI_GETFILE2(CString() >> (short)0 >> (char)0 >> (char)file.length() << file);
 	}
+	return true;
+}
+
+// Sigh.  A third one.  Just to add a single byte to the start and data packets.
+bool TServer::msgSVI_GETFILE3(CString& pPacket)
+{
+	unsigned short pId = pPacket.readGUShort();
+	unsigned char pTy = pPacket.readGUChar();
+	CString shortName = pPacket.readChars(pPacket.readGUChar());
+	CString fileData = filesystem.load(shortName);
+	time_t modTime = filesystem.getModTime(shortName);
+
+	if (fileData.length() != 0)
+	{
+		int packetLength = 1 + 1 + 1 + shortName.length() + 1;
+
+		// Tell the server that it should expect a file.
+		sendPacket(CString() >> (char)SVO_FILESTART3 >> (char)pTy >> (char)shortName.length() << shortName);
+
+		// Save the file length.
+		int fileLength = fileData.length();
+
+		// Compress the file.
+		// Don't compress .png files since they are already zlib compressed.
+		CString ext = shortName.subString(shortName.length() - 4, 4);
+		char doCompress = 0;
+		if (ext.comparei(".png") == false)
+		{
+			doCompress = 1;
+			fileData.zcompressI();
+		}
+
+		// Send the file to the server.
+		while (fileData.length() != 0)
+		{
+			int sendSize = clip(32000, 0, fileData.length());
+			sendPacket(CString() >> (char)SVO_RAWDATA >> (int)(packetLength + sendSize));
+			sendPacket(CString() >> (char)SVO_FILEDATA3 >> (char)pTy >> (char)shortName.length() << shortName << fileData.subString(0, sendSize));
+			fileData.removeI(0, sendSize);
+		}
+
+		// Tell the gserver that the file send is now finished.
+		sendPacket(CString() >> (char)SVO_FILEEND3 >> (short)pId >> (char)pTy >> (char)doCompress >> (long long)modTime >> (long long)fileLength << shortName);
+	}
+
 	return true;
 }

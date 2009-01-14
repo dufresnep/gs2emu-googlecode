@@ -26,6 +26,7 @@ enum
 	SVI_SETLOCALIP		= 18,
 	SVI_GETFILE2		= 19,
 	SVI_UPDATEFILE		= 20,
+	SVI_GETFILE3		= 21,
 };
 
 enum
@@ -45,6 +46,9 @@ enum
 	SVO_FILESTART2		= 12,
 	SVO_FILEDATA2		= 13,
 	SVO_FILEEND2		= 14,
+	SVO_FILESTART3		= 15,
+	SVO_FILEDATA3		= 16,
+	SVO_FILEEND3		= 17,
 	SVO_PING			= 99,
 	SVO_RAWDATA			= 100,
 };
@@ -123,6 +127,7 @@ class TServer
 		bool msgSVI_SETLOCALIP(CString& pPacket);
 		bool msgSVI_GETFILE2(CString& pPacket);
 		bool msgSVI_UPDATEFILE(CString& pPacket);
+		bool msgSVI_GETFILE3(CString& pPacket);
 
 	private:
 		CSocket *sock;
