@@ -9,7 +9,7 @@ class CFileSystem
 	public:
 		CFileSystem() {};
 
-		void addDir(const CString& dir);
+		void addDir(const CString& dir, const CString& wildcard = "*");
 		void removeDir(const CString& dir);
 		void addFile(const CString& file);
 		void removeFile(const CString& file);
@@ -27,8 +27,11 @@ class CFileSystem
 		std::map<CString, CString>* getDirList()	{ return &dirList; }
 
 		static void fixPathSeparators(CString* pPath);
+		static char getPathSeparator();
 
 	private:
+		void loadAllDirectories(const CString& directory, bool recursive = false);
+
 		CString basedir;
 		std::map<CString, CString> fileList;
 		std::map<CString, CString> dirList;

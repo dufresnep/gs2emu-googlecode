@@ -37,7 +37,7 @@ CString homepath;
 static void getBasePath();
 
 // Filesystem.
-CFileSystem filesystem;
+CFileSystem filesystem[5];
 
 int main(int argc, char *argv[])
 {
@@ -49,7 +49,11 @@ int main(int argc, char *argv[])
 	getBasePath();
 
 	// Initialize data directory.
-	filesystem.addDir("global");
+	filesystem[0].addDir("global");
+	filesystem[1].addDir("global/heads");
+	filesystem[2].addDir("global/bodies");
+	filesystem[3].addDir("global/swords");
+	filesystem[4].addDir("global/shields");
 
 	// Definitions
 	CSocket playerSock, serverSock;
@@ -179,7 +183,8 @@ int main(int argc, char *argv[])
 		if ((int)difftime(time(0), t5min) > (5*60))
 		{
 			ipBans = CString::loadToken("ipbans.txt", "\n", true);
-			filesystem.resync();
+			for (int i = 0; i < 5; ++i)
+				filesystem[i].resync();
 			t5min = time(0);
 		}
 

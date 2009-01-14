@@ -21,16 +21,17 @@
 
 extern CString homepath;
 
-static void loadAllDirectories(std::map<CString, CString>& fileList, const CString& directory);
-
-void CFileSystem::addDir(const CString& dir)
+void CFileSystem::addDir(const CString& dir, const CString& wildcard)
 {
 	// Format the directory.
 	CString newDir(dir);
 	if (newDir[newDir.length() - 1] == '/' || newDir[newDir.length() - 1] == '\\')
 		CFileSystem::fixPathSeparators(&newDir);
 	else
+	{
 		newDir << fSep;
+		CFileSystem::fixPathSeparators(&newDir);
+	}
 
 	// See if the directory already exists.
 	// If it does, first remove it before re-adding it.
@@ -38,10 +39,10 @@ void CFileSystem::addDir(const CString& dir)
 		removeDir(newDir);
 
 	// Add the directory to the directory list.
-	dirList[newDir] = CString() << homepath << newDir;
+	dirList[newDir] = CString() << homepath << newDir << wildcard;
 
 	// Load up the files in the directory.
-	loadAllDirectories(fileList, dirList[newDir]);
+	loadAllDirectories(dirList[newDir], false);
 }
 
 void CFileSystem::removeDir(const CString& dir)
@@ -65,7 +66,7 @@ void CFileSystem::removeDir(const CString& dir)
 	for (std::map<CString, CString>::iterator i = dirList.begin(); i != dirList.end();)
 	{
 		if (i->second.findi(searchDir))
-			fileList.erase(i++);
+			dirList.erase(i++);
 		else ++i;
 	}
 }
@@ -78,6 +79,8 @@ void CFileSystem::addFile(const CString& file)
 
 	// Fix directory path separators.
 	CFileSystem::fixPathSeparators(&directory);
+	if (directory.find(homepath) != -1)
+		directory.removeI(0, homepath.length());
 
 	// Add to the map.
 	fileList[filename] = CString() << homepath << directory << filename;
@@ -103,7 +106,7 @@ void CFileSystem::resync()
 
 	// Iterate through all the directories, reloading their file list.
 	for (std::map<CString, CString>::const_iterator i = dirList.begin(); i != dirList.end(); ++i)
-		loadAllDirectories(fileList, i->second);
+		loadAllDirectories(i->second, false);
 }
 
 CString CFileSystem::find(const CString& file) const
@@ -147,40 +150,59 @@ CString CFileSystem::finddiri(const CString& dir) const
 }
 
 #if defined(_WIN32) || defined(_WIN64)
-void loadAllDirectories(std::map<CString, CString>& fileList, const CString& directory)
+void CFileSystem::loadAllDirectories(const CString& directory, bool recursive)
 {
-	CString searchdir = CString() << directory << "*";
+	CString dir = CString() << directory.remove(directory.findl(fSep)) << fSep;
 	WIN32_FIND_DATAA filedata;
-	HANDLE hFind = FindFirstFileA(searchdir.text(), &filedata);
+	HANDLE hFind = FindFirstFileA(directory.text(), &filedata);
 
-	if (hFind != 0)
+	if (hFind != INVALID_HANDLE_VALUE)
 	{
 		do
 		{
 			if (filedata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
-				if (filedata.cFileName[0] != '.')
-					loadAllDirectories(fileList, CString() << directory << CString(filedata.cFileName) << fSep);
+				if (filedata.cFileName[0] != '.' && recursive)
+				{
+					// We need to add the directory to the directory list.
+					CString newDir(filedata.cFileName);
+					for (std::map<CString, CString>::const_iterator i = dirList.begin(); i != dirList.end();)
+					{
+						// We found a match for the previous directory.
+						CString sDir = CString() << i->second.remove(i->second.findl(fSep)) << fSep;
+						if (sDir == dir)
+						{
+							CString firstDir = i->first;
+							if (firstDir[firstDir.length() - 1] != CString(fSep))
+								firstDir << fSep;
+							firstDir << newDir;
+							addDir(firstDir);	// Add the directory to the directory list.
+							i = dirList.end();
+						} else ++i;
+					}
+				}
 			}
 			else
 			{
 				// Grab the file name.
-				CString file(filedata.cFileName);
-				fileList[file] = CString(directory) << filedata.cFileName;
+				CString file((char *)filedata.cFileName);
+				fileList[file] = CString(dir) << filedata.cFileName;
 			}
 		} while (FindNextFileA(hFind, &filedata));
 	}
 	FindClose(hFind);
 }
 #else
-void loadAllDirectories(std::map<CString, CString>& fileList, const CString& directory)
+void CFileSystem::loadAllDirectories(const CString& directory, bool recursive)
 {
+	CString path = CString() << directory.remove(directory.findl(fSep)) << fSep;
+	CString wildcard = directory.subString(directory.findl(fSep) + 1);
 	DIR *dir;
 	struct stat statx;
 	struct dirent *ent;
 
 	// Try to open the directory.
-	if ((dir = opendir(directory.text())) == 0)
+	if ((dir = opendir(path.text())) == 0)
 		return;
 
 	// Read everything in it now.
@@ -188,11 +210,26 @@ void loadAllDirectories(std::map<CString, CString>& fileList, const CString& dir
 	{
 		if (ent->d_name[0] != '.')
 		{
-			CString dir = CString() << directory << ent->d_name;
-			stat(dir.text(), &statx);
-			if (statx.st_mode & S_IFDIR)
+			CString dircheck = CString() << path << ent->d_name;
+			stat(dircheck.text(), &statx);
+			if ((statx.st_mode & S_IFDIR) && recursive)
 			{
-				loadAllDirectories(fileList, dir);
+				// We need to add the directory to the directory list.
+				CString newDir(ent->d_name);
+				for (std::map<CString, CString>::const_iterator i = dirList.begin(); i != dirList.end();)
+				{
+					// We found a match for the previous directory.
+					CString sDir = CString() << i->second.remove(i->second.findl(fSep)) << fSep;
+					if (sDir == path)
+					{
+						CString firstDir = i->first;
+						if (firstDir[firstDir.length() - 1] != CString(fSep))
+							firstDir << fSep;
+						firstDir << newDir;
+						addDir(firstDir);	// Add the directory to the directory list.
+						i = dirList.end();
+					} else ++i;
+				}
 				continue;
 			}
 		}
@@ -200,7 +237,8 @@ void loadAllDirectories(std::map<CString, CString>& fileList, const CString& dir
 
 		// Grab the file name.
 		CString file(ent->d_name);
-		fileList[file] = CString(directory) << ent->d_name;
+		if (file.match(wildcard))
+			fileList[file] = CString(path) << file;
 	}
 	closedir(dir);
 }
@@ -262,4 +300,9 @@ int CFileSystem::getFileSize(const CString& file) const
 void CFileSystem::fixPathSeparators(CString* pPath)
 {
 	pPath->replaceAllI(fSep_O, fSep);
+}
+
+char CFileSystem::getPathSeparator()
+{
+	return fSep;
 }

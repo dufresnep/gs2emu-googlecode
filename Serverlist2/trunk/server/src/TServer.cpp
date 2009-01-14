@@ -13,7 +13,7 @@
 extern CSettings *settings;
 extern std::vector<TServer *> serverList;
 extern CLog serverlog;
-extern CFileSystem filesystem;
+extern CFileSystem filesystem[5];
 
 /*
 	Pointer-Functions for Packets
@@ -484,7 +484,15 @@ bool TServer::msgSVI_GETFILE(CString& pPacket)
 	unsigned short pId = pPacket.readGUShort();
 	unsigned char pTy = pPacket.readGUChar();
 	CString shortName = pPacket.readChars(pPacket.readGUChar());
-	CString fileData = filesystem.load(shortName);
+	CFileSystem* fileSystem = &(filesystem[0]);
+	switch (pTy)
+	{
+		case 0: fileSystem = &(filesystem[1]); break;
+		case 1: fileSystem = &(filesystem[2]); break;
+		case 2: fileSystem = &(filesystem[3]); break;
+		case 3: fileSystem = &(filesystem[4]); break;
+	}
+	CString fileData = fileSystem->load(shortName);
 
 	if (fileData.length() != 0)
 	{
@@ -637,8 +645,16 @@ bool TServer::msgSVI_GETFILE2(CString& pPacket)
 	unsigned short pId = pPacket.readGUShort();
 	unsigned char pTy = pPacket.readGUChar();
 	CString shortName = pPacket.readChars(pPacket.readGUChar());
-	CString fileData = filesystem.load(shortName);
-	time_t modTime = filesystem.getModTime(shortName);
+	CFileSystem* fileSystem = &(filesystem[0]);
+	switch (pTy)
+	{
+		case 0: fileSystem = &(filesystem[1]); break;
+		case 1: fileSystem = &(filesystem[2]); break;
+		case 2: fileSystem = &(filesystem[3]); break;
+		case 3: fileSystem = &(filesystem[4]); break;
+	}
+	CString fileData = fileSystem->load(shortName);
+	time_t modTime = fileSystem->getModTime(shortName);
 
 	if (fileData.length() != 0)
 	{
@@ -679,12 +695,21 @@ bool TServer::msgSVI_GETFILE2(CString& pPacket)
 bool TServer::msgSVI_UPDATEFILE(CString& pPacket)
 {
 	time_t modTime = pPacket.readGUInt5();
+	unsigned char pTy = pPacket.readGUChar();
 	CString file = pPacket.readString("");
+	CFileSystem* fileSystem = &(filesystem[0]);
+	switch (pTy)
+	{
+		case 0: fileSystem = &(filesystem[1]); break;
+		case 1: fileSystem = &(filesystem[2]); break;
+		case 2: fileSystem = &(filesystem[3]); break;
+		case 3: fileSystem = &(filesystem[4]); break;
+	}
 
-	time_t modTime2 = filesystem.getModTime(file);
+	time_t modTime2 = fileSystem->getModTime(file);
 	if (modTime2 != modTime)
 	{
-		return msgSVI_GETFILE2(CString() >> (short)0 >> (char)0 >> (char)file.length() << file);
+		return msgSVI_GETFILE3(CString() >> (short)0 >> (char)pTy >> (char)file.length() << file);
 	}
 	return true;
 }
@@ -695,8 +720,16 @@ bool TServer::msgSVI_GETFILE3(CString& pPacket)
 	unsigned short pId = pPacket.readGUShort();
 	unsigned char pTy = pPacket.readGUChar();
 	CString shortName = pPacket.readChars(pPacket.readGUChar());
-	CString fileData = filesystem.load(shortName);
-	time_t modTime = filesystem.getModTime(shortName);
+	CFileSystem* fileSystem = &(filesystem[0]);
+	switch (pTy)
+	{
+		case 0: fileSystem = &(filesystem[1]); break;
+		case 1: fileSystem = &(filesystem[2]); break;
+		case 2: fileSystem = &(filesystem[3]); break;
+		case 3: fileSystem = &(filesystem[4]); break;
+	}
+	CString fileData = fileSystem->load(shortName);
+	time_t modTime = fileSystem->getModTime(shortName);
 
 	if (fileData.length() != 0)
 	{
