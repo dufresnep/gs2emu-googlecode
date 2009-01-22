@@ -9,6 +9,8 @@ Changes:
   updated to take this change into account.  This lets you sort out,
   for example, heads from swords in your foldersconfig.txt file so
   people can't set their head to a global sword.
+- Server now sends timevar on connect.  Previously, you would have to
+  wait a few seconds before timevar was sent to the client.
 
 Fixes:
 - The gserver now retrieves the case-sensitive account name of the
@@ -22,6 +24,9 @@ Fixes:
 - Altering a player's rights when they are logged in as both RC and
   as a player should now synchronize the changes between both player
   states.
+- Fixed a bug where the server would crash if a player issued a color
+  changing command (setsleeves, setcoat, setbelt, etc) without
+  specifying a color.
 
 
 --------------------------------------------

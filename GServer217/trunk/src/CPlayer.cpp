@@ -541,6 +541,13 @@ void CPlayer::sendAccount()
 			}
 		}
 
+		// Send timevar.
+		CPacket out;
+		out << (char)NEWWORLDTIME;
+		out.writeByte4(getNWTime());
+		sendPacket(out);
+
+		// Send start message.
 		sendPacket(CPacket() << (char)STARTMESSAGE << serverMessage);
 	}
 	else
@@ -1145,17 +1152,19 @@ void CPlayer::processChat(CString& pMessage)
 	}
 
 	//colour commands
-	int cloth  = clothCommands.find(words[0].text());
-	if (cloth >= 5) cloth = cloth - 3;
-	if (cloth >= 0)
+	if (words.count() == 2)
 	{
-		int colour = colourNames.find(words[1].text());
-		if (colour >= 0)
+		int cloth  = clothCommands.find(words[0].text());
+		if (cloth >= 5) cloth = cloth - 3;
+		if (cloth >= 0)
 		{
-			colors[cloth] = colour;
-			updateProp(PLAYERCOLORS);
+			int colour = colourNames.find(words[1].text());
+			if (colour >= 0)
+			{
+				colors[cloth] = colour;
+				updateProp(PLAYERCOLORS);
+			}
 		}
-
 	}
 
 	if(words.count() <= 2)
