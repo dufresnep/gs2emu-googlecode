@@ -296,6 +296,7 @@ bool TServer::msgSVI_SETNAME(CString& pPacket)
 	name = pPacket.readString("");
 
 	// Find out the server type.
+	type = TYPE_CLASSIC;
 	CString sType = name.subString(0, 2);
 	if (sType == "P ") type = TYPE_GOLD;
 	if (sType == "H ") type = TYPE_HOSTED;
