@@ -2,6 +2,13 @@
 New features/bug fixes in v2.171 build 65
 --------------------------------------------
 
+Additions:
+- New server option, "localip".  Defaults to AUTO.  It provides a
+  manual override for the local IP address the gserver sends to the
+  serverlist, introduced in build 64.  Useful for Linux systems, as
+  the gserver can't reliably obtain the local IP address on Linux
+  systems.
+
 Changes:
 - Global files now save to their appropriate folder in the global
   directory.  Heads are saved to global/heads/, swords to

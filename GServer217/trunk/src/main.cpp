@@ -66,7 +66,7 @@ CStringList folderConfig, defaultFiles;
 CWordFilter WordFilter;
 float unstickmeX, unstickmeY;
 int aptime[5], baddyRespawn, cheatwindowstime, gameTime = 1, heartLimit, horseLife, idleDisconnect, listServerPort, maxNoMovement, maxPlayers, nwTime, serverTime = 0, shieldLimit, swordLimit, tileRespawn;
-CString serverPort;
+CString serverPort, localip;
 
 void acceptNewPlayers(CSocket &pSocket);
 void doTimer();
@@ -477,6 +477,7 @@ bool loadSettings(char* pFile)
 	listServerFields[2] = findKey("language", "English");
 	listServerFields[4] = findKey("url", "http://www.graal.in");
 	listServerFields[5] = findKey("myip", "AUTO");
+	localip = findKey("localip", "AUTO");
 	serverPort = findKey("serverport", "14802");
 	shareFolder = findKey("sharefolder");
 	staffHead = findKey("staffhead", "head25.png");

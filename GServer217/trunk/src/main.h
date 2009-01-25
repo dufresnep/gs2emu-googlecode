@@ -31,7 +31,7 @@ extern CStringList adminNames, cheatwindows, clothCommands, colourNames, globalG
 extern CStringList folderConfig, defaultFiles;
 extern float unstickmeX, unstickmeY;
 extern int aptime[5], baddyRespawn, cheatwindowstime, gameTime, heartLimit, horseLife, maxNoMovement, maxPlayers, nwTime, shieldLimit, swordLimit, tileRespawn;
-extern CString serverPort;
+extern CString serverPort, localip;
 extern CWordFilter WordFilter;
 
 bool isValidFile(CBuffer& file, int type);
