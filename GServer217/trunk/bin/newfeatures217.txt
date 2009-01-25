@@ -11,6 +11,8 @@ Changes:
   people can't set their head to a global sword.
 - Server now sends timevar on connect.  Previously, you would have to
   wait a few seconds before timevar was sent to the client.
+- The gserver will now inform the listserver if the 'underconstruction'
+  server option is changed through RC.
 
 Fixes:
 - The gserver now retrieves the case-sensitive account name of the

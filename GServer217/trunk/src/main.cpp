@@ -386,6 +386,7 @@ bool updateFile(char *pFile)
 
 bool loadSettings(char* pFile)
 {
+	bool wasUC = underconstruction;
 	CStringList settings;
 	if (!settings.load(pFile))
 		return false;
@@ -484,7 +485,16 @@ bool loadSettings(char* pFile)
 	// If the server is flagged as under construction, prepend the
 	// Under Construction value to the name.
 	if ( underconstruction && !listServerFields[0].match( "U *" ) )
+	{
 		listServerFields[0] = CBuffer() << "U " << listServerFields[0];
+		if (lsConnected)
+			ListServer_Send(CPacket() << (char)SLSNAME << listServerFields[0] << "\n");
+	}
+	else if (wasUC)
+	{
+		if (lsConnected)
+			ListServer_Send(CPacket() << (char)SLSNAME << listServerFields[0] << "\n");
+	}
 
 	/* Load Maps */
 	for(int i = 0; i < CMap::mapList.count(); i++)

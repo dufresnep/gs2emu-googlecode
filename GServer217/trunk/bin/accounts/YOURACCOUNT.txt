@@ -41,6 +41,10 @@ FOLDERRIGHT rw world/*
 FOLDERRIGHT rw world/bodies/*
 FOLDERRIGHT rw world/ganis/*
 FOLDERRIGHT rw world/global/*
+FOLDERRIGHT rw world/global/heads/*
+FOLDERRIGHT rw world/global/bodies/*
+FOLDERRIGHT rw world/global/swords/*
+FOLDERRIGHT rw world/global/shields/*
 FOLDERRIGHT rw world/hats/*
 FOLDERRIGHT rw world/heads/*
 FOLDERRIGHT rw world/images/*
