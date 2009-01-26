@@ -23,7 +23,7 @@ std::vector<TSVSock> svfunc;
 void createSVFunctions()
 {
 	// kinda like a memset-ish thing y'know
-	for (int i = 0; i < 22; i++)
+	for (int i = 0; i < 23; i++)
 		svfunc.push_back(&TServer::msgSVI_NULL);
 
 	// now set non-nulls
@@ -49,6 +49,7 @@ void createSVFunctions()
 	svfunc[SVI_GETFILE2] = &TServer::msgSVI_GETFILE2;
 	svfunc[SVI_UPDATEFILE] = &TServer::msgSVI_UPDATEFILE;
 	svfunc[SVI_GETFILE3] = &TServer::msgSVI_GETFILE3;
+	svfunc[SVI_NEWSERVER] = &TServer::msgSVI_NEWSERVER;
 }
 
 /*
@@ -764,6 +765,30 @@ bool TServer::msgSVI_GETFILE3(CString& pPacket)
 		// Tell the gserver that the file send is now finished.
 		sendPacket(CString() >> (char)SVO_FILEEND3 >> (short)pId >> (char)pTy >> (char)doCompress >> (long long)modTime >> (long long)fileLength << shortName);
 	}
+
+	return true;
+}
+
+bool TServer::msgSVI_NEWSERVER(CString& pPacket)
+{
+	CString name = pPacket.readChars(pPacket.readGUChar());
+	CString description = pPacket.readChars(pPacket.readGUChar());
+	CString language = pPacket.readChars(pPacket.readGUChar());
+	CString version = pPacket.readChars(pPacket.readGUChar());
+	CString url = pPacket.readChars(pPacket.readGUChar());
+	CString ip = pPacket.readChars(pPacket.readGUChar());
+	CString port = pPacket.readChars(pPacket.readGUChar());
+	CString localip = pPacket.readChars(pPacket.readGUChar());
+
+	// Set up the server.
+	if (msgSVI_SETNAME(name) == false) return false;
+	msgSVI_SETDESC(description);
+	msgSVI_SETLANG(language);
+	msgSVI_SETVERS(version);
+	msgSVI_SETURL(url);
+	msgSVI_SETIP(ip);
+	msgSVI_SETLOCALIP(localip);
+	msgSVI_SETPORT(port);
 
 	return true;
 }

@@ -27,6 +27,7 @@ enum
 	SVI_GETFILE2		= 19,
 	SVI_UPDATEFILE		= 20,
 	SVI_GETFILE3		= 21,
+	SVI_NEWSERVER		= 22,
 };
 
 enum
@@ -128,6 +129,7 @@ class TServer
 		bool msgSVI_GETFILE2(CString& pPacket);
 		bool msgSVI_UPDATEFILE(CString& pPacket);
 		bool msgSVI_GETFILE3(CString& pPacket);
+		bool msgSVI_NEWSERVER(CString& pPacket);
 
 	private:
 		CSocket *sock;
