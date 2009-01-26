@@ -56,7 +56,7 @@ void createSVFunctions()
 	Constructor - Deconstructor
 */
 TServer::TServer(CSocket *pSocket)
-: sock( pSocket ), type( 0 )
+: sock(pSocket), type(0), addedToSQL(false)
 {
 	language = "English";
 	lastPing = lastPlayerCount = lastData = time(0);
@@ -157,6 +157,18 @@ void TServer::kill()
 	// Delete
 	serverList.erase(std::find(serverList.begin(), serverList.end(), this));
 	delete this;
+}
+
+void TServer::SQLupdate(CString tblval, const CString& newVal)
+{
+#ifndef NO_MYSQL
+	if (!addedToSQL) return;
+	CString query;
+	query << "UPDATE `" << settings->getStr("serverlist") << "` SET "
+		<< tblval.escape() << "='" << newVal.escape() << "' "
+		<< "WHERE name='" << name.escape() << "'";
+	mySQL->query(query);
+#endif
 }
 
 /*
@@ -294,9 +306,11 @@ bool TServer::msgSVI_NULL(CString& pPacket)
 
 bool TServer::msgSVI_SETNAME(CString& pPacket)
 {
+	CString oldName(name);
 	name = pPacket.readString("");
 
 	// Find out the server type.
+	int oldType = type;
 	type = TYPE_CLASSIC;
 	CString sType = name.subString(0, 2);
 	if (sType == "P ") type = TYPE_GOLD;
@@ -319,6 +333,7 @@ bool TServer::msgSVI_SETNAME(CString& pPacket)
 		name.removeI(0, 2);
 
 	// check for duplicates
+	bool dupFound = false;
 	int dupCount = 0;
 dupCheck:
 	for (unsigned int i = 0; i < serverList.size(); i++)
@@ -343,24 +358,45 @@ dupCheck:
 					goto dupCheck;
 				}
 				serverList[i]->sendPacket(CString() >> (char)SVO_ERRMSG << "Servername is already in use!");
-				return false;
+				dupFound = true;
+				break;
 			}
 		}
 	}
 
-	serverlog.out(CString() << "New Server: " << name << "\n");
+	// In a worst case scenario, attempt to see if we originally had a valid name.
+	// If so, just go back to it.
+	if (dupFound && addedToSQL)
+	{
+		name = oldName;
+		type = oldType;
+		return true;
+	}
+	else return false;
+
+	// If we aren't in SQL yet, that means we are a new server.  If so, announce it.
+	// If we are in SQL, update the SQL entry with our new name.
+	if (!addedToSQL) serverlog.out(CString() << "New Server: " << name << "\n");
+	else
+	{
+		SQLupdate("name", name);
+		if (getType().length() != 0) SQLupdate("type", getType());
+	}
+
 	return true;
 }
 
 bool TServer::msgSVI_SETDESC(CString& pPacket)
 {
 	description = pPacket.readString("");
+	SQLupdate("description", description);
 	return true;
 }
 
 bool TServer::msgSVI_SETLANG(CString& pPacket)
 {
 	language = pPacket.readString("");
+	SQLupdate("language", language);
 	return true;
 }
 
@@ -374,12 +410,14 @@ bool TServer::msgSVI_SETVERS(CString& pPacket)
 		version = CString("Revision ") << CString(abs(verNum));
 	else
 		version = CString("Build ") << CString(verNum);
+	SQLupdate("version", version);
 	return true;
 }
 
 bool TServer::msgSVI_SETURL(CString& pPacket)
 {
 	url = pPacket.readString("");
+	SQLupdate("url", url);
 	return true;
 }
 
@@ -387,6 +425,7 @@ bool TServer::msgSVI_SETIP(CString& pPacket)
 {
 	ip = pPacket.readString("");
 	ip = (ip == "AUTO" ? sock->tcpIp() : ip);
+	SQLupdate("ip", ip);
 	return true;
 }
 
@@ -397,24 +436,29 @@ bool TServer::msgSVI_SETPORT(CString& pPacket)
 	// This should be the last packet sent when the server is initialized.
 	// Add it to the database now.
 #ifndef NO_MYSQL
-	if ( name.length() > 0 )
+	if (!addedToSQL)
 	{
-		CString query;
-		query << "INSERT INTO " << settings->getStr("serverlist") << " ";
-		query << "(name, ip, port, playercount, description, url, language, type, version) ";
-		query << "VALUES ('"
-			<< name.escape() << "','"
-			<< ip.escape() << "','"
-			<< port.escape() << "','"
-			<< CString((int)playerList.size()) << "','"
-			<< description.escape() << "','"
-			<< url.escape() << "','"
-			<< language.escape() << "','"
-			<< getType().escape() << "','"
-			<< version.escape() << "'"
-			<< ")";
-		mySQL->query(query);
+		if (name.length() > 0)
+		{
+			CString query;
+			query << "INSERT INTO " << settings->getStr("serverlist") << " ";
+			query << "(name, ip, port, playercount, description, url, language, type, version) ";
+			query << "VALUES ('"
+				<< name.escape() << "','"
+				<< ip.escape() << "','"
+				<< port.escape() << "','"
+				<< CString((int)playerList.size()) << "','"
+				<< description.escape() << "','"
+				<< url.escape() << "','"
+				<< language.escape() << "','"
+				<< getType().escape() << "','"
+				<< version.escape() << "'"
+				<< ")";
+			mySQL->query(query);
+			addedToSQL = true;
+		}
 	}
+	else SQLupdate("port", port);
 #endif
 
 	return true;
@@ -788,7 +832,7 @@ bool TServer::msgSVI_NEWSERVER(CString& pPacket)
 	msgSVI_SETURL(url);
 	msgSVI_SETIP(ip);
 	msgSVI_SETLOCALIP(localip);
-	msgSVI_SETPORT(port);
+	msgSVI_SETPORT(port);			// Port last.
 
 	return true;
 }

@@ -87,6 +87,8 @@ class TServer
 		// kill client
 		void kill();
 
+		void SQLupdate(CString tblval, const CString& newVal);
+
 		// get-value functions
 		const CString& getDescription();
 		const CString getIp(const CString& pIp = "");
@@ -139,6 +141,7 @@ class TServer
 		int type;
 		std::vector<player *> playerList;
 		time_t lastPing, lastData, lastPlayerCount;
+		bool addedToSQL;
 };
 
 #endif // TSERVER_H
