@@ -372,7 +372,8 @@ dupCheck:
 		type = oldType;
 		return true;
 	}
-	else return false;
+	else if (dupFound)
+		return false;
 
 	// If we aren't in SQL yet, that means we are a new server.  If so, announce it.
 	// If we are in SQL, update the SQL entry with our new name.
