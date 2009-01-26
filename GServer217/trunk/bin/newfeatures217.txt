@@ -8,6 +8,9 @@ Additions:
   serverlist, introduced in build 64.  Useful for Linux systems, as
   the gserver can't reliably obtain the local IP address on Linux
   systems.
+- You can now change a server's name, description, language, etc
+  through RC and have the changes be instantly reflected on the
+  serverlist without requiring a server restart.
 
 Changes:
 - Global files now save to their appropriate folder in the global

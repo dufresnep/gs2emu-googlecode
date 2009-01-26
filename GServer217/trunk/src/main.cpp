@@ -387,6 +387,14 @@ bool updateFile(char *pFile)
 bool loadSettings(char* pFile)
 {
 	bool wasUC = underconstruction;
+	CString prevName = listServerFields[0];
+	CString prevDesc = listServerFields[1];
+	CString prevLang = listServerFields[2];
+	CString prevURL = listServerFields[4];
+	CString prevIP = listServerFields[5];
+	CString prevLIP = localip;
+	CString prevPort = serverPort;
+
 	CStringList settings;
 	if (!settings.load(pFile))
 		return false;
@@ -485,7 +493,7 @@ bool loadSettings(char* pFile)
 
 	// If the server is flagged as under construction, prepend the
 	// Under Construction value to the name.
-	if ( underconstruction && !listServerFields[0].match( "U *" ) )
+	if (underconstruction && !listServerFields[0].match( "U *" ))
 	{
 		listServerFields[0] = CBuffer() << "U " << listServerFields[0];
 		if (lsConnected)
@@ -496,6 +504,22 @@ bool loadSettings(char* pFile)
 		if (lsConnected)
 			ListServer_Send(CPacket() << (char)SLSNAME << listServerFields[0] << "\n");
 	}
+	else if (prevName != listServerFields[0])
+		ListServer_Send(CPacket() << (char)SLSNAME << listServerFields[0] << "\n");
+
+	// Send changes to the serverlist.
+	if (prevDesc != listServerFields[1])
+		ListServer_Send(CPacket() << (char)SLSDESC << listServerFields[1] << "\n");
+	if (prevLang != listServerFields[2])
+		ListServer_Send(CPacket() << (char)SLSLANG << listServerFields[2] << "\n");
+	if (prevURL != listServerFields[4])
+		ListServer_Send(CPacket() << (char)SLSURL << listServerFields[4] << "\n");
+	if (prevIP != listServerFields[5])
+		ListServer_Send(CPacket() << (char)SLSIP << listServerFields[5] << "\n");
+	if (prevLIP != localip)
+		ListServer_Send(CPacket() << (char)SLSSETLOCALIP << localip << "\n");
+	if (prevPort != serverPort)
+		ListServer_Send(CPacket() << (char)SLSPORT << serverPort << "\n");
 
 	/* Load Maps */
 	for(int i = 0; i < CMap::mapList.count(); i++)

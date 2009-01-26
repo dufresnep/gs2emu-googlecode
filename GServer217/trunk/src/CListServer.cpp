@@ -37,23 +37,30 @@ void ListServer_Connect()
 
 	errorOut("serverlog.txt", CBuffer() << "Connected to the list server successfully.", true);
 
-	// send gserver info to listserver
-	ListServer_Send(CPacket() << (char)SLSNAME << listServerFields[0] << "\n"
-		<< (char)SLSDESC << listServerFields[1] << "\n"
-		<< (char)SLSLANG << listServerFields[2] << "\n"
-		<< (char)SLSVER  << listServerFields[3] << "\n"
-		<< (char)SLSURL  << listServerFields[4] << "\n"
-		<< (char)SLSIP   << listServerFields[5] << "\n");
+	// assemble server packet.
+	CPacket pack;
+	pack << (char)SLSNEWSERVER << (char)listServerFields[0].length() << listServerFields[0];
+	pack << (char)listServerFields[1].length() << listServerFields[1];
+	pack << (char)listServerFields[2].length() << listServerFields[2];
+	pack << (char)listServerFields[3].length() << listServerFields[3];
+	pack << (char)listServerFields[4].length() << listServerFields[4];
+	pack << (char)listServerFields[5].length() << listServerFields[5];
+	pack << (char)serverPort.length() << serverPort;
 	if (localip == CString("AUTO"))
 	{
 		CString slocalip(listServer.getLocalIp());
 		if (slocalip == CString("127.0.1.1") || slocalip == CString("127.0.0.1"))
+		{
 			errorOut("serverlog.txt", CBuffer() << "[WARNING] Socket returned " << slocalip << " for its local ip!  Not sending local ip to serverlist.", true);
-		else
-			ListServer_Send(CPacket() << (char)SLSSETLOCALIP << slocalip << "\n");
+			pack << (char)0;
+		}
+		else pack << (char)slocalip.length() << slocalip;
 	}
-	else ListServer_Send(CPacket() << (char)SLSSETLOCALIP << localip << "\n");
-	ListServer_Send(CPacket() << (char)SLSPORT << serverPort << "\n");
+	else pack << (char)localip.length() << localip;
+	pack << "\n";
+
+	// send gserver info to listserver
+	ListServer_Send(pack);
 
 	// send players to listserver
 	CPacket pPacket;

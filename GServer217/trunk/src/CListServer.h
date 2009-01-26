@@ -40,6 +40,7 @@ enum
 	SLSGETFILE2			= 19,
 	SLSUPDATEFILE		= 20,
 	SLSGETFILE3			= 21,
+	SLSNEWSERVER		= 22,
 };
 
 enum
