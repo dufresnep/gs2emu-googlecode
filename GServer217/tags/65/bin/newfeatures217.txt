@@ -1,0 +1,819 @@
+--------------------------------------------
+New features/bug fixes in v2.171 build 65
+--------------------------------------------
+
+Additions:
+- New server option, "localip".  Defaults to AUTO.  It provides a
+  manual override for the local IP address the gserver sends to the
+  serverlist, introduced in build 64.  Useful for Linux systems, as
+  the gserver can't reliably obtain the local IP address on Linux
+  systems.
+- You can now change a server's name, description, language,
+  underconstruction status, etc through RC and have the changes be
+  instantly reflected on the serverlist without requiring a server
+  restart.
+- The gserver now supports .zelda levels.  Note, it only supports
+  version 1.03.  If your .zelda file doesn't load, send it to me so I
+  can add support for other versions.
+
+Changes:
+- Global files now save to their appropriate folder in the global
+  directory.  Heads are saved to global/heads/, swords to
+  global/swords/, and so on.  The default foldersconfig.txt was also
+  updated to take this change into account.  This lets you sort out,
+  for example, heads from swords in your foldersconfig.txt file so
+  people can't set their head to a global sword.
+- Server now sends timevar on connect.  Previously, you would have to
+  wait a few seconds before timevar was sent to the client.
+
+Fixes:
+- The gserver now retrieves the case-sensitive account name of the
+  player from the serverlist.  This should fix problems with gservers
+  run on case-sensitive file systems.
+- If a level is updated on the server, it will no longer forget that it
+  was part of a map specified in the "maps" server option.  Just as a
+  reminder, the "maps" option specifies a comma-delimited list of
+  bigmap.txt type maps that the server uses.  If a level is on a map,
+  you will be able to see players move and talk in adjacent levels.
+- Altering a player's rights when they are logged in as both RC and
+  as a player should now synchronize the changes between both player
+  states.
+- Fixed a bug where the server would crash if a player issued a color
+  changing command (setsleeves, setcoat, setbelt, etc) without
+  specifying a color.
+- Baddies without any text verses will no longer say odd characters.
+
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 64
+--------------------------------------------
+
+Changes:
+- The gserver now restricts access to the 2.171 client.  If you use a
+  2.170 client, you will have to upgrade.
+- If the gserver loses connection with the serverlist, it now tries to
+  reconnect once every 5 seconds instead of 10 times per second.
+
+Additions:
+- The gserver now sends its local IP address to the serverlist so the
+  serverlist can help players connect to their own server when they
+  have routing issues.  Should get rid of the need for a no-ip/dyndns
+  host name for simple network setups.
+- Added a new global file sending scheme.  The serverlist now doesn't
+  have to encode files in base64 and it can now send the files
+  compressed.  This should save on bandwidth when obtaining a global
+  file.
+
+Fixes:
+- Clicking the X to close the gserver will now cause it to correctly
+  shutdown and save all its data.
+- GServer now correctly reads the client version string.  This causes
+  no changes in the operation of the GServer at all.  Just thought I
+  would document it.
+- Maybe fixed the bug where NPCs sometimes appear in the water while on
+  land.
+- Maybe fixed a bug where warping wasn't working for fractional (0.5)
+  tile values.
+- Crop the NPC script to 16383 bytes as that is the max size a script
+  can be.
+- When using 'warpto x y', you no longer change your x and y location
+  in sequence.  It is now a single move instead of two.
+- Fixed the 'showonlinetime' chat command.  It now will no longer say
+  0h when you haven't played for an hour, and it will no longer cap
+  your hours played at 60.
+- Fixed a bug introduced in build 63 where moving NPCs would
+  occasionally leave the level.
+
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 63
+--------------------------------------------
+
+Additions:
+- 'canbecarried' gscript command support has been improved.  Keep in
+  mind that 'canbecarried' has always been fundamentally broken in
+  pre-npcserver Graal.  Our implementation is good, but not perfect.
+  And it might differ from what people are used to.
+
+Fixes:
+- Fixed a rare bug which caused a level to lock up the client when
+  loading.
+- Fixed a bug that would cause servers to fall into an infinite loop.
+- Listening socket has been marked as reusable.  Should fix problems
+  where the gserver would refuse to start.
+
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 62
+--------------------------------------------
+
+Fixes:
+- Fixed the evil decompression errors.
+
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 61
+--------------------------------------------
+
+Changes:
+- Accounts now use Windows line endings.
+
+Fixes:
+- Fixed a bug that broke admin rights.
+- Fixed a bunch of NPC/player prop bugs.  This caused problems where,
+  for example, head file names over 27 characters would break.
+
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 60
+--------------------------------------------
+
+Additions:
+- Large file support added.  You no longer need to split files into
+  64KB chunks.
+
+Changes:
+- RC IP mask now also locks the client to the specified IP address.
+  Only works if the IP mask is changed from 0.0.0.0.
+
+Fixes:
+- NPCs are now properly deleted on the client if destroy is called.
+- If the client requests a file and has the current version of it, the
+  gserver correctly informs the client it has an up-to-date copy
+  instead of telling the client it failed to send it.
+- Horses correctly save its image, direction, and bush count when you
+  dismount.
+- Fixed the protection against sending default files.  For sure this
+  time.  Really.
+
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 59
+--------------------------------------------
+
+Maintenance:
+- Some constructor reworking.
+- Updated defaultaccount.txt with some default values.
+- Updated foldersconfig.txt with the global directory pre set up.
+- Socket code re-write.  Hopefully fixes some of the connection bugs.
+
+Changes:
+- You can no longer delete the defaultaccount account through RC.  If
+  you ever wish to do that, you will need to manually delete it through
+  FTP or via the server itself.
+- You can no longer remove your own "Change Rights" or "Change Staff
+  Account" rights through RC.
+- png, mng, and gif auto detection has now been added for all of the
+  setbody, sethead, etc commands.
+
+Fixes:
+- Fixed the status list bugs that could cause crashes.
+- Fixed some crash bugs related to not checking if fopen succeeded.
+- Fixed a bug where fractional values didn't work with putnpc.  Before,
+  if you tried to place an npc at (30.5, 27.5), it would instead place
+  it at (30, 27).
+- If an RC changes their name, the new name should now be visible in
+  the RC player list.
+- Fixed some bugs related to level caching.  This fixes a memory leak
+  (it would constantly allocate new data when it shouldn't have) and it
+  might fix some more evil NPC props stuff.  Also, it now sends a
+  PLAYERWARPED packet when you update the level.  This might fix some
+  more stuff.
+- If you are the only person in the level and you die, npcs won't break
+  anymore.  Yay.
+- Fixed a bug that caused png/mng/gif auto detection to fail to work.
+- Altering an RC's rights should now immediately apply.  Previously
+  they would need to log out to get their new rights.
+
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 58
+--------------------------------------------
+
+Additions:
+- If you have the "Change staff accounts" right, you can now give any
+  right to an account.  Previously you would need that right to be able
+  to set it.
+
+Changes:
+- Players no longer need to be in the staff= section of the server
+  options in order to gain access to rights such as update level,
+  warpto, and summon.  The staff= section now only lists players who
+  are allowed to log on via RC (and players who can warp out of jail
+  levels).
+
+Fixes:
+- Fixed a network bug while communication with the list server.  This
+  should most likely fix the problem where profiles would get mangled.
+  It should also fix bugs where files retrieved from the list server
+  could become corrupted.
+- Fixed default ganis sending to players when they shouldn't be.
+- If the command sethead fails to find a head on the server, it will
+  now properly ask the list server if the specified head exists
+  globally and download it.
+- When setting a player's rights, it would sometimes (almost always)
+  trigger a "[Hack] Account attempted to open a FileBrowser session."
+  message.  (Actually a 1/4294967295 chance to not declare as a hack.)
+- Disabling the folders config through the server options via RC will
+  now correctly re-cache all the sub-directories.
+- warpto no longer requires the "Warp players" right to work.
+- The player's status message will now be sent to new players who just
+  logged on.
+
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 57
+--------------------------------------------
+
+Maintenance:
+- Re-worked the logging system to log into three files now: rclog.txt,
+  errorlog.txt, and serverlog.txt.
+- Added logging of more RC actions.
+
+Additions:
+- If a player says 'sethead head30', the server will check png, mng,
+  and gif files in that order for a match and return the first one
+  found, if any.
+- The gserver can now be set to 'localhost mode' by modifying the
+  'myip' option in the serveroptions.txt file and setting it to
+  'localhost'.  It will disable the listserver connection and
+  authentication allowing for development in locations where an
+  Internet connection is unavailable, or when one needs to test scripts
+  locally with multiple Graal clients.
+- Removed file exists check for when players change their gani.
+  Clients can set their gani to gani's not allowed via
+  foldersconfig.txt; however, if the gani location isn't in
+  foldersconfig.txt, the gani won't be sent to the player.
+- Added new boolean server option, nofoldersconfig.  If set to true, it
+  will disable the foldersconfig.txt file.  It can only be changed by
+  people who have the "change staff accounts" right.  Keep in mind that
+  if you disable it, people will be able to do stuff like:
+  sethead flash-sword.png
+- Implemented spar rating.  It uses the glicko formula.
+- A player's spar rating is now saved to their account.  Also, all new
+  players will also start with a rating of 1500/350 instead of 0/50.
+- If you start a directory in foldersconfig.txt with a ./ then it will
+  use the directory of the gserver instead of the world/ directory.
+  For example: ./accounts/* will search for serverDIR/accounts/
+  For example: accounts/* will search for serverDIR/world/accounts/
+- You can now use the =, >, >=, <, <=, and != conditionals when
+  searching for accounts.  Also, searching for numbers has been
+  improved.
+- Renamed the following serveroptions.txt values to be more in line
+  with the official Graal server options:
+  tilerespawn -> respawntime
+  staffonly -> onlystaff
+  baddydropitems -> baddyitems
+- The onlystaff option in serveroptions.txt now requires the Change
+  Staff Accounts right.
+- The normaladminscanchangegralats, globalguilds, and
+  allowedglobalguilds server options now work.  If globalguilds is set
+  to false, only guilds listed in allowedglobalguilds will be allowed.
+- New death item dropping logic.  Use the new mindeathgralats and
+  maxdeathgralats options in serveroptions.txt to change how much money
+  is dropped.  mindeathgralats defaults to 1 while maxdeathgralats
+  defaults to 50.
+- New server option healswords.  If set to true, the gserver will allow
+  swords with a negative power.  It defaults to false.
+- New server option putnpcenabled.  If set to false, the gserver will
+  not allow new NPCs created by the putnpc scripting command.  It
+  defaults to true.
+- New server option tiledroprate.  It affects the rate that items drop
+  from tiles like bushes.  The value is a percentage from 0 to 100.  It
+  defaults to 50.
+
+Fixes:
+- The server now properly shuts down when you hit CTRL+C.
+- RC can now correctly reset broken accounts.
+- Players won't get disconnected for inactivity for no reason anymore.
+- Fixed the spar rating player prop.  It was previously being sent as a
+  two-byte variable when it should have been sent as a three-byte
+  variable.  This also fixes a bunch of player props.
+- When an RC edits a player's attributes, it will now correctly send
+  head, body, ap, etc to everybody in that player's level.
+- When a player dies in a sparring zone and dropitems is enabled, the
+  player will no longer drop items.
+- Fixed a problem where 'sparringzone' levels weren't correctly being
+  marked as sparring zones on certain occasions.
+- Tabs in the foldersconfig.txt file won't break it anymore.
+- Altering the foldersconfig.txt file via RC will now correctly set the
+  new configuration without requiring the server to be restarted.
+- Fixed some bugs in the account searching code that could potentially
+  return incorrect results.
+- The default ganis, swords, and shields will now properly be prevented
+  from being sent to clients.
+- Spaces in the 'Conditions' field when searching for accounts won't
+  break the search anymore.
+- Fixed a level loading bug dealing with the word 'join' that was
+  inadvertently found by HandupOnYoHip.
+- The "maps" option in serveroptions.txt works properly again.  Set it
+  to your bigmap.txt type level list to view players moving and talking
+  in adjacent levels.
+- Fixed the annoying bug where when you logged into the server your
+  head on the minimap would be "linked" to the head of the first person
+  on the server.  When that happened, changing your head would also
+  change the look of their head on the minimap.
+- Fixed a nasty update level bug.
+- Flowers should properly animate when you join a cached level.
+- Horse fire attacks should now be sent to everyone in levels adjacent
+  to you.
+- Fixed the tokenizing code so blank lines are no longer eaten in RC.
+- Fixed a bug where RCs who didn't have the right to alter the
+  restricted options in serveroptions.txt could in fact end up altering
+  half of them.  Also improved the code involving the loading/setting
+  of server options through RC by limited rights admins.
+- Fixed the problem where the bomb would come back if you set a
+  player's props through RC.
+- Fixed the Linux Makefile to correctly compile with debugging info.
+- Fixed a security vulnerability related to the File Browser.
+- Fixed a nasty bug regarding the gserver network code.  It should no
+  longer discard half-complete packets.  It will now properly keep the
+  packet in memory until the rest arrives.  This should fix a bunch of
+  the crazy packet and attribute problems experienced by people with
+  slow Internet connections.
+- Fixed NPCs disappearing when calling update level while two or more
+  people were in the level.
+
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 56
+--------------------------------------------
+
+Maintenance:
+- Compilable on PSP :)
+- Fixed the tiling errors in the packaged onlinestartlocal.nw.
+- Re-worked most of the console messages.
+- The log files now display everything on one line.
+- Re-worked the RC messages again to send to all RC's and to display
+  the account name of the player who sent the packet.
+- Attempts by player's to issue RC commands through packet forgery are
+  now logged in rclog.txt.  Do a search for [Hack] to view all
+  access attempts.
+- Added the images folder to world/ to fit with the current
+  foldersconfig.txt file.
+- Removed CBuffer::findIn().  Wasn't needed after all.  :x
+
+Additions:
+- Added the new serveroptions.txt option "detailedconsole".  It is a
+  boolean value that defaults to false.  If true, it will display the
+  old detailed console messages.
+- Added the new serveroptions.txt option "underconstruction".  It is a
+  boolean value that defaults to false.  If true, the server will be
+  flagged as Under Construction, which means it will not show up in the
+  player list.  To access the server, you have to type in the name
+  of the server in the edit box below the server list and press Enter.
+- Added the new serveroptions.txt option "baddydropitems".  It is a
+  boolean value that defaults to false.  If true, baddies will drop
+  items when killed.
+- The GServer now prints less console messages and in a less detailed
+  format.  It also prints the IP address of all incoming connections.
+- Folder Configuration is now implemented.  See the foldersconfig.txt
+  file for a list of default options.  The folder configuration is
+  mainly used to restrict files to certain directories, like
+  restricting head images to world/heads/*.  This will prevent players
+  from being able to do odd things like 'sethead pics1.png'.
+  PLEASE MAKE SURE YOUR FOLDERSCONFIG.TXT FILE IS CORRECT BEFORE YOU
+  SEEK HELP!  IF YOUR FOLDERSCONFIG.TXT FILE IS INCORRECT, IT WILL
+  CAUSE MANY THINGS TO TO BREAK.
+- The gserver will no longer send any of the default sword, shield, or
+  gani files to the client if the files on the gserver differ.  This
+  will prevent problems like the gserver sending the broken sword.gani
+  file with the wrong hat position to clients who connect.
+- Added RC command /updatelevelall.  It updates all loaded levels on
+  the gserver.
+
+Fixes:
+- More NPC props fixes.
+- Fixed Private Messages.
+- Made NPC's default to looking down.
+- Server should now correctly disconnect players who send bad packets.
+- Players who don't have the Change Staff Accounts right but do have
+  the ability to alter attributes can now correctly set player
+  attributes.
+- If a player fails to warp to a new level and fails to warp back to
+  his previous level, the gserver will now attempt to warp the player
+  to the unstick me level before disconnecting the player.
+- Fixed a bug that would crash the gserver when opening the FileBrowser
+  after certain actions.
+- Overhauled the time modification system.  Might fix some problems.
+- Fixed the baddy verse that activates when a baddy hurts a player.
+- When a player changes his nickname or head, it is now sent properly
+  to everybody on the server.  This fixes the problem where player's
+  heads weren't updating on the mini-map.
+- The GServer won't send dead baddies to the client anymore.  This
+  fixes the problem where a player would enter a level full of dead
+  baddies, load them, then immediately watch them all die.
+- The PLANGUAGE player property is now sent when requested.
+
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 55
+--------------------------------------------
+
+Maintenance:
+- Re-did all of the RC messages to be less Engrishy and more consistent.
+- Added a new function: CBuffer::findIn().  It basically calls strstr()
+  on the data in the CBuffer class.  Could be useful for GServer
+  modders.
+
+Additions:
+- Players who have the "Change Staff Accounts" right can now evade local
+  server bans.  Remember to remove that right from any admin you ban.
+- The "Get Accounts List" dialog in RC is now fully implemented again.
+  Both the "Account name description" and the "Conditions" field accept
+  wildcard characters.  The wildcard characters %, *, and ? are
+  supported, with % acting the same as *.  The "Conditions" field
+  searches the account .txt files for matches.  "swordp=2" will search
+  for everybody who's "swordp" value in their account .txt file is equal
+  to 2.  "level=rha_*,ap=51" will search for the level value that starts
+  with "rha_" and whose ap value is 51.  "ap=51,flag=System_Hearts=1"
+  will search for players whose ap is 51 and who have the flag
+  "System_Hearts=1" in their account.  View the accounts .txt file for
+  all the values.
+- RCs who have the "change rights" ability can no longer give rights
+  that they themselves do not have.
+- When opening the FileBrowser on RC, it should now properly read the
+  LastFolder line in your account and open that directory.  It used to
+  just open the first directory in your folder rights.
+
+Fixes:
+- Some more work on NPC props.  The gserver should now correctly save
+  NPC prop changes and correctly save the time the player left the
+  level.  This results in NPCs that work better and faster level load
+  times; however, the "created" flag is still broken so you should still
+  be working around that.  Make use of the isleader flag in your
+  "playerenters" code section workarounds for changing certain npc props
+  (like the NPC gani) for maximum compatibility.
+- Fixed client login props.  I don't know if there will be any
+  noticeable difference or not, but it is fixed.
+- Fixed player heart formatting in the player profile menu.  Instead of
+  showing 3.00, it will now show 3.  Instead of 2.50, it now shows 2.5.
+- If the player attempts to log into a non-existent level, they will now
+  be sent correctly to the unstick me level.
+- Chatting doesn't reset the unstick me timer anymore.
+- Logging in to a non-existent level should now properly send the player
+  to the unstick me level.
+- When a player logs into RC, the "Players" field in RC is now correctly
+  incremented, RC announces to the player that they logged in, and the
+  player now correctly appears in the Player List.
+- Modified the GServer init message to say Build instead of Revision
+  since we aren't using the Revision nomenclature anymore.
+- Fixed an issue where attempting to log in twice on the same account
+  would permanently add 1 to the player count.
+- Re-enabled kicking for bad packets.
+
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 54
+--------------------------------------------
+
+Maintenance:
+- Replaced all 4-character spaces with actual tabs in all the source files.
+- Improved Visual Studio compatibility by fixing up some headers and
+  removing some includes.
+
+Additions:
+- Push-pull blocks can now be clientside.  The serveroptions.txt variable
+  clientsidepushpull turns this behavior on and off.  It is a boolean
+  value, so adding clientsidepushpull = false to your serveroptions.txt
+  will allow all players to see push-pull blocks move.
+- NPCs now send gani attributes 6-9.  The client doesn't send props 10-30
+  so it is impossible to use those, for now.
+
+Fixes:
+- Fixed the 'destroy' command not destroying NPCs.  Don't ask how.
+  It isn't pretty.
+- Changed it so only the people who have the "Change staff accounts" right
+  are able to edit the default account.
+- Fixed NPC props.  Sorta.  Shields don't disappear and hopefully other
+  wonky stuff won't happen.  We'll see.
+- The join command will now work in .graal levels and in putnpc npc code.
+- Some other stuff that may or may not fix current/future bugs.  D:
+
+
+--------------------------------------------
+New features/bug fixes in v2.171 build 53
+--------------------------------------------
+
+Maintenance:
+- Fixed up Linux compile problems and fixed some source issues to improve
+  compatibility.
+- Potentially improved stability.
+- Some formatting and default values were assaulted in an effort to keep
+  myself sane.
+
+Additions:
+- Removed newaccount.ini.  Instead, defaultaccount.txt inside the accounts
+  folder is used to specify the default account attributes of new players.
+  Because of this, you can now change the default account attributes a player
+  starts with through RC (flags, weapons, start level, etc.)  Just modify the
+  account named "defaultaccount" through the accounts list.
+- Added new server option, "defaultweapons".  It is a boolean value that
+  defaults to "true".  If false, it will prevent the client from obtaining any
+  of the default weapons like bow, fireblast, and nukeshot.
+
+Fixes:
+- Thanks to the pure oozing awesomeness of Joey, who is way more awesome than
+  myself (who spent countless hours only to fail), the problem where the Bomb
+  npc loads no matter what was solved in a matter of minutes.  D:
+- Changed "horsetime" to "horselifetime" in the settings loading code to
+  correctly reflect the name in serveroptions.txt and fixed a crash that could
+  result from it.
+- Fixed the loading and saving of NPC weapons with no image to weapons.txt.
+  This fixes problems where hidden system npcs with no image were not being
+  reloaded properly when the gserver was restarted.
+- When a client grabs an updated weapon while an old version exists locally,
+  they will correctly receive the new version.
+- Updating the server flags through RC should now send that change to all
+  clients.
+- Fixed offline attribute editing by RC's.  It now won't erase the player's
+  weapon list.
+- Altering a player's flags and weapons through RC now properly sends the
+  changes to the player.
+- When you log into RC, it now uses the specified nickname instead of your
+  account name.
+- Fixed RC player folder rights saving.  It was previously limited to 255
+  characters worth of directories.
+- Fixed a bug where RC would freeze if you tried to download a file that ended
+  in a newline character.
+- Possibly fixed a bug where you could randomly disconnect while uploading
+  large files through RC.
+- Began work on improving support for the 'join' command.  It now dumps the
+  joined code to the end of the file and leaves a semi-colon in place of the
+  join command.  It also won't be executed from the inside of a multi-line
+  comment anymore.
+
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 52
+-------------------------------------------
+
+Additions:
+- New Server Options:
+    cheatwindows = array [ list of names to search for in active windows ]
+    cheatwindowsban = bool [ ban if caught above, else disconnect - logged ]
+    cheatwindowstime = int [ time in seconds when client sends cheat windows ]
+- New Word Filter - refer to docu_wordfilter.txt
+- Profiles now work, and has been globalized.
+
+Fixes:
+- AP Counter resets after killing a player.
+- AP should no longer update if there was no change. (ex: kill someone w/ <20 ap)
+- Bandwidth usage should be lower -- no longer sends the entire playerlist every 10 seconds.
+- Chests should now properly save.
+- No longer disconnected from no-movement if you are talking.
+- Sword power should now properly save.
+- Level warping should load new levels. (warpto/summon)
+- Level warping shouldn't double-warp.
+
+RC Additions:
+- /find FILE_NAME (allows wildcard - *)
+
+RC Fixes:
+- RC Rights should properly work now -- also reloads rights on login, and prevents the ability to go beyond the gserver folder.
+- Server Option: maxnomovement should properly work now when disconnecting from no-movement.
+- Set own attributes, and set own attributes properly work now.
+- Viewing files in wordpad should properly show new lines now.
+
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 51
+-------------------------------------------
+
+Additions:
+- AP Improvements: Can now set the ap intervals between 20,40,60,80,100 ap. (via server options)
+- Gani Attributes (30 available, instead of the 5) -- thanks to beholder
+- New Server Options:
+    aptime(0-4) = integer [ time to gain an ap - intervals of 20 ]
+    dontaddserverflags = bool [ allows disabling adding of server flags ]
+    dontchangekills = bool [ allows disabling playerkills from increasing ]
+    setbodyallowed = bool [ allows disabling body changing ]
+    setheadallowed = bool [ allows disabling head changing ]
+    setswordallowed = bool [ allows disabling sword changing ]
+    setshieldallowed = bool [ allows disabling shield changing ]
+    warptoforall = bool [ allows none-admins to use warpto ]
+
+Fixes:
+- Level Warping has been shortened a tiny-bit.. made the exe 0.5 kb shorter =D
+- Props now save, will no longer lose things like hats (#P1) etc..
+- Settings.ini has been dropped, it has been changed to serveroptions.txt.
+- SQLite has been dropped, accounts are now stored in text files under the directory 'accounts'. Uses the same format as graals account files (with a few additions -- should be easier to edit now too).
+
+RC Additions:
+- Admin Level has been dropped -- uses admin rights only now.
+- Folder Configuration (though currently useless) is editable live with immediate-changes.
+- Full FTP (download, upload, delete, move, and rename files -- currently does not allow rw */* etc.. )
+- Serveroptions now editable -- If you have the right 'changestaffaccounts' you see special variables for the listserver, else they are hidden. (advise keeping to the owner only)
+
+RC Fixes:
+- Admin Rights should work correclty now.
+- AP / Onlinetime is no longer gained while idling on rc.
+- Ban Reason / Comments are now seperated correctly.
+- Status Fixed -- when opening/closing playerlist it will now correctly show your status.
+- Totally redid the RC Commands -- use /help.
+
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 50
+-------------------------------------------
+
+Additions:
+- added 'setsleeves' and 'setshoes' to list of
+  built-in tailor commands.
+- GServer will get notified if the version is old
+  by listserver. Listserver automatically sends
+  the newest executable.
+
+Fixes:
+- RC will now create the proper filename for 
+  Guilds when using /addguild Guild_Name
+- Setstrings will delete properly now.
+
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 43
+-------------------------------------------
+
+Additions:
+- server now sends the playerlist to the
+  serverlist -- data can be used for other
+  things if wanted.
+- server now sends nickname changes to the
+  serverlist which will change your forum
+  name (not account)
+
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 31
+-------------------------------------------
+
+Fixes:
+- I'm proud to announce that the linux gserver
+  now works (and 100% at that)
+- Chest items now properly clip to the max
+  when you open them.
+
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 30
+-------------------------------------------
+
+Additions:
+- A global database of bodies, heads, shields,
+  and swords has been established. You will
+  be able to upload your heads to this global
+  database and will be able to use it on any
+  server using revision 30+. All global files
+  will be 'cached' on the server itself in
+  the worlds folder called 'globals'. There
+  will soon be a new organized method of 
+  doing this soon ( which will establish
+  the folder configuration )
+- AP Spawning:
+  AP < 20 -> 3 hearts
+  AP < 40 -> 5 hearts
+  Ap >= 40 -> full hearts
+
+Fixes:
+- Memory leak causing the serverlist to crash
+  should be fixed now. =)
+- RemoteControl attribute-editing should no
+  longer crash.
+
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 29
+-------------------------------------------
+
+Additions:
+- ability to have nick-specific guilds or
+  any-nick guilds. By default guilds are
+  NOT nick-specific. To set a guild
+  nick-specific, set the firstline as:
+  TYPE=NICK. For an example, check:
+  'guilds/guildExample.txt'
+- chat is limited to 220 characters, and
+  nick is limited to 200 characters.
+- level protection: When logging on, if your
+  level does not exist, you will be warped
+  to unstick me. If unstick me does not exist,
+  you will see the "Connecting" screen.
+- when setting your nick, it will now have you
+  wait 10 seconds before changing your nickname
+  again.
+- Staff commands like warpto, and summon, will
+  tell you if you're not authorized.
+
+Fixes:
+- accounts can now utilize spaces to log on
+  servers. The serverlist now uses the same
+  method of communicating as server->player.
+  ALL GSERVERS WILL BE REQUIRED TO UPDATE
+  OR THEY WONT BE ABLE TO CONNECT.
+- chat used to cause other props to be
+  'activated'. (example: you warp to a
+  non-existant level) This should no longer
+  happen anymore
+- flag string-arrays (setstring a,b,c,d,e;) now save
+  correctly, only thing is, all your current
+  flags will break when using this update,
+  sorry about that.
+- flags / weapons should be updated immediately
+  after changing players with the rc.
+- global guilds are now nickname-specific, also
+  fixed a bug with being able to set your nick
+  to any guild.
+- guilds now use the old prefix of guild for
+  the filename. Example: guildAccount_Name.txt
+- props now send the correct prop if it gets
+  changed after it recieves a prop. (ex. chat
+  now shows when it changes after processing)
+- toguild messages now display the toguild
+  icon.
+- you can no longer have extra spaces in the
+  front of your nickname or have no name. If
+  attempted, your nickname will be set to
+  'unknown'.
+
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 28
+-------------------------------------------
+
+Fixes:
+- ap shouldn't go below 0 anymore. sorry
+  about that.
+
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 27
+-------------------------------------------
+
+Fixes:
+ - Shield / Sword limit should now clip
+   correctly, sorry about that.
+
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 26
+-------------------------------------------
+
+Additions:
+- Merged several text files (jails, staffguilds, and statuslist) into a settings file.
+- All log files will now be saved in the new logs folder.
+- You can now get a copy of the current playerlist in the format of account,nickname,levelname,x,y,ap. Each account is seperated by a line, this file is updated every 10 seconds (same as serverflags.txt)
+
+- Added Profile Vars for custom profile fields in the server options. Format: Name:=VAR - Works for flags as well as several player variables
+- After 20 minutes of idling you will be disconnected, this can be disabled in the server options
+
+- New Server Options:
+  - allowedglobalguilds (string list) - list of global guilds that can bypass disabling global guilds.
+  - globalguilds (bool) - If true, allow global guilds
+  - jaillevels (string list) - jails.txt was moved into this setting.
+  - playerlisticons (string list) - statuslist.txt was moved into this setting.
+  - profilevars (string list) - a list of custom profile fields in the profile.
+  
+  - noexplosions (bool) - If true, disables explosions (only the creator of the explosion will see it)
+  
+  - apsystem (bool) - If true, enables the ap system.
+  - disconnectifnotmoved (bool) - If true, you will be disconnected for no movement every 20 minutes.
+  - heartlimit (int) - Max heart power, should always be an integer, unexpected results may happen if you use a float.
+  - shieldlimit (int) - Max shield power, should always be an integer, unexpected results may happen if you use a float.
+  - swordlimit (int) - Max sword power, should always be an integer, unexpected results may happen if you use a float.
+
+Fixes:
+ - Player hearts are now 'clipped' to the max hearts, when you log on, or when your playerhearts are changed from a client message.
+
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 25
+-------------------------------------------
+
+Additions:
+- You can now view the current guild members of a specific guild or your own guild by using the command 'showguild `guild`'. To show your own guild, just say 'showguild'.
+- You can now send messages to guild members by using 'toguild: `message`'
+- You can now view the current admins by using the command 'showadmins'
+
+Fixes:
+- When setting guilds, with the nickname being your account, a star is correctly placed in the front to indicate you're using your account (and to also move you to the top of the playerlist ;))
+- Levels shouldn't messup when tile[0,0] is placed on a straight line anymore. (entire line would be random tiles)
+
+
+-------------------------------------------
+New features/bug fixes in v2.17 revision 24
+-------------------------------------------
+
+Additions:
+- Ability to set the staff head in settings.ini
+- Ability to make your server staff only in settings.ini
+- A staff list in settings.ini, players must be defined to logon rc / staff-only in there.
+- Displays when a user logs on/off rc instead of just on.
+- RPG Window (F2) now shows.
+
+Fixes:
+- List Server processes faster (for global guilds mainly)
+- New World time no longer starts at 0, and it is also sent every 5 seconds instead of 60.
+- On logon, if your level can't be found, it sends you to unstick me.
+- Player X/Y no longer sets as an integer on login.
+- Sign codes no longer mess up.
+- When you set your nick and put many stars in front, all of them will be removed instead of just one.
