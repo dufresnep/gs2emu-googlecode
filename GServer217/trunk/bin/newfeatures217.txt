@@ -8,9 +8,10 @@ Additions:
   serverlist, introduced in build 64.  Useful for Linux systems, as
   the gserver can't reliably obtain the local IP address on Linux
   systems.
-- You can now change a server's name, description, language, etc
-  through RC and have the changes be instantly reflected on the
-  serverlist without requiring a server restart.
+- You can now change a server's name, description, language,
+  underconstruction status, etc through RC and have the changes be
+  instantly reflected on the serverlist without requiring a server
+  restart.
 - The gserver now supports .zelda levels.  Note, it only supports
   version 1.03.  If your .zelda file doesn't load, send it to me so I
   can add support for other versions.
@@ -24,8 +25,6 @@ Changes:
   people can't set their head to a global sword.
 - Server now sends timevar on connect.  Previously, you would have to
   wait a few seconds before timevar was sent to the client.
-- The gserver will now inform the listserver if the 'underconstruction'
-  server option is changed through RC.
 
 Fixes:
 - The gserver now retrieves the case-sensitive account name of the
@@ -42,7 +41,7 @@ Fixes:
 - Fixed a bug where the server would crash if a player issued a color
   changing command (setsleeves, setcoat, setbelt, etc) without
   specifying a color.
-- Baddies without any text versus will no longer say odd characters.
+- Baddies without any text verses will no longer say odd characters.
 
 
 --------------------------------------------
