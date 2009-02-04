@@ -661,7 +661,6 @@ bool TServer::msgSVI_SVRPING(CString& pPacket)
 //	{transaction}{CHAR \xa7}{password}
 bool TServer::msgSVI_VERIACC2(CString& pPacket)
 {
-#ifndef NO_MYSQL
 	// definitions
 	CString account = pPacket.readChars(pPacket.readGUChar());
 	CString password = pPacket.readChars(pPacket.readGUChar());
@@ -676,7 +675,6 @@ bool TServer::msgSVI_VERIACC2(CString& pPacket)
 		>> (char)account.length() << account
 		>> (short)id >> (char)type
 		<< getAccountError(ret));
-#endif
 
 	return true;
 }

@@ -32,9 +32,15 @@ void createPLFunctions()
 /*
 	Constructor - Deconstructor
 */
-TPlayer::TPlayer(CSocket *pSocket)
-: sock(pSocket), key(0), version(PLV_PRE22)
+TPlayer::TPlayer(CSocket *pSocket, bool pIsOld)
+: sock(pSocket), key(0), version(PLV_PRE22), isOld(pIsOld)
 {
+	// 1.41 doesn't request a server list.  It assumes the server will just send it out.
+	if (isOld)
+	{
+		if (getServerCount() > 0)
+			sendPacket(CString() >> (char)PLO_SVRLIST << getServerList(sock->tcpIp()), true);
+	}
 }
 
 TPlayer::~TPlayer()

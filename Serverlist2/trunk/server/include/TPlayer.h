@@ -43,7 +43,7 @@ class TPlayer
 {
 	public:
 		// constructor-destructor
-		TPlayer(CSocket *pSocket);
+		TPlayer(CSocket *pSocket, bool pIsOld = false);
 		~TPlayer();
 
 		// main loop
@@ -69,6 +69,7 @@ private:
 		codec out_codec;
 		int key;
 		int version;
+		bool isOld;
 };
 
 #endif // TPLAYER_H

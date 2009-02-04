@@ -61,6 +61,7 @@ enum // Socket Type
 {
 	SOCK_PLAYER			= 0,
 	SOCK_SERVER			= 1,
+	SOCK_PLAYEROLD		= 2,
 };
 
 enum // Account Status

@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 	filesystem[4].addDir("global/shields");
 
 	// Definitions
-	CSocket playerSock, serverSock;
+	CSocket playerSock, playerSockOld, serverSock;
 	playerList.clear();
 	serverList.clear();
 
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 	serverSock.setOptions( SOCKET_OPTION_NONBLOCKING );
 	serverSock.setDescription( "serverSock" );
 	CString empty;
-	if ( serverSock.init( empty, settings->getStr("gserverport") ) )
+	if ( serverSock.init( empty, settings->getStr("gserverPort") ) )
 	{
 		serverlog.out( "[Error] Could not initialize sockets.\n" );
 		return ERR_LISTEN;
@@ -91,14 +91,25 @@ int main(int argc, char *argv[])
 	playerSock.setProtocol( SOCKET_PROTOCOL_TCP );
 	playerSock.setOptions( SOCKET_OPTION_NONBLOCKING );
 	playerSock.setDescription( "playerSock" );
-	if ( playerSock.init( empty, settings->getStr("clientport") ) )
+	if ( playerSock.init( empty, settings->getStr("clientPort") ) )
+	{
+		serverlog.out( "[Error] Could not initialize sockets.\n" );
+		return ERR_LISTEN;
+	}
+
+	// Player sock.
+	playerSockOld.setType( SOCKET_TYPE_SERVER );
+	playerSockOld.setProtocol( SOCKET_PROTOCOL_TCP );
+	playerSockOld.setOptions( SOCKET_OPTION_NONBLOCKING );
+	playerSockOld.setDescription( "playerSockOld" );
+	if ( playerSockOld.init( empty, settings->getStr("clientPortOld") ) )
 	{
 		serverlog.out( "[Error] Could not initialize sockets.\n" );
 		return ERR_LISTEN;
 	}
 
 	// Connect sockets.
-	if ( serverSock.connect() || playerSock.connect() )
+	if ( serverSock.connect() || playerSock.connect() || playerSockOld.connect() )
 	{
 		serverlog.out( "[Error] Could not connect sockets.\n" );
 		return ERR_SOCKETS;
@@ -146,6 +157,7 @@ int main(int argc, char *argv[])
 
 		// Accept New Connections
 		acceptSock(playerSock, SOCK_PLAYER);
+		acceptSock(playerSockOld, SOCK_PLAYEROLD);
 		acceptSock(serverSock, SOCK_SERVER);
 
 		// Player Sockets
@@ -168,7 +180,7 @@ int main(int argc, char *argv[])
 			TServer* server = (TServer*)*iter;
 			if ((int)server->getLastData() >= 300 || server->doMain() == false)
 			{
-				serverlog.out("Server disconnected: %s\n", server->getName().text());
+				serverlog.out(CString() << "Server disconnected: " << server->getName() << "\n");
 				server->sendCompress();
 				delete server;
 				iter = serverList.erase( iter );
@@ -228,7 +240,7 @@ void acceptSock(CSocket& pSocket, int pType)
 
 	//newSock->setOptions( SOCKET_OPTION_NONBLOCKING );
 	serverlog.out(CString() << "New Connection: " << CString(newSock->tcpIp()) << " -> " << ((pType == SOCK_PLAYER) ? "Player" : "Server") << "\n");
-	(pType == SOCK_PLAYER ? playerList.push_back(new TPlayer(newSock)) : serverList.push_back(new TServer(newSock)));
+	(pType == SOCK_PLAYER ? playerList.push_back(new TPlayer(newSock, (pType == SOCK_PLAYEROLD ? true : false))) : serverList.push_back(new TServer(newSock)));
 }
 
 /*
