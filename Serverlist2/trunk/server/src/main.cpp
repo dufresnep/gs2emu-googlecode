@@ -240,7 +240,9 @@ void acceptSock(CSocket& pSocket, int pType)
 
 	//newSock->setOptions( SOCKET_OPTION_NONBLOCKING );
 	serverlog.out(CString() << "New Connection: " << CString(newSock->tcpIp()) << " -> " << ((pType == SOCK_PLAYER) ? "Player" : "Server") << "\n");
-	(pType == SOCK_PLAYER ? playerList.push_back(new TPlayer(newSock, (pType == SOCK_PLAYEROLD ? true : false))) : serverList.push_back(new TServer(newSock)));
+	if (pType == SOCK_PLAYER || pType == SOCK_PLAYEROLD)
+		playerList.push_back(new TPlayer(newSock, (pType == SOCK_PLAYEROLD ? true : false)));
+	else serverList.push_back(new TServer(newSock));
 }
 
 /*
