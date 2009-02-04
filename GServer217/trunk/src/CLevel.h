@@ -44,6 +44,7 @@ class CLevel
 
 	bool loadNW(CString& pFileName);
 	bool loadGraal(CString& pFileName);
+	bool loadZelda(CString& pFileName);
 	void loadTiles(CPacket& levelData, CString& pVersion);
 	void loadLinks(CPacket& levelData);
 	void loadBaddies(CPacket& levelData);

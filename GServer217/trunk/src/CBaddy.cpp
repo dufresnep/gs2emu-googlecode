@@ -63,6 +63,7 @@ CPacket CBaddy::getProperty(int pId)
 			int verseId = pId-BADDYVERSE1;
 			if(verseId < verses.count())
 				retVal << (char)verses[verseId].length() << verses[verseId];
+			else retVal << (char)0;
 		}
 		break;
 	}

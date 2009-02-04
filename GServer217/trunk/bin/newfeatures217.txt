@@ -11,6 +11,9 @@ Additions:
 - You can now change a server's name, description, language, etc
   through RC and have the changes be instantly reflected on the
   serverlist without requiring a server restart.
+- The gserver now supports .zelda levels.  Note, it only supports
+  version 1.03.  If your .zelda file doesn't load, send it to me so I
+  can add support for other versions.
 
 Changes:
 - Global files now save to their appropriate folder in the global
@@ -39,6 +42,7 @@ Fixes:
 - Fixed a bug where the server would crash if a player issued a color
   changing command (setsleeves, setcoat, setbelt, etc) without
   specifying a color.
+- Baddies without any text versus will no longer say odd characters.
 
 
 --------------------------------------------

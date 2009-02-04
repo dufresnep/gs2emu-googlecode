@@ -32,13 +32,20 @@ CLevel::CLevel(CString& pFileName)
 	saveCounter = 5;
 	memset(tiles, 0, sizeof(tiles));
 
-	if(pFileName.find(".nw") >= 0)
+	CString ext = getFileExtension(pFileName);
+	if(ext == ".nw")
 	{
 		if(!loadNW(pFileName))
 			return;
-	} else
+	}
+	else if (ext == ".graal")
 	{
 		if(!loadGraal(pFileName))
+			return;
+	}
+	else
+	{
+		if (!loadZelda(pFileName))
 			return;
 	}
 
@@ -342,6 +349,55 @@ bool CLevel::loadGraal(CString& pFileName)
 	return true;
 }
 
+bool CLevel::loadZelda(CString& pFileName)
+{
+	CPacket levelData;
+	CString version;
+	char* dataFile = getDataFile(pFileName.text());
+	if(!strlen(dataFile))
+		return false;
+	if(!levelData.load(dataFile))
+		return false;
+	fileName = pFileName;
+	modTime = getFileModTime(dataFile);
+	version = levelData.readChars(8);
+
+	// Some clients will actually save .zelda levels as .graal.
+	// If this is the case, parse it through the .graal loader.
+	if (version.copy(0, 2) == "GR")
+		return loadGraal(pFileName);
+
+	bool v0 = (version == "unknown");
+	bool v1 = (version == "unknown");
+	bool v2 = (version == "unknown");
+	bool v3 = (version == "Z3-V1.03");
+
+	// If we encountered an unknown version, ask the user to send it in so we can add support for it.
+	if (!v3)
+	{
+		errorOut("errorlog.txt", CString() << "Level " << fileName << " is of version " << version << ".  Only version Z3-V1.03 is supported.  Please send us the level so we may add support for it.", true);
+		return false;
+	}
+
+	loadTiles(levelData, version);
+	loadLinks(levelData);
+	loadBaddies(levelData);
+	loadSigns(levelData);
+
+	//Find our map id
+	for(int i = 0; i < CMap::mapList.count(); i++)
+	{
+		CMap* m = (CMap*)CMap::mapList[i];
+		if((levelIndex = m->getLevelpos(pFileName)) >= 0)
+		{
+			map = m;
+			break;
+		}
+	}
+
+	return true;
+}
+
 void CLevel::loadTiles(CPacket& levelData, CString& pVersion)
 {
 	int boardindex = 0;
@@ -465,6 +521,11 @@ void CLevel::loadBaddies(CPacket& levelData)
 		int x = line.readByte();
 		int y = line.readByte();
 		char type = line.readByte();
+
+		// .zelda levels end the baddy section with a blank baddy.
+		if (x == -1 || y == -1 || type == -1)
+			break;
+
 		CBaddy* baddy = new CBaddy(x, y, type);
 		baddy->id = createBaddyId(baddy);
 		baddy->loadVerses(line.readChars(line.bytesLeft()));
@@ -677,13 +738,20 @@ void CLevel::updateLevel(CString& pFileName)
 		return;
 
 	level->reset();
-	if(getFileExtension(pFileName) == ".nw")
+	CString ext = getFileExtension(pFileName);
+	if(ext == ".nw")
 	{
 		if(!level->loadNW(pFileName))
 			return;
-	} else
+	}
+	else if (ext == ".graal")
 	{
 		if(!level->loadGraal(pFileName))
+			return;
+	}
+	else
+	{
+		if (!level->loadZelda(pFileName))
 			return;
 	}
 	CList playerTemp;

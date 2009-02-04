@@ -22,6 +22,7 @@ file    *.txt
 file    *.gmap
 level   *.graal
 level   *.nw
+level   *.zelda
 level   *.gmap
 file    global/*
 head    global/heads/*
