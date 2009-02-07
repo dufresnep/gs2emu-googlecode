@@ -9,6 +9,10 @@
 #include "CSettings.h"
 #include "md5.h"
 
+#if !(defined(WIN32) || defined(WIN64))
+#define Sleep sleep
+#endif
+
 // Function pointer for signal handling.
 typedef void (*sighandler_t)(int);
 
