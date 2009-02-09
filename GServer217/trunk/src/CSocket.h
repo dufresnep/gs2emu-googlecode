@@ -46,6 +46,8 @@
 	typedef unsigned int SOCKET;
 #endif
 
+//#define WIN2000_BUILD
+
 //! Properties to pass to the socket.
 struct sock_properties
 {
@@ -55,7 +57,11 @@ struct sock_properties
 	int options;
 	int state;
 	char description[ SOCKET_MAX_DESCRIPTION ];
+#ifdef WIN2000_BUILD
+	sockaddr_in address;
+#else
 	sockaddr_storage address;
+#endif
 };
 
 //! Socket class.

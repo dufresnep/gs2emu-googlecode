@@ -108,12 +108,38 @@ CSocket::~CSocket()
 
 int CSocket::init( CString& host, CString& port )
 {
-	struct addrinfo hints;
-	struct addrinfo* res;
-
 	// Make sure a TCP socket is disconnected.
 	if ( properties.protocol == SOCKET_PROTOCOL_TCP && properties.state != SOCKET_STATE_DISCONNECTED )
 		return SOCKET_ALREADY_CONNECTED;
+
+#ifdef WIN2000_BUILD
+	struct hostent* he;
+
+	properties.address.sin_family = AF_INET;
+	properties.address.sin_port = htons(atoi(port.text()));
+
+	if (host.length() != 0)
+	{
+		he = (struct hostent *)gethostbyname(host.text());
+		if (!he)
+		{
+			errorOut("errorlog.txt", CString() << "[CSocket::init] gethostbyname() returned 0.");
+			return SOCKET_HOST_UNKNOWN;
+		}
+
+		if (he->h_length != 4 && he->h_length != 8)
+		{
+			errorOut("errorlog.txt", CString() << "[CSocket::init] gethostbyname() returned an invalid address.");
+			return SOCKET_HOST_UNKNOWN;
+		}
+
+		memcpy(&properties.address.sin_addr, he->h_addr_list[0], he->h_length);
+	}
+	memset(properties.address.sin_zero, 0, 8);
+	return 0;
+#else
+	struct addrinfo hints;
+	struct addrinfo* res;
 
 	// Start creating the hints.
 	memset( (struct sockaddr_storage*)&properties.address, 0, sizeof(struct sockaddr_storage) );
@@ -144,6 +170,7 @@ int CSocket::init( CString& host, CString& port )
 		memcpy( (void*)&properties.address, res->ai_addr, res->ai_addrlen );
 
 	return 0;
+#endif
 }
 
 void CSocket::destroy()
