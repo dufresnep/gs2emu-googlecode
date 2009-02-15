@@ -73,8 +73,8 @@ bool TPlayer::doMain()
 	while (sockBuffer.length() >= 2)
 	{
 		// packet length
-		unsigned int len = sockBuffer.readShort();
-		if (len > (unsigned int)sockBuffer.length()-2)
+		unsigned short len = (unsigned short)sockBuffer.readShort();
+		if ((unsigned int)len > (unsigned int)sockBuffer.length()-2)
 			break;
 
 		// version 2.2+
