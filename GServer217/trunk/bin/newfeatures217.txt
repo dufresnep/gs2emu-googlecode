@@ -2,6 +2,9 @@
 New features/bug fixes in v2.171 build 66
 --------------------------------------------
 
+Additions:
+- Added support for .zelda version 1.04.
+
 Fixes:
 - Fixed bugs related to uploading files through the File Browser.
 

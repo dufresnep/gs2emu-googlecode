@@ -371,11 +371,12 @@ bool CLevel::loadZelda(CString& pFileName)
 	bool v1 = (version == "unknown");
 	bool v2 = (version == "unknown");
 	bool v3 = (version == "Z3-V1.03");
+	bool v4 = (version == "Z3-V1.04");
 
 	// If we encountered an unknown version, ask the user to send it in so we can add support for it.
-	if (!v3)
+	if (!v3 && !v4)
 	{
-		errorOut("errorlog.txt", CString() << "Level " << fileName << " is of version " << version << ".  Only version Z3-V1.03 is supported.  Please send us the level so we may add support for it.", true);
+		errorOut("errorlog.txt", CString() << "Level " << fileName << " is of version " << version << ".  That version is unknown.  Please send us the level so we may add support for it.", true);
 		return false;
 	}
 
