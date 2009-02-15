@@ -2306,9 +2306,7 @@ CPacket CPlayer::setProps(CPacket& pProps, bool pForward, CPlayer* rc)
 			case HORSEGIF:
 			{
 				len = (unsigned char)pProps.readByte1();
-				CString temp( pProps.readChars(len) );
-				if ( noFoldersConfig || isValidFile( temp, -1 ) )
-					horseImage = temp;
+				horseImage = pProps.readChars(len);
 				//TO DO: add hack check
 			}
 			break;
