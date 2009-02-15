@@ -4,6 +4,9 @@
 #include "CServerBot.h"
 
 #ifdef WIN32
+#ifndef WIN32_LEAN_AND_MEAN		// For windows.h in zlib.h
+	#define WIN32_LEAN_AND_MEAN
+#endif
 	#include "zlib.h"
 #endif
 

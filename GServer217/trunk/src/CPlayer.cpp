@@ -41,7 +41,7 @@ pt2func CPlayer::msgFuncs[] = {
 			&CPlayer::msgSLISTPROCESSES,&CPlayer::msgEMPTY45,
 			&CPlayer::msgEMPTY46,&CPlayer::msgEMPTY47,
 			&CPlayer::msgEMPTY48,&CPlayer::msgEMPTY49,
-			&CPlayer::msgEMPTY50,&CPlayer::msgSWANTSOPTIONS,
+			&CPlayer::msgRAWDATA,&CPlayer::msgSWANTSOPTIONS,
 			&CPlayer::msgSSETOPTIONS,&CPlayer::msgWANTRCFOLDERS,
 			&CPlayer::msgSETRCFOLDERS,&CPlayer::msgSETRESPAWN,
 			&CPlayer::msgSETHORSELIFE,&CPlayer::msgSETAPINCRTIME,
@@ -180,7 +180,7 @@ CPlayer::CPlayer(CSocket* pSocket)
 id(-1), packCount(0), udpPort(0), lastNick(0), statusMsg(0),
 firstPacket(true), firstLevel(true), deleteMe(false), allowBomb(false),
 level(NOLEVEL), playerSock(pSocket),
-carryNpcId(0), carryNpcThrown(false)
+carryNpcId(0), carryNpcThrown(false), nextIsRaw(false), rawPacketSize(0)
 {
 	lastData = lastChat = lastSave = loginTime = getSysTime();
 	lastMessage = lastMovement = getTime();
@@ -248,7 +248,7 @@ CPlayer::~CPlayer()
 
 void CPlayer::main()
 {
-	char packets[65536];
+	char packets[0xFFFFF];
 
 	// Get data.
 	if ( playerSock->getData() == -1 )
@@ -275,10 +275,10 @@ void CPlayer::main()
 	{
 		lastData = time(NULL);
 		int error, cLen = sizeof(packets);
-		unsigned int len = (((unsigned int)(unsigned char)packetBuffer[0]) << 8) + (unsigned int)(unsigned char)packetBuffer[1];
+		unsigned short len = (((unsigned short)(unsigned char)packetBuffer[0]) << 8) + (unsigned short)(unsigned char)packetBuffer[1];
 
 		// Packet might not be fully in yet.
-		if ( len > (unsigned int)packetBuffer.length() - 2 )
+		if ( (unsigned int)len > (unsigned int)packetBuffer.length() - 2 )
 		{
 			//errorOut( "debuglog.txt", CString() << accountName << ": Packet not fully in yet?", true );
 			break;
@@ -306,19 +306,12 @@ void CPlayer::main()
 				}
 				else
 				{
-					//parsePacket(CPacket() << lines.readString("\n"));
-					int id = lines.readByte1();
-					lines.setRead(lines.getRead() - 1);
-
-					if (type == CLIENTRC && id == DFILEFTPUP)
+					if (nextIsRaw)
 					{
-						parsePacket(CPacket() << lines.copy(lines.getRead()));
-						lines.setRead(lines.length());
+						nextIsRaw = false;
+						parsePacket(CPacket() << lines.readChars(rawPacketSize));
 					}
-					else
-					{
-						parsePacket(CPacket() << lines.readString("\n"));
-					}
+					else parsePacket(CPacket() << lines.readString("\n"));
 				}
 
 				if(deleteMe)
@@ -328,9 +321,22 @@ void CPlayer::main()
 		}
 		else
 		{
-			errorOut("errorlog.txt", CString() << "Decompression error for player " << accountName);
+			CString reason;
+			switch (error)
+			{
+				case Z_MEM_ERROR:
+					reason = "Not enough memory.";
+					break;
+				case Z_BUF_ERROR:
+					reason = "Buffer not large enough to decompress.";
+					break;
+				case Z_DATA_ERROR:
+					reason = "Input data corrupted.";
+					break;
+			}
+			errorOut("errorlog.txt", CString() << "Decompression error for player " << accountName << ": " << reason);
 			deleteMe = true;
-			sendPacket(CPacket() << (char)DISMESSAGE << "Decompression error\n");
+			sendPacket(CPacket() << (char)DISMESSAGE << "Decompression error: " << reason << "\n");
 			compressAndSend();
 			return;
 		}
@@ -3631,10 +3637,10 @@ void CPlayer::msgEMPTY49(CPacket& pPacket)
 	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY49:\r\n" << pPacket.text(), false );
 }
 
-void CPlayer::msgEMPTY50(CPacket& pPacket)
+void CPlayer::msgRAWDATA(CPacket& pPacket)
 {
-	CPlayer::sendGlobally( CPacket() << (char)SRPGWINDOW << "\"EMPTY50 was just sent.\"" );
-	errorOut( "debuglog.txt", CString() << accountName << " sent packet EMPTY50:\r\n" << pPacket.text(), false );
+	nextIsRaw = true;
+	rawPacketSize = pPacket.readByte3();
 }
 
 //RC

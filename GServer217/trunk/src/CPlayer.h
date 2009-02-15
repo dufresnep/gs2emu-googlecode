@@ -176,7 +176,7 @@ enum {
 	SSTAFFGUILDS,	  // 47
 	EMPTY48,	  // 48
 	EMPTY49,	  // 49
-	EMPTY50,	  // 50
+	RAWDATA,	  // 50
 	SWANTSOPTIONS, // 51
 	SSETOPTIONS,  // 52
 	WANTRCFOLDERS,// 53
@@ -368,6 +368,8 @@ class CPlayer : public CAccount
 		#ifdef GSERV22
 			codec mcodec;
 		#endif
+		bool nextIsRaw;
+		int rawPacketSize;
 
 		CBuffer packetBuffer;
 
@@ -457,7 +459,7 @@ class CPlayer : public CAccount
 		void msgEMPTY47(CPacket&);
 		void msgEMPTY48(CPacket&);
 		void msgEMPTY49(CPacket&);
-		void msgEMPTY50(CPacket&);
+		void msgRAWDATA(CPacket&);
 		void msgSWANTSOPTIONS(CPacket&);
 		void msgSSETOPTIONS(CPacket&);
 		void msgWANTRCFOLDERS(CPacket&);

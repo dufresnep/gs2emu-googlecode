@@ -1,4 +1,12 @@
 --------------------------------------------
+New features/bug fixes in v2.171 build 66
+--------------------------------------------
+
+Fixes:
+- Fixed bugs related to uploading files through the File Browser.
+
+
+--------------------------------------------
 New features/bug fixes in v2.171 build 65
 --------------------------------------------
 
