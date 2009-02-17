@@ -248,7 +248,7 @@ CPlayer::~CPlayer()
 
 void CPlayer::main()
 {
-	char packets[0xFFFFF];
+	char packets[65536];
 
 	// Get data.
 	if ( playerSock->getData() == -1 )
@@ -308,8 +308,10 @@ void CPlayer::main()
 				{
 					if (nextIsRaw)
 					{
+						CPacket pack;
+						pack.writeBytes(lines.readChars(rawPacketSize), rawPacketSize);
 						nextIsRaw = false;
-						parsePacket(CPacket() << lines.readChars(rawPacketSize));
+						parsePacket(pack);
 					}
 					else parsePacket(CPacket() << lines.readString("\n"));
 				}
@@ -3639,6 +3641,7 @@ void CPlayer::msgRAWDATA(CPacket& pPacket)
 {
 	nextIsRaw = true;
 	rawPacketSize = pPacket.readByte3();
+	printf("rawpacket: %d\n", rawPacketSize);
 }
 
 //RC
