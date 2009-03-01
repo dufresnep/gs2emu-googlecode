@@ -3641,7 +3641,6 @@ void CPlayer::msgRAWDATA(CPacket& pPacket)
 {
 	nextIsRaw = true;
 	rawPacketSize = pPacket.readByte3();
-	printf("rawpacket: %d\n", rawPacketSize);
 }
 
 //RC
