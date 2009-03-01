@@ -55,7 +55,12 @@ CPacket CNpc::getPropertyList(time_t newTime)
 	for ( int i = 0; i < npcpropcount; i++ )
 	{
 		if ( modTime[i] >= newTime && modTime[i] > 0 )
-			retVal << (char)i << getProperty(i);
+		{
+			if (i == VISFLAGS && newTime == 0)
+				retVal << (char)i << (char)1;
+			else
+				retVal << (char)i << getProperty(i);
+		}
 		if (modTime[NPCANI] == 0 && image == "#c#")
 			retVal << (char)NPCANI << (char)4 << "idle";
 	}
