@@ -4,10 +4,17 @@ New features/bug fixes in v2.171 build 66
 
 Additions:
 - Added support for .zelda version 1.04.
+- New server option: "oldcreated".  It defaults to false.  If it is set
+  to true, it uses the "if (created)" fix that allows servers with old
+  clientside based NPCs (ie, levels designed for 1.39) to function
+  better.  When true, "if (created)" is called for each player when
+  they visit the level.  If false, it uses the normal style where
+  "if (created)" is only called once: when the level is first loaded.
 
 Fixes:
 - Fixed bugs related to uploading files through the File Browser.
 - Fixed the "if (created)" problem everybody whines about.  qq
+  See Additions for more details.
 
 
 --------------------------------------------

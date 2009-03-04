@@ -110,25 +110,6 @@ name = My Server
 description = My Server
 url = http://www.graal.in/
 
-# Maximum number of players allowed on the server.
-maxplayers = 128
-
-# Enables/disables staff only.  If true, only accounts in the staff option are allowed on.
-onlystaff = false
-
-# If true, the server doesn't show up in the server list.
-underconstruction = false
-
-# Set to true to disable the folder configuration.
-nofoldersconfig = false
-
-# If folders config is disabled, put additional search directories besides "world" here.
-# Comma delimited array.
-sharefolder = 
-
-# Sets the language.  Currently not implemented.
-language = English
-
 # The information of the computer hosting the gserver.  This gets sent to people wanting to connect.
 # If myip is set to AUTO, it uses the IP address exposed to the list server.
 # localip is the IP address of the computer returned via ipconfig (Linux: ifconfig).  Keep at AUTO unless under Linux.
@@ -141,6 +122,29 @@ serverport = 14802
 # DON'T CHANGE IF YOU DON'T KNOW WHAT YOU ARE DOING.
 listip = listserver.graal.in
 listport = 14900
+
+# Maximum number of players allowed on the server.
+maxplayers = 128
+
+# Enables/disables staff only.  If true, only accounts in the staff option are allowed on.
+onlystaff = false
+
+# If true, the server doesn't show up in the server list.
+underconstruction = false
+
+# Set to true to disable the folder configuration.
+nofoldersconfig = false
+
+# Determines whether or not to use the old "if (created)" style.
+# In the old style, "if (created)" is called for each player that enters the level for their first time.
+oldcreated = false
+
+# If folders config is disabled, put additional search directories besides "world" here.
+# Comma delimited array.
+sharefolder = 
+
+# Sets the language.  Currently not implemented.
+language = English
 
 # Console settings.
 detailedconsole = false

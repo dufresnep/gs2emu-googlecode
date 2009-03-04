@@ -56,7 +56,7 @@ CPacket CNpc::getPropertyList(time_t newTime)
 	{
 		if ( modTime[i] >= newTime && modTime[i] > 0 )
 		{
-			if (i == VISFLAGS && newTime == 0)
+			if (oldcreated && i == VISFLAGS && newTime == 0)
 				retVal << (char)i << (char)1;
 			else
 				retVal << (char)i << getProperty(i);

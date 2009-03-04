@@ -33,6 +33,7 @@ extern float unstickmeX, unstickmeY;
 extern int aptime[5], baddyRespawn, cheatwindowstime, gameTime, heartLimit, horseLife, maxNoMovement, maxPlayers, nwTime, shieldLimit, swordLimit, tileRespawn;
 extern CString serverPort, localip;
 extern CWordFilter WordFilter;
+extern bool oldcreated;
 
 bool isValidFile(CBuffer& file, int type);
 bool isIpBanned(CString& pIp);

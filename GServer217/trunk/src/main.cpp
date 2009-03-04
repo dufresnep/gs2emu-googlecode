@@ -64,6 +64,7 @@ CString programDir;
 CStringList adminNames, cheatwindows, clothCommands, colourNames, globalGuildList, jailLevels, mapNames, profileList, RCBans, RCMessage, RCHelpMessage, serverFlags, staffGuilds, staffList, statusList, subDirs;
 CStringList folderConfig, defaultFiles;
 CWordFilter WordFilter;
+bool oldcreated;
 float unstickmeX, unstickmeY;
 int aptime[5], baddyRespawn, cheatwindowstime, gameTime = 1, heartLimit, horseLife, idleDisconnect, listServerPort, maxNoMovement, maxPlayers, nwTime, serverTime = 0, shieldLimit, swordLimit, tileRespawn;
 CString serverPort, localip;
@@ -452,7 +453,8 @@ bool loadSettings(char* pFile)
 	staffOnly = CHECK_BOOL(findKey("onlystaff", "false"));
 	underconstruction = CHECK_BOOL(findKey("underconstruction", "false"));
 	vasesDrop = CHECK_BOOL(findKey("vasesdrop", "true"));
-	warptoforall  = CHECK_BOOL(findKey("warptoforall", "false"));
+	warptoforall = CHECK_BOOL(findKey("warptoforall", "false"));
+	oldcreated = CHECK_BOOL(findKey("oldcreated", "false"));
 
 	/* INT Server-Options */
 	aptime[0] = atoi(findKey("aptime0", "30"));
