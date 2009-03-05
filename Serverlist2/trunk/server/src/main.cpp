@@ -31,6 +31,7 @@ CLog serverlog( "serverlog.txt" );
 CLog clientlog( "clientlog.txt" );
 
 std::vector<CString> ipBans;
+std::vector<CString> serverTypes;
 
 // Home path of the serverlist.
 CString homepath;
@@ -73,6 +74,9 @@ int main(int argc, char *argv[])
 	serverlog.out("Loaded following IP bans:\n");
 	for (std::vector<CString>::iterator i = ipBans.begin(); i != ipBans.end(); ++i)
 		serverlog.out("\t%s\n", i->text());
+
+	// Load server types.
+	serverTypes = CString::loadToken("servertypes.txt", "\n", true);
 
 	// Server sock.
 	serverSock.setType( SOCKET_TYPE_SERVER );
@@ -195,6 +199,7 @@ int main(int argc, char *argv[])
 		if ((int)difftime(time(0), t5min) > (5*60))
 		{
 			ipBans = CString::loadToken("ipbans.txt", "\n", true);
+			serverTypes = CString::loadToken("servertypes.txt", "\n", true);
 			for (int i = 0; i < 5; ++i)
 				filesystem[i].resync();
 			t5min = time(0);

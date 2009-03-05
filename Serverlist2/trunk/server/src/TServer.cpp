@@ -13,6 +13,7 @@
 extern CSettings *settings;
 extern std::vector<TServer *> serverList;
 extern CLog serverlog;
+extern std::vector<CString> serverTypes;
 extern CFileSystem filesystem[5];
 
 /*
@@ -313,24 +314,39 @@ bool TServer::msgSVI_SETNAME(CString& pPacket)
 	int oldType = type;
 	type = TYPE_CLASSIC;
 	CString sType = name.subString(0, 2);
-	if (sType == "P ") type = TYPE_GOLD;
-	if (sType == "H ") type = TYPE_HOSTED;
+	//if (sType == "P ") type = TYPE_GOLD;
+	//if (sType == "H ") type = TYPE_HOSTED;
 	if (sType == "U ") type = TYPE_HIDDEN;
-	if (sType == "3 ") type = TYPE_3D;
-
-	// Prevent servers from trying to steal the Graal Reborn name.
-	if (name == "P Graal Reborn" && CString(sock->tcpIp()) != "79.136.36.119")
-		name = "Graal Reborn (unofficial)";
-
-	// Restrict what type a server can be.
-	// TODO: serverhq stuff.  Currently, Graal Reborn is hard-coded in.
-	if (name != "P Graal Reborn")
-		if (type != TYPE_HIDDEN)
-			type = TYPE_CLASSIC;
+	//if (sType == "3 ") type = TYPE_3D;
 
 	// Remove all server type strings from the name of the server.
 	while (name.subString(0, 2) == "U " || name.subString(0, 2) == "P " || name.subString(0, 2) == "H " || name.subString(0, 2) == "3 ")
 		name.removeI(0, 2);
+
+	// Restrict types.
+	bool found = false;
+	for (std::vector<CString>::iterator i = serverTypes.begin(); i != serverTypes.end(); ++i)
+	{
+		CString sip = i->readString(" ");
+		CString stype = i->readString(" ");
+		CString sname = i->readString("");
+		i->setRead(0);
+		if (CString(sock->tcpIp()) == sip && name == sname)
+		{
+			found = true;
+			if (type != TYPE_HIDDEN && stype == "gold")
+				type = TYPE_GOLD;
+			else if (type != TYPE_HIDDEN && stype == "hosted")
+				type = TYPE_HOSTED;
+			else if (type != TYPE_HIDDEN && stype == "3d")
+				type = TYPE_3D;
+			break;
+		}
+	}
+
+	// Prevent servers from trying to steal the Graal Reborn name.
+	if (name == "Graal Reborn" && type != TYPE_GOLD)
+		name = "Graal Reborn (unofficial)";
 
 	// check for duplicates
 	bool dupFound = false;
