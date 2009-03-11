@@ -24,6 +24,7 @@ void createPLFunctions()
 	// now set non-nulls
 	plfunc[PLI_V1VER] = &TPlayer::msgPLI_V1VER;
 	plfunc[PLI_SERVERLIST] = &TPlayer::msgPLI_SERVERLIST;
+	plfunc[PLI_V2VER] = &TPlayer::msgPLI_V2VER;
 	plfunc[PLI_V2SERVERLISTRC] = &TPlayer::msgPLI_V2SERVERLISTRC;
 	plfunc[PLI_V2ENCRYPTKEYCL] = &TPlayer::msgPLI_V2ENCRYPTKEYCL;
 	plfunc[PLI_GRSECURELOGIN] = &TPlayer::msgPLI_GRSECURELOGIN;
@@ -109,6 +110,18 @@ bool TPlayer::doMain()
 			if (unBuffer.length() < 1)
 				return false;
 		}
+		else if (version == PLV_22)
+		{
+			unBuffer = sockBuffer.remove(0, 2);
+
+			// Decrypt.
+			in_codec.limitfromtype(ENCRYPT22_BZ2);
+			in_codec.apply(reinterpret_cast<uint8_t*>(unBuffer.text()), unBuffer.length());
+
+			unBuffer.bzuncompressI();
+			if (unBuffer.length() == 0)
+				return false;
+		}
 
 		// remove read-data
 		sockBuffer.removeI(0, len+2);
@@ -161,10 +174,22 @@ void TPlayer::sendCompress()
 		// Send outBuffer.
 		sock->sendData(outBuffer);
 	}
-	else
+	else if (version == PLV_PRE22)
 	{
 		// Compress the packet and add it to the out buffer.
 		sendBuffer.zcompressI();
+		outBuffer << (short)sendBuffer.length() << sendBuffer;
+
+		// Send outBuffer.
+		sock->sendData(outBuffer);
+	}
+	else if (version == PLV_22)
+	{
+		sendBuffer.bzcompressI();
+
+		// Encrypt the packet and add it to the out buffer.
+		out_codec.limitfromtype(ENCRYPT22_BZ2);
+		out_codec.apply(reinterpret_cast<uint8_t*>(sendBuffer.text()), sendBuffer.length());
 		outBuffer << (short)sendBuffer.length() << sendBuffer;
 
 		// Send outBuffer.
@@ -201,11 +226,11 @@ bool TPlayer::parsePacket(CString& pPacket)
 	while (pPacket.bytesLeft() > 0)
 	{
 		// read id & packet
-		int id = pPacket.readGUChar();
 		CString str = pPacket.readString("\n");
+		int id = str.readGUChar();
 
 		// check lengths
-		if (str.length() < 0 || id > (int)plfunc.size())
+		if (str.length() < 0 || id >= (int)plfunc.size())
 			continue;
 
 		// valid packet, call function
@@ -219,7 +244,7 @@ bool TPlayer::parsePacket(CString& pPacket)
 bool TPlayer::msgPLI_NULL(CString& pPacket)
 {
 	pPacket.setRead(0);
-	clientlog.out( "Unknown Player Packet: %i (%s)\n", pPacket.readGUChar(), pPacket.text()+1 );
+	printf("Unknown Player Packet: %d (%s)\n", pPacket.readGUChar(), pPacket.text()+1 );
 	return true;
 }
 
@@ -271,6 +296,17 @@ bool TPlayer::msgPLI_SERVERLIST(CString& pPacket)
 	}
 }
 
+bool TPlayer::msgPLI_V2VER(CString& pPacket)
+{
+	//version = PLV_POST22;
+	version = PLV_22;
+	key = pPacket.readGChar();
+	in_codec.reset(key);
+	out_codec.reset(key);
+	pPacket.readString("");// == newmain
+	return true;
+}
+
 bool TPlayer::msgPLI_V2SERVERLISTRC(CString& pPacket)
 {
 	version = PLV_POST22;
@@ -284,6 +320,8 @@ bool TPlayer::msgPLI_V2ENCRYPTKEYCL(CString& pPacket)
 {
 	version = PLV_POST22;
 	key = pPacket.readGChar();
+	//version = pPacket.readChars(8);
+	//pPacket.readString("") == newmain
 	in_codec.reset(key);
 	out_codec.reset(key);
 	return true;

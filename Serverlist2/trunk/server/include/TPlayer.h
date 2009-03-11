@@ -7,6 +7,7 @@ enum
 {
 	PLI_V1VER			= 0,
 	PLI_SERVERLIST		= 1,
+	PLI_V2VER			= 4,
 	PLI_V2SERVERLISTRC	= 5,
 	PLI_V2ENCRYPTKEYCL	= 7,
 	PLI_GRSECURELOGIN	= 223		// GR created function.
@@ -27,6 +28,7 @@ enum
 {
 	PLV_PRE22			= 0,
 	PLV_POST22			= 1,
+	PLV_22				= 2,
 };
 
 enum
@@ -58,6 +60,7 @@ class TPlayer
 		bool msgPLI_NULL(CString& pPacket);
 		bool msgPLI_V1VER(CString& pPacket);
 		bool msgPLI_SERVERLIST(CString& pPacket);
+		bool msgPLI_V2VER(CString& pPacket);
 		bool msgPLI_V2SERVERLISTRC(CString& pPacket);
 		bool msgPLI_V2ENCRYPTKEYCL(CString& pPacket);
 		bool msgPLI_GRSECURELOGIN(CString& pPacket);
