@@ -309,7 +309,7 @@ void CPlayer::main()
 					if (nextIsRaw)
 					{
 						CPacket pack;
-						pack.writeBytes(lines.readChars(rawPacketSize), rawPacketSize);
+						pack.writeBytes(lines.readChars(rawPacketSize), rawPacketSize - 1);
 						nextIsRaw = false;
 						parsePacket(pack);
 					}
