@@ -336,10 +336,15 @@ bool TServer::msgSVI_SETNAME(CString& pPacket)
 #ifndef NO_MYSQL
 	CString query;
 	std::vector<CString> result;
-	query = CString() << "SELECT activated FROM `" << settings->getStr("serverhq") << "` WHERE servername='" << name.escape() << "' AND activated='1' AND password=" << "MD5(CONCAT(MD5('" << serverhq_pass.escape() << "'), `salt`)) LIMIT 1";
+	query = CString() << "SELECT activated FROM `" << settings->getStr("serverhq") << "` WHERE servername='" << name.escape() << "' LIMIT 1";
 	mySQL->query(query, &result);
-	if (result.size() == 0)
-		name << " (unofficial)";
+	if (result.size() != 0)
+	{
+		query = CString() << "SELECT activated FROM `" << settings->getStr("serverhq") << "` WHERE servername='" << name.escape() << "' AND activated='1' AND password=" << "MD5(CONCAT(MD5('" << serverhq_pass.escape() << "'), `salt`)) LIMIT 1";
+		mySQL->query(query, &result);
+		if (result.size() == 0)
+			name << " (unofficial)";
+	}
 #endif
 
 	// check for duplicates
