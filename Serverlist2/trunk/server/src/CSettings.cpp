@@ -41,6 +41,13 @@ bool CSettings::loadFile(const CString& pStr)
 		for (unsigned int j = 0; j < line.size(); j++)
 			line[j].trimI();
 
+		// Fix problem involving settings with an = in the value.
+		if (line.size() > 2)
+		{
+			for (unsigned int j = 2; j < line.size(); ++j)
+				line[1] << "=" << line[j];
+		}
+
 		// Create Key
 		keys.push_back(new CKey(line[0].toLowerI(), line[1]/*.toLowerI()*/));
 	}
