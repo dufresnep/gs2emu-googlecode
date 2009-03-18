@@ -50,7 +50,7 @@ CREATE TABLE graal_servers (
 
 CREATE TABLE graal_servers_hq (
 	id int NOT NULL,
-	servername varchar(100) NOT NULL,
+	name varchar(100) NOT NULL,
 	maxlevel int NOT NULL default '1',
 	curlevel int NOT NULL default '1',
 	password varchar(32) NOT NULL,
@@ -59,7 +59,6 @@ CREATE TABLE graal_servers_hq (
 	userid int NOT NULL,
 	parked int NOT NULL default '0',
 	uptime int(255) NOT NULL default '0',
-	FOREIGN KEY (id) REFERENCES graal_servers(id) ON DELETE CASCADE,
 	FOREIGN KEY (userid) REFERENCES graal_users(id) ON DELETE CASCADE
 );
 
