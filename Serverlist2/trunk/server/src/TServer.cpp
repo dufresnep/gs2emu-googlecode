@@ -224,6 +224,9 @@ const CString TServer::getType()
 		case TYPE_HIDDEN:
 			ret = "U ";
 			break;
+		case TYPE_3D:
+			ret = "3 ";
+			break;
 	}
 	return ret;
 }
