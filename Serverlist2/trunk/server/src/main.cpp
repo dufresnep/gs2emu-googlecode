@@ -274,7 +274,7 @@ CString getAccountError(int pErrorId)
 	}
 }
 
-CString getServerList(const CString& pIp)
+CString getServerList(int PLVER, const CString& pIp)
 {
 	// definitions
 	CString packet;
@@ -287,7 +287,7 @@ CString getServerList(const CString& pIp)
 	{
 		TServer* server = (TServer*)*i;
 		if (server->getName().length() != 0)
-			packet << server->getServerPacket(pIp);
+			packet << server->getServerPacket(PLVER, pIp);
 	}
 	return packet;
 }

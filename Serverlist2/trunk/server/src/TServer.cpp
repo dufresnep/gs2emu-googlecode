@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "TServer.h"
+#include "TPlayer.h"
 #include "CLog.h"
 #include "FProfile.h"
 #include "CFileSystem.h"
@@ -223,7 +224,7 @@ const CString& TServer::getPort()
 	return port;
 }
 
-const CString TServer::getType()
+const CString TServer::getType(int PLVER)
 {
 	CString ret;
 	switch (serverhq_level)
@@ -243,6 +244,9 @@ const CString TServer::getType()
 			ret = "U ";
 			break;
 	}
+	if (PLVER == PLV_PRE22 && serverhq_level == TYPE_BRONZE)
+		ret.clear();
+
 	return ret;
 }
 
@@ -256,10 +260,10 @@ const CString& TServer::getVersion()
 	return version;
 }
 
-const CString TServer::getServerPacket(const CString& pIp)
+const CString TServer::getServerPacket(int PLVER, const CString& pIp)
 {
 	CString testIp = getIp(pIp);
-	return CString() >> (char)8 >> (char)(getType().length() + getName().length()) << getType() << getName() >> (char)getLanguage().length() << getLanguage() >> (char)getDescription().length() << getDescription() >> (char)getUrl().length() << getUrl() >> (char)getVersion().length() << getVersion() >> (char)getPCount().length() << getPCount() >> (char)testIp.length() << testIp >> (char)getPort().length() << getPort();
+	return CString() >> (char)8 >> (char)(getType(PLVER).length() + getName().length()) << getType(PLVER) << getName() >> (char)getLanguage().length() << getLanguage() >> (char)getDescription().length() << getDescription() >> (char)getUrl().length() << getUrl() >> (char)getVersion().length() << getVersion() >> (char)getPCount().length() << getPCount() >> (char)testIp.length() << testIp >> (char)getPort().length() << getPort();
 }
 
 /*
@@ -466,7 +470,7 @@ bool TServer::msgSVI_SETPORT(CString& pPacket)
 				<< description.escape() << "','"
 				<< url.escape() << "','"
 				<< language.escape() << "','"
-				<< getType().escape() << "','"
+				<< getType(4).escape() << "','"
 				<< version.escape() << "'"
 				<< ")";
 			mySQL->query(query);

@@ -101,10 +101,10 @@ class TServer
 		const CString& getName();
 		const CString& getPCount();
 		const CString& getPort();
-		const CString getType();
+		const CString getType(int PLVER);
 		const CString& getUrl();
 		const CString& getVersion();
-		const CString getServerPacket(const CString& pIp = "");
+		const CString getServerPacket(int PLVER, const CString& pIp = "");
 		int getLastData() { return (int)difftime( time(0), lastData ); }
 
 		// send-packet functions
