@@ -44,11 +44,11 @@
 typedef void (*sighandler_t)(int);
 
 bool apSystem, bushesDrop, cheatwindowsban, dontaddserverflags, dontchangekills, dropItemsDead, globalGuilds, hasShutdown = false, lsConnected = false, noExplosions, serverRunning, setbodyallowed, setheadallowed, setswordallowed, setshieldallowed, showConsolePackets, staffOnly, vasesDrop, warptoforall, defaultweapons;
-bool clientsidePushPull, detailedconsole, underconstruction, baddyDropItems, noFoldersConfig;
+bool clientsidePushPull, detailedconsole, baddyDropItems, noFoldersConfig;
 bool healswords, putnpcenabled, adminCanChangeGralat;
 int mindeathgralats, maxdeathgralats, tiledroprate;
 char fSep[] = "/";
-const char* __admin[]   = {"description", "detailedconsole", "language", "listport", "listip", "maxplayers", "myip", "name", "nofoldersconfig", "onlystaff", "serverport", "sharefolder", "showconsolepackets", "underconstruction", "url", "worldname"};
+const char* __admin[]   = {"description", "detailedconsole", "language", "listport", "listip", "maxplayers", "myip", "name", "nofoldersconfig", "onlystaff", "serverport", "sharefolder", "showconsolepackets", "url", "worldname"};
 const char* __colours[] = {"white", "yellow", "orange", "pink", "red", "darkred", "lightgreen", "green", "darkgreen", "lightblue", "blue", "darkblue", "brown", "cynober", "purple", "darkpurple", "lightgray", "gray", "black", "transparent"};
 const char* __cloths[]  = {"setskin", "setcoat", "setsleeve", "setshoe", "setbelt", "setsleeves", "setshoes"};
 const char* __defaultfiles[] = {
@@ -68,6 +68,8 @@ bool oldcreated;
 float unstickmeX, unstickmeY;
 int aptime[5], baddyRespawn, cheatwindowstime, gameTime = 1, heartLimit, horseLife, idleDisconnect, listServerPort, maxNoMovement, maxPlayers, nwTime, serverTime = 0, shieldLimit, swordLimit, tileRespawn;
 CString serverPort, localip;
+CString serverhq_pass;
+int serverhq_level;
 
 void acceptNewPlayers(CSocket &pSocket);
 void doTimer();
@@ -137,6 +139,7 @@ int main(int argc, char *argv[])
 	updateFile("serverflags.txt");
 	updateFile("servermessage.html");
 	updateFile("foldersconfig.txt");
+	updateFile("serverhq.txt");
 
 	/* Load Settings */
 	if (!loadSettings("serveroptions.txt"))
@@ -379,6 +382,29 @@ bool updateFile(char *pFile)
 
 		getSubDirs();
 	}
+	else if (strcmp(pFile, "serverhq.txt") == 0)
+	{
+		CStringList settings;
+		if (!settings.load("serverhq.txt"))
+			return false;
+
+		serverhq_pass.clear();
+		serverhq_level = 1;
+
+		for (int i = 0; i < settings.count(); i++)
+		{
+			if (settings[i][0] == '#' || settings[i][0] == '\'')
+				continue;
+
+			CString name = settings[i].copy(0, settings[i].find('=')).trim();
+			CString value = settings[i].copy(settings[i].find('=') + 1).trim();
+
+			if (name == "password")
+				serverhq_pass = value;
+			else if (name == "level")
+				serverhq_level = atoi(value.text());
+		}
+	}
 	else
 		return false;
 
@@ -387,7 +413,6 @@ bool updateFile(char *pFile)
 
 bool loadSettings(char* pFile)
 {
-	bool wasUC = underconstruction;
 	CString prevName = listServerFields[0];
 	CString prevDesc = listServerFields[1];
 	CString prevLang = listServerFields[2];
@@ -451,7 +476,6 @@ bool loadSettings(char* pFile)
 	setshieldallowed = CHECK_BOOL(findKey("setshieldallowed", "true"));
 	showConsolePackets = CHECK_BOOL(findKey("showconsolepackets", "false"));
 	staffOnly = CHECK_BOOL(findKey("onlystaff", "false"));
-	underconstruction = CHECK_BOOL(findKey("underconstruction", "false"));
 	vasesDrop = CHECK_BOOL(findKey("vasesdrop", "true"));
 	warptoforall = CHECK_BOOL(findKey("warptoforall", "false"));
 	oldcreated = CHECK_BOOL(findKey("oldcreated", "false"));
@@ -492,22 +516,6 @@ bool loadSettings(char* pFile)
 	shareFolder = findKey("sharefolder");
 	staffHead = findKey("staffhead", "head25.png");
 	worldName = findKey("worldname", "main");
-
-	// If the server is flagged as under construction, prepend the
-	// Under Construction value to the name.
-	if (underconstruction && !listServerFields[0].match( "U *" ))
-	{
-		listServerFields[0] = CBuffer() << "U " << listServerFields[0];
-		if (lsConnected)
-			ListServer_Send(CPacket() << (char)SLSNAME << listServerFields[0] << "\n");
-	}
-	else if (wasUC)
-	{
-		if (lsConnected)
-			ListServer_Send(CPacket() << (char)SLSNAME << listServerFields[0] << "\n");
-	}
-	else if (prevName != listServerFields[0])
-		ListServer_Send(CPacket() << (char)SLSNAME << listServerFields[0] << "\n");
 
 	// Send changes to the serverlist.
 	if (prevDesc != listServerFields[1])

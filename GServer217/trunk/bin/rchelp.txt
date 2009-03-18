@@ -9,3 +9,4 @@ Available commands for GServer:
 /shutdown: Shuts down the server
 /updatelevel level[,level]: reloads levels form hard disk
 /updatelevelall: updates all loaded levels
+/updateserverhq: Sends the ServerHQ information to the serverlist.

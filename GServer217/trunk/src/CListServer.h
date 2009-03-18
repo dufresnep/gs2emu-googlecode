@@ -15,6 +15,7 @@ void ListServer_Connect();
 void ListServer_End();
 void ListServer_Main();
 void ListServer_Send(CPacket &pPacket);
+void ListServer_SendServerHQ();
 
 enum
 {
@@ -41,6 +42,8 @@ enum
 	SLSUPDATEFILE		= 20,
 	SLSGETFILE3			= 21,
 	SLSNEWSERVER		= 22,
+	SLSSERVERHQPASS		= 23,
+	SLSSERVERHQLEVEL	= 24,
 };
 
 enum

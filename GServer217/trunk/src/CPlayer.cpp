@@ -4321,6 +4321,13 @@ void CPlayer::msgDRCCHAT(CPacket& pPacket)
 		errorOut( "rclog.txt", CString() << accountName << " updated all the levels." );
 		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " updated all the levels.");
 	}
+	else if (words[0] == "/updateserverhq")
+	{
+		updateFile("serverhq.txt");
+		ListServer_SendServerHQ();
+		errorOut( "rclog.txt", CString() << accountName << " updated the ServerHQ." );
+		sendRCPacket(CPacket() << (char)DRCLOG << accountName << " updated the ServerHQ.");
+	}
 }
 
 //reminder

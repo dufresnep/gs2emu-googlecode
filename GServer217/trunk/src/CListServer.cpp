@@ -40,8 +40,11 @@ void ListServer_Connect()
 
 	errorOut("serverlog.txt", CBuffer() << "Connected to the list server successfully.", true);
 
-	// assemble server packet.
+	// Send the ServerHQ password.
 	CPacket pack;
+	pack << (char)SLSSERVERHQPASS << serverhq_pass << "\n";
+
+	// assemble server packet.
 	pack << (char)SLSNEWSERVER << (char)listServerFields[0].length() << listServerFields[0];
 	pack << (char)listServerFields[1].length() << listServerFields[1];
 	pack << (char)listServerFields[2].length() << listServerFields[2];
@@ -61,6 +64,9 @@ void ListServer_Connect()
 	}
 	else pack << (char)localip.length() << localip;
 	pack << "\n";
+
+	// Send the ServerHQ level.
+	pack << (char)SLSSERVERHQLEVEL << (char)serverhq_level << "\n";
 
 	// send gserver info to listserver
 	ListServer_Send(pack);
@@ -469,6 +475,28 @@ void ListServer_Send(CPacket &pPacket)
 		pPacket << "\n";
 
 	if ( listServer.sendData( pPacket ) < 0 )
+	{
+		errorOut("serverlog.txt", "Disconnected from list server.");
+		lsConnected = false;
+	}
+}
+
+void ListServer_SendServerHQ()
+{
+	if ( serverRunning == false ) return;
+	if ( listServerFields[5] == "localhost" ) return;
+
+	if (!lsConnected)
+	{
+		ListServer_Connect();
+		if (!lsConnected)
+			return;
+	}
+
+	CPacket packet;
+	packet << (char)SLSSERVERHQPASS << serverhq_pass << "\n";
+	packet << (char)SLSSERVERHQLEVEL << (char)serverhq_level << "\n";
+	if (listServer.sendData(packet) < 0)
 	{
 		errorOut("serverlog.txt", "Disconnected from list server.");
 		lsConnected = false;

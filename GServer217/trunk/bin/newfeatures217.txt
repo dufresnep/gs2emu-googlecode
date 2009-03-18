@@ -10,6 +10,17 @@ Additions:
   better.  When true, "if (created)" is called for each player when
   they visit the level.  If false, it uses the normal style where
   "if (created)" is only called once: when the level is first loaded.
+- Added a new file, ServerHQ.txt.  It is part of a new ServerHQ system
+  where registered servers can change which tab they appear under in
+  the server list.  Unregistered servers can choose between level 1
+  (Hosted) and level 0 (Hidden).
+- Added a new RC command: /updateserverhq.  It re-sends the contents
+  of ServerHQ.txt to the server list so you can alter which tab your
+  server appears on.
+
+Changes:
+- Removed the server option "underconstruction".  Functionality has
+  been moved to the new ServerHQ stuff.
 
 Fixes:
 - Fixed bugs related to uploading files through the File Browser.
