@@ -259,7 +259,7 @@ const CString& TServer::getVersion()
 const CString TServer::getServerPacket(const CString& pIp)
 {
 	CString testIp = getIp(pIp);
-	return CString() >> (char)8 >> (char)(getName().length() + getType().length()) << getType() << getName() >> (char)getLanguage().length() << getLanguage() >> (char)getDescription().length() << getDescription() >> (char)getUrl().length() << getUrl() >> (char)getVersion().length() << getVersion() >> (char)getPCount().length() << getPCount() >> (char)testIp.length() << testIp >> (char)getPort().length() << getPort();
+	return CString() >> (char)8 >> (char)(getType().length() + getName().length()) << getType() << getName() >> (char)getLanguage().length() << getLanguage() >> (char)getDescription().length() << getDescription() >> (char)getUrl().length() << getUrl() >> (char)getVersion().length() << getVersion() >> (char)getPCount().length() << getPCount() >> (char)testIp.length() << testIp >> (char)getPort().length() << getPort();
 }
 
 /*
