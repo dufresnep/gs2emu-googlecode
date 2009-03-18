@@ -340,6 +340,7 @@ bool TServer::msgSVI_SETNAME(CString& pPacket)
 	mySQL->query(query, &result);
 	if (result.size() != 0)
 	{
+		result.clear();
 		query = CString() << "SELECT activated FROM `" << settings->getStr("serverhq") << "` WHERE servername='" << name.escape() << "' AND activated='1' AND password=" << "MD5(CONCAT(MD5('" << serverhq_pass.escape() << "'), `salt`)) LIMIT 1";
 		mySQL->query(query, &result);
 		if (result.size() == 0)
