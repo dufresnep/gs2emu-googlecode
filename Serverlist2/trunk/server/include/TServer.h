@@ -28,6 +28,8 @@ enum
 	SVI_UPDATEFILE		= 20,
 	SVI_GETFILE3		= 21,
 	SVI_NEWSERVER		= 22,
+	SVI_SERVERHQPASS	= 23,
+	SVI_SERVERHQLEVEL	= 24,
 };
 
 enum
@@ -56,10 +58,12 @@ enum
 
 enum
 {
-	TYPE_CLASSIC	= 0,
-	TYPE_GOLD		= 1,
-	TYPE_HOSTED		= 2,
-	TYPE_HIDDEN		= 3,
+	TYPE_HIDDEN		= 0,
+	TYPE_BRONZE		= 1,
+	TYPE_HOSTED		= 1,
+	TYPE_SILVER		= 2,
+	TYPE_CLASSIC	= 2,
+	TYPE_GOLD		= 3,
 	TYPE_3D			= 4,
 };
 
@@ -88,6 +92,7 @@ class TServer
 		void kill();
 
 		void SQLupdate(CString tblval, const CString& newVal);
+		void SQLupdate(CString tbl, CString tblval, const CString& newVal);
 
 		// get-value functions
 		const CString& getDescription();
@@ -132,16 +137,19 @@ class TServer
 		bool msgSVI_UPDATEFILE(CString& pPacket);
 		bool msgSVI_GETFILE3(CString& pPacket);
 		bool msgSVI_NEWSERVER(CString& pPacket);
+		bool msgSVI_SERVERHQPASS(CString& pPacket);
+		bool msgSVI_SERVERHQLEVEL(CString& pPacket);
 
 	private:
 		CSocket *sock;
 		CString sendBuffer, sockBuffer, outBuffer;
 
 		CString description, ip, language, name, pcount, port, url, version, localip;
-		int type;
 		std::vector<player *> playerList;
 		time_t lastPing, lastData, lastPlayerCount;
 		bool addedToSQL;
+		CString serverhq_pass;
+		unsigned char serverhq_level;
 };
 
 #endif // TSERVER_H

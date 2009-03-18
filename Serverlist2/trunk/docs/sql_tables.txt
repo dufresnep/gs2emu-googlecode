@@ -44,31 +44,23 @@ CREATE TABLE graal_servers (
 	description varchar(255) NOT NULL,
 	url varchar(255) NOT NULL default 'http://www.graal.in/',
 	language varchar(255) NOT NULL default 'English',
-	type char(2) NOT NULL,
 	version varchar(255) NOT NULL,
 	PRIMARY KEY (id)
 );
 
 CREATE TABLE graal_servers_hq (
-	id int NOT NULL auto_increment,
-	pass varchar(32) NOT NULL,
+	id int NOT NULL,
+	servername varchar(100) NOT NULL,
+	maxlevel int NOT NULL default '1',
+	curlevel int NOT NULL default '1',
+	password varchar(32) NOT NULL,
 	salt char(3) NOT NULL,
-	server_name varchar(255) UNIQUE NOT NULL,
-	server_description varchar(255) NOT NULL,
-	server_url varchar(255) NOT NULL,
-	server_langage varchar(255) NOT NULL,
-	server_type char(2) NOT NULL,
-	server_maxplayers int NOT NULL,
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE graal_servers_hq_members (
-	id int UNIQUE NOT NULL,
-	account varchar(100) NOT NULL,
-	owner tinyint NOT NULL,
-	permissions int NOT NULL,
-	FOREIGN KEY (id) REFERENCES graal_servers_hq(id) ON DELETE CASCADE,
-	FOREIGN KEY (account) REFERENCES graal_users(account) ON DELETE CASCADE
+	activated int NOT NULL default '1',
+	userid int NOT NULL,
+	parked int NOT NULL default '0',
+	uptime int(255) NOT NULL default '0',
+	FOREIGN KEY (id) REFERENCES graal_servers(id) ON DELETE CASCADE,
+	FOREIGN KEY (userid) REFERENCES graal_users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE graal_ipban (

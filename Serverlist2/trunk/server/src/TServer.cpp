@@ -24,7 +24,7 @@ std::vector<TSVSock> svfunc;
 void createSVFunctions()
 {
 	// kinda like a memset-ish thing y'know
-	for (int i = 0; i < 23; i++)
+	for (int i = 0; i < 25; i++)
 		svfunc.push_back(&TServer::msgSVI_NULL);
 
 	// now set non-nulls
@@ -51,13 +51,15 @@ void createSVFunctions()
 	svfunc[SVI_UPDATEFILE] = &TServer::msgSVI_UPDATEFILE;
 	svfunc[SVI_GETFILE3] = &TServer::msgSVI_GETFILE3;
 	svfunc[SVI_NEWSERVER] = &TServer::msgSVI_NEWSERVER;
+	svfunc[SVI_SERVERHQPASS] = &TServer::msgSVI_SERVERHQPASS;
+	svfunc[SVI_SERVERHQLEVEL] = &TServer::msgSVI_SERVERHQLEVEL;
 }
 
 /*
 	Constructor - Deconstructor
 */
 TServer::TServer(CSocket *pSocket)
-: sock(pSocket), type(0), addedToSQL(false)
+: sock(pSocket), serverhq_level(1), addedToSQL(false)
 {
 	language = "English";
 	lastPing = lastPlayerCount = lastData = time(0);
@@ -172,6 +174,17 @@ void TServer::SQLupdate(CString tblval, const CString& newVal)
 #endif
 }
 
+void TServer::SQLupdate(CString tbl, CString tblval, const CString& newVal)
+{
+#ifndef NO_MYSQL
+	CString query;
+	query << "UPDATE `" << tbl << "` SET "
+		<< tblval.escape() << "='" << newVal.escape() << "' "
+		<< "WHERE name='" << name.escape() << "'";
+	mySQL->query(query);
+#endif
+}
+
 /*
 	Get-Value Functions
 */
@@ -213,19 +226,21 @@ const CString& TServer::getPort()
 const CString TServer::getType()
 {
 	CString ret;
-	switch ( type )
+	switch (serverhq_level)
 	{
+		case TYPE_3D:
+			ret = "3 ";
+			break;
 		case TYPE_GOLD:
 			ret = "P ";
 			break;
-		case TYPE_HOSTED:
+		case TYPE_SILVER:
+			break;
+		case TYPE_BRONZE:
 			ret = "H ";
 			break;
 		case TYPE_HIDDEN:
 			ret = "U ";
-			break;
-		case TYPE_3D:
-			ret = "3 ";
 			break;
 	}
 	return ret;
@@ -313,43 +328,19 @@ bool TServer::msgSVI_SETNAME(CString& pPacket)
 	CString oldName(name);
 	name = pPacket.readString("");
 
-	// Find out the server type.
-	int oldType = type;
-	type = TYPE_CLASSIC;
-	CString sType = name.subString(0, 2);
-	//if (sType == "P ") type = TYPE_GOLD;
-	//if (sType == "H ") type = TYPE_HOSTED;
-	if (sType == "U ") type = TYPE_HIDDEN;
-	//if (sType == "3 ") type = TYPE_3D;
-
 	// Remove all server type strings from the name of the server.
 	while (name.subString(0, 2) == "U " || name.subString(0, 2) == "P " || name.subString(0, 2) == "H " || name.subString(0, 2) == "3 ")
 		name.removeI(0, 2);
 
-	// Restrict types.
-	bool found = false;
-	for (std::vector<CString>::iterator i = serverTypes.begin(); i != serverTypes.end(); ++i)
-	{
-		CString sip = i->readString(" ");
-		CString stype = i->readString(" ");
-		CString sname = i->readString("");
-		i->setRead(0);
-		if (CString(sock->tcpIp()) == sip && name == sname)
-		{
-			found = true;
-			if (type != TYPE_HIDDEN && stype == "gold")
-				type = TYPE_GOLD;
-			else if (type != TYPE_HIDDEN && stype == "hosted")
-				type = TYPE_HOSTED;
-			else if (type != TYPE_HIDDEN && stype == "3d")
-				type = TYPE_3D;
-			break;
-		}
-	}
-
-	// Prevent servers from trying to steal the Graal Reborn name.
-	if (name == "Graal Reborn" && type != TYPE_GOLD)
-		name = "Graal Reborn (unofficial)";
+	// Check ServerHQ if we can use this name.
+#ifndef NO_MYSQL
+	CString query;
+	std::vector<CString> result;
+	query = CString() << "SELECT activated FROM `" << settings->getStr("serverhq") << "` WHERE servername='" << name.escape() << "' AND activated='1' AND password=" << "MD5(CONCAT(MD5('" << serverhq_pass.escape() << "'), `salt`)) LIMIT 1";
+	mySQL->query(query, &result);
+	if (result.size() == 0)
+		name << " (unofficial)";
+#endif
 
 	// check for duplicates
 	bool dupFound = false;
@@ -388,7 +379,6 @@ dupCheck:
 	if (dupFound && addedToSQL)
 	{
 		name = oldName;
-		type = oldType;
 		return true;
 	}
 	else if (dupFound)
@@ -400,7 +390,6 @@ dupCheck:
 	else
 	{
 		SQLupdate("name", name);
-		if (getType().length() != 0) SQLupdate("type", getType());
 	}
 
 	return true;
@@ -851,6 +840,41 @@ bool TServer::msgSVI_NEWSERVER(CString& pPacket)
 	msgSVI_SETIP(ip);
 	msgSVI_SETLOCALIP(localip);
 	msgSVI_SETPORT(port);			// Port last.
+
+	return true;
+}
+
+bool TServer::msgSVI_SERVERHQPASS(CString& pPacket)
+{
+	serverhq_pass = pPacket.readString("");
+	return true;
+}
+
+bool TServer::msgSVI_SERVERHQLEVEL(CString& pPacket)
+{
+	serverhq_level = pPacket.readGUChar();
+
+#ifndef NO_MYSQL
+	// Ask what our max level is.
+	CString query;
+	std::vector<CString> result;
+	query = CString() << "SELECT maxlevel FROM `" << settings->getStr("serverhq", "graal_serverhq") << "` WHERE servername='" << name.escape() << "' AND activated='1' AND password=" << "MD5(CONCAT(MD5('" << serverhq_pass.escape() << "'), `salt`)) LIMIT 1";
+	mySQL->query(query, &result);
+
+	// If the password was wrong, limit ourselves to the bronze tab.
+	if (result.size() == 0)
+	{
+		if (serverhq_level != 0) serverhq_level = 1;
+		return true;
+	}
+
+	// Limit ourselves to our max level.
+	int res = strtoint(result[0]);
+	if (serverhq_level > res) serverhq_level = res;
+
+	// Update our current level.
+	SQLupdate(settings->getStr("serverhq", "graal_serverhq"), "curlevel", CString((int)serverhq_level));
+#endif
 
 	return true;
 }
