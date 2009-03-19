@@ -884,6 +884,7 @@ bool TServer::msgSVI_SERVERHQLEVEL(CString& pPacket)
 
 	// Update our current level.
 	SQLupdate(settings->getStr("serverhq", "graal_serverhq"), "curlevel", CString((int)serverhq_level));
+	SQLupdate("type", getType(4));
 #endif
 
 	return true;
