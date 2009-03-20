@@ -152,9 +152,15 @@ bool TServer::doMain()
 		lastUptimeCheck = time(0);
 		CString query;
 		query << "UPDATE `" << settings->getStr("serverlist") << "`";
-		if (isServerHQ) query << ".`" << settings->getStr("serverhq") << "`";
 		query << " SET uptime=uptime+" << CString((int)uptime) << " WHERE name='" << name.escape() << "'";
 		mySQL->query(query);
+		if (isServerHQ)
+		{
+			query.clear();
+			query << "UPDATE `" << settings->getStr("serverhq") << "`";
+			query << " SET uptime=uptime+" << CString((int)uptime) << " WHERE name='" << name.escape() << "'";
+			mySQL->query(query);
+		}
 	}
 #endif
 
@@ -942,16 +948,16 @@ bool TServer::msgSVI_SERVERHQLEVEL(CString& pPacket)
 	// Limit ourselves to our max level.
 	if (isServerHQ)
 	{
-		int res = strtoint(result[2]);
-		if (serverhq_level > res) serverhq_level = res;
+		int maxlevel = strtoint(result[2]);
+		if (serverhq_level > maxlevel) serverhq_level = maxlevel;
 
 		// Update our uptime.
 		if (result.size() > 1)
 		{
 			// Update our uptime.
-			CString query;
-			query << "UPDATE `" << settings->getStr("serverlist") << "` SET uptime=" << result[1] << " WHERE name='" << name.escape() << "'";
-			mySQL->query(query);
+			CString query2;
+			query2 << "UPDATE `" << settings->getStr("serverlist") << "` SET uptime=" << result[1] << " WHERE name='" << name.escape() << "'";
+			mySQL->query(query2);
 		}
 
 		// If we got max players, update the graal_servers table.
