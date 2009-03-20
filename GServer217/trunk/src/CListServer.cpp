@@ -76,7 +76,7 @@ void ListServer_Connect()
 	for (int i = 0; i < playerList.count(); i++)
 	{
 		CPlayer *player = (CPlayer *)playerList[i];
-		pPacket << (char)player->accountName.length() << player->accountName << player->getProp(NICKNAME) << player->getProp(CURLEVEL) << player->getProp(PLAYERX) << player->getProp(PLAYERY) << player->getProp(PALIGNMENT) << (char)player->type;
+		pPacket << (char)player->accountName.length() << player->accountName << player->getProp(NICKNAME) << player->getProp(CURLEVEL) << player->getProp(PLAYERX) << player->getProp(PLAYERY) << player->getProp(PALIGNMENT) << (char)(1 << player->type);
 	}
 
 	ListServer_Send(CPacket() << (char)SLSCOUNT << (char)playerList.count() << pPacket << "\n");
