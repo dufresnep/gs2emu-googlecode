@@ -92,7 +92,8 @@ class TServer
 		void kill();
 
 		void SQLupdate(CString tblval, const CString& newVal);
-		void SQLupdate(CString tbl, CString tblval, const CString& newVal);
+		void SQLupdateHQ(CString tblval, const CString& newVal);
+		void updatePlayers();
 
 		// get-value functions
 		const CString& getDescription();
@@ -146,8 +147,9 @@ class TServer
 
 		CString description, ip, language, name, pcount, port, url, version, localip;
 		std::vector<player *> playerList;
-		time_t lastPing, lastData, lastPlayerCount;
+		time_t lastPing, lastData, lastPlayerCount, lastUptimeCheck;
 		bool addedToSQL;
+		bool isServerHQ;
 		CString serverhq_pass;
 		unsigned char serverhq_level;
 };

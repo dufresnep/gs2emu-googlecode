@@ -60,10 +60,11 @@ void createSVFunctions()
 	Constructor - Deconstructor
 */
 TServer::TServer(CSocket *pSocket)
-: sock(pSocket), serverhq_level(1), addedToSQL(false)
+: sock(pSocket), addedToSQL(false), isServerHQ(false),
+serverhq_level(1)
 {
 	language = "English";
-	lastPing = lastPlayerCount = lastData = time(0);
+	lastPing = lastPlayerCount = lastData = lastUptimeCheck = time(0);
 }
 
 TServer::~TServer()
@@ -73,11 +74,22 @@ TServer::~TServer()
 		delete playerList[i];
 	playerList.clear();
 
+#ifndef NO_MYSQL
+	// Update our uptime.
+	if (isServerHQ)
+	{
+		int uptime = (int)difftime(time(0), lastUptimeCheck);
+		CString query;
+		query << "UPDATE `" << settings->getStr("serverhq") << "` SET uptime=uptime+" << CString((int)uptime) << " WHERE name='" << name.escape() << "'";
+		mySQL->query(query);
+	}
+#endif
+
 	// Delete server from SQL serverlist.
 #ifndef NO_MYSQL
 	CString query;
 	query << "DELETE FROM " << settings->getStr("serverlist") << " WHERE name='" << name.escape() << "'";
-	mySQL->query( query );
+	mySQL->query(query);
 #endif
 
 	// delete socket
@@ -133,14 +145,15 @@ bool TServer::doMain()
 	}
 
 #ifndef NO_MYSQL
-	// Update the player count every three minutes.
-	if ((int)difftime(time(0), lastPlayerCount) >= 180)
+	// Update our uptime every 3 minutes.
+	if ((int)difftime(time(0), lastUptimeCheck) >= 180)
 	{
-		lastPlayerCount = time(0);
+		int uptime = (int)difftime(time(0), lastUptimeCheck);
+		lastUptimeCheck = time(0);
 		CString query;
-		query << "UPDATE `" << settings->getStr("serverlist") << "` SET "
-			<< "playercount='" << CString((int)playerList.size()).escape() << "' "
-			<< "WHERE name='" << name.escape() << "'";
+		query << "UPDATE `" << settings->getStr("serverlist") << "`";
+		if (isServerHQ) query << ".`" << settings->getStr("serverhq") << "`";
+		query << " SET uptime=uptime+" << CString((int)uptime) << " WHERE name='" << name.escape() << "'";
 		mySQL->query(query);
 	}
 #endif
@@ -175,14 +188,51 @@ void TServer::SQLupdate(CString tblval, const CString& newVal)
 #endif
 }
 
-void TServer::SQLupdate(CString tbl, CString tblval, const CString& newVal)
+void TServer::SQLupdateHQ(CString tblval, const CString& newVal)
 {
 #ifndef NO_MYSQL
 	CString query;
-	query << "UPDATE `" << tbl << "` SET "
+	query << "UPDATE `" << settings->getStr("serverhq") << "` SET "
 		<< tblval.escape() << "='" << newVal.escape() << "' "
 		<< "WHERE name='" << name.escape() << "'";
 	mySQL->query(query);
+#endif
+}
+
+void TServer::updatePlayers()
+{
+#ifndef NO_MYSQL
+	// Set our lastconnected.
+	CString query;
+	query << "UPDATE `" << settings->getStr("serverhq") << "`";
+	if (isServerHQ) query << ".`" << settings->getStr("serverlist") << "`";
+	query << " SET lastconnected=NOW() " << "WHERE name='" << name.escape() << "'";
+	mySQL->query(query);
+
+	// Update our playercount.
+	SQLupdate("playercount", CString((int)playerList.size()));
+
+	// Update our player list.
+	CString playerlist;
+	for (std::vector<player*>::iterator i = playerList.begin(); i != playerList.end(); ++i)
+		playerlist << (*i)->account << ",";
+	SQLupdate("playerlist", playerlist);
+
+	// Check to see if we can increase our maxplayers.
+	std::vector<CString> result;
+	query = CString() << "SELECT maxplayers FROM `" << settings->getStr("serverlist") << "` WHERE name='" << name.escape() << "' LIMIT 1";
+	mySQL->query(query, &result);
+
+	// If we got no maxplayers back, wtf.
+	if (result.size() == 0) return;
+
+	// Check if we can increase our maxplayers.
+	int maxplayers = strtoint(result[0]);
+	if (playerList.size() > (unsigned int)maxplayers)
+	{
+		SQLupdate("maxplayers", CString((int)playerList.size()));
+		if (isServerHQ) SQLupdateHQ("maxplayers", CString((int)playerList.size()));
+	}
 #endif
 }
 
@@ -510,6 +560,9 @@ bool TServer::msgSVI_SETPLYR(CString& pPacket)
 		playerList.push_back(pl);
 	}
 
+	// Update the database.
+	updatePlayers();
+
 	return true;
 }
 
@@ -641,6 +694,10 @@ bool TServer::msgSVI_PLYRADD(CString& pPacket)
 		pl->ap = pPacket.readGChar();
 		pl->type = pPacket.readGChar();
 	playerList.push_back(pl);
+
+	// Update the database.
+	updatePlayers();
+
 	return true;
 }
 
@@ -665,6 +722,9 @@ bool TServer::msgSVI_PLYRREM(CString& pPacket)
 		else
 			++iter;
 	}
+
+	// Update the database.
+	updatePlayers();
 
 	return true;
 }
@@ -865,26 +925,57 @@ bool TServer::msgSVI_SERVERHQLEVEL(CString& pPacket)
 	serverhq_level = pPacket.readGUChar();
 
 #ifndef NO_MYSQL
-	// Ask what our max level is.
+	// Ask what our max level and max players is.
 	CString query;
 	std::vector<CString> result;
-	query = CString() << "SELECT maxlevel FROM `" << settings->getStr("serverhq", "graal_serverhq") << "` WHERE name='" << name.escape() << "' AND activated='1' AND password=" << "MD5(CONCAT(MD5('" << serverhq_pass.escape() << "'), `salt`)) LIMIT 1";
+	query = CString() << "SELECT maxplayers, uptime, maxlevel FROM `" << settings->getStr("serverhq") << "` WHERE name='" << name.escape() << "' AND activated='1' AND password=" << "MD5(CONCAT(MD5('" << serverhq_pass.escape() << "'), `salt`)) LIMIT 1";
 	mySQL->query(query, &result);
 
 	// If the password was wrong, limit ourselves to the bronze tab.
-	if (result.size() == 0)
+	if (result.size() != 0)
 	{
-		if (serverhq_level != 0) serverhq_level = 1;
-		return true;
+		if (serverhq_level != 0)
+			serverhq_level = 1;
 	}
+	else isServerHQ = true;
 
 	// Limit ourselves to our max level.
-	int res = strtoint(result[0]);
-	if (serverhq_level > res) serverhq_level = res;
+	if (isServerHQ)
+	{
+		int res = strtoint(result[2]);
+		if (serverhq_level > res) serverhq_level = res;
+
+		// Update our uptime.
+		if (result.size() > 1)
+		{
+			// Update our uptime.
+			CString query;
+			query << "UPDATE `" << settings->getStr("serverlist") << "` SET uptime=" << result[1] << " WHERE name='" << name.escape() << "'";
+			mySQL->query(query);
+		}
+
+		// If we got max players, update the graal_servers table.
+		if (result.size() != 0)
+		{
+			int maxplayers = strtoint(result[0]);
+
+			// Check to see if the graal_servers table has a larger max players.
+			std::vector<CString> result2;
+			CString query2 = CString() << "SELECT maxplayers FROM `" << settings->getStr("serverlist") << "` WHERE name='" << name.escape() << "' LIMIT 1";
+			mySQL->query(query2, &result2);
+			if (result2.size() != 0)
+			{
+				int s_maxp = strtoint(result2[0]);
+				if (maxplayers > s_maxp) SQLupdate("maxplayers", CString((int)maxplayers));
+				else SQLupdateHQ("maxplayers", CString((int)s_maxp));
+			}
+			else SQLupdate("maxplayers", CString((int)maxplayers));
+		}
+	}
 
 	// Update our current level.
-	SQLupdate(settings->getStr("serverhq", "graal_serverhq"), "curlevel", CString((int)serverhq_level));
 	SQLupdate("type", getType(4));
+	if (isServerHQ) SQLupdateHQ("curlevel", CString((int)serverhq_level));
 #endif
 
 	return true;

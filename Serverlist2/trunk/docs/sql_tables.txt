@@ -44,13 +44,18 @@ CREATE TABLE graal_servers (
 	description varchar(255) NOT NULL,
 	url varchar(255) NOT NULL default 'http://www.graal.in/',
 	language varchar(255) NOT NULL default 'English',
+	type char(2) NOT NULL default '',
 	version varchar(255) NOT NULL,
+	uptime int(255) NOT NULL default '0',
+	lastconnected datetime NOT NULL default '0',
+	playerlist text NOT NULL default '',
 	PRIMARY KEY (id)
 );
 
-CREATE TABLE graal_servers_hq (
+CREATE TABLE graal_servershq (
 	id int NOT NULL,
 	name varchar(100) NOT NULL,
+	maxplayers int NOT NULL,
 	maxlevel int NOT NULL default '1',
 	curlevel int NOT NULL default '1',
 	password varchar(32) NOT NULL,
@@ -59,6 +64,7 @@ CREATE TABLE graal_servers_hq (
 	userid int NOT NULL,
 	parked int NOT NULL default '0',
 	uptime int(255) NOT NULL default '0',
+	lastconnected datetime NOT NULL default '0',
 	FOREIGN KEY (userid) REFERENCES graal_users(id) ON DELETE CASCADE
 );
 
