@@ -209,11 +209,13 @@ void TServer::updatePlayers()
 {
 #ifndef NO_MYSQL
 	// Set our lastconnected.
-	CString query;
-	query << "UPDATE `" << settings->getStr("serverhq") << "`";
-	if (isServerHQ) query << ".`" << settings->getStr("serverlist") << "`";
-	query << " SET lastconnected=NOW() " << "WHERE name='" << name.escape() << "'";
+	CString query = CString() << "UPDATE `" << settings->getStr("serverlist") << "` SET lastconnected=NOW() " << "WHERE name='" << name.escape() << "'";
 	mySQL->query(query);
+	if (isServerHQ)
+	{
+		query = CString() << "UPDATE `" << settings->getStr("serverhq") << "` SET lastconnected=NOW() " << "WHERE name='" << name.escape() << "'";
+		mySQL->query(query);
+	}
 
 	// Update our playercount.
 	SQLupdate("playercount", CString((int)playerList.size()));
