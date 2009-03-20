@@ -932,7 +932,7 @@ bool TServer::msgSVI_SERVERHQLEVEL(CString& pPacket)
 	mySQL->query(query, &result);
 
 	// If the password was wrong, limit ourselves to the bronze tab.
-	if (result.size() != 0)
+	if (result.size() == 0)
 	{
 		if (serverhq_level != 0)
 			serverhq_level = 1;
