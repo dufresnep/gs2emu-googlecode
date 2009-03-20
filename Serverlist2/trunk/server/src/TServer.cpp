@@ -553,8 +553,8 @@ bool TServer::msgSVI_SETPLYR(CString& pPacket)
 			pl->account = pPacket.readChars(pPacket.readGUChar());
 			pl->nick = pPacket.readChars(pPacket.readGUChar());
 			pl->level = pPacket.readChars(pPacket.readGUChar());
-			pl->x = (float)pPacket.readGChar() / 2;
-			pl->y = (float)pPacket.readGChar() / 2;
+			pl->x = (float)pPacket.readGChar() / 2.0f;
+			pl->y = (float)pPacket.readGChar() / 2.0f;
 			pl->ap = pPacket.readGChar();
 			pl->type = pPacket.readGChar();
 		playerList.push_back(pl);
