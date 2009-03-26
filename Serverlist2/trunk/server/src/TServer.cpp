@@ -223,7 +223,11 @@ void TServer::updatePlayers()
 	// Update our player list.
 	CString playerlist;
 	for (std::vector<player*>::iterator i = playerList.begin(); i != playerList.end(); ++i)
-		playerlist << (*i)->account << ",";
+	{
+		int ANY_CLIENT = (int)(1 << 0) | (int)(1 << 4) | (int)(1 << 5);
+		player* p = *i;
+		if (p->type & ANY_CLIENT != 0) playerlist << (*i)->account << ",";
+	}
 	SQLupdate("playerlist", playerlist);
 
 	// Check to see if we can increase our maxplayers.
