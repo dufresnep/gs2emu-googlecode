@@ -53,6 +53,7 @@
 
 	#include <sys/socket.h>
 	#include <netinet/in.h>
+	#include <netinet/tcp.h>
 	#define SOCKET_ERROR	-1
 	#define INVALID_SOCKET	(unsigned int)-1
 
@@ -264,6 +265,13 @@ int CSocket::connect()
 			properties.state = SOCKET_STATE_DISCONNECTED;
 			return SOCKET_CONNECT_ERROR;
 		}
+	}
+
+	// Disable the nagle algorithm.
+	if (properties.protocol == SOCKET_PROTOCOL_TCP)
+	{
+		int nagle = 1;
+		setsockopt(properties.handle, IPPROTO_TCP, TCP_NODELAY, (char*)&nagle, sizeof(nagle));
 	}
 
 	// Socket connected!

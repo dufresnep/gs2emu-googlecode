@@ -26,6 +26,8 @@ Fixes:
 - Fixed bugs related to uploading files through the File Browser.
 - Fixed the "if (created)" problem everybody whines about.  qq
   See Additions for more details.
+- The nagle algorithm is correctly disabled now.  Linux servers should
+  see smoother movement and less lag.
 
 
 --------------------------------------------
