@@ -1,0 +1,87 @@
+# Project: winGserverDev.xe
+# Makefile created by Dev-C++ 4.9.9.2
+
+CPP  = g++.exe
+CC   = gcc.exe
+WINDRES = windres.exe
+RES  = 
+OBJ  = ../src/md5.o ../src/CAccount.o ../src/CBaddy.o ../src/CBuffer.o ../src/CDatabase.o ../src/CIni.o ../src/CLevel.o ../src/CLinkedList.o ../src/CList.o ../src/CMap.o ../src/CNpc.o ../src/codec.o ../src/COther.o ../src/CPacket.o ../src/CPlayer.o ../src/CServerBot.o ../src/CSocket.o ../src/CStringList.o ../src/CWeapon.o ../src/main.o $(RES)
+LINKOBJ  = ../src/md5.o ../src/CAccount.o ../src/CBaddy.o ../src/CBuffer.o ../src/CDatabase.o ../src/CIni.o ../src/CLevel.o ../src/CLinkedList.o ../src/CList.o ../src/CMap.o ../src/CNpc.o ../src/codec.o ../src/COther.o ../src/CPacket.o ../src/CPlayer.o ../src/CServerBot.o ../src/CSocket.o ../src/CStringList.o ../src/CWeapon.o ../src/main.o $(RES)
+LIBS =  -L"E:/Program/Dev-Cpp/lib" ../CodeBlocks/lib/libzdll.a ../CodeBlocks/lib/libsqlite.a ../CodeBlocks/lib/libws2_32.a  
+INCS =  -I"E:/Program/Dev-Cpp/include" 
+CXXINCS =  -I"E:/Program/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"E:/Program/Dev-Cpp/include/c++/3.4.2/backward"  -I"E:/Program/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"E:/Program/Dev-Cpp/include/c++/3.4.2"  -I"E:/Program/Dev-Cpp/include" 
+BIN  = ../bin/winGserverDev.exe
+CXXFLAGS = $(CXXINCS)  
+CFLAGS = $(INCS)  
+RM = rm -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before ../bin/winGserverDev.exe all-after
+
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CPP) $(LINKOBJ) -o "..\bin\winGserverDev.exe" $(LIBS)
+
+../src/md5.o: ../src/md5.cpp
+	$(CPP) -c ../src/md5.cpp -o ../src/md5.o $(CXXFLAGS)
+
+../src/CAccount.o: ../src/CAccount.cpp
+	$(CPP) -c ../src/CAccount.cpp -o ../src/CAccount.o $(CXXFLAGS)
+
+../src/CBaddy.o: ../src/CBaddy.cpp
+	$(CPP) -c ../src/CBaddy.cpp -o ../src/CBaddy.o $(CXXFLAGS)
+
+../src/CBuffer.o: ../src/CBuffer.cpp
+	$(CPP) -c ../src/CBuffer.cpp -o ../src/CBuffer.o $(CXXFLAGS)
+
+../src/CDatabase.o: ../src/CDatabase.cpp
+	$(CPP) -c ../src/CDatabase.cpp -o ../src/CDatabase.o $(CXXFLAGS)
+
+../src/CIni.o: ../src/CIni.cpp
+	$(CPP) -c ../src/CIni.cpp -o ../src/CIni.o $(CXXFLAGS)
+
+../src/CLevel.o: ../src/CLevel.cpp
+	$(CPP) -c ../src/CLevel.cpp -o ../src/CLevel.o $(CXXFLAGS)
+
+../src/CLinkedList.o: ../src/CLinkedList.cpp
+	$(CPP) -c ../src/CLinkedList.cpp -o ../src/CLinkedList.o $(CXXFLAGS)
+
+../src/CList.o: ../src/CList.cpp
+	$(CPP) -c ../src/CList.cpp -o ../src/CList.o $(CXXFLAGS)
+
+../src/CMap.o: ../src/CMap.cpp
+	$(CPP) -c ../src/CMap.cpp -o ../src/CMap.o $(CXXFLAGS)
+
+../src/CNpc.o: ../src/CNpc.cpp
+	$(CPP) -c ../src/CNpc.cpp -o ../src/CNpc.o $(CXXFLAGS)
+
+../src/codec.o: ../src/codec.cpp
+	$(CPP) -c ../src/codec.cpp -o ../src/codec.o $(CXXFLAGS)
+
+../src/COther.o: ../src/COther.cpp
+	$(CPP) -c ../src/COther.cpp -o ../src/COther.o $(CXXFLAGS)
+
+../src/CPacket.o: ../src/CPacket.cpp
+	$(CPP) -c ../src/CPacket.cpp -o ../src/CPacket.o $(CXXFLAGS)
+
+../src/CPlayer.o: ../src/CPlayer.cpp
+	$(CPP) -c ../src/CPlayer.cpp -o ../src/CPlayer.o $(CXXFLAGS)
+
+../src/CServerBot.o: ../src/CServerBot.cpp
+	$(CPP) -c ../src/CServerBot.cpp -o ../src/CServerBot.o $(CXXFLAGS)
+
+../src/CSocket.o: ../src/CSocket.cpp
+	$(CPP) -c ../src/CSocket.cpp -o ../src/CSocket.o $(CXXFLAGS)
+
+../src/CStringList.o: ../src/CStringList.cpp
+	$(CPP) -c ../src/CStringList.cpp -o ../src/CStringList.o $(CXXFLAGS)
+
+../src/CWeapon.o: ../src/CWeapon.cpp
+	$(CPP) -c ../src/CWeapon.cpp -o ../src/CWeapon.o $(CXXFLAGS)
+
+../src/main.o: ../src/main.cpp
+	$(CPP) -c ../src/main.cpp -o ../src/main.o $(CXXFLAGS)
