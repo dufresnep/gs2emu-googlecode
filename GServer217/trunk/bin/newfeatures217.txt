@@ -1,4 +1,12 @@
 --------------------------------------------
+New features/bug fixes in v2.171 build 67
+--------------------------------------------
+
+Fixes:
+- All sign codes are properly sent to the player now.
+
+
+--------------------------------------------
 New features/bug fixes in v2.171 build 66
 --------------------------------------------
 

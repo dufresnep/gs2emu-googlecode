@@ -15,9 +15,9 @@ CString base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
 CString signText = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 				"0123456789!?-.,#>()#####\"####':/~&### <####;\n";
 CString signSymbols = "ABXYudlrhxyz#4.";
-int ctablen[] = {1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1};
-int ctabindex[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 16};
-int ctab[] = {91, 92, 93, 94, 77, 78, 79, 80, 74, 75, 71, 72, 73, 86, 87, 88, 67};
+int ctablen[] = {1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1};
+int ctabindex[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 15};
+int ctab[] = {91, 92, 93, 94, 77, 78, 79, 80, 74, 75, 71, 72, 73, 87, 88, 67};
 extern const char* itemNames[];
 
 // Store join command stuff.
@@ -658,17 +658,36 @@ CString CLevel::getSignCode(CString& pText)
 			{
 				letter = pText[i];
 				int code = signSymbols.find(letter);
-				if(code >= 0)
+				if(code != -1)
 				{
 					for(int ii = 0; ii < ctablen[code]; ii++)
 						retVal.writeChar(ctab[ctabindex[code] + ii] + 32);
-				}
+					continue;
+				} else letter = pText[--i];
 			}
-		} else
+		}
+
+		int code = signText.find(letter);
+		if (letter == '#') code = 86;
+		if(code != -1)
+			retVal.writeChar(code+32);
+		else
 		{
-			int code = signText.find(letter);
-			if(code >= 0)
-				retVal.writeChar(code+32);
+			retVal.writeChar(86 +32);	// #
+			retVal.writeChar(10 +32);	// K
+			retVal.writeChar(69 +32);	// (
+
+			char buf[10];
+			memset(buf, 0, 10);
+			sprintf(buf,"%d", code);
+			CString scode(buf);
+			for (int i = 0; i < scode.length(); ++i)
+			{
+				int c = signText.find(scode[i]);
+				if (c != -1) retVal.writeChar(c +32);
+			}
+
+			retVal.writeChar(70 +32);	// )
 		}
 	}
 	return retVal;
