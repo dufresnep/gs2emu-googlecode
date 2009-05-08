@@ -226,7 +226,7 @@ void TServer::updatePlayers()
 	{
 		int ANY_CLIENT = (int)(1 << 0) | (int)(1 << 4) | (int)(1 << 5);
 		player* p = *i;
-		if (p->type & ANY_CLIENT != 0) playerlist << (*i)->account << ",";
+		if ((p->type & ANY_CLIENT) != 0) playerlist << (*i)->account << ",";
 	}
 	SQLupdate("playerlist", playerlist);
 
@@ -424,7 +424,7 @@ dupCheck:
 		{
 			// If the IP addresses are the same, something happened and this server is reconnecting.
 			// Delete the old server.
-			if (serverList[i]->getIp() == this->getIp())
+			if (CString(serverList[i]->getSock()->tcpIp()) == CString(sock->tcpIp()))
 			{
 				name = serverList[i]->getName();
 				serverList[i]->kill();
