@@ -422,12 +422,14 @@ dupCheck:
 	{
 		if (serverList[i] != this && serverList[i]->getName() == name)
 		{
+			TServer* server = serverList[i];
+
 			// If the IP addresses are the same, something happened and this server is reconnecting.
 			// Delete the old server.
-			if (CString(serverList[i]->getSock()->tcpIp()) == CString(sock->tcpIp()))
+			if (server->getSock() == null || strcmp(server->getSock()->tcpIp(), sock->tcpIp()) == 0)
 			{
-				name = serverList[i]->getName();
-				serverList[i]->kill();
+				name = server->getName();
+				server->kill();
 				i = serverList.size();
 			}
 			else
@@ -439,7 +441,7 @@ dupCheck:
 					name << CString(rand() % 9);
 					goto dupCheck;
 				}
-				serverList[i]->sendPacket(CString() >> (char)SVO_ERRMSG << "Servername is already in use!");
+				sendPacket(CString() >> (char)SVO_ERRMSG << "Servername is already in use!");
 				dupFound = true;
 				break;
 			}
