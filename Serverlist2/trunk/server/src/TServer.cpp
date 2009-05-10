@@ -426,7 +426,7 @@ dupCheck:
 
 			// If the IP addresses are the same, something happened and this server is reconnecting.
 			// Delete the old server.
-			if (server->getSock() == null || strcmp(server->getSock()->tcpIp(), sock->tcpIp()) == 0)
+			if (server->getSock() == 0 || strcmp(server->getSock()->tcpIp(), sock->tcpIp()) == 0)
 			{
 				name = server->getName();
 				server->kill();
