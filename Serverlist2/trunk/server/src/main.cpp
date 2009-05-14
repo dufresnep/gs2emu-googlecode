@@ -182,6 +182,12 @@ int main(int argc, char *argv[])
 		for ( std::vector<TServer*>::iterator iter = serverList.begin(); iter != serverList.end() ; )
 		{
 			TServer* server = (TServer*)*iter;
+			if (server == 0)
+			{
+				iter = serverList.erase(iter);
+				continue;
+			}
+
 			if ((int)server->getLastData() >= 300 || server->doMain() == false)
 			{
 				serverlog.out(CString() << "Server disconnected: " << server->getName() << "\n");
