@@ -178,7 +178,8 @@ void TServer::kill()
 	sendCompress();
 
 	// Delete
-	serverList.erase(std::find(serverList.begin(), serverList.end(), this));
+	std::vector<TServer*>::iterator iter = std::find(serverList.begin(), serverList.end(), this);
+	if (iter != serverList.end()) *iter = 0;
 	delete this;
 }
 
