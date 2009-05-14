@@ -184,6 +184,7 @@ int main(int argc, char *argv[])
 			TServer* server = (TServer*)*iter;
 			if (server == 0)
 			{
+				serverlog.out(CString() << "Server disconnected: [Orphaned server]\n");
 				iter = serverList.erase(iter);
 				continue;
 			}
