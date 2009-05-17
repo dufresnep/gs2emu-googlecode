@@ -293,6 +293,8 @@ CString getServerList(int PLVER, const CString& pIp)
 	for (std::vector<TServer*>::iterator i = serverList.begin(); i != serverList.end(); ++i)
 	{
 		TServer* server = (TServer*)*i;
+		if (server == 0) continue;
+
 		if (server->getName().length() != 0)
 			packet << server->getServerPacket(PLVER, pIp);
 	}
