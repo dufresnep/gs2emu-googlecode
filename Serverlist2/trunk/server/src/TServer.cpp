@@ -421,6 +421,7 @@ bool TServer::msgSVI_SETNAME(CString& pPacket)
 dupCheck:
 	for (unsigned int i = 0; i < serverList.size(); i++)
 	{
+		if (serverList[i] == 0) continue;
 		if (serverList[i] != this && serverList[i]->getName() == name)
 		{
 			TServer* server = serverList[i];
