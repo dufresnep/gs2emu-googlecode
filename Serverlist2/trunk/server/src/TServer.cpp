@@ -277,9 +277,9 @@ const CString& TServer::getName()
 	return name;
 }
 
-const CString& TServer::getPCount()
+const int TServer::getPCount()
 {
-	return (pcount = playerList.size());
+	return playerList.size();
 }
 
 const CString& TServer::getPort()
@@ -326,7 +326,8 @@ const CString& TServer::getVersion()
 const CString TServer::getServerPacket(int PLVER, const CString& pIp)
 {
 	CString testIp = getIp(pIp);
-	return CString() >> (char)8 >> (char)(getType(PLVER).length() + getName().length()) << getType(PLVER) << getName() >> (char)getLanguage().length() << getLanguage() >> (char)getDescription().length() << getDescription() >> (char)getUrl().length() << getUrl() >> (char)getVersion().length() << getVersion() >> (char)getPCount().length() << getPCount() >> (char)testIp.length() << testIp >> (char)getPort().length() << getPort();
+	CString pcount((int)playerList.size());
+	return CString() >> (char)8 >> (char)(getType(PLVER).length() + getName().length()) << getType(PLVER) << getName() >> (char)getLanguage().length() << getLanguage() >> (char)getDescription().length() << getDescription() >> (char)getUrl().length() << getUrl() >> (char)getVersion().length() << getVersion() >> (char)pcount.length() << pcount >> (char)testIp.length() << testIp >> (char)getPort().length() << getPort();
 }
 
 /*
@@ -551,16 +552,13 @@ bool TServer::msgSVI_SETPORT(CString& pPacket)
 
 bool TServer::msgSVI_SETPLYR(CString& pPacket)
 {
-	// definitions
-	unsigned int count = 0;
-
 	// clear list
 	for (unsigned int i = 0; i < playerList.size(); i++)
 		delete playerList[i];
 	playerList.clear();
 
 	// grab new playercount
-	count = pPacket.readGUChar();
+	unsigned int count = pPacket.readGUChar();
 
 	// remake list
 	for (unsigned int i = 0; i < count; i++)
@@ -571,8 +569,8 @@ bool TServer::msgSVI_SETPLYR(CString& pPacket)
 			pl->level = pPacket.readChars(pPacket.readGUChar());
 			pl->x = (float)pPacket.readGChar() / 2.0f;
 			pl->y = (float)pPacket.readGChar() / 2.0f;
-			pl->ap = pPacket.readGChar();
-			pl->type = pPacket.readGChar();
+			pl->ap = pPacket.readGUChar();
+			pl->type = pPacket.readGUChar();
 		playerList.push_back(pl);
 	}
 
@@ -604,7 +602,7 @@ bool TServer::msgSVI_VERIGLD(CString& pPacket)
 	CString nickname = pPacket.readChars(pPacket.readGUChar());
 	CString guild = pPacket.readChars(pPacket.readGUChar());
 
-	if (verifyGuild(account, nickname, guild))
+	if (verifyGuild(account, nickname, guild) == GUILDSTAT_ALLOWED)
 	{
 		nickname << " (" << guild << ")";
 		sendPacket(CString() >> (char)SVO_VERIGLD >> (short)playerid >> (char)nickname.length() << nickname);
@@ -705,10 +703,10 @@ bool TServer::msgSVI_PLYRADD(CString& pPacket)
 		pl->account = pPacket.readChars(pPacket.readGUChar());
 		pl->nick = pPacket.readChars(pPacket.readGUChar());
 		pl->level = pPacket.readChars(pPacket.readGUChar());
-		pl->x = (float)pPacket.readGChar() / 2;
-		pl->y = (float)pPacket.readGChar() / 2;
-		pl->ap = pPacket.readGChar();
-		pl->type = pPacket.readGChar();
+		pl->x = (float)pPacket.readGChar() / 2.0f;
+		pl->y = (float)pPacket.readGChar() / 2.0f;
+		pl->ap = pPacket.readGUChar();
+		pl->type = pPacket.readGUChar();
 	playerList.push_back(pl);
 
 	// Update the database.
@@ -719,24 +717,23 @@ bool TServer::msgSVI_PLYRADD(CString& pPacket)
 
 bool TServer::msgSVI_PLYRREM(CString& pPacket)
 {
-	if ( playerList.size() == 0 )
+	if (playerList.size() == 0)
 		return true;
 
 	unsigned char type = pPacket.readGUChar();
 	CString accountname = pPacket.readString("");
 
 	// Find the player and remove him.
-	std::vector<player*>::iterator iter;
-	for ( iter = playerList.begin(); iter != playerList.end(); )
+	for (std::vector<player*>::iterator i = playerList.begin(); i != playerList.end(); )
 	{
-		player* pl = (player*)*iter;
-		if ( pl->account == accountname && pl->type == type )
+		player* pl = *i;
+		if (pl->account == accountname && pl->type == type)
 		{
 			delete pl;
-			iter = playerList.erase( iter );
+			i = playerList.erase(i);
 		}
 		else
-			++iter;
+			++i;
 	}
 
 	// Update the database.

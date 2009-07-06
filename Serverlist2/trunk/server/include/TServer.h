@@ -75,7 +75,7 @@ struct player
 {
 	CString account, nick, level;
 	float x, y;
-	int ap, type;
+	unsigned char ap, type;
 };
 
 class TServer
@@ -100,7 +100,7 @@ class TServer
 		const CString getIp(const CString& pIp = "");
 		const CString& getLanguage();
 		const CString& getName();
-		const CString& getPCount();
+		const int getPCount();
 		const CString& getPort();
 		const CString getType(int PLVER);
 		const CString& getUrl();
@@ -146,7 +146,7 @@ class TServer
 		CSocket *sock;
 		CString sendBuffer, sockBuffer, outBuffer;
 
-		CString description, ip, language, name, pcount, port, url, version, localip;
+		CString description, ip, language, name, port, url, version, localip;
 		std::vector<player *> playerList;
 		time_t lastPing, lastData, lastPlayerCount, lastUptimeCheck;
 		bool addedToSQL;
