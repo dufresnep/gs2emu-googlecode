@@ -431,7 +431,7 @@ int verifyGuild(const CString& pAccount, const CString& pNickname, const CString
 		if (restrictNick != 0)
 			query << " AND nickname='" << pNickname.escape() << "'";
 
-		return (mySQL->query(query) == 0 ? GUILDSTAT_DISALLOWED : GUILDSTAT_ALLOWED);
+		return (mySQL->query(query, &result) == 0 ? GUILDSTAT_DISALLOWED : GUILDSTAT_ALLOWED);
 	}
 
 	return GUILDSTAT_DISALLOWED;
