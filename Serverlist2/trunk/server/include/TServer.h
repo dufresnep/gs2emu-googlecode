@@ -30,6 +30,7 @@ enum
 	SVI_NEWSERVER		= 22,
 	SVI_SERVERHQPASS	= 23,
 	SVI_SERVERHQLEVEL	= 24,
+	SVI_SERVERINFO		= 25,
 };
 
 enum
@@ -52,6 +53,7 @@ enum
 	SVO_FILESTART3		= 15,
 	SVO_FILEDATA3		= 16,
 	SVO_FILEEND3		= 17,
+	SVO_SERVERINFO		= 18,
 	SVO_PING			= 99,
 	SVO_RAWDATA			= 100,
 };
@@ -141,6 +143,7 @@ class TServer
 		bool msgSVI_NEWSERVER(CString& pPacket);
 		bool msgSVI_SERVERHQPASS(CString& pPacket);
 		bool msgSVI_SERVERHQLEVEL(CString& pPacket);
+		bool msgSVI_SERVERINFO(CString& pPacket);
 
 	private:
 		CSocket *sock;

@@ -54,6 +54,7 @@ void createSVFunctions()
 	svfunc[SVI_NEWSERVER] = &TServer::msgSVI_NEWSERVER;
 	svfunc[SVI_SERVERHQPASS] = &TServer::msgSVI_SERVERHQPASS;
 	svfunc[SVI_SERVERHQLEVEL] = &TServer::msgSVI_SERVERHQLEVEL;
+	svfunc[SVI_SERVERINFO] = &TServer::msgSVI_SERVERINFO;
 }
 
 /*
@@ -990,6 +991,26 @@ bool TServer::msgSVI_SERVERHQLEVEL(CString& pPacket)
 	SQLupdate("type", getType(4));
 	if (isServerHQ) SQLupdateHQ("curlevel", CString((int)serverhq_level));
 #endif
+
+	return true;
+}
+
+bool TServer::msgSVI_SERVERINFO(CString& pPacket)
+{
+	int pid = pPacket.readGUShort();
+	CString servername = pPacket.readString("");
+
+	int id = 0;
+	for (std::vector<TServer*>::iterator i = serverList.begin(); i != serverList.end(); ++i)
+	{
+		TServer* server = *i;
+		if (server->getName() == servername)
+		{
+			sendPacket(CString() >> (char)SVO_SERVERINFO >> (short)pid << "playerworld" << CString((int)id) << "," << server->getName() << "," << server->getIp() << "," << server->getPort());
+			return true;
+		}
+		++id;
+	}
 
 	return true;
 }
