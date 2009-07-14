@@ -25,7 +25,7 @@ std::vector<TSVSock> svfunc;
 void createSVFunctions()
 {
 	// kinda like a memset-ish thing y'know
-	for (int i = 0; i < 25; i++)
+	for (int i = 0; i < 26; i++)
 		svfunc.push_back(&TServer::msgSVI_NULL);
 
 	// now set non-nulls
