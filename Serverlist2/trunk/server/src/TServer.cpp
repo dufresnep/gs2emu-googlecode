@@ -1004,7 +1004,7 @@ bool TServer::msgSVI_SERVERINFO(CString& pPacket)
 	for (std::vector<TServer*>::iterator i = serverList.begin(); i != serverList.end(); ++i)
 	{
 		TServer* server = *i;
-		if (server->getName() == servername)
+		if (servername.comparei(server->getName())
 		{
 			sendPacket(CString() >> (char)SVO_SERVERINFO >> (short)pid << "playerworld" << CString((int)id) << "," << server->getName() << "," << server->getIp() << "," << server->getPort());
 			return true;
