@@ -108,8 +108,7 @@ class TServer
 		const CString& getUrl();
 		const CString& getVersion();
 		const CString getServerPacket(int PLVER, const CString& pIp = "");
-		int getLastData()	{ return (int)difftime( time(0), lastData ); }
-		CSocket* getSock()	{ return sock; }
+		int getLastData() { return (int)difftime( time(0), lastData ); }
 
 		// send-packet functions
 		void sendCompress();

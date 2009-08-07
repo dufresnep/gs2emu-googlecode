@@ -182,13 +182,6 @@ int main(int argc, char *argv[])
 		for ( std::vector<TServer*>::iterator iter = serverList.begin(); iter != serverList.end() ; )
 		{
 			TServer* server = (TServer*)*iter;
-			if (server == 0)
-			{
-				serverlog.out(CString() << "Server disconnected: [Orphaned server]\n");
-				iter = serverList.erase(iter);
-				continue;
-			}
-
 			if ((int)server->getLastData() >= 300 || server->doMain() == false)
 			{
 				serverlog.out(CString() << "Server disconnected: " << server->getName() << "\n");
@@ -293,8 +286,6 @@ CString getServerList(int PLVER, const CString& pIp)
 	for (std::vector<TServer*>::iterator i = serverList.begin(); i != serverList.end(); ++i)
 	{
 		TServer* server = (TServer*)*i;
-		if (server == 0) continue;
-
 		if (server->getName().length() != 0)
 			packet << server->getServerPacket(PLVER, pIp);
 	}
