@@ -155,7 +155,10 @@ void CSocket::destroy()
 {
 	// Shut down the socket.
 	if (shutdown(properties.handle, SHUT_WR) == SOCKET_ERROR)
-		serverlog.out(CString() << "[CSocket::destroy] shutdown returned error: " << errorMessage(identifyError()) << "\n");
+	{
+		int err = identifyError();
+		if (err != ENOTCONN) serverlog.out(CString() << "[CSocket::destroy] shutdown returned error: " << errorMessage(identifyError()) << "\n");
+	}
 
 	// Mark socket as terminating.
 	properties.state = SOCKET_STATE_TERMINATING;

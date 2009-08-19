@@ -179,7 +179,8 @@ void TServer::kill()
 	sendCompress();
 
 	// Delete
-	serverList.erase(std::find(serverList.begin(), serverList.end(), this));
+	std::vector<TServer*>::iterator iter = std::find(serverList.begin(), serverList.end(), this);
+	if (iter != serverList.end()) *iter = 0;
 	delete this;
 }
 
@@ -227,7 +228,7 @@ void TServer::updatePlayers()
 	{
 		int ANY_CLIENT = (int)(1 << 0) | (int)(1 << 4) | (int)(1 << 5);
 		player* p = *i;
-		if (p->type & ANY_CLIENT != 0) playerlist << (*i)->account << ",";
+		if ((p->type & ANY_CLIENT) != 0) playerlist << (*i)->account << ",";
 	}
 	SQLupdate("playerlist", playerlist);
 
@@ -422,14 +423,17 @@ bool TServer::msgSVI_SETNAME(CString& pPacket)
 dupCheck:
 	for (unsigned int i = 0; i < serverList.size(); i++)
 	{
+		if (serverList[i] == 0) continue;
 		if (serverList[i] != this && serverList[i]->getName() == name)
 		{
+			TServer* server = serverList[i];
+
 			// If the IP addresses are the same, something happened and this server is reconnecting.
 			// Delete the old server.
-			if (serverList[i]->getIp() == this->getIp())
+			if (server->getSock() == 0 || strcmp(server->getSock()->tcpIp(), sock->tcpIp()) == 0)
 			{
-				name = serverList[i]->getName();
-				serverList[i]->kill();
+				name = server->getName();
+				server->kill();
 				i = serverList.size();
 			}
 			else
@@ -441,7 +445,7 @@ dupCheck:
 					name << CString(rand() % 9);
 					goto dupCheck;
 				}
-				serverList[i]->sendPacket(CString() >> (char)SVO_ERRMSG << "Servername is already in use!");
+				sendPacket(CString() >> (char)SVO_ERRMSG << "Servername is already in use!");
 				dupFound = true;
 				break;
 			}
