@@ -61,9 +61,9 @@ CPacket CNpc::getPropertyList(time_t newTime)
 			else
 				retVal << (char)i << getProperty(i);
 		}
-		if (modTime[NPCANI] == 0 && image == "#c#")
-			retVal << (char)NPCANI << (char)4 << "idle";
 	}
+	if (modTime[NPCANI] == 0 && image == "#c#")
+		retVal << (char)NPCANI << (char)4 << "idle";
 	return retVal;
 }
 

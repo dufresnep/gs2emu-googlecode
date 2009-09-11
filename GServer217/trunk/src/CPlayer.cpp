@@ -1803,7 +1803,7 @@ void CPlayer::dropItems()
 			gralats -= 100;
 			itemId = GOLDRUPEE;
 		}
-		if ( gralats % 30 != gralats )
+		else if ( gralats % 30 != gralats )
 		{
 			gralats -= 30;
 			itemId = REDRUPEE;
