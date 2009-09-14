@@ -1,3 +1,4 @@
+#include "IDebug.h"
 #include "CString.h"
 
 #ifdef _WIN32
@@ -9,89 +10,103 @@
 	Constructor ~ Deconstructor
 */
 
-CString::CString(const char *pString)
+CString::CString()
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
+	clear(30);
+}
+
+CString::CString(const char *pString)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
+{
+	if (pString == 0)
+	{
+		clear(30);
+		return;
+	}
 
 	int length = strlen(pString);
-	clear(length);
-	write(pString, length);
+	if (length != 0)
+	{
+		clear(length);
+		write(pString, length);
+	}
+	else clear(30);
 }
 
 CString::CString(const CString& pString)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	clear(pString.length());
 	write(pString.text(), pString.length());
 }
 
 CString::CString(char pChar)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	clear(sizeof(char));
 	writeChar(pChar);
 }
 
 CString::CString(double pDouble)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	char tempBuff[32];
 	sprintf(tempBuff, "%f", pDouble);
 	*this = tempBuff;
 }
 
 CString::CString(float pFloat)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	char tempBuff[32];
 	sprintf(tempBuff, "%.2f", pFloat);
 	*this = tempBuff;
 }
 
 CString::CString(int pInteger)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	char tempBuff[32];
 	sprintf(tempBuff, "%i", pInteger);
 	*this = tempBuff;
 }
 
 CString::CString(unsigned int pUInteger)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	char tempBuff[32];
 	sprintf(tempBuff, "%u", pUInteger);
 	*this = tempBuff;
 }
 
-CString::CString(unsigned long int pLUInteger)
+CString::CString(long pLInteger)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
+	char tempBuff[32];
+	sprintf(tempBuff, "%ld", pLInteger);
+	*this = tempBuff;
+}
 
+CString::CString(unsigned long pLUInteger)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
+{
 	char tempBuff[32];
 	sprintf(tempBuff, "%lu", pLUInteger);
 	*this = tempBuff;
 }
 
 CString::CString(long long pLLInteger)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	char tempBuff[64];
 	sprintf(tempBuff, "%lld", pLLInteger);
 	*this = tempBuff;
 }
 
 CString::CString(unsigned long long pLLUInteger)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	char tempBuff[64];
 	sprintf(tempBuff, "%llu", pLLUInteger);
 	*this = tempBuff;
@@ -99,7 +114,7 @@ CString::CString(unsigned long long pLLUInteger)
 
 CString::~CString()
 {
-	free(buffer);
+	if (buffer) free(buffer);
 }
 
 /*
@@ -177,6 +192,8 @@ int CString::write(const char *pSrc, int pSize)
 {
 	if (!pSize)
 		return 0;
+	if (buffer == 0)
+		clear(pSize);
 
 	if (writec + pSize >= buffc)
 	{
@@ -198,7 +215,7 @@ int CString::write(const CString& pString)
 
 void CString::clear(int pSize)
 {
-	free(buffer);
+	if (buffer) free(buffer);
 	sizec = readc = writec = 0;
 	buffc = (pSize > 0 ? pSize : 1) + 1;
 	buffer = (char*)malloc(buffc);
@@ -223,6 +240,28 @@ CString CString::escape() const
 			retVal << "\'\'";
 		else
 			retVal << buffer[i];
+	}
+
+	return retVal;
+}
+
+CString CString::unescape() const
+{
+	CString retVal;
+
+	for (int i = 0; i < length() - 1; i++)
+	{
+		char cur = buffer[i];
+		char nex = buffer[++i];
+		
+		if (cur == '\\' && nex == '\\')
+			retVal << "\\";
+		else if (cur == '\"' && nex == '\"')
+			retVal << "\"";
+		else if (cur == '\'' && nex == '\'')
+			retVal << "\'";
+		else
+			retVal << buffer[--i];
 	}
 
 	return retVal;
@@ -280,6 +319,7 @@ CString CString::removeAll(const CString& pString) const
 		pStart += (pRead + pLen);
 	}
 	while ((pLoc = find(pString, pStart)) != -1);
+	retVal << subString(pStart);
 
 	// Done!
 	return retVal;
@@ -336,7 +376,7 @@ CString CString::trimLeft() const
 {
 	for (int i = 0; i < length(); ++i)
 	{
-		if (buffer[i] > ' ')
+		if ((unsigned char)buffer[i] > (unsigned char)' ')
 			return subString(i, length() - i);
 	}
 
@@ -348,79 +388,113 @@ CString CString::trimRight() const
 {
 	for (int i = length() - 1; i >= 0; --i)
 	{
-		if (buffer[i] > ' ')
+		if ((unsigned char)buffer[i] > (unsigned char)' ')
 			return subString(0, i+1);
 	}
 
 	return CString(*this);
 }
 
-CString CString::bzcompress() const
+CString CString::bzcompress(unsigned int buffSize) const
 {
 	CString retVal;
-	char buf[65536];
+	char* buf = new char[buffSize];
+	memset((void*)buf, 0, buffSize);
 	int error = 0;
-	unsigned int clen = sizeof(buf);
+	unsigned int clen = buffSize;
 
 	if ((error = BZ2_bzBuffToBuffCompress(buf, &clen, buffer, length(), 1, 0, 30)) != BZ_OK)
+	{
+		delete [] buf;
 		return retVal;
+	}
 
 	retVal.write(buf, clen);
+	delete [] buf;
 	return retVal;
 }
 
-CString CString::bzuncompress() const
+CString CString::bzuncompress(unsigned int buffSize) const
 {
 	CString retVal;
-	char buf[65536];
+	char* buf = new char[buffSize];
+	memset((void*)buf, 0, buffSize);
 	int error = 0;
-	unsigned int clen = sizeof(buf);
+	unsigned int clen = buffSize;
 
 	if ((error = BZ2_bzBuffToBuffDecompress(buf, &clen, buffer, length(), 0, 0)) != BZ_OK)
+	{
+		delete [] buf;
 		return retVal;
+	}
 
 	retVal.write(buf, clen);
+	delete [] buf;
 	return retVal;
 }
 
-CString CString::zcompress() const
+CString CString::zcompress(unsigned int buffSize) const
 {
 	CString retVal;
-	char buf[65536];
+	char* buf = new char[buffSize];
+	memset((void*)buf, 0, buffSize);
 	int error = 0;
-	unsigned long clen = sizeof(buf);
+	unsigned long clen = buffSize;
 
 	if ((error = compress((Bytef *)buf, (uLongf *)&clen, (const Bytef *)buffer, length())) != Z_OK)
+	{
+		delete [] buf;
 		return retVal;
+	}
 
 	retVal.write(buf, clen);
+	delete [] buf;
 	return retVal;
 }
 
-CString CString::zuncompress() const
+CString CString::zuncompress(unsigned int buffSize) const
 {
 	CString retVal;
-	char buf[65536];
+	char* buf = new char[buffSize];
+	memset((void*)buf, 0, buffSize);
 	int error = 0;
-	unsigned long clen = sizeof(buf);
+	unsigned long clen = buffSize;
 
 	if ((error = uncompress((Bytef *)buf, (uLongf *)&clen, (const Bytef *)buffer, length())) != Z_OK)
+	{
+		switch (error)
+		{
+			case Z_MEM_ERROR:
+				printf("[zlib] Not enough memory to decompress.\n");
+				break;
+			case Z_BUF_ERROR:
+				printf("[zlib] Not enough room in the output buffer to decompress.\n");
+				break;
+			case Z_DATA_ERROR:
+				printf("[zlib] The input data was corrupted.\n");
+				break;
+		}
+		delete [] buf;
 		return retVal;
+	}
 
 	retVal.write(buf, clen);
+	delete [] buf;
 	return retVal;
 }
 
 int CString::find(const CString& pString, int pStart) const
 {
-	for (int i = pStart; i <= sizec - pString.length(); ++i)
+	const char* obuffer = pString.text();
+	const int olen = pString.length();
+	for (int i = pStart; i <= sizec - olen; ++i)
 	{
 		if (buffer[i] == 0)
 		{
-			if (pString.length() == 0) return i;
+			if (olen == 0) return i;
 			else continue;
 		}
-		if (strncmp(buffer + i, pString.text(), pString.length()) == 0)
+		if (memcmp(buffer + i, obuffer, olen) == 0)
 			return i;
 	}
 	return -1;
@@ -458,13 +532,70 @@ std::vector<CString> CString::tokenize(const CString& pString) const
 	return strList;
 }
 
+std::vector<CString> CString::tokenizeConsole() const
+{
+	std::vector<CString> strList;
+	bool quotes = false;
+	CString str;
+	for (int i = 0; i < sizec; ++i)
+	{
+		switch (buffer[i])
+		{
+			case ' ':
+				if (!quotes)
+				{
+					strList.push_back(str);
+					str.clear(30);
+				}
+				else str.write(buffer + i, 1);
+				break;
+			case '\"':
+				quotes = !quotes;
+				break;
+			case '\\':
+				if (i + 1 < sizec)
+				{
+					switch (buffer[i + 1])
+					{
+						case '\"':
+							str.write("\"", 1);
+							++i;
+							break;
+						case '\\':
+							str.write("\\", 1);
+							++i;
+							break;
+						default:
+							str.write(buffer + i, 1);
+							break;
+					}
+				}
+				else str.write(buffer + i, 1);
+				break;
+			default:
+				str.write(buffer + i, 1);
+				break;
+		}
+	}
+	strList.push_back(str);
+	return strList;
+}
+
 std::vector<CString> CString::loadToken(const CString& pFile, const CString& pToken, bool removeCR)
 {
 	CString fileData;
 	if (!fileData.load(pFile))
 		return std::vector<CString>();
+
 	if (removeCR) fileData.removeAllI("\r");
-	return fileData.tokenize(pToken);
+
+	// parse file
+	std::vector<CString> result;
+	while (fileData.bytesLeft())
+		result.push_back(fileData.readString(pToken));
+	
+	// return
+	return result;
 }
 
 CString CString::replaceAll(const CString& pString, const CString& pNewString) const
@@ -492,16 +623,17 @@ CString CString::replaceAll(const CString& pString, const CString& pNewString) c
 
 CString CString::gtokenize() const
 {
+	CString self(*this);
 	CString retVal;
 	int pos[] = {0, 0};
 
 	// Add a trailing \n to the line if one doesn't already exist.
-	if (buffer[sizec - 1] != '\n') retVal.writeChar('\n');
+	if (buffer[sizec - 1] != '\n') self.writeChar('\n');
 
 	// Do the tokenization stuff.
-	while ((pos[0] = find("\n", pos[1])) != -1)
+	while ((pos[0] = self.find("\n", pos[1])) != -1)
 	{
-		CString temp(subString(pos[1], pos[0] - pos[1]));
+		CString temp(self.subString(pos[1], pos[0] - pos[1]));
 		temp.replaceAllI( "\"", "\"\"" );	// Change all " to ""
 		temp.removeAllI("\r");
 		if (temp.length() != 0)
@@ -623,84 +755,44 @@ CString CString::guntokenize() const
 
 bool CString::match(const CString& pMask) const
 {
-	int sloc = 0, mloc = 0;
+	char stopstring[1];
+	*stopstring = 0;
+	const char* matchstring = buffer;
+	const char* wildstring = pMask.text();
 
-	// Check to see if they are equal.
-	if (length() == pMask.length())
+	while (*matchstring)
 	{
-		if (memcmp(buffer, pMask.text(), length()) == 0)
-			return true;
-	}
-
-	// Check for a blank string.
-	if (buffer[sloc] == 0)
-	{
-		if ((pMask.text())[mloc] != '*') return false;
-		else return true;
-	}
-
-	// Check just for a single *.
-	if (pMask == "*") return true;
-
-	// Do the match now.
-	while (buffer[sloc] != 0)
-	{
-		// ? only wildcards a single character.
-		// Jump to the next character and try again.
-		if ((pMask.text())[mloc] == '?')
+		if (*wildstring == '*')
 		{
-			sloc++;
-			mloc++;
-			continue;
+			if (!*++wildstring)
+				return true;
+			else *stopstring = *wildstring;
 		}
 
-		// Find the next * or ?.
-		int loc = pMask.find("*", mloc);
-		int loc2 = pMask.find("?", mloc);
-		if (loc == -1 && loc2 == -1)
+		if (*stopstring)
 		{
-			// If neither * or ? was found, see if the rest of the string matches.
-			if (subString(sloc) == pMask.subString(mloc)) return true;
-			else
+			if (*stopstring == *matchstring)
 			{
-				// If they don't match, let's make sure the last mask value wasn't a *.
-				if ((pMask.text())[pMask.length() - 1] == '*') return true;
-				return false;
+				wildstring++;
+				matchstring++;
+				*stopstring = 0;
 			}
+			else matchstring++;
 		}
-
-		// Grab the string to search.
-		// Only read up to the first * or ? so choose the correct one.
-		if (loc == -1) loc = loc2;
-		if (loc2 != -1 && loc2 < loc) loc = loc2;
-		CString search = pMask.subString(mloc, loc - mloc);
-
-		// This should only happen if the mask starts with a *.
-		if (search.length() == 0)
+		else if ((*wildstring == *matchstring) || (*wildstring == '?'))
 		{
-			mloc++;
-			int loc3 = pMask.find("*", mloc);
-			int loc4 = pMask.find("?", mloc);
-			if (loc4 < loc3) loc3 = loc4;
-			sloc = find(pMask.subString(mloc, loc3));
-			continue;
+			wildstring++;
+			matchstring++;
 		}
+		else return false;
 
-		// See if we can find the search string.  If not, we don't match.
-		if ((loc2 = find(search, sloc)) == -1) return false;
-
-		// Update our locations.
-		sloc = loc2 + search.length();
-		mloc = loc + 1;
+		if (!*matchstring && *wildstring && *wildstring != '*')
+		{
+			// matchstring too short
+			return false;
+		}
 	}
-
-	// See if any non-wildcard characters are left in pMask.
-	// If not, return true.
-	CString search = pMask.subString(mloc);
-	search.removeAllI("*");
-	search.removeAllI("?");
-	if (search.length() == 0) return true;
-	return false;
+	return true;
 }
 
 bool CString::comparei(const CString& pOther) const
@@ -710,6 +802,29 @@ bool CString::comparei(const CString& pOther) const
 	return false;
 }
 
+bool CString::isNumber()
+{
+	const char numbers[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
+	char periodCount = 0;
+	for (int i = 0; i < sizec; ++i)
+	{
+		bool isNum = false;
+		for (int j = 0; j < 11; ++j)
+		{
+			if (buffer[i] == numbers[j])
+			{
+				if (j == 10) periodCount++;
+				isNum = true;
+				j = 11;
+			}
+		}
+		if (isNum == false || periodCount > 1)
+			return false;
+	}
+	return true;
+}
+
+
 /*
 	Operators
 */
@@ -718,8 +833,12 @@ CString& CString::operator=(const CString& pString)
 	if (this == &pString)
 		return *this;
 
-	clear(pString.length());
-	write((char*)pString.text(), pString.length());
+	if (pString.length() != 0)
+	{
+		clear(pString.length() + 10);
+		write((char*)pString.text(), pString.length());
+	}
+	else clear(30);
 	return *this;
 }
 
@@ -743,6 +862,11 @@ CString CString::operator+(const CString& pString)
 }
 
 char& CString::operator[](int pIndex)
+{
+	return buffer[pIndex];
+}
+
+char CString::operator[](int pIndex) const
 {
 	return buffer[pIndex];
 }

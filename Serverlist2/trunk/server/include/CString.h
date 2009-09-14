@@ -24,14 +24,16 @@ class CString
 {
 	public:
 		/* Constructor ~ Deconstructor */
-		CString(const char *pString = "");
+		CString();
+		CString(const char *pString);
 		CString(const CString& pString);
 		CString(char pChar);
 		CString(double pDouble);
 		CString(float pFloat);
 		CString(int pInteger);
 		CString(unsigned int pUInteger);
-		CString(unsigned long int pLUInteger);
+		CString(long pLInteger);
+		CString(unsigned long pLUInteger);
 		CString(long long pLLInteger);
 		CString(unsigned long long pLLUInteger);
 		~CString();
@@ -60,6 +62,7 @@ class CString
 
 		/* Functions */
 		CString escape() const;
+		CString unescape() const;
 		CString left(int pLength) const;
 		CString right(int pLength) const;
 		CString remove(int pStart, int pLength = -1) const;
@@ -70,38 +73,42 @@ class CString
 		CString trim() const;
 		CString trimLeft() const;
 		CString trimRight() const;
-		CString bzcompress() const;
-		CString bzuncompress() const;
-		CString zcompress() const;
-		CString zuncompress() const;
+		CString bzcompress(unsigned int buffSize = 65536) const;
+		CString bzuncompress(unsigned int buffSize = 65536) const;
+		CString zcompress(unsigned int buffSize = 65536) const;
+		CString zuncompress(unsigned int buffSize = 65536) const;
 		int find(const CString& pString, int pStart = 0) const;
 		int findi(const CString& pString, int pStart = 0) const;
 		int findl(char pChar) const;
 		std::vector<CString> tokenize(const CString& pString = " ") const;
+		std::vector<CString> tokenizeConsole() const;
 		static std::vector<CString> loadToken(const CString& pFile, const CString& pToken = "\n", bool removeCR = false);
 		CString replaceAll(const CString& pString, const CString& pNewString) const;
 		CString gtokenize() const;
 		CString guntokenize() const;
 		bool match(const CString& pMask) const;
 		bool comparei(const CString& pOther) const;
+		bool isNumber();
 
 		/* In-Functions */
 		inline CString& escapeI();
+		inline CString& unescapeI();
 		inline CString& removeI(int pStart, int pLength = -1);
 		inline CString& removeAllI(const CString& pString);
 		inline CString& toLowerI();
 		inline CString& toUpperI();
 		inline CString& trimI();
-		inline CString& bzcompressI();
-		inline CString& bzuncompressI();
-		inline CString& zcompressI();
-		inline CString& zuncompressI();
+		inline CString& bzcompressI(unsigned int buffSize = 65536);
+		inline CString& bzuncompressI(unsigned int buffSize = 65536);
+		inline CString& zcompressI(unsigned int buffSize = 65536);
+		inline CString& zuncompressI(unsigned int buffSize = 65536);
 		inline CString& replaceAllI(const CString& pString, const CString& pNewString);
 		inline CString& gtokenizeI();
 		inline CString& guntokenizeI();
 
 		/* Operators */
 		char& operator[](int pIndex);
+		char operator[](int pIndex) const;
 		CString& operator=(const CString& pString);
 		CString& operator<<(const CString& pString);
 		CString& operator+=(const CString& pString);
@@ -281,6 +288,12 @@ inline CString& CString::escapeI()
 	return *this;
 }
 
+inline CString& CString::unescapeI()
+{
+	*this = unescape();
+	return *this;
+}
+
 inline CString& CString::removeI(int pStart, int pLength)
 {
 	*this = remove(pStart, pLength);
@@ -311,27 +324,27 @@ inline CString& CString::trimI()
 	return *this;
 }
 
-inline CString& CString::bzcompressI()
+inline CString& CString::bzcompressI(unsigned int buffSize)
 {
-	*this = bzcompress();
+	*this = bzcompress(buffSize);
 	return *this;
 }
 
-inline CString& CString::bzuncompressI()
+inline CString& CString::bzuncompressI(unsigned int buffSize)
 {
-	*this = bzuncompress();
+	*this = bzuncompress(buffSize);
 	return *this;
 }
 
-inline CString& CString::zcompressI()
+inline CString& CString::zcompressI(unsigned int buffSize)
 {
-	*this = zcompress();
+	*this = zcompress(buffSize);
 	return *this;
 }
 
-inline CString& CString::zuncompressI()
+inline CString& CString::zuncompressI(unsigned int buffSize)
 {
-	*this = zuncompress();
+	*this = zuncompress(buffSize);
 	return *this;
 }
 
