@@ -60,6 +60,12 @@ enum
 
 enum
 {
+	VERSION_1		= 0,
+	VERSION_2		= 1,
+};
+
+enum
+{
 	TYPE_HIDDEN		= 0,
 	TYPE_BRONZE		= 1,
 	TYPE_HOSTED		= 1,
@@ -156,6 +162,7 @@ class TServer
 		bool isServerHQ;
 		CString serverhq_pass;
 		unsigned char serverhq_level;
+		int server_version;
 };
 
 #endif // TSERVER_H

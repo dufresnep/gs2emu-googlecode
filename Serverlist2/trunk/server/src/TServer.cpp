@@ -62,7 +62,7 @@ void createSVFunctions()
 */
 TServer::TServer(CSocket *pSocket)
 : sock(pSocket), addedToSQL(false), isServerHQ(false),
-serverhq_level(1)
+serverhq_level(1), server_version(VERSION_1)
 {
 	language = "English";
 	lastPing = lastPlayerCount = lastData = lastUptimeCheck = time(0);
@@ -490,13 +490,37 @@ bool TServer::msgSVI_SETLANG(CString& pPacket)
 bool TServer::msgSVI_SETVERS(CString& pPacket)
 {
 	CString ver(pPacket.readString(""));
-	int verNum = atoi(ver.text());
-	if (verNum == 0)
-		version = CString("Custom build: ") << ver;
-	else if (verNum <= 52)
-		version = CString("Revision ") << CString(abs(verNum));
-	else
-		version = CString("Build ") << CString(verNum);
+	switch (server_version)
+	{
+		case VERSION_1:
+		{
+			int verNum = atoi(ver.text());
+			if (verNum == 0)
+				version = CString("Custom build: ") << ver;
+			else if (verNum <= 52)
+				version = CString("Revision ") << CString(abs(verNum));
+			else
+				version = CString("Build ") << CString(verNum);
+			break;
+		}
+
+		case VERSION_2:
+		{
+			if (ver.match("?.??.?") || ver.match("?.?.?"))
+				version = CString("Version: ") << ver;
+			else if (ver.find("SVN") != -1)
+			{
+				CString ver2 = ver.removeAll("SVN").trim();
+				if (ver2.match("?.??.?") || ver2.match("?.?.?"))
+					version = CString("SVN version: ") << ver2;
+				else
+					version = CString("Custom version: ") << ver;
+			}
+			else
+				version = CString("Custom version: ") << ver;
+			break;
+		}
+	}
 	SQLupdate("version", version);
 	return true;
 }
@@ -906,6 +930,8 @@ bool TServer::msgSVI_GETFILE3(CString& pPacket)
 
 bool TServer::msgSVI_NEWSERVER(CString& pPacket)
 {
+	server_version = VERSION_2;
+
 	CString name = pPacket.readChars(pPacket.readGUChar());
 	CString description = pPacket.readChars(pPacket.readGUChar());
 	CString language = pPacket.readChars(pPacket.readGUChar());
@@ -1004,7 +1030,7 @@ bool TServer::msgSVI_SERVERINFO(CString& pPacket)
 	for (std::vector<TServer*>::iterator i = serverList.begin(); i != serverList.end(); ++i)
 	{
 		TServer* server = *i;
-		if (servername.comparei(server->getName())
+		if (servername.comparei(server->getName()))
 		{
 			sendPacket(CString() >> (char)SVO_SERVERINFO >> (short)pid << "playerworld" << CString((int)id) << "," << server->getName() << "," << server->getIp() << "," << server->getPort());
 			return true;
