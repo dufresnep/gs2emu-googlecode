@@ -1,4 +1,3 @@
-#include "IDebug.h"
 #include "CString.h"
 
 #ifdef _WIN32
