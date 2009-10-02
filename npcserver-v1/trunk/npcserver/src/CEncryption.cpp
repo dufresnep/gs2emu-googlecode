@@ -2,24 +2,24 @@
 // (C) GraalReborn 2008
 
 #include "CString.h"
-#include "CCodec.h"
+#include "CEncryption.h"
 
-const uint32_t CCodec::ITERATOR_START[6] = {0, 0, 0x04A80B38, 0x4A80B38, 0x4A80B38, 0};
+const uint32_t CEncryption::ITERATOR_START[6] = {0, 0, 0x04A80B38, 0x4A80B38, 0x4A80B38, 0};
 
-CCodec::CCodec()
+CEncryption::CEncryption()
 : m_key(0), m_offset(0), m_limit(-1), m_gen(ENCRYPT_GEN_3)
 {
 	m_iterator = ITERATOR_START[m_gen];
 }
 
-void CCodec::reset(uint8_t key) {
+void CEncryption::reset(uint8_t key) {
 	m_key = key;
 	m_offset = 0;
 	m_iterator = ITERATOR_START[m_gen];
 	m_limit = -1;
 }
 
-void CCodec::decrypt(CString& pBuf) {
+void CEncryption::decrypt(CString& pBuf) {
 	// Apply the correct decryption algorithm.
 	switch (m_gen)
 	{
@@ -66,7 +66,7 @@ void CCodec::decrypt(CString& pBuf) {
 	}
 }
 
-CString CCodec::encrypt(CString pBuf)
+CString CEncryption::encrypt(CString pBuf)
 {
 	switch (m_gen)
 	{
@@ -111,12 +111,12 @@ CString CCodec::encrypt(CString pBuf)
 	return pBuf;
 }
 
-void CCodec::limit(int32_t limit)
+void CEncryption::limit(int32_t limit)
 {
 	m_limit = limit;
 }
 
-int CCodec::limitFromType(uint8_t type)
+int CEncryption::limitFromType(uint8_t type)
 {
 	// { type, limit, type2, limit2, ... }
 	static int limits[] = { 0x02, 0x0C, 0x04, 0x04, 0x06, 0x04 };

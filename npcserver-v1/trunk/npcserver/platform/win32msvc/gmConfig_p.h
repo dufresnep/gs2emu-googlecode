@@ -96,7 +96,7 @@
 #define GM_MAX_PATH           256
 
 // basic types
-typedef const char * LPCTSTR;
+//typedef const char * LPCTSTR;
 typedef unsigned int gmuint;
 typedef char gmint8;
 typedef unsigned char gmuint8;

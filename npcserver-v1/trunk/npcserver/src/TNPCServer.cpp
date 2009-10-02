@@ -2,7 +2,8 @@
 
 
 
-TNPCServer::TNPCServer():fileQueue(&playerSock)
+TNPCServer::TNPCServer()
+: fileQueue(&playerSock)
 {
 	m_version = "0.5 beta"; 
 

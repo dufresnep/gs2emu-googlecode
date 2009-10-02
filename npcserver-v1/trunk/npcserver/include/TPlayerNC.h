@@ -14,11 +14,7 @@
 class TScriptWeapon;
 class TScriptClass;
 class TNPCServer;
-
-
-
-
-class TPlayerNC :  public CSocketStub
+class TPlayerNC : public CSocketStub
 {
 public:
 	TPlayerNC(CSocket* pSocket, TNPCServer* pNPCServer);
@@ -27,6 +23,8 @@ public:
 	//CSocketStub
 	bool onRecv();
 	bool onSend()				{ return true; }
+	bool onRegister()			{ return true; }
+	void onUnregister()			{}
 	SOCKET getSocketHandle()	{ return playerSock->getHandle(); }
 	bool canRecv()				{ return true; }
 	bool canSend()				{ return false; }

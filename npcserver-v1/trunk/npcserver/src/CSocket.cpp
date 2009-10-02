@@ -1,3 +1,4 @@
+#include "IDebug.h"
 #if defined(_WIN32) || defined(_WIN64)
 	#ifndef WIN32_LEAN_AND_MEAN
 		#define WIN32_LEAN_AND_MEAN
@@ -40,7 +41,10 @@
 	#define ECONNRESET			WSAECONNRESET
 	#define EHOSTUNREACH		WSAEHOSTUNREACH
 	#define SHUT_WR				SD_SEND
+	#define SHUT_RD				SD_RECEIVE
+	#define SHUT_RDWR			SD_BOTH
 
+	#define sleep Sleep
 	#define snprintf _snprintf
 #else
 	#include <netdb.h>
@@ -57,14 +61,20 @@
 	typedef unsigned int SOCKET;
 #endif
 
+// Don't send a signal.  Should only affect Linux.
+#ifndef MSG_NOSIGNAL
+	#define MSG_NOSIGNAL 0
+#endif
+
 #include <memory.h>
 #include <stdio.h>
 #include "CSocket.h"
-#include "IUtil.h"
 
 // Change this to any printf()-like function you use for logging purposes.
 #define SLOG	printf
 //////
+
+#include "IUtil.h"
 
 // Function declarations.
 static const char* errorMessage(int error);
@@ -80,6 +90,9 @@ bool CSocketManager::update(long sec, long usec)
 	tm.tv_usec = usec;
 	FD_ZERO(&set_read);
 	FD_ZERO(&set_write);
+
+	// Failed stubs will go here and will be unregistered at the end of the function.
+	std::vector<CSocketStub*> failedStubs;
 
 	// Put all the socket handles into the set.
 	for (std::vector<CSocketStub*>::iterator i = stubList.begin(); i != stubList.end();)
@@ -103,16 +116,9 @@ bool CSocketManager::update(long sec, long usec)
 	select(fd_max + 1, &set_read, &set_write, 0, &tm);
 
 	// Loop through all the socket handles and call relevant functions.
-	blockStubs = true;
-	for (std::vector<CSocketStub*>::iterator i = stubList.begin(); i != stubList.end();)
+	for (std::vector<CSocketStub*>::iterator i = stubList.begin(); i != stubList.end(); ++i)
 	{
 		CSocketStub* stub = *i;
-		if (stub == 0)
-		{
-			i = stubList.erase(i);
-			continue;
-		}
-		bool erased = false;
 		SOCKET sock = stub->getSocketHandle();
 		if (sock != INVALID_SOCKET)
 		{
@@ -120,64 +126,39 @@ bool CSocketManager::update(long sec, long usec)
 			{
 				if (stub->onRecv() == false)
 				{
-					i = stubList.erase(i);
-					erased = true;
+					// Failed.  Add to the list of failed stubs and continue.
+					failedStubs.push_back(stub);
+					continue;
 				}
 			}
-			if (!erased && FD_ISSET(sock, &set_write))
+			if (FD_ISSET(sock, &set_write))
 			{
 				if (stub->onSend() == false)
 				{
-					i = stubList.erase(i);
-					erased = true;
+					// Failed.  Add to the list of failed stubs and continue.
+					failedStubs.push_back(stub);
+					continue;
 				}
 			}
 		}
-		if (!erased) ++i;
-	}
-	blockStubs = false;
-
-	// If any stubs were added while parsing data, add them to the list now.
-	if (newStubs.size() != 0)
-	{
-		for (std::vector<CSocketStub*>::iterator i = newStubs.begin(); i != newStubs.end(); ++i)
-		{
-			CSocketStub* stub = *i;
-			stubList.push_back(stub);
-		}
-		newStubs.clear();
 	}
 
-	// If any stubs were removed while parsing data, remove them now.
-	if (removeStubs.size() != 0)
+	// Unregister failed stubs.
+	for (std::vector<CSocketStub*>::iterator i = failedStubs.begin(); i != failedStubs.end();)
 	{
-		for (std::vector<CSocketStub*>::iterator i = removeStubs.begin(); i != removeStubs.end();)
-		{
-			CSocketStub* stub = *i;
-			for (std::vector<CSocketStub*>::iterator j = stubList.begin(); j != stubList.end();)
-			{
-				CSocketStub* search = *j;
-				if (stub == search)
-					j = stubList.erase(j);
-				else ++j;
-			}
-			i = removeStubs.erase(i);
-		}
-		removeStubs.clear();
+		CSocketStub* stub = *i;
+		if (stub)
+			stub->onUnregister();
+
+		i = failedStubs.erase(i);
 	}
+
+	// Add new stubs.
+	stubList.insert(stubList.end(), newStubs.begin(), newStubs.end());
+	newStubs.clear();
 
 	return true;
 }
-
-void CSocketManager::cleanup(bool callOnUnregister)
-{
-	for (std::vector<CSocketStub*>::iterator i = stubList.begin(); i != stubList.end();)
-	{
-		i = stubList.erase(i);
-	}
-	fd_max = 0;
-}
-
 
 bool CSocketManager::updateSingle(CSocketStub* stub, bool pRead, bool pWrite, long sec, long usec)
 {
@@ -202,53 +183,23 @@ bool CSocketManager::updateSingle(CSocketStub* stub, bool pRead, bool pWrite, lo
 	select(fd_max + 1, &set_read, &set_write, 0, &tm);
 
 	// Call relevant functions.
-	blockStubs = true;
-	bool erased = false;
 	if (FD_ISSET(sock, &set_read))
 	{
 		if (stub->onRecv() == false)
 		{
-			vecRemove<CSocketStub*>(stubList, stub);
-			erased = true;
+			stub->onUnregister();
+			vecReplace<CSocketStub*>(stubList, stub, 0);	// Will remove during next call to update().
+			return false;
 		}
 	}
-	if (!erased && FD_ISSET(sock, &set_write))
+	if (FD_ISSET(sock, &set_write))
 	{
 		if (stub->onSend() == false)
 		{
-			vecRemove<CSocketStub*>(stubList, stub);
-			erased = true;
+			stub->onUnregister();
+			vecReplace<CSocketStub*>(stubList, stub, 0);
+			return false;
 		}
-	}
-	blockStubs = false;
-
-	// If any stubs were added while parsing data, add them to the list now.
-	if (newStubs.size() != 0)
-	{
-		for (std::vector<CSocketStub*>::iterator i = newStubs.begin(); i != newStubs.end(); ++i)
-		{
-			CSocketStub* stub = *i;
-			stubList.push_back(stub);
-		}
-		newStubs.clear();
-	}
-
-	// If any stubs were removed while parsing data, remove them now.
-	if (removeStubs.size() != 0)
-	{
-		for (std::vector<CSocketStub*>::iterator i = removeStubs.begin(); i != removeStubs.end();)
-		{
-			CSocketStub* stub = *i;
-			for (std::vector<CSocketStub*>::iterator j = stubList.begin(); j != stubList.end();)
-			{
-				CSocketStub* search = *j;
-				if (stub == search)
-					j = stubList.erase(j);
-				else ++j;
-			}
-			i = removeStubs.erase(i);
-		}
-		removeStubs.clear();
 	}
 
 	return true;
@@ -257,10 +208,13 @@ bool CSocketManager::updateSingle(CSocketStub* stub, bool pRead, bool pWrite, lo
 bool CSocketManager::registerSocket(CSocketStub* stub)
 {
 	SOCKET sock = stub->getSocketHandle();
-	if (sock > fd_max) fd_max = sock;
-	if (blockStubs) newStubs.push_back(stub);
-	else stubList.push_back(stub);
-	return true;
+	if (stub->onRegister())
+	{
+		if (sock > fd_max) fd_max = sock;
+		newStubs.push_back(stub);
+		return true;
+	}
+	return false;
 }
 
 bool CSocketManager::unregisterSocket(CSocketStub* stub)
@@ -278,13 +232,8 @@ bool CSocketManager::unregisterSocket(CSocketStub* stub)
 		if (findNewMax && sock2 != sock && sock2 > max) max = sock2;
 		if (sock2 == sock)
 		{
-			if (blockStubs)
-			{
-				(*i) = 0;
-				removeStubs.push_back(stub);
-				++i;
-			}
-			else i = stubList.erase(i);
+			(*i)->onUnregister();
+			i = stubList.erase(i);
 			found = true;
 			if (!findNewMax) break;
 		}
@@ -294,6 +243,18 @@ bool CSocketManager::unregisterSocket(CSocketStub* stub)
 	if (findNewMax) fd_max = max;
 	return found;
 }
+
+void CSocketManager::cleanup(bool callOnUnregister)
+{
+	for (std::vector<CSocketStub*>::iterator i = stubList.begin(); i != stubList.end();)
+	{
+		if (callOnUnregister)
+			(*i)->onUnregister();
+		i = stubList.erase(i);
+	}
+	fd_max = 0;
+}
+
 
 
 
@@ -467,7 +428,7 @@ int CSocket::connect()
 void CSocket::disconnect()
 {
 	// Shut down the socket.
-	if (shutdown(properties.handle, SHUT_WR) == SOCKET_ERROR)
+	if (shutdown(properties.handle, SHUT_RDWR) == SOCKET_ERROR)
 	{
 		int error = identifyError();
 		if (error == ENOTSOCK)
@@ -483,21 +444,20 @@ void CSocket::disconnect()
 	properties.state = SOCKET_STATE_TERMINATING;
 
 	// Gracefully shut it down.
+	/*
 	if (properties.protocol == SOCKET_PROTOCOL_TCP)
 	{
+		int count = 0;
 		char buff[ 0x2000 ];
 		int size;
-		while ( true )
+		while (++count < 3)
 		{
-			size = recv( properties.handle, buff, 0x2000, 0 );
+			size = recv(properties.handle, buff, 0x2000, 0);
 			if (size == 0) break;
-			if (size == SOCKET_ERROR)
-			{
-				int e = identifyError();
-				if (!(e == EWOULDBLOCK || e == EINPROGRESS)) break;
-			}
+			if (size == SOCKET_ERROR) break;
 		}
 	}
+	*/
 
 	// Destroy the socket of d00m.
 #if defined(_WIN32) || defined(_WIN64)
@@ -596,7 +556,7 @@ int CSocket::sendData(char* data, unsigned int* dsize)
 	int intError = 0;
 
 	// Make sure the socket is connected!
-	if (properties.state == SOCKET_STATE_DISCONNECTED)
+	if (properties.state == SOCKET_STATE_DISCONNECTED || properties.handle == INVALID_SOCKET)
 	{
 		*dsize = 0;
 		return 0;
@@ -604,7 +564,7 @@ int CSocket::sendData(char* data, unsigned int* dsize)
 
 	// Send our data, yay!
 	int sent = 0;
-	if ((sent = ::send(properties.handle, data, *dsize, 0)) == SOCKET_ERROR)
+	if ((sent = ::send(properties.handle, data, *dsize, MSG_NOSIGNAL)) == SOCKET_ERROR)
 	{
 		sent = 0;
 		intError = identifyError();
@@ -644,7 +604,7 @@ char* CSocket::getData(unsigned int* dsize)
 	static char buff[0x8000];	// 32KB.
 
 	// Make sure it is connected!
-	if (properties.state == SOCKET_STATE_DISCONNECTED)
+	if (properties.state == SOCKET_STATE_DISCONNECTED || properties.handle == INVALID_SOCKET)
 	{
 		*dsize = 0;
 		return 0;
@@ -702,7 +662,7 @@ char* CSocket::peekData(unsigned int* dsize)
 	int intError;
 
 	// Make sure it is connected!
-	if (properties.state == SOCKET_STATE_DISCONNECTED)
+	if (properties.state == SOCKET_STATE_DISCONNECTED || properties.handle == INVALID_SOCKET)
 	{
 		*dsize = 0;
 		return 0;
@@ -769,7 +729,7 @@ int CSocket::setType(int sock_type)
 int CSocket::setDescription(const char *strDescription)
 {
 	memset((void*)&properties.description, 0, SOCKET_MAX_DESCRIPTION);
-	memcpy((void*)&properties.description, strDescription, SOCKET_MAX_DESCRIPTION - 1);
+	strncpy(properties.description, strDescription, MIN(strlen(strDescription), SOCKET_MAX_DESCRIPTION - 1));
 	return SOCKET_OK;
 }
 
@@ -798,6 +758,19 @@ const char* CSocket::getRemoteIp()
 	if (error) return 0;
 	hostret = host;
 	return hostret;
+}
+
+const char* CSocket::getRemotePort()
+{
+	char* portret;
+	static char port[32];
+	memset((void*)port, 0, 32);
+
+	// Grab the IP address.
+	int error = getnameinfo((struct sockaddr*)&properties.address, sizeof(struct sockaddr_storage), 0, 0, port, 32, NI_NUMERICSERV);
+	if (error) return 0;
+	portret = port;
+	return portret;
 }
 
 const char* CSocket::getLocalIp()

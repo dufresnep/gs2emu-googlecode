@@ -1,21 +1,20 @@
+#ifndef TGRAALPLAYER_H
+#define TGRAALPLAYER_H
+
 #include <iostream>
 using namespace std;
 #include <math.h>
 #include <stdio.h>
 #include <algorithm>
 #include <vector>
+#include "gmThread.h"
 #include "CString.h"
 #include "IUtil.h"
 #include <map>
 #include "CSocket.h"
-#include "CList.h"
 #include "TNPCServer.h"
 #include <stdio.h>
 #include "CFileQueue.h"
-#include "gmThread.h"
-
-#ifndef TGRAALPLAYER_H
-#define TGRAALPLAYER_H
 
 #define propscount	83
 
@@ -94,7 +93,5 @@ class TPlayer
 		// Variables -> Server
 		TNPCServer * mServer;
 };
-
-
 
 #endif

@@ -1,11 +1,11 @@
 #ifndef CFILEQUEUE_H
 #define CFILEQUEUE_H
-#include "ICommon.h"
+
 #include <queue>
-#include "CCodec.h"
+#include "ICommon.h"
 #include "CString.h"
 #include "CSocket.h"
-
+#include "CEncryption.h"
 
 class CFileQueue
 {
@@ -33,7 +33,7 @@ class CFileQueue
 		CString pack100;
 		CString oBuffer;
 
-		CCodec out_codec;
+		CEncryption out_codec;
 
 		int bytesSentWithoutFile;
 };

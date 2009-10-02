@@ -14,7 +14,6 @@
 #include "CSettings.h"
 
 
-
 /*
 	Define Functions
 */

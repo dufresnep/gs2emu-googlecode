@@ -31,9 +31,10 @@ enum
 	COMPRESS_BZ2			= 0x06,
 };
 
-class CCodec {
+class CEncryption
+{
 	public:
-		CCodec();
+		CEncryption();
 
 		static const uint32_t ITERATOR_START[6];
 		void reset(uint8_t key);

@@ -1,5 +1,6 @@
 #ifndef TNPC_H
 #define TNPC_H
+
 #include <math.h>
 #include <vector>
 #include "ICommon.h"

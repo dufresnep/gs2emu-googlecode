@@ -51,8 +51,10 @@
 class CSocketStub
 {
 	public:
-		virtual bool onRecv() = 0;
 		virtual bool onSend() = 0;
+		virtual bool onRecv() = 0;
+		virtual bool onRegister() = 0;
+		virtual void onUnregister() = 0;
 		virtual SOCKET getSocketHandle() = 0;
 		virtual bool canRecv() = 0;
 		virtual bool canSend() = 0;
@@ -63,7 +65,7 @@ class CSocketManager
 {
 	public:
 		//! Constructor.
-		CSocketManager() : fd_max(0), blockStubs(false) {}
+		CSocketManager() : fd_max(0) {}
 
 		//! Updates the state of the sockets.
 		//! Calls the functions of all the registered CSocketStub classes.
@@ -71,8 +73,6 @@ class CSocketManager
 		//! \param usec Nanoseconds to wait.
 		//! \return False if select() returned nothing, true otherwise.
 		bool update(long sec = 0, long usec = 0);
-
-		void CSocketManager::cleanup(bool callOnUnregister);
 
 		//! Updates a single socket.
 		//! Calls the functions of the CSocketStub class.
@@ -90,22 +90,23 @@ class CSocketManager
 		bool registerSocket(CSocketStub* stub);
 
 		//! Unregisters a class.
+		//! Don't call during an onSend() or onRecv() event!
 		//! \param stub The class to remove from the system.
 		//! \return False if stub is not found
 		//! \return True if it is successfully removed.
 		bool unregisterSocket(CSocketStub* stub);
 
+		//! Removes all socket stubs.
+		//! \param callUnregister If true, calls onUnregister() for all the stubs.
+		void cleanup(bool callOnUnregister = true);
+
 	private:
 		//! List of classes registered with the socket manager.
 		std::vector<CSocketStub*> stubList;
 		std::vector<CSocketStub*> newStubs;
-		std::vector<CSocketStub*> removeStubs;
 
 		//! Max socket descriptor.
 		SOCKET fd_max;
-
-		//! Are we accessing stubList?
-		bool blockStubs;
 };
 
 
@@ -121,7 +122,7 @@ struct sock_properties
 	int protocol;
 	int type;
 	int state;
-	char description[ SOCKET_MAX_DESCRIPTION ];
+	char description[SOCKET_MAX_DESCRIPTION];
 	sockaddr_storage address;
 };
 
@@ -245,6 +246,10 @@ class CSocket
 		//! Gets the IP address of the device at the other end of the socket.
 		//! \return The IP address.
 		const char* getRemoteIp();
+
+		//! Gets the port of the device at the other end of the socket.
+		//! \return The port.
+		const char* getRemotePort();
 
 		//! Gets the IP address of the current device.
 		/*! Gets the IP address of the current device.

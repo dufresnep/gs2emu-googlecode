@@ -4,6 +4,7 @@
 #include <math.h>
 #include <algorithm>
 #include <vector>
+#include "gmSystemLib.h"
 #include "CString.h"
 #include "IUtil.h"
 #include "CSocket.h"
@@ -17,7 +18,6 @@
 #include "PlayerFunctions.h"
 #include "NPCFunctions.h"
 #include "CSettings.h"
-#include "gmSystemLib.h"
 
 
 class TPlayerNC;
@@ -45,12 +45,14 @@ struct pPropTable_Data
 class TLevel;
 
 
-class TNPCServer :public CSocketStub
+class TNPCServer : public CSocketStub
 {
 	public:
 		// Required by CSocketStub.
 		bool onRecv();
 		bool onSend()				{ return true; }
+		bool onRegister()			{ return true; }
+		void onUnregister()			{}
 		SOCKET getSocketHandle()	{ return playerSock.getHandle(); }
 		bool canRecv()				{ return true; }
 		bool canSend()				{ return false; }
@@ -72,22 +74,22 @@ class TNPCServer :public CSocketStub
 		bool isGserverConnected();
 
 		//Get Functions
-		std::map<CString, TScriptWeapon *>	* getWeaponList()	{ return &mWeapons;}
+		std::map<CString, TScriptWeapon *>	* getWeaponList()	{ return &mWeapons; }
 		std::map<CString, TScriptClass  *>	* getClassList()	{ return &mClasses; }
-		std::map<int, TPlayer *> * getGraalPlayers()				{return &mGraalPlayers;}
-		TGserverConn  * getGserverConn()							{ return &mGserverConnection;}
+		std::map<int, TPlayer *> * getGraalPlayers()			{ return &mGraalPlayers; }
+		TGserverConn  * getGserverConn()						{ return &mGserverConnection; }
+		std::vector<TLevel *>* getLevelList()					{ return &mLevelList; }
+		CString getVersion()									{ return m_version; }
+		CString getCurrentLevel()								{ return currentLevel; }
+		gmMachine * getMachine()								{ return &npcMachine; }
+		CString getMOTD()										{ return motd; }
 		TScriptClass  * getClass(const CString& className);
 		TScriptWeapon * getWeapon(const CString& weaponName);
 		TPlayer	* getGraalPlayer(int id);
 		TPlayer	* getGraalPlayer(CString account);
 		int getPlayerCount();
 		TLevel* getLevel(const CString& pLevel);
-		std::vector<TLevel *>* getLevelList()			{ return &mLevelList; }
 		TNPC * getNPC(int id);
-		CString getVersion()	{return m_version;}
-		CString getCurrentLevel() {return currentLevel;}
-		gmMachine * getMachine() { return &npcMachine;}
-		CString getMOTD() {return motd;}
 		TPlayerNC * getNC(CString account);
 
 		//Misc functions
@@ -158,7 +160,5 @@ class TNPCServer :public CSocketStub
 		CSocket playerSock;
 		CString rBuffer, sBuffer, oBuffer;
 		unsigned int dataSize;
-		
-		
 };
 #endif

@@ -1,3 +1,5 @@
+#include "gmThread.h"
+#include "gmVariable.h"
 #include "PlayerFunctions.h"
 
 //Function: playerobj.removeweapon(weapon);

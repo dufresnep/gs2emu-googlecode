@@ -1,7 +1,7 @@
 #include "TScriptEngine.h"
 #include "IUtil.h"
 
-
+/*
 void TScriptEngine::callFunction(CString function,TPlayer * pPlayer,CString params)
 {        
 	gmVariable returnVar;
@@ -55,3 +55,4 @@ void TScriptEngine::callFunction(CString function,TPlayer * pPlayer,CString para
 	}
 	return;
 }
+*/

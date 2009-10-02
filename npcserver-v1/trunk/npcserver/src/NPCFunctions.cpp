@@ -1,3 +1,5 @@
+#include "gmThread.h"
+#include "gmVariable.h"
 #include "NPCFunctions.h"
 
 int GM_CDECL func_setTimer(gmThread * a_thread)

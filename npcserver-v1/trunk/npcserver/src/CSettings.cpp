@@ -1,19 +1,19 @@
-
+#include "IDebug.h"
+#include <boost/thread.hpp>
 #include "ICommon.h"
 #include "CSettings.h"
-//#include <boost/thread.hpp>
 
 /*
 	Constructor - Deconstructor
 */
 CSettings::CSettings()
 {
-	//m_preventChange = new boost::recursive_mutex();
+	m_preventChange = new boost::recursive_mutex();
 }
 
 CSettings::CSettings(const CString& pStr, const CString& pSeparator)
 {
-	//m_preventChange = new boost::recursive_mutex();
+	m_preventChange = new boost::recursive_mutex();
 	strSep = pSeparator;
 	opened = loadFile(pStr);
 }
@@ -21,7 +21,7 @@ CSettings::CSettings(const CString& pStr, const CString& pSeparator)
 CSettings::~CSettings()
 {
 	clear();
-	//delete m_preventChange;
+	delete m_preventChange;
 }
 
 /*
@@ -29,19 +29,19 @@ CSettings::~CSettings()
 */
 bool CSettings::isOpened() const
 {
-	//boost::recursive_mutex::scoped_lock lock(*m_preventChange);
+	boost::recursive_mutex::scoped_lock lock(*m_preventChange);
 	return opened;
 }
 
 void CSettings::setSeparator(const CString& pSeparator)
 {
-	//boost::recursive_mutex::scoped_lock lock(*m_preventChange);
+	boost::recursive_mutex::scoped_lock lock(*m_preventChange);
 	strSep = pSeparator;
 }
 
 bool CSettings::loadFile(const CString& pStr)
 {
-	//boost::recursive_mutex::scoped_lock lock(*m_preventChange);
+	boost::recursive_mutex::scoped_lock lock(*m_preventChange);
 
 	// definitions
 	CString fileData;
@@ -95,7 +95,7 @@ bool CSettings::loadFile(const CString& pStr)
 
 void CSettings::clear()
 {
-	//boost::recursive_mutex::scoped_lock lock(*m_preventChange);
+	boost::recursive_mutex::scoped_lock lock(*m_preventChange);
 
 	// Clear Keys
 	for (unsigned int i = 0; i < keys.size(); i++)
@@ -122,7 +122,7 @@ CKey* CSettings::addKey(const CString& pKey, const CString& pValue)
 */
 CKey * CSettings::getKey(const CString& pStr)
 {
-	//boost::recursive_mutex::scoped_lock lock(*m_preventChange);
+	boost::recursive_mutex::scoped_lock lock(*m_preventChange);
 
 	// Lowercase Name
 	CString strName = pStr.toLower();
@@ -140,7 +140,7 @@ CKey * CSettings::getKey(const CString& pStr)
 
 const CKey* CSettings::getKey(const CString& pStr) const
 {
-	//boost::recursive_mutex::scoped_lock lock(*m_preventChange);
+	boost::recursive_mutex::scoped_lock lock(*m_preventChange);
 
 	// Lowercase Name
 	CString strName = pStr.toLower();
@@ -158,41 +158,41 @@ const CKey* CSettings::getKey(const CString& pStr) const
 
 bool CSettings::getBool(const CString& pStr, bool pDefault) const
 {
-	//boost::recursive_mutex::scoped_lock lock(*m_preventChange);
+	boost::recursive_mutex::scoped_lock lock(*m_preventChange);
 	const CKey *key = getKey(pStr);
 	return (key == 0 ? pDefault : (key->value == "true" || key->value == "1"));
 }
 
 float CSettings::getFloat(const CString& pStr, float pDefault) const
 {
-	//boost::recursive_mutex::scoped_lock lock(*m_preventChange);
+	boost::recursive_mutex::scoped_lock lock(*m_preventChange);
 	const CKey *key = getKey(pStr);
 	return (key == 0 ? pDefault : (float)strtofloat(key->value));
 }
 
 int CSettings::getInt(const CString& pStr, int pDefault) const
 {
-	//boost::recursive_mutex::scoped_lock lock(*m_preventChange);
+	boost::recursive_mutex::scoped_lock lock(*m_preventChange);
 	const CKey *key = getKey(pStr);
 	return (key == 0 ? pDefault : strtoint(key->value));
 }
 
 const CString CSettings::getStr(const CString& pStr, const CString& pDefault) const
 {
-	//boost::recursive_mutex::scoped_lock lock(*m_preventChange);
+	boost::recursive_mutex::scoped_lock lock(*m_preventChange);
 	const CKey *key = getKey(pStr);
 	return (key == 0 ? pDefault : key->value);
 }
 
 const CString CSettings::operator[](int pIndex) const
 {
-	//boost::recursive_mutex::scoped_lock lock(*m_preventChange);
+	boost::recursive_mutex::scoped_lock lock(*m_preventChange);
 	return strList[pIndex].trim();
 }
 
 std::vector<CString> CSettings::getFile() const
 {
-//	boost::recursive_mutex::scoped_lock lock(*m_preventChange);
+	boost::recursive_mutex::scoped_lock lock(*m_preventChange);
 
 	std::vector<CString> newStrList;
 	std::copy(strList.begin(), strList.end(), newStrList.begin());

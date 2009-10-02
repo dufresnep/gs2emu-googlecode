@@ -1,3 +1,4 @@
+#include "IDebug.h"
 #include "CString.h"
 
 #ifdef _WIN32
@@ -10,96 +11,102 @@
 */
 
 CString::CString()
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	clear(30);
 }
 
 CString::CString(const char *pString)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	if (pString == 0) return;
-	buffer = 0;
+	if (pString == 0)
+	{
+		clear(30);
+		return;
+	}
 
 	int length = strlen(pString);
-	clear(length);
-	write(pString, length);
+	if (length != 0)
+	{
+		clear(length);
+		write(pString, length);
+	}
+	else clear(30);
 }
 
 CString::CString(const CString& pString)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	clear(pString.length());
 	write(pString.text(), pString.length());
 }
 
 CString::CString(char pChar)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	clear(sizeof(char));
 	writeChar(pChar);
 }
 
 CString::CString(double pDouble)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	char tempBuff[32];
 	sprintf(tempBuff, "%f", pDouble);
 	*this = tempBuff;
 }
 
 CString::CString(float pFloat)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	char tempBuff[32];
 	sprintf(tempBuff, "%.2f", pFloat);
 	*this = tempBuff;
 }
 
 CString::CString(int pInteger)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	char tempBuff[32];
 	sprintf(tempBuff, "%i", pInteger);
 	*this = tempBuff;
 }
 
 CString::CString(unsigned int pUInteger)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	char tempBuff[32];
 	sprintf(tempBuff, "%u", pUInteger);
 	*this = tempBuff;
 }
 
-CString::CString(unsigned long int pLUInteger)
+CString::CString(long pLInteger)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
+	char tempBuff[32];
+	sprintf(tempBuff, "%ld", pLInteger);
+	*this = tempBuff;
+}
 
+CString::CString(unsigned long pLUInteger)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
+{
 	char tempBuff[32];
 	sprintf(tempBuff, "%lu", pLUInteger);
 	*this = tempBuff;
 }
 
 CString::CString(long long pLLInteger)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	char tempBuff[64];
 	sprintf(tempBuff, "%lld", pLLInteger);
 	*this = tempBuff;
 }
 
 CString::CString(unsigned long long pLLUInteger)
+: buffer(0), buffc(0), sizec(0), readc(0), writec(0)
 {
-	buffer = 0;
-
 	char tempBuff[64];
 	sprintf(tempBuff, "%llu", pLLUInteger);
 	*this = tempBuff;
@@ -107,7 +114,7 @@ CString::CString(unsigned long long pLLUInteger)
 
 CString::~CString()
 {
-	free(buffer);
+	if (buffer) free(buffer);
 }
 
 /*
@@ -185,6 +192,8 @@ int CString::write(const char *pSrc, int pSize)
 {
 	if (!pSize)
 		return 0;
+	if (buffer == 0)
+		clear(pSize);
 
 	if (writec + pSize >= buffc)
 	{
@@ -206,7 +215,7 @@ int CString::write(const CString& pString)
 
 void CString::clear(int pSize)
 {
-	free(buffer);
+	if (buffer) free(buffer);
 	sizec = readc = writec = 0;
 	buffc = (pSize > 0 ? pSize : 1) + 1;
 	buffer = (char*)malloc(buffc);
@@ -453,6 +462,18 @@ CString CString::zuncompress(unsigned int buffSize) const
 
 	if ((error = uncompress((Bytef *)buf, (uLongf *)&clen, (const Bytef *)buffer, length())) != Z_OK)
 	{
+		switch (error)
+		{
+			case Z_MEM_ERROR:
+				printf("[zlib] Not enough memory to decompress.\n");
+				break;
+			case Z_BUF_ERROR:
+				printf("[zlib] Not enough room in the output buffer to decompress.\n");
+				break;
+			case Z_DATA_ERROR:
+				printf("[zlib] The input data was corrupted.\n");
+				break;
+		}
 		delete [] buf;
 		return retVal;
 	}
@@ -592,7 +613,7 @@ CString CString::replaceAll(const CString& pString, const CString& pNewString) c
 		// Remove the string.
 		retVal.removeI(pos, len);
 
-		// add the new string where the removed data used to be.
+		// Add the new string where the removed data used to be.
 		retVal = CString() << retVal.subString(0, pos) << pNewString << retVal.subString(pos);
 
 		pos += len2;
@@ -606,7 +627,7 @@ CString CString::gtokenize() const
 	CString retVal;
 	int pos[] = {0, 0};
 
-	// add a trailing \n to the line if one doesn't already exist.
+	// Add a trailing \n to the line if one doesn't already exist.
 	if (buffer[sizec - 1] != '\n') self.writeChar('\n');
 
 	// Do the tokenization stuff.
@@ -697,7 +718,7 @@ CString CString::guntokenize() const
 		t2.removeAllI("\n");
 		t2.removeAllI("\r");
 
-		// add it.
+		// Add it.
 		temp.push_back(t2);
 
 		// Move forward the correct number of spaces.
@@ -812,8 +833,12 @@ CString& CString::operator=(const CString& pString)
 	if (this == &pString)
 		return *this;
 
-	clear(pString.length());
-	write((char*)pString.text(), pString.length());
+	if (pString.length() != 0)
+	{
+		clear(pString.length() + 10);
+		write((char*)pString.text(), pString.length());
+	}
+	else clear(30);
 	return *this;
 }
 

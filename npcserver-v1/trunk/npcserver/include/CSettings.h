@@ -19,7 +19,7 @@ struct CKey
 
 namespace boost
 {
-	//class recursive_mutex;
+	class recursive_mutex;
 }
 
 class CSettings
@@ -55,7 +55,7 @@ class CSettings
 		std::vector<CKey *> keys;
 		std::vector<CString> strList;
 
-		//mutable boost::recursive_mutex* m_preventChange;
+		mutable boost::recursive_mutex* m_preventChange;
 };
 
 #endif // CSETTINGS_H

@@ -1,8 +1,6 @@
 #ifndef TLEVELBOARDCHANGE_H
 #define TLEVELBOARDCHANGE_H
 
-
-
 #include "ICommon.h"
 //#include "CTimeout.h"
 #include "CString.h"

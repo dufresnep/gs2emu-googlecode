@@ -1,10 +1,10 @@
-
+#include "IDebug.h"
+#include "ICommon.h"
 #include <queue>
-#include "CFileQueue.h"
 #include "CString.h"
+#include "TPlayer.h"
+#include "CFileQueue.h"
 #include "CSocket.h"
-#include "TPlayerNC.h"
-
 
 void CFileQueue::addPacket(CString pPacket)
 {
@@ -71,8 +71,16 @@ void CFileQueue::sendCompress()
 	if (sock == 0 || sock->getState() == SOCKET_STATE_DISCONNECTED)
 		return;
 
+	// If the next normal packet is huge, lets "try" to send it.
+	// Everything else should skip because this may throw is way over the limit.
+	if (!normalBuffer.empty() && normalBuffer.front().length() > 0xF000)
+	{
+		pSend << normalBuffer.front();
+		normalBuffer.pop();
+	}
+
 	// If we haven't sent a file in a while, forcibly send one now.
-	if (bytesSentWithoutFile > 0x7FFF && !fileBuffer.empty())	// 32KB
+	if (pSend.length() == 0 && bytesSentWithoutFile > 0x7FFF && !fileBuffer.empty())	// 32KB
 	{
 		bytesSentWithoutFile = 0;
 		pSend << fileBuffer.front();
@@ -82,17 +90,24 @@ void CFileQueue::sendCompress()
 	// Keep adding packets from normalBuffer until we hit 48KB or we run out of packets.
 	while (pSend.length() < 0xC000 && !normalBuffer.empty())	// 48KB
 	{
+		// If the next packet sticks us over 60KB, don't add it.
+		if (pSend.length() + normalBuffer.front().length() > 0xF000) break;
+
 		pSend << normalBuffer.front();
 		normalBuffer.pop();
 	}
 	bytesSentWithoutFile += pSend.length();
 
-	// If we have less than 16KB of data, add a file.
+	// If we have less than 16KB of data, try to add a file.
 	if (pSend.length() < 0x4000 && !fileBuffer.empty())	// 16KB
 	{
-		bytesSentWithoutFile = 0;
-		pSend << fileBuffer.front();
-		fileBuffer.pop();
+		// If the next packet sticks us over 60KB, don't add it.
+		if (pSend.length() + fileBuffer.front().length() <= 0xF000)
+		{
+			bytesSentWithoutFile = 0;
+			pSend << fileBuffer.front();
+			fileBuffer.pop();
+		}
 	}
 
 	// Reset this if we have no files to send.
@@ -112,8 +127,17 @@ void CFileQueue::sendCompress()
 
 		case ENCRYPT_GEN_3:
 		{
-			// Compress the packet and add it to the out buffer.
+			// Compress the packet.
 			pSend.zcompressI();
+
+			// Sanity check.
+			if (pSend.length() > 0xFFFD)
+			{
+				printf("** [ERROR] Trying to send a GEN_3 packet over 65533 bytes!  Tossing data.\n");
+				return;
+			}
+
+			// Add the packet to the out buffer.
 			CString data = CString() << (short)pSend.length() << pSend;
 			oBuffer << data;
 			unsigned int dsize = oBuffer.length();
@@ -124,6 +148,13 @@ void CFileQueue::sendCompress()
 		case ENCRYPT_GEN_4:
 		{
 			pSend.bzcompressI();
+
+			// Sanity check.
+			if (pSend.length() > 0xFFFD)
+			{
+				printf("** [ERROR] Trying to send a GEN_4 packet over 65533 bytes!  Tossing data.\n");
+				return;
+			}
 
 			// Encrypt the packet and add it to the out buffer.
 			out_codec.limitFromType(COMPRESS_BZ2);
@@ -137,6 +168,8 @@ void CFileQueue::sendCompress()
 
 		case ENCRYPT_GEN_5:
 		{
+			//unsigned int oldSize = pSend.length();
+
 			// Choose which compression to use and apply it.
 			int compressionType = COMPRESS_UNCOMPRESSED;
 			if (pSend.length() > 0x2000)	// 8KB
@@ -144,10 +177,20 @@ void CFileQueue::sendCompress()
 				compressionType = COMPRESS_BZ2;
 				pSend.bzcompressI();
 			}
-			else if (pSend.length() > 40)
+			else if (pSend.length() > 55)
 			{
 				compressionType = COMPRESS_ZLIB;
 				pSend.zcompressI();
+			}
+
+			//unsigned int newSize = pSend.length();
+			//printf("Compression [%s] - old size: %ld, new size: %ld\n", (compressionType == COMPRESS_UNCOMPRESSED ? "uncompressed" : (compressionType == COMPRESS_ZLIB ? "zlib" : "bz2")), oldSize, newSize);
+
+			// Sanity check.
+			if (pSend.length() > 0xFFFC)
+			{
+				printf("** [ERROR] Trying to send a GEN_5 packet over 65532 bytes!  Tossing data.\n");
+				return;
 			}
 
 			// Encrypt the packet and add it to the out buffer.
