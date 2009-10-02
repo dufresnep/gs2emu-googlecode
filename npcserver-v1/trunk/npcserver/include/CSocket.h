@@ -72,6 +72,8 @@ class CSocketManager
 		//! \return False if select() returned nothing, true otherwise.
 		bool update(long sec = 0, long usec = 0);
 
+		void CSocketManager::cleanup(bool callOnUnregister);
+
 		//! Updates a single socket.
 		//! Calls the functions of the CSocketStub class.
 		//! \param stub The socket to update.

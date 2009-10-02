@@ -1,0 +1,15 @@
+#NPC-Server account,password and nickname
+account = (npcserver)
+password = 
+nickname = NPC-Server (Server)
+
+#NPC-Server ip and port to listen on
+npcserver_ip = 
+npcserver_port = 
+
+#Gserver ip and port
+gserver_ip = 
+gserver_port = 
+
+#MOTD
+motd = Welcome to the NPC-Server.

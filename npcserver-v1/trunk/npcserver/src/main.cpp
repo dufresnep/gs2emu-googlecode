@@ -1,50 +1,106 @@
+#include <iostream>
+#include <signal.h>
+using namespace std;
 #include "main.h"
+#include "TNPCServer.h"
 
-/*
-	Notes:
-		- NPC-Server connects like a regular graal player,
-		  so therefore we need to tweak the login packet a
-		  bit with maybe a special key to connect with similar
-		  to anope services with ircd. 3 keys that the gserver
-		  is expecting or whatever, should be kept private so
-		  it would go under the private server options section
-		  or whatever.. throwing things out there, you know.
+// Function pointer for signal handling.
+typedef void (*sighandler_t)(int);
+static void getBasePath();
 
-		- NPC-Server loads levels and npcs on start, but it's
-		  also possible for the npc-server to load levels
-		  while the server is running, you know.. incase say
-		  someone uploads a new level? dur! throwing things out
-		  there right now lol.
-*/
+CString homepath;
+
+TNPCServer * npcServer;
+
+bool sshutdown = false;
 
 int main(int argc, char *argv[])
 {
-	// load options.. skip!
+	// Shut down the server if we get a kill signal.
+	signal(SIGINT, (sighandler_t) Shutdown);
+	signal(SIGTERM, (sighandler_t) Shutdown);
+	signal(SIGBREAK, (sighandler_t) Shutdown);
+	signal(SIGABRT, (sighandler_t) Shutdown);
 
-	// connect to gserver.. skip!
+	//Get the path to npcserver
+	getBasePath();
 
-	// load levels.. skip!
+	npcServer = new TNPCServer();
 
-	// load npcs from database.. skip!
-
-	// while the connection to the gserver is up
-	while (true) // gserver.isconnected() or something..
+	if (npcServer->startServer())
 	{
-		// get data from gserver.. skip!
-
-		// run all npc scripts.. skip!
-
-		// send changed npc attributes to the players.. skip!
-		
-		// send changed player attributes to the gserver & players.. skip!
-
-		// wait till 0.1 seconds are over
-		sleep(100);
+		while(!sshutdown) 
+		{
+			if (!npcServer->doMain()) break;
+			sleep(100);
+		}
+		delete npcServer;
 	}
-
-	// finished..
 	return 0;
 }
+
+void Shutdown()
+{
+	sshutdown = true;
+	return;
+}
+
+const CString getHomePath()
+{
+	return homepath;
+}
+
+void getBasePath()
+{
+	#if defined(_WIN32) || defined(_WIN64)
+	// Get the path.
+	char path[ MAX_PATH ];
+	GetModuleFileNameA(0, path, MAX_PATH);
+
+	// Find the program exe and remove it from the path.
+	// Assign the path to homepath.
+	homepath = path;
+	int pos = homepath.findl('\\');
+	if (pos == -1) homepath.clear();
+	else if (pos != (homepath.length() - 1))
+		homepath.removeI(++pos, homepath.length());
+#else
+	// Get the path to the program.
+	char path[260];
+	memset((void*)path, 0, 260);
+	readlink("/proc/self/exe", path, sizeof(path));
+
+	// Assign the path to homepath.
+	char* end = strrchr(path, '/');
+	if (end != 0)
+	{
+		end++;
+		if (end != 0) *end = '\0';
+		homepath = path;
+	}
+#endif
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
 1. The npc server program consist of following instructions:

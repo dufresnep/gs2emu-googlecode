@@ -48,7 +48,7 @@ class TScriptClass
 		}
 
 		// -- Returns Class Name -- //
-		inline const CString& GetClassName() const
+		CString GetScriptClassName() 
 		{
 			return mClassName;
 		}

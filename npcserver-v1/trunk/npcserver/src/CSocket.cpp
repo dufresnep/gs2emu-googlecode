@@ -169,6 +169,16 @@ bool CSocketManager::update(long sec, long usec)
 	return true;
 }
 
+void CSocketManager::cleanup(bool callOnUnregister)
+{
+	for (std::vector<CSocketStub*>::iterator i = stubList.begin(); i != stubList.end();)
+	{
+		i = stubList.erase(i);
+	}
+	fd_max = 0;
+}
+
+
 bool CSocketManager::updateSingle(CSocketStub* stub, bool pRead, bool pWrite, long sec, long usec)
 {
 	fd_set set_read;
