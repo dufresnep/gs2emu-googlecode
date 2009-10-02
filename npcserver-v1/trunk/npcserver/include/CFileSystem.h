@@ -6,6 +6,7 @@
 #include "CString.h"
 //#include "TServer.h"
 
+/*
 namespace boost
 {
 	class recursive_mutex;
@@ -50,5 +51,6 @@ class CFileSystem
 		std::map<CString, CString> fileList;
 		std::vector<CString> dirList;
 };
+*/
 
 #endif

@@ -1,3 +1,4 @@
+/*
 #include "IDebug.h"
 #include <sys/stat.h>
 #if !defined(_WIN32) && !defined(_WIN64)
@@ -280,3 +281,4 @@ char CFileSystem::getPathSeparator()
 {
 	return fSep;
 }
+*/

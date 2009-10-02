@@ -11,7 +11,7 @@
 #include "gmCall.h"
 
 class TNPCServer;
-
+class TPlayer;
 class TScriptWeapon
 {
 	public:
