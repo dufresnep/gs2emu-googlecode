@@ -57,7 +57,7 @@ bool CSettings::loadFile(const CString& pStr)
 		// Remove comments.
 		int comment_pos = strList[i].find("#");
 		if (comment_pos != -1)
-			strList[i].remove(comment_pos);
+			strList[i].removeI(comment_pos);
 
 		// Skip empty lines.
 		if (strList[i].isEmpty() || strList[i].find(strSep) == -1)
