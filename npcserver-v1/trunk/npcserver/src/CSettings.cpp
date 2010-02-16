@@ -60,7 +60,7 @@ bool CSettings::loadFile(const CString& pStr)
 			strList[i].remove(comment_pos);
 
 		// Skip empty lines.
-		if (strList.empty() || strList[i].find(strSep) == -1)
+		if (strList[i].isEmpty() || strList[i].find(strSep) == -1)
 			continue;
 
 		// Tokenize Line && Trim && Lowercase Key Name
