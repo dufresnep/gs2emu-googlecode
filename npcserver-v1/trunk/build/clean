@@ -1,2 +1,2 @@
 #!/bin/bash
-premake --clean
+premake4 clean

@@ -1,2 +1,2 @@
-premake --target gnu
+premake4.exe gmake
 pause
