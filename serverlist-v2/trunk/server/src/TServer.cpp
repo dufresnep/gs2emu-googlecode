@@ -1032,7 +1032,7 @@ bool TServer::msgSVI_SERVERINFO(CString& pPacket)
 		TServer* server = *i;
 		if (servername.comparei(server->getName()))
 		{
-			sendPacket(CString() >> (char)SVO_SERVERINFO >> (short)pid << "playerworld" << CString((int)id) << "," << server->getName() << "," << server->getIp() << "," << server->getPort());
+			sendPacket(CString() >> (char)SVO_SERVERINFO >> (short)pid << "playerworld" << CString((int)id) << ",\"" << server->getName() << "\"," << server->getIp() << "," << server->getPort());
 			return true;
 		}
 		++id;
