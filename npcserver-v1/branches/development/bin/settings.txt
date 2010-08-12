@@ -4,16 +4,12 @@ password =
 nickname = NPC-Server (Server)
 
 #NPC-Server ip and port to listen on
-#npcserver_ip = andrewfox.ath.cx
-npcserver_ip = 192.168.0.20
-npcserver_port = 3893
+npcserver_ip = 
+npcserver_port = 
 
 #Gserver ip and port
-gserver_ip = andrewfox.ath.cx
-#gserver_ip = 192.168.0.20
-gserver_port = 3931
-#gserver_ip = 67.214.160.82
-#gserver_port = 14802
+gserver_ip = 
+gserver_port = 
 
 #MOTD
 # Set blank to have one with the version number auto entered :)
