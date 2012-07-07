@@ -750,6 +750,9 @@ int CSocket::setType(int sock_type)
 	return SOCKET_OK;
 }
 
+#ifndef min
+	#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
 int CSocket::setDescription(const char *strDescription)
 {
 	memset((void*)&properties.description, 0, SOCKET_MAX_DESCRIPTION);
