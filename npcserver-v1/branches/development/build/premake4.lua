@@ -21,7 +21,7 @@ solution "npcserver"
 		
 		-- Windows specific.
 		configuration "windows"
-			if string.startswith(_ACTION, "vs") then
+			if _ACTION ~= nil and string.startswith(_ACTION, "vs") then
 				files { "../npcserver/platform/win32msvc/*.h" }
 				includedirs { "../npcserver/platform/win32msvc" }
 			else
