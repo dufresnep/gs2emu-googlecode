@@ -650,7 +650,9 @@ static int GM_CDECL gmBlock(gmThread * a_thread) // var, ...
   }
   else if(res == -2)
   {
-    return GM_SYS_YIELD;
+    // Failed to block, so exception to prevent undefined or unexpected behavior
+    GM_EXCEPTION_MSG("cannot block on null");
+    return GM_EXCEPTION;
   }
   a_thread->Push(a_thread->Param(res));
   return GM_OK;
@@ -740,7 +742,7 @@ static int GM_CDECL gmTableDuplicate(gmThread * a_thread)
 
 void gmConcat(gmMachine * a_machine, char * &a_dst, int &a_len, int &a_size, const char * a_src, int a_growBy = 32)
 {
-  int len = strlen(a_src);
+  int len = (int)strlen(a_src);
 
   if((a_len + len + 1) >= a_size)
   {

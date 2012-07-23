@@ -16,10 +16,10 @@
 #include "gmFunctionObject.h"
 #include "gmOperators.h"
 #include "gmMachineLib.h"
-#include "MiscFunctions.h"
 
 // helper macros
 
+#define OPCODE_INT(I)  *((gmint *) (I)); (I) += sizeof(gmint);
 #define OPCODE_PTR(I)  *((gmptr *) (I)); (I) += sizeof(gmptr);
 #define OPCODE_PTR_NI(I)  *((gmptr *) I);
 #define OPCODE_FLOAT(I)  *((gmfloat *) I); I += sizeof(gmfloat);
@@ -43,7 +43,7 @@ void gmGetLineFromString(const char * a_string, int a_line, char * a_buffer, int
 
   eol = cp;
   while(*eol && *eol != '\n' && *eol != '\r') ++eol;
-  int len = eol - cp;
+  int len = (int)(eol - cp);
   len = ((a_len - 1) < len) ? (a_len - 1) : len;
   memcpy(a_buffer, cp, len);
   a_buffer[len] = '\0';
@@ -643,7 +643,7 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
       {
         SetTop(top);
         
-        int numParams = (int) OPCODE_PTR(instruction);
+        int numParams = (int) OPCODE_INT(instruction);
 
         State res = PushStackFrame(numParams, &instruction, &code);
         top = GetTop(); 
@@ -742,7 +742,7 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 #endif //GM_USE_FORK
       case BC_FOREACH :
       {
-        gmuint32 localvalue = OPCODE_PTR(instruction);
+        gmuint32 localvalue = OPCODE_INT(instruction);
         gmuint32 localkey = localvalue >> 16;
         localvalue &= 0xffff;
 
@@ -839,7 +839,7 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
       case BC_PUSHINT :
       {
         top->m_type = GM_INT;
-        top->m_value.m_int = OPCODE_PTR(instruction);
+        top->m_value.m_int = OPCODE_INT(instruction);
         ++top;
         break;
       }
@@ -894,13 +894,24 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
       }
       case BC_GETLOCAL :
       {
-        gmuint32 offset = OPCODE_PTR(instruction);
+        gmuint32 offset = OPCODE_INT(instruction);
         *(top++) = base[offset];
         break;
       }
       case BC_SETLOCAL :
       {
-        gmuint32 offset = OPCODE_PTR(instruction);
+        gmuint32 offset = OPCODE_INT(instruction);
+
+        // Write barrier old local objects
+        {
+          gmGarbageCollector* gc = m_machine->GetGC();
+          if( !gc->IsOff() && base[offset].IsReference() )
+          {
+            gmObject * object = GM_MOBJECT(m_machine, base[offset].m_value.m_ref);
+            gc->WriteBarrier(object);
+          }
+        }
+
         base[offset] = *(--top);
         break;
       }
@@ -1061,6 +1072,22 @@ gmThread::State gmThread::PushStackFrame(int a_numParameters, const gmuint8 ** a
 
     int result = fn->m_cFunction(this);
 
+    // Write barrier old local objects at native pop time
+    {
+      gmGarbageCollector* gc = m_machine->GetGC();
+      if( !gc->IsOff() )
+      {
+        for(int index = m_base; index < m_top; ++index)
+        {
+          if(m_stack[index].IsReference())
+          {
+            gmObject * object = GM_MOBJECT(m_machine, m_stack[index].m_value.m_ref);
+            gc->WriteBarrier(object);
+          }
+        }
+      }
+    }
+
     // handle state
     if(result == GM_SYS_STATE)
     {
@@ -1181,6 +1208,22 @@ gmThread::State gmThread::Sys_PopStackFrame(const gmuint8 * &a_ip, const gmuint8
     return SYS_EXCEPTION;
   }
 
+  // Write barrier old local objects
+  {
+    gmGarbageCollector* gc = m_machine->GetGC();
+    if( !gc->IsOff() )
+    {
+      for(int index = m_base-2; index < m_top; ++index)
+      {
+        if(m_stack[index].IsReference())
+        {
+          gmObject * object = GM_MOBJECT(m_machine, m_stack[index].m_value.m_ref);
+          gc->WriteBarrier(object);
+        }
+      }
+    }
+  }
+
   gmStackFrame * frame = m_frame->m_prev;
   if( frame == NULL ) // Final frame, we will exit now
   {
@@ -1220,7 +1263,6 @@ void gmThread::LogLineFile()
         char buffer[80];
         gmGetLineFromString(source, line, buffer, 80);
         m_machine->GetLog().LogEntry(GM_NL"%s(%d) : %s", filename, line, buffer);
-		
       }
       else
       {
@@ -1238,7 +1280,11 @@ bool gmThread::Touch(int a_extra)
   bool reAlloc = false; 
   while((m_top + a_extra + GMTHREAD_SLACKSPACE) >= m_size) 
   { 
-    if(sizeof(gmVariable) * m_size > GMTHREAD_MAXBYTESIZE) return false; 
+    if(sizeof(gmVariable) * m_size > GMTHREAD_MAXBYTESIZE)
+    {
+      GM_ASSERT(!"GMTHREAD_MAXBYTESIZE exceeded");
+      return false; 
+    }
     m_size *= 2; 
     reAlloc = true; 
   } 

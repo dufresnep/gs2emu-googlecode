@@ -161,7 +161,7 @@ public:
 
   /// \brief Gray this object.
   void GrayThisObject(gmGCObjBase* a_obj);
-  
+
   /// \brief Called on a new object being allocated.
   void Allocate(gmGCObjBase* a_obj);
 

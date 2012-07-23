@@ -27,7 +27,7 @@
 /// \enum gmEndian Endian byte order
 enum gmEndian
 {
-  GM_ENDIAN_BIG = 0,      //!< MOTOROLA (MAC), NINTENDO GC
+  GM_ENDIAN_BIG = 0,      //!< MOTOROLA (MAC), NINTENDO GC, Xbox360, PS3
   GM_ENDIAN_LITTLE = 1    //!< x86, XBOX, PS2
 };
 
@@ -54,10 +54,11 @@ enum gmEndian
 // RUNTIME THREAD
 
 #define GMTHREAD_INITIALBYTESIZE    512       // initial stack byte size for a single thread
-#define GMTHREAD_MAXBYTESIZE        128000    //1024  // max stack byte size for a single thread (Sample scripts like it big)
+#define GMTHREAD_MAXBYTESIZE        (150*1024) //1024  // max stack byte size for a single thread (Sample scripts like it big)
 
 // MACHINE
 
+#define GMMACHINE_DEFAULT_FUNCTION  CTVT_LOCAL // CTVT_LOCAL, CTVT_GLOBAL or CTVT_MEMBER for default scope of function using sugar syntax
 #define GMMACHINE_REMOVECOMPILER    0         // Remove compiler code, will only be able to run precompiled libs
 #define GMMACHINE_GMCHECKDIVBYZERO  0         // Let GM operator check for divide by zero and possibly cause GM run time exception (rather than OS exception)
 #define GMMACHINE_NULL_VAR_CTOR     0         // Nullify gmVariable in constructor.  Not recommended for real-time / time critical applications.

@@ -80,8 +80,8 @@ public:
 
   gmSourceEntry(const char * a_source, const char * a_filename)
   {
-    int slen = strlen(a_source);
-    int flen = strlen(a_filename);
+    int slen = (int)strlen(a_source);
+    int flen = (int)strlen(a_filename);
     m_id = gmCrc32String(a_source);
 
     m_source = GM_NEW( char[slen + flen + 2] );
@@ -436,7 +436,6 @@ void gmMachine::RegisterLibrary(gmFunctionEntry * a_functions, int a_numFunction
     strcpy(funcNameLower, a_functions[index].m_name);
     _strlwr(funcNameLower);
 
-    m_cFuncUserData
     table->Set(this, funcNameLower, gmVariable(GM_FUNCTION, (gmptr)funcObj));
 
 #else // !GM_CASE_INSENSITIVE
@@ -924,6 +923,12 @@ int gmMachine::Sys_Block(gmThread * a_thread, int m_numBlocks, const gmVariable 
   int i;
   for(i = 0; i < m_numBlocks; ++i)
   {
+    // Catch attempts to block on null
+    if( a_blocks[i].IsNull() )
+    {
+      return -2;
+    }
+
 #if GM_USE_ENDON
     // hunt for an existing block on the thread
     gmBlock * block = a_thread->Sys_GetBlocks();
@@ -1031,6 +1036,7 @@ void gmMachine::Sys_SwitchState(gmThread * a_thread, int a_to)
     case gmThread::SYS_PENDING :
     {
       // remove and clean up the blocks.
+      Sys_RemoveSignals(a_thread); // Prevent signals from accumulating
       Sys_RemoveBlocks(a_thread);
       m_blockedThreads.Remove(a_thread);
       break;
@@ -1283,7 +1289,7 @@ bool gmMachine::CollectGarbage(bool a_forceFullCollect)
         {
           // We ran out of memory because we needed more than our limit, so increase limit
           int newHard = (int)(GMMACHINE_GC_HARD_MEM_INC_FRAC_OF_USED * (float)afterMemUsage);
-          int newSoft = (int)(GMMACHINE_GC_SOFT_MEM_DEFAULT_FRAC_OF_HARD * (float)GetDesiredByteMemoryUsageHard());
+          int newSoft = (int)(GMMACHINE_GC_SOFT_MEM_DEFAULT_FRAC_OF_HARD * (float)newHard);
 
           if( !GMMACHINE_AUTOMEMALLOWSHRINK )
           {
@@ -1484,7 +1490,7 @@ gmStringObject * gmMachine::AllocStringObject(const char * a_string, int a_lengt
   
   if(a_length < 0)
   {
-    a_length = strlen(a_string);
+    a_length = (int)strlen(a_string);
   }
   char * string = (char *) Sys_Alloc(a_length + 1);
   memcpy(string, a_string, a_length + 1);
@@ -1914,7 +1920,7 @@ gmType gmMachine::GetTypeId(const char * a_typename) const
 {
   for(gmuint id = GM_NULL; id < m_types.Count(); ++id)
   {
-    if( strcmp((const char *)m_types[id].m_name, a_typename) == 0 )
+    if( strcmp((const char *)(*m_types[id].m_name), a_typename) == 0 )
     {
       return id;
     }

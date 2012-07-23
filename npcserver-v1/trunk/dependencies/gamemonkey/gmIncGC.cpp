@@ -232,7 +232,7 @@ void gmGCColorSet::GrayThisObject(gmGCObjBase* a_obj)
 #endif //GM_GC_DEBUG
 }
 
-  
+
 void gmGCColorSet::Revive(gmGCObjBase* a_obj)
 {
   // NOTE: Once objects are in the free list, we can't trust the color mark, 
@@ -290,6 +290,12 @@ void gmGCColorSet::Revive(gmGCObjBase* a_obj)
 void gmGCColorSet::ReclaimGarbage()
 {
   GM_ASSERT(m_scan->GetPrev() == m_gray);
+
+#if GM_GC_DEBUG
+  // Slow, paranoid check
+  VerifyIntegrity();
+#endif //GM_GC_DEBUG
+
 
 #if GM_GC_DEBUG
   {
@@ -374,6 +380,11 @@ void gmGCColorSet::ReclaimGarbage()
   GM_ASSERT(m_gray->GetNext() == m_scan);
 
 #if GM_GC_DEBUG
+  // Slow, paranoid check
+  VerifyIntegrity();
+#endif //GM_GC_DEBUG
+
+#if GM_GC_DEBUG
   {
     int count = 0;
     for(gmGCObjBase* temp = m_free; temp != m_white; temp = temp->GetNext())
@@ -439,6 +450,12 @@ int gmGCColorSet::DestructSomeFreeObjects(int a_maxToDestruct)
       m_scan = m_free;
     }
   }
+
+#if GM_GC_DEBUG
+  // Slow, paranoid check
+  VerifyIntegrity();
+#endif //GM_GC_DEBUG
+
   return numDestructed;
 }
 
@@ -734,7 +751,6 @@ void gmGarbageCollector::FullCollect()
   }
   m_fullThrottle = false;
 }
-
 
 
 //////////////////////////////////////////////////

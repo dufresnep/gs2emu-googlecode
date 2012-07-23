@@ -25,18 +25,30 @@
 
 // These two are for MSVS 2005 security consciousness until safe std lib funcs are available
 #pragma warning(disable : 4996) // Deprecated functions
-//#define _CRT_SECURE_NO_DEPRECATE // Allow old unsecure standard library functions, Disable some 'warning C4996 - function was deprecated'
-//#define _USE_32BIT_TIME_T // So system binds can use int for timestamps
+#define _CRT_SECURE_NO_DEPRECATE // Allow old unsecure standard library functions, Disable some 'warning C4996 - function was deprecated'
 
 #include <malloc.h> // alloca
 #include <new>
 #include <cassert>
 
 // system defines
+#if defined(_XBOX)
+  #define GM_LITTLE_ENDIAN      0
+  #define GM_DEFAULT_ALLOC_ALIGNMENT 4
+#endif //_XBOX
+#if defined(WIN32)
+  #define GM_LITTLE_ENDIAN      1
+  #if defined(_M_X64) // 64bit target
+    #define GM_DEFAULT_ALLOC_ALIGNMENT 16
+    #define GM_PTR_SIZE_64 // Ptr size is 64bit
+  #else // 32bit target
+    #define GM_DEFAULT_ALLOC_ALIGNMENT 4
+    #define GM_PTR_SIZE_32 // Ptr size is 32bit
+  #endif
+//  #define GM_X86
+#endif //_WIN32
 
-#define GM_LITTLE_ENDIAN      1
-#define GM_COMPILER_MSVC6
-#define GM_X86
+//#define GM_COMPILER_MSVC6
 
 #define GM_CDECL              __cdecl
 #ifdef _DEBUG
@@ -55,12 +67,12 @@
 #endif // _DEBUG
 #define GM_PRINTF             printf
 
-//#define GM_CHECK_USER_BREAK_CALLBACK // Enable this only if a user break callback is set
+#define GM_CHECK_USER_BREAK_CALLBACK // Enable this only if a user break callback is set
 
 #define GM_NEW( alloc_params ) new alloc_params
 #define GM_PLACEMENT_NEW( alloc_params, address ) new(address) alloc_params
 
-#define GM_DEFAULT_ALLOC_ALIGNMENT 4
+//#define GM_DEFAULT_ALLOC_ALIGNMENT 4
 
 #define GM_MAKE_ID32( a, b, c, d )  ( ((d)<<24) | ((c)<<16) | ((b)<<8) | (a))
 
@@ -96,7 +108,7 @@
 #define GM_MAX_PATH           256
 
 // basic types
-//typedef const char * LPCTSTR;
+typedef const char * LPCTSTR;
 typedef unsigned int gmuint;
 typedef char gmint8;
 typedef unsigned char gmuint8;
@@ -104,9 +116,18 @@ typedef short gmint16;
 typedef unsigned short gmuint16;
 typedef int gmint32;
 typedef unsigned int gmuint32;
+typedef int gmint;
+typedef unsigned int gmuint;
 typedef float gmfloat;
-typedef int gmptr; // machine pointer size as int
-typedef unsigned int gmuptr; // machine pointer size as int
+#ifdef GM_PTR_SIZE_64
+  typedef __int64 gmptr; // machine pointer size as int
+  typedef unsigned __int64 gmuptr; // machine pointer size as int
+  typedef __int64 gmint64;
+  typedef unsigned __int64 gmuint64;
+#else //!GM_PTR_SIZE_64
+  typedef int gmptr; // machine pointer size as int
+  typedef unsigned int gmuptr; // machine pointer size as int
+#endif //!GM_PTR_SIZE_64
 
 
 #define GM_CRT_DEBUG

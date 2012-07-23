@@ -648,6 +648,7 @@ YY_MALLOC_DECL
 /* Gets input and stuffs it into "buf".  number of characters read, or YY_NULL,
  * is returned in "result".
  */
+/* 
 #ifndef YY_INPUT
 #define YY_INPUT(buf,result,max_size) \
 	if ( yy_current_buffer->yy_is_interactive ) \
@@ -666,6 +667,27 @@ YY_MALLOC_DECL
 		  && ferror( yyin ) ) \
 		YY_FATAL_ERROR( "input in flex scanner failed" );
 #endif
+*/
+// _GD_ added cast for 64bit build
+#ifndef YY_INPUT
+#define YY_INPUT(buf,result,max_size) \
+	if ( yy_current_buffer->yy_is_interactive ) \
+		{ \
+		int c = '*', n; \
+		for ( n = 0; n < max_size && \
+			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
+			buf[n] = (char) c; \
+		if ( c == '\n' ) \
+			buf[n++] = (char) c; \
+		if ( c == EOF && ferror( yyin ) ) \
+			YY_FATAL_ERROR( "input in flex scanner failed" ); \
+		result = n; \
+		} \
+	else if ( ((result = (int)fread( buf, 1, max_size, yyin )) == 0) \
+		  && ferror( yyin ) ) \
+		YY_FATAL_ERROR( "input in flex scanner failed" );
+#endif
+
 
 /* No semi-colon after return; correct usage is to write "yyterminate();" -
  * we don't want an extra ';' after the "return" because that will cause
@@ -716,7 +738,7 @@ YY_DECL
 #line 29 "gmScanner.l"
 
 
-#line 720 "gmScanner.cpp"
+#line 742 "gmScanner.cpp"
 
    if ( yy_init )
       {
@@ -1215,7 +1237,7 @@ YY_RULE_SETUP
 #line 129 "gmScanner.l"
 ECHO;
 	YY_BREAK
-#line 1219 "gmScanner.cpp"
+#line 1241 "gmScanner.cpp"
 			case YY_STATE_EOF(INITIAL):
 				yyterminate();
 

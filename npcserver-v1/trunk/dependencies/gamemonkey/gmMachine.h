@@ -60,7 +60,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #undef GetObject //Argh Windows defines this in WINGDI.H
 
-#define GM_VERSION "1.25"
+#define GM_VERSION "1.28"
 
 // fwd decls
 class gmStringObject;
@@ -555,7 +555,7 @@ public:
   /// \brief Is GC actually running a cycle
   bool IsGCRunning();
 
-  /// \brief add a CPP owned gmObject so machine knows about it to handle GC.
+  /// \brief Add a CPP owned gmObject so machine knows about it to handle GC.
   void AddCPPOwnedGMObject(gmObject * a_obj);
   /// \brief Remove a CPP owned gmObject.
   void RemoveCPPOwnedGMObject(gmObject * a_obj);
