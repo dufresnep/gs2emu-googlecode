@@ -18,16 +18,17 @@ solution "npcserver"
 		files { "../dependencies/bzip2/**" }
 		includedirs { "../dependencies/zlib" }
 		includedirs { "../dependencies/bzip2" }
+
+		if _ACTION ~= nil and string.startswith(_ACTION, "vs") then
+			files { "../npcserver/platform/win32msvc/*.h" }
+			includedirs { "../npcserver/platform/win32msvc" }
+		else
+			files { "../npcserver/platform/win32gcc/*.h" }
+			includedirs { "../npcserver/platform/win32gcc" }
+		end
 		
 		-- Windows specific.
 		configuration "windows"
-			if _ACTION ~= nil and string.startswith(_ACTION, "vs") then
-				files { "../npcserver/platform/win32msvc/*.h" }
-				includedirs { "../npcserver/platform/win32msvc" }
-			else
-				files { "../npcserver/platform/win32gcc/*.h" }
-				includedirs { "../npcserver/platform/win32gcc" }
-			end
 		
 		-- Libraries.
 		configuration "windows"
