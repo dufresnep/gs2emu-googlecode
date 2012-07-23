@@ -14,19 +14,21 @@ solution "npcserver"
 		includedirs { "../npcserver/include" }
 		
 		-- Dependencies.
-		files { "../dependencies/gamemonkey/**" }
+		--gamemonkey must finish with just /* not /** because we want to manually choose platform
+		files { "../dependencies/gamemonkey/*" }
 		files { "../dependencies/zlib/**" }
 		files { "../dependencies/bzip2/**" }
 		includedirs { "../dependencies/gamemonkey" }
 		includedirs { "../dependencies/zlib" }
 		includedirs { "../dependencies/bzip2" }
 
+		-- The following allows gmconfig.h to include platform specific gmconfig_p.h file
 		if _ACTION ~= nil and string.startswith(_ACTION, "vs") then
-			files { "../npcserver/platform/win32msvc/*.h" }
-			includedirs { "../npcserver/platform/win32msvc" }
+			includedirs { "../dependencies/gamemonkey/platform/win32msvc" }
 		else
-			files { "../npcserver/platform/win32gcc/*.h" }
-			includedirs { "../npcserver/platform/win32gcc" }
+			-- For now, try to use the Windows gcc platform spectific file for Linux, BSD, etc.
+			-- Yes, it's wrong, but GM does not have those defined, we'll define our own soon
+			includedirs { "../dependencies/gamemonkey/platform/win32gcc" }
 		end
 		
 		-- Windows specific.
