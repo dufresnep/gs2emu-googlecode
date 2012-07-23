@@ -74,7 +74,7 @@ bool TNPCServer::startServer()
 	mPassword = serverSettings.getStr("password","testpass");
 	nickname = serverSettings.getStr("nickname","NPC-Server (Server)");
 
-	motd = serverSettings.getStr("motd",CString() << "Welcome to NPC Server (" << getVersion() << ")");
+	motd = serverSettings.getStr("motd",CString() << "Welcome to NPC Server (v" << getVersion() << ")");
 	
 	playerSock.setType(SOCKET_TYPE_SERVER);
 	playerSock.setProtocol(SOCKET_PROTOCOL_TCP);
@@ -197,13 +197,44 @@ TPlayer	* TNPCServer::getGraalPlayer(CString account)
 	return 0;
 }
 
+bool TNPCServer::CheckMultipleNC(CString account)
+{
+
+	int nccount;
+	nccount = 0;
+	/*for (std::vector<TPlayerNC *>::iterator i = mNCPlayers.begin(); i != mNCPlayers.end(); ++i)
+	{
+		if ((*i)->account == account){ nccount = nccount+1; }
+	}*/
+
+		// Check if the account is already in use.
+
+	for (std::vector<TPlayerNC *>::iterator i = mNCPlayers.begin(); i != mNCPlayers.end(); ++i)
+	{
+		TPlayerNC* player = *i;
+
+		if (player->account == account)
+		{
+			player->sendPacket(CString() >> (char)PLO_DISCMESSAGE << "NPC (Server): Someone else has logged into your account.");
+		}
+	}
+
+	/*if(nccount>1){ // Oh noez, more than 1 NC? MY HEAD A SPLODE!
+		return true;
+	}else{
+		return false;
+	}*/
+
+	return false;
+}
+
 TPlayerNC * TNPCServer::getNC(CString account)
 {
 
 	for (std::vector<TPlayerNC *>::iterator i = mNCPlayers.begin(); i != mNCPlayers.end(); ++i)
 	{
 		if ((*i)->account == account) return *i;
-	
+
 	}
 
 	return 0;
@@ -268,7 +299,6 @@ TNPC * TNPCServer::getNPC(int id)
 void TNPCServer::triggerAction(int playerId,CString action,CString params)
 {
 	TPlayer * pPlayer = getGraalPlayer(playerId);
-
 	if (pPlayer == 0) return;
 
 	std::vector<CString> weaponList = pPlayer->getWeaponList();
@@ -277,10 +307,18 @@ void TNPCServer::triggerAction(int playerId,CString action,CString params)
 
 	if (paramList.size() < 2) return;
 
-	TScriptWeapon * pWeapon = getWeapon(paramList[1]);
+	if (paramList[0] == "serverside") // Triggering a weapon or Control-NPC.
+	{
+	  TScriptWeapon * pWeapon = getWeapon(paramList[1]);
+	  for (int i =0; i < paramList.size(); ++i)
+	  {
+		printf("%i: %s\n",i,paramList[i].text());
+	  }
 	
-	if (pWeapon == 0) return;
-		pWeapon->callFunction(action,pPlayer,params);
+	  if (pWeapon == 0) return;
+	  printf("Called %s\n",pWeapon->getName().text());
+		pWeapon->callFunction("onActionServerside",pPlayer,params);
+	}
 
 }
 
@@ -292,7 +330,7 @@ void TNPCServer::triggerAction(int playerid, int npcid,float x, float y,CString 
 
 	TLevel * playerLevel = getLevel(player->GetLevel());
 
-	playerLevel->callSpecificNPC(x,y,action,player,params);
+	playerLevel->callSpecificNPC(x,y,"onAction" + action,player,params);
 }
 
 void TNPCServer::sendToGserver(CString pPacket)
@@ -309,11 +347,21 @@ void TNPCServer::sendPlayerPM(CString account,CString message)
 	mGserverConnection.sendPM(pPlayer->GetId(),message);
 }
 
+void TNPCServer::sendPlayerRPGMessage(CString account,CString message)
+{
+	TPlayer * pPlayer = getGraalPlayer(account);
+
+	if (pPlayer == 0) return;
+
+	mGserverConnection.sendRPGMessage(pPlayer->GetId(),message);
+}
+
 void TNPCServer::setNCRights(CString account, std::map<CString, CString> rights)
 {
 	TPlayerNC * player = getNC(account);
 
 	if (player) player->folderRights = rights;
+	printf("Set rights of %s to %s", player->account.text(), player->folderRights[1].text());
 }
 
 //Weapon functionality
@@ -478,11 +526,19 @@ void TNPCServer::RegisterFunctions()
 	
 	static gmFunctionEntry GlobalFunctions[] = 
 	{
+		{"echo",func_sendtorc_echo,this},
 		{"sendtorc",func_sendtorc,this},
+		{"sendtonc",func_sendtonc,this},
 		{"findplayer",func_findplayer,this},
 		{"getPlayerCount",func_getPlayerCount,this},
-		{"sendPM",func_sendPM,this},
+		{"sendpm",func_sendPM,this},
+		{"sendrpgmessage",func_sendRPGMessage,this},
 		{"tokenize",func_tokenize},
+		{"md5",func_md5},
+		{"upper",func_uppercase},
+		{"uppercase",func_uppercase},
+		{"lower",func_lowercase},
+		{"lowercase",func_lowercase},
 		{"getPlayers",func_getPlayers,this},
 	};
 
@@ -497,6 +553,8 @@ void TNPCServer::RegisterFunctions()
 	{
 		{"setTimer",func_setTimer,NULL},
 		{"setshape",func_setshape,NULL},
+		{"setimg",func_setimg,NULL},
+		{"warpto",func_warpto,NULL},
 	};
 
 	npcMachine.RegisterTypeOperator(TScriptWeapon::s_typeId, O_GETDOT,NULL,TScriptWeapon::TScriptWeaponGetDot);

@@ -1,0 +1,105 @@
+function onPlayertouchsme(player)
+{
+ list = table("Jesus","Mr.T","Space Cadet","Captain Cool","Test","Captain Planet");
+ player.chat = list[3];
+ this.var = findplayer("Agret");
+ this.var.nick = "Agret";
+ this.var.addweapon("Chicken");
+ }
+
+ list = getPlayers();
+ for (i = 0; i < getPlayerCount(); i = i + 1){
+  sendtorc(list[i].nick);
+ }
+
+Deprecated Functions
+--------------------
+setimg() is now this.image - Example, instead of: setimg("beer.png"); it's now this.image="beer.png";
+ 
+Setting Size - The server doesn't automatically size based off images (yet)
+So you must tell it how big your image is in pixels.
+---------------------------------------------------------------------------
+function onCreated()
+{
+ this.setshape(32,32);
+}
+
+Messing with tables
+-------------------
+function onCreated()
+{
+  myTest = table( 1, 4, Test="Text string!", 7, 8 );
+  sendtorc(myTest["Test"]);
+}
+Will send "NPC (Server): Text String!" to RC chat
+Note: If you use a named variable in your table then it will not increment the counter.
+Ex: myTest[2] will = 7 and not "Text string!", so you cannot output it in a loop
+ 
+How to loop a table
+-------------------
+function onCreated()
+{
+  myTest = table( 1, 4, Test="Text String!", 7, 8 );
+  foreach( keyVar and valVar in myTest)
+  {
+    sendtorc( keyVar + "=" + valVar);
+  }
+}
+
+Output:
+NPC (Server): 0=1
+NPC (Server): 1=4
+NPC (Server): 2=7
+NPC (Server): Test=Text String!
+NPC (Server): 3=8
+
+Very cool =]
+
+How to loop online players
+--------------------------
+list = getPlayers();
+for (i = 0; i < getPlayerCount(); i += 1){
+  if (list[i].level != ""){ // If they are on a level, not RC
+    list[i].chat = "OMG HAXORZ IN MY CHAT";
+  }
+}
+
+How to do triggeractions
+------------------------
+function freeze(player,params)
+{
+  this.frozen+=1;
+  this.chat="WTF NO - Frozen " + this.frozen + " Time(s) - CURSE YOU " + upper(player.nick) + "!!!! How dare you cast " + params[0] + " on me? Didn't you know that takes " + params[1] + " damage!!?";
+}
+
+Note on variables & scoping
+---------------------------
+function onCreated()
+{
+  test = "Hello";
+}
+CANNOT BE ACCESS FROM ANY OTHER FUNCTION
+function onPlayertouchsme(player)
+{
+  player.chat = test;
+}
+WILL NOT WORK
+
+You must do it like this:
+function onCreated()
+{
+  this.test = "Hello";
+}
+function onPlayertouchsme(player)
+{
+  player.chat = this.test;
+}
+
+More info on scoping
+--------------------
+  apple = 3;          // 'apple' variable is local to function
+  global apple;       // Declare 'apple' to be accessed from global scope
+  local apple;        // Declare 'apple' to be accessed locally again
+  member apple;       // Declare 'apple' to be a member of 'this'
+  this.apple;         // Explicitly access 'apple' off 'this'
+  .apple;             // Implicitly access 'apple' off 'this'

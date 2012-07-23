@@ -427,6 +427,7 @@ enum
 	NCO_LEVELGET			= 12,
 	NCO_NPCPROPSSET			= 13,
 	NCO_NPCWARP				= 14,
+	NCO_SENDRPGMESSAGE		= 15,
 };
 
 enum

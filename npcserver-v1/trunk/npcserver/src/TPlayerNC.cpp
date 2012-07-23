@@ -31,10 +31,11 @@ void TPlayerNC::createFunctions()
 	TPLFunc[PLI_NC_WEAPONGET]     = &TPlayerNC::msgPLI_NC_WEAPONGET;
 	TPLFunc[PLI_NC_WEAPONADD]     = &TPlayerNC::msgPLI_NC_WEAPONADD;
 	TPLFunc[PLI_NC_WEAPONDELETE]  = &TPlayerNC::msgPLI_NC_WEAPONDELETE;
-	TPLFunc[PLI_NC_LEVELLISTGET] = &TPlayerNC::msgPLI_NC_LEVELLISTGET;
-	TPLFunc[PLI_NC_CLASSEDIT]	= &TPlayerNC::msgPLI_NC_CLASSEDIT;
-	TPLFunc[PLI_NC_CLASSADD]   = &TPlayerNC::msgPLI_NC_CLASSADD;
-	TPLFunc[PLI_NC_CLASSDELETE] = &TPlayerNC::msgPLI_NC_CLASSDELETE;
+	TPLFunc[PLI_NC_LEVELLISTGET]  = &TPlayerNC::msgPLI_NC_LEVELLISTGET;
+	TPLFunc[PLI_NC_NPCADD]        = &TPlayerNC::msgPLI_NC_NPCADD; // {111}{GSTRING info}  - (info) name,id,type,scripter,starting level,x,y
+	TPLFunc[PLI_NC_CLASSEDIT]	  = &TPlayerNC::msgPLI_NC_CLASSEDIT;
+	TPLFunc[PLI_NC_CLASSADD]      = &TPlayerNC::msgPLI_NC_CLASSADD;
+	TPLFunc[PLI_NC_CLASSDELETE]   = &TPlayerNC::msgPLI_NC_CLASSDELETE;
 	// Finished
 
 }
@@ -131,6 +132,7 @@ void TPlayerNC::sendCompress()
         // Clear the send buffer.
         sBuffer.clear();
 }
+
 bool TPlayerNC::sendPacket(CString pPacket)
 {
 
@@ -149,21 +151,22 @@ bool TPlayerNC::msgPLI_LOGIN(CString& pPacket)
 	switch (type)
 	{
 		case PLTYPE_NC:
-		//	serverlog.out("NC\n");
-		//	in_codec.setGen(ENCRYPT_GEN_3);
-		//	getKey = false;
+			// cout << "NC Connecting" << endl;
+			// in_codec.setGen(ENCRYPT_GEN_3);
+			// getKey = false;
 			break;
 		default:
-			//serverlog.out("Unknown (%d)\n", type);
-			//sendPacket(CString() >> (char)PLO_DISCMESSAGE << "Your client type is unknown.  Please inform the Graal Reborn staff.  Type: " << CString((int)type) << ".");
+			cout << "Unknown (" << type << ")" << endl;
+			sendPacket(CString() >> (char)PLO_DISCMESSAGE << "Your client type is unknown.  Please inform the Graal Reborn staff.  Type: " << CString((int)type) << ".");
 			return false;
 			break;
 	}
 
 	version = pPacket.readChars(8);
 
-	if (version != "NCL21075")
+	if (version != "NCL21075" && version != "NCL11012") //TODO: Better denying of old versions, I think best way is through GServer.
 	{
+		server->rcChat("Your nc version (" + version + ") is not allowed on this server.");
 		sendPacket(CString() >> (char)PLO_DISCMESSAGE << "Your nc version is not allowed on this server.");
 		playerSock->disconnect();
 		return false;
@@ -177,11 +180,21 @@ bool TPlayerNC::msgPLI_LOGIN(CString& pPacket)
 	printf("Account:  %s\n", account.text());
 	printf("Version:  %s\n", version.text());
 
+	if(server->CheckMultipleNC(account)) //TODO: Better handling of previous logins, this treats your new one as a duplicate still
+	{
+	  sendPacket(CString() >> (char)PLO_DISCMESSAGE << "Multiple connections are not allowed on nc");
+	  playerSock->disconnect();
+	  return false;
+	}
+
+
 	server->sendToGserver(CString() >> (char)GO_REQUEST_RIGHTS << account);
 	
 	//Message
 	sendPacket(CString() >> (char)PLO_RC_CHAT << server->getMOTD());
-	sendPacket(CString() >> (char)PLO_RC_CHAT << "Programmed by Lnxmad");
+	sendPacket(CString() >> (char)PLO_RC_CHAT << "Programmed by Lnxmad & Agret");
+
+	server->rcChat("New NC: " + account);
 
 	std::map<CString, TScriptClass *> * classList = server->getClassList();
 	
@@ -205,6 +218,85 @@ bool TPlayerNC::msgPLI_NULL(CString& pPacket)
 	
 	return true;
 }
+
+bool TPlayerNC::msgPLI_NC_NPCADD(CString& pPacket)
+{
+
+	//TODO RIGHTS
+	// printf("Unknown Player Packet: %i (%s)\n", pPacket.readGUChar(), pPacket.text()+1);
+	// Unknown Player Packet: 2 ("TEsting THis",1000,OBJECT,Agret,onlinestartlocal.nw,30.5,30)
+
+//	server->rcChat(pPacket.text()+1);
+
+	CString line = pPacket.text()+1;
+	std::vector<CString> names = line.tokenize(",");
+	
+	/*for (std::vector<CString>::iterator j = names.begin(); j != names.end(); ++j)
+	{
+		server->ncChat("Hey: " + names[0]);
+	}*/
+
+	// server->ncChat(line); // Debug print - Name,1000,OBJECT,Agret,onlinestartlocal.nw,30.5,30
+
+	CString npcName = names[0].replaceAll("\"", "");
+	int npcID = atoi(names[1].text());
+	CString npcType = names[2];
+	CString npcScripter = names[3];
+	CString npcStartLevel = names[4];
+	float npcStartX = (float)atof(names[5].text());
+	float npcStartY = (float)atof(names[6].text());
+
+	if (npcName.length() < 1 || npcName.length() > 30)
+	{
+		sendPacket(CString() >> (char)PLO_RC_CHAT << CString("Error - Blank/Invalid NPC Name."));
+		return false;
+	}
+	if (npcID < 1 || npcID > 1000000){
+		sendPacket(CString() >> (char)PLO_RC_CHAT << CString("Error - Invalid NPC ID."));
+		return false;
+	}
+	// server->ncChat("NPC (Server): NPC " + npcName + " Added (ID: " + npcID + "). StartX:" + npcStartX + " StartY: " + npcStartY + " Scripter: " + npcScripter);
+	server->ncChat(account + " added NPC \"" + npcName + "\" (ID " + npcID + ")");
+
+	return true;
+}
+
+/*bool TPlayerNC::msgPLI_RC_NPCLISTGET(CString& pPacket)
+{
+	CString packet = CString() >> (char)PLO_NC_WEAPONLISTGET;
+
+	std::map<CString, TScriptWeapon *> * weaponList = server->getWeaponList();
+	
+	for (std::map<CString, TScriptWeapon *>::const_iterator i = weaponList->begin(); i != weaponList->end(); ++i)
+	{
+		CString weaponName = i->second->getName();
+
+		for (std::map<CString, CString>::const_iterator t = folderRights.begin(); t != folderRights.end(); ++t)
+		{
+			if ((*t).first.find("WEAPONS") >= 0)
+			{
+				CString path(CString() << "WEAPONS/"<<weaponName);
+	
+				std::vector<CString> rights = (*t).second.tokenize("\n");
+				
+				for (std::vector<CString>::iterator c = rights.begin(); c != rights.end(); ++c)
+				{
+					CString right(CString() << (*t).first << (*c).tokenize(":")[1].trim());
+					if (path.match(right))
+					{
+						CString imageName  = i->second->getImage();
+						CString scriptData = i->second->getFullScript();
+						packet >> (char)weaponName.length() << weaponName;
+						break;
+					}
+				}
+			}	
+		}
+	}
+
+	sendPacket(packet);
+	return true;
+}*/
 
 bool TPlayerNC::msgPLI_NC_CLASSDELETE(CString& pPacket)
 {
@@ -259,6 +351,24 @@ bool TPlayerNC::msgPLI_RC_CHAT(CString& pPacket)
 	{
 		//sendPacket(CString() >> (char)PLO_RC_CHAT  << ": " << message);
 		return true;
+	}else{ // message is the full message // words[0] is the first word i.e. /test, it tokenizes by a space
+		if(message == "/help")
+		{
+			sendPacket(CString() >> (char)PLO_RC_CHAT  << "Available Commands For The NPC-Server:");
+			sendPacket(CString() >> (char)PLO_RC_CHAT  << "/weaponlist: Lists the current weapons loaded by NPC-Server");
+			sendPacket(CString() >> (char)PLO_RC_CHAT  << "/reloadweapons: Reloads all weapons (not implemented)");
+		}else if(message == "/weaponlist" || message == "/weaponslist")
+		{
+			sendPacket(CString() >> (char)PLO_RC_CHAT  << "Weapon List:");
+			std::map<CString, TScriptWeapon *> * weaponList = server->getWeaponList();
+			
+			for (std::map<CString, TScriptWeapon *>::const_iterator i = weaponList->begin(); i != weaponList->end(); ++i)
+			{
+				sendPacket(CString() >> (char)PLO_RC_CHAT  << i->second->getName());
+			}
+
+			sendPacket(CString() >> (char)PLO_RC_CHAT  << "End of list:");
+		}
 	}
 
 	return true;

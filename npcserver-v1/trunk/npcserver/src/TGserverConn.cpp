@@ -61,29 +61,29 @@ void TGserverConn::login(CString nickname,CString account,CString password, int 
 
 bool TGserverConn::created = false;
 typedef bool (TGserverConn::*TPLSock)(CString&);
-std::vector<TPLSock> TPLFunc(255, &TGserverConn::msgPLI_NULL);
+std::vector<TPLSock> GSCFunc(255, &TGserverConn::msgPLI_NULL);
 
 void TGserverConn::createFunctions()
 {
 	if (TGserverConn::created)
 		return;
 
-	TPLFunc[GI_WEAPONADD]		= &TGserverConn::msgGI_NPCWEAPONADD;
-	TPLFunc[GI_OTHERPLPROPS]	= &TGserverConn::msgGI_OTHERPLPROPS;
-	TPLFunc[GI_FLAGSET]			= &TGserverConn::msgGI_FLAGSET;
-	TPLFunc[GI_PRIVATEMESSAGE]	= &TGserverConn::msgGI_PRIVATEMESSAGE;
-	TPLFunc[GI_NEWWORLDTIME]	= &TGserverConn::msgGI_NEWWORLDTIME;
-	TPLFunc[GI_NC_REQUEST]		= &TGserverConn::msgGI_NC_REQUEST;
-	TPLFunc[GI_TRIGGERACTION]	= &TGserverConn::msgGI_TRIGGERACTION;
-	TPLFunc[GI_LEVELNAME]		= &TGserverConn::msgGI_LEVELNAME;
-	TPLFunc[GI_LEVELLINK]		= &TGserverConn::msgGI_LEVELLINK;
-	TPLFunc[GI_LEVELSIGN]		= &TGserverConn::msgGI_LEVELSIGN;	
-	TPLFunc[GI_NPCPROPS]		= &TGserverConn::msgGI_NPCPROPS;
-	TPLFunc[GI_LEVELMODTIME]	= &TGserverConn::msgGI_LEVELMODTIME;
-	TPLFunc[GI_NPCDEL]			= &TGserverConn::msgGI_NPCDEL; 
-	TPLFunc[GI_NPCDEL2]			= &TGserverConn::msgGI_NPCDEL; 
-	TPLFunc[GI_PLAYER_RIGHTS]   = &TGserverConn::msgGI_PLAYER_RIGHTS;
-	TPLFunc[GI_PLAYERPROPS]		= &TGserverConn::msgGI_NPCDEL;
+	GSCFunc[GI_WEAPONADD]		= &TGserverConn::msgGI_NPCWEAPONADD;
+	GSCFunc[GI_OTHERPLPROPS]	= &TGserverConn::msgGI_OTHERPLPROPS;
+	GSCFunc[GI_FLAGSET]			= &TGserverConn::msgGI_FLAGSET;
+	GSCFunc[GI_PRIVATEMESSAGE]	= &TGserverConn::msgGI_PRIVATEMESSAGE;
+	GSCFunc[GI_NEWWORLDTIME]	= &TGserverConn::msgGI_NEWWORLDTIME;
+	GSCFunc[GI_NC_REQUEST]		= &TGserverConn::msgGI_NC_REQUEST;
+	GSCFunc[GI_TRIGGERACTION]	= &TGserverConn::msgGI_TRIGGERACTION;
+	GSCFunc[GI_LEVELNAME]		= &TGserverConn::msgGI_LEVELNAME;
+	GSCFunc[GI_LEVELLINK]		= &TGserverConn::msgGI_LEVELLINK;
+	GSCFunc[GI_LEVELSIGN]		= &TGserverConn::msgGI_LEVELSIGN;	
+	GSCFunc[GI_NPCPROPS]		= &TGserverConn::msgGI_NPCPROPS;
+	GSCFunc[GI_LEVELMODTIME]	= &TGserverConn::msgGI_LEVELMODTIME;
+	GSCFunc[GI_NPCDEL]			= &TGserverConn::msgGI_NPCDEL; 
+	GSCFunc[GI_NPCDEL2]			= &TGserverConn::msgGI_NPCDEL; 
+	GSCFunc[GI_PLAYER_RIGHTS]   = &TGserverConn::msgGI_PLAYER_RIGHTS;
+	GSCFunc[GI_PLAYERPROPS]		= &TGserverConn::msgGI_NPCDEL;
 
 	created = true;
 	// Finished
@@ -119,10 +119,16 @@ bool TGserverConn::msgGI_TRIGGERACTION(CString& pPacket)
 	if (loc[0] == 0.0f && loc[1] == 0.0f)
 	{
 		server->triggerAction(playerId,action.readString(","),action);
+		printf("triggeraction1 - player id %i action: %s\n", playerId, action.text()); //DEBUG
 	}
 	else
 	{
 		server->triggerAction(playerId,npcId,loc[0],loc[1],action.readString(","),action);
+		printf("triggeraction2 - plyrID %i npcID: %i X: %f Y: %f act: %s\n", playerId, npcId, loc[0], loc[1], action.text()); //DEBUG
+
+		
+		//TLevel * level = mServer->getLevel(mPlayerLevel);
+		//if (level != 0) level->callNPCS("onPlayerchats",this,"");
 	}
 
 	return true;
@@ -210,6 +216,7 @@ bool TGserverConn::msgGI_PLAYER_RIGHTS(CString& pPacket)
 		folder.removeI(0, folder.readPos());
 		folder.replaceAllI("\\", "/");
 		folder.trimI();
+		printf("RIGHT: %s\n", folder.text());
 		if (folder.find("WEAPONS") >= 0 || folder.find("CLASSES") >= 0 || folder.find("NPCS") >= 0) 
 		{
 			if (folder[folder.length() - 1] != '/')
@@ -223,6 +230,7 @@ bool TGserverConn::msgGI_PLAYER_RIGHTS(CString& pPacket)
 				}
 			}
 			folderMap[folder] << rights << ":" << wild << "\n";
+			printf("MATCHED NAME: %s RIGHT: %s WILD: %s\n", folder.text(), rights.text(), wild.text());
 		}
 	}
 	server->setNCRights(account,folderMap);
@@ -317,6 +325,12 @@ void TGserverConn::sendPM(int playerId, CString message)
 }
 
 
+void TGserverConn::sendRPGMessage(int playerId, CString message)
+{
+	fileQueue.addPacket(CString() >> (char)GO_NC_QUERY >> (char)NCO_SENDRPGMESSAGE  >> (short)playerId << message);
+	fileQueue.sendCompress();
+}
+
 void TGserverConn::sendToGserver(CString pPacket)
 {
 	fileQueue.addPacket(pPacket);
@@ -387,7 +401,7 @@ bool TGserverConn::parsePacket(CString& pPacket)
 
                 
                //valid packet, call function
-               if (!(*this.*TPLFunc[id])(curPacket))
+               if (!(*this.*GSCFunc[id])(curPacket))
 			return false;
         }
         return true;

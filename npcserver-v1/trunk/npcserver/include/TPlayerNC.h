@@ -39,6 +39,7 @@ public:
 	bool msgPLI_NC_WEAPONADD(CString& pPacket);
 	bool msgPLI_NC_WEAPONDELETE(CString& pPacket);
 	bool msgPLI_NC_LEVELLISTGET(CString& pPacket);
+	bool msgPLI_NC_NPCADD(CString& pPacket);
 	bool msgPLI_NC_CLASSEDIT(CString& pPacket);
 	bool msgPLI_NC_CLASSADD(CString& pPacket);
 	bool msgPLI_NC_CLASSDELETE(CString& pPacket);

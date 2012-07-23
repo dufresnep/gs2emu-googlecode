@@ -51,6 +51,8 @@ class TNPC
 		CString getFullScript() const	{ return fullScript; }
 		float getY() {return y;}
 		float getX() {return x;}
+		float getWidth() {return width;}
+		float getHeight() {return height;}
 		time_t getPropModTime(unsigned char pId);
 		TNPCServer * GetServer()	{return server;}
 		gmMachine * GetMachine()	{return machine;}

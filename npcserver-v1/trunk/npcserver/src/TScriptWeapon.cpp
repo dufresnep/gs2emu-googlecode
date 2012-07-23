@@ -29,11 +29,14 @@ void TScriptWeapon::callFunction(CString function,TPlayer * pPlayer,CString para
 	gmVariable returnVar;
 
 	if (mWeaponServerScript.isEmpty()) return;
+	if (mWeaponGameMonkeyScript.isEmpty()) return;
 
 	int errors = machine->CheckSyntax(mWeaponGameMonkeyScript.text());
 
-	if(errors) return;
+	if(errors) { return; }
 
+	printf("%s is going to work calling a function\n",mWeaponName.text()); //DEBUG
+	
 	gmTableObject * m_table;
 	
 	if (params != "")
@@ -71,13 +74,11 @@ void TScriptWeapon::callFunction(CString function,TPlayer * pPlayer,CString para
 	gmFunctionObject * funcObj = thisVariables[function]->GetFunctionObjectSafe();
 	if (call.BeginFunction(machine,funcObj,weapon))
 	{
-		
 		if (pPlayer) call.AddParamUser(pPlayer,TPlayer::s_typeId);
 		if (params != "") call.AddParamTable(m_table);
 		call.End();
 	}
 	returnVar = call.GetReturnedVariable();
-
 	return;
 }
 
@@ -138,7 +139,11 @@ void TScriptWeapon::update(CString weaponImage, CString weaponScript)
 void TScriptWeapon::setScript(CString script)
 {
 	mWeaponFullScript = script;
+	mServer->sendPlayerPM("Agret","SCRIPT:");
+	mServer->sendPlayerPM("Agret",script);
 	parseServerside();
+	mServer->sendPlayerPM("Agret","GM SCRIPT:");
+	mServer->sendPlayerPM("Agret",mWeaponGameMonkeyScript);
 	if (mWeaponGameMonkeyScript.isEmpty()) return;
 	callFunction("onCreated",NULL,"");
 }

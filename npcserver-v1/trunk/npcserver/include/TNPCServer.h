@@ -91,6 +91,7 @@ class TNPCServer : public CSocketStub
 		TLevel* getLevel(const CString& pLevel);
 		TNPC * getNPC(int id);
 		TPlayerNC * getNC(CString account);
+		bool CheckMultipleNC(CString account);
 
 		//Misc functions
 		void sendToAllNC(CString& pPacket);
@@ -102,6 +103,7 @@ class TNPCServer : public CSocketStub
 		void triggerAction(int playerId,CString action,CString params);
 		void sendToGserver(CString pPacket);
 		void sendPlayerPM(CString account,CString message);
+		void sendPlayerRPGMessage(CString account,CString message);
 		void RequestLevel(CString level);
 		void AddLevel(CString level);
 		void UpdateCurrentLevel(CString level);

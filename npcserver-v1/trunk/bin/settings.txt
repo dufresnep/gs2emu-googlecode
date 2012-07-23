@@ -12,4 +12,5 @@ gserver_ip =
 gserver_port = 
 
 #MOTD
-motd = Welcome to the NPC-Server.
+# Set blank to have one with the version number auto entered :)
+#motd = Welcome to the NPC-Server.

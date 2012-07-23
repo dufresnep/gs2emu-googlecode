@@ -58,6 +58,7 @@ class TGserverConn : public CSocketStub
 		bool msgGI_NPCDEL(CString& pPacket);
 		bool msgGI_PLAYER_RIGHTS(CString& pPacket);
 		void sendPM(int playerId, CString message);
+		void sendRPGMessage(int playerId, CString message);
 		static bool created;
 		static void createFunctions();
 

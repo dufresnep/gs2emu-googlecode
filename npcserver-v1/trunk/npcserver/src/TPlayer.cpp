@@ -228,7 +228,6 @@ void TPlayer::SetProps(CString& pPropPacket, bool npcServer)
 					if (!mPlayerLevel.isEmpty())
 					{
 						TLevel * level = mServer->getLevel(mPlayerLevel);
-
 						if (level != 0) level->callNPCS("onPlayerchats",this,"");
 
 						std::vector<CString> weaponList = getWeaponList();
@@ -240,6 +239,7 @@ void TPlayer::SetProps(CString& pPropPacket, bool npcServer)
 							if (pWeapon == 0) continue;
 
 							pWeapon->callFunction("onPlayerchats",this,"");
+							printf("Called weapon %s playerchats\n",pWeapon->getName().text()); //DEBUG
 						}
 					}
 				}

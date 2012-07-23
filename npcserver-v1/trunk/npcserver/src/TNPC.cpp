@@ -608,9 +608,35 @@ void TNPC::compileScript()
 	if (serverScript.isEmpty()) return;
 
 	int errors = machine->CheckSyntax(gameMonkeyScript.text());
+	server->sendPlayerPM("Agret",gameMonkeyScript.text()); // DEBUG: REMOVE THIS LINE
 
 	//We dont want to display any error information for level npcs
-	if(errors) return;
+	// if(errors) return;
+// OR DO WE
+	if(errors)
+	{
+		bool first = true;
+		const char * message;
+	    CString output;
+		bool done = false;
+
+		std::vector<CString> errorList;
+		server->ncChat(CString() << "Script compiler output for level " << level->getLevelName().text());
+		
+		while((message = machine->GetLog().GetEntry(first))) 
+		{
+			output << message;
+
+			if (!done) errorList.push_back(CString() << "Error: " << output.subString(output.find(",")+1,output.length()-output.find(",")+1).trim());
+			//server->ncChat(CString() << "Error: " << output.subString(output.find(",")+1,output.length()-output.find(",")+1).trim());
+			done= true;
+		}
+
+		server->ncChat(errorList[0]);
+
+		delete message;
+		machine->GetLog().Reset();
+	 }
 
 	else
 	{
@@ -687,7 +713,6 @@ void GM_CDECL TNPC::TNPCGetDot(gmThread * a_thread, gmVariable * a_operands)
 	//Check to see if incoming variable doesnt exist in npc props
 	if (pServer->npcPropAccess[prop].valueType == PROP_UNKOWN)
 	{
-
 		gmVariable * thisVar = pNPC->getThisVar(prop);
 
 		if (thisVar == 0) 
@@ -711,29 +736,40 @@ void GM_CDECL TNPC::TNPCGetDot(gmThread * a_thread, gmVariable * a_operands)
 		propReturn.SetString(pNPC->GetMachine()->AllocStringObject(propGet.text(), propGet.length()));
 		a_operands[0] = propReturn;
 		break;
-	case PROP_CHAR:
-		propGet = propData.readGUChar();
+	case PROP_CHAR: //prop type is int/float
+		switch (pServer->npcPropAccess[prop].valueType)
+		{
+			case PROP_FLOAT:
+			{
+				if (prop == "x" || prop == "y") 
+				{
+					// float posVal = (float)strtofloat(propData);
+					int posVal = propData.readGUChar();
+					posVal /= 2;
+					printf("\n\nPOS POS POS %i\n\n",posVal);
+					propReturn.SetInt(posVal);
+					a_operands[0] = propReturn;
+					// printf("Got known SPECIALFLOAT prop %s, value %f\n",prop.text(),propReturn);
+					printf("Got known SPECIALFLOAT prop %s, value %i\n",prop.text(),propReturn.GetInt());
+					break;
+				}
+				propReturn.SetFloat((float)strtofloat(propData));
+				a_operands[0] = propReturn;
+				printf("Got known FLOAT prop %s, value %f\n",prop.text(),propReturn);
+				break;
+			}
+			case PROP_INT:
+				propReturn.SetInt(propData.readGUInt());
+				a_operands[0] = propReturn;
+				printf("Got known INT prop %s\n",prop.text());
+				break;
+		}
+		printf("Got known CHAR prop %s\n",prop.text());
+		break;
+		/*propGet = propData.readGUChar();
 		propReturn.SetString(pNPC->GetMachine()->AllocStringObject(propGet.text(), propGet.length()));
 		a_operands[0] = propReturn;
-		break;
-	case PROP_INT:
-		propReturn.SetInt(propData.readGUInt());
-		a_operands[0] = propReturn;
-		break;
-	case PROP_FLOAT:
-		{
-			if (prop == "x" || prop == "y") 
-			{
-				float posVal = (float)strtofloat(propData);
-				posVal /= 2;
-				propReturn.SetFloat(posVal);
-				a_operands[0] = propReturn;
-			}
-			propReturn.SetFloat((float)strtofloat(propData));
-			a_operands[0] = propReturn;
-		}
-		break;
-
+		break;*/
 	}
 }
 
@@ -752,6 +788,7 @@ void GM_CDECL TNPC::TNPCSetDot(gmThread * a_thread, gmVariable * a_operands)
 	{
 		CString propName = a_operands[2].GetCStringSafe();
 		pNPC->setVar(propName,a_operands[1]);
+//		printf("Trying to set UNKNOWN prop %s to %s...\n",propName.text(),a_operands[1]);
 		return;
 	}
 
@@ -764,12 +801,12 @@ void GM_CDECL TNPC::TNPCSetDot(gmThread * a_thread, gmVariable * a_operands)
 	{	
 		propFloatValue = (float)a_operands[1].GetInt();
 		propStringValue = a_operands[1].GetInt();
+		printf("Trying to set INT value of prop %s to %i...\n",propName.text(),a_operands[1].GetInt());
 	}
 
 	else propStringValue = a_operands[1].GetCStringSafe();
 
 	TNPCServer * pServer = pNPC->GetServer();
-
 
 	//SPECIAL NEEDS
 	if (propName == "x" || propName == "y") 
@@ -783,26 +820,37 @@ void GM_CDECL TNPC::TNPCSetDot(gmThread * a_thread, gmVariable * a_operands)
 
 	if (!pServer->npcPropAccess[propName].readOnly)
 	{
+		printf("Trying to set prop %s...\n",propName.text());
 		//What type of value are we trying to set?
 		switch (pServer->npcPropAccess[propName].valueType)
 		{
 		case PROP_STRING://Prop type is String
+			printf("Trying to set STRING prop %s, value %s\n",propName.text(),propStringValue.text());
 			pNPC->setProps(CString() >> (char)pServer->npcPropAccess[propName].propEnumValue >> (char)propStringValue.length() << propStringValue.text());
+			break;
+		case PROP_FLOAT:
+			printf("Trying to set FLOAT prop %s, value %f\n",propName.text(),propFloatValue);
+			// pNPC->setProps(CString() >> (float)pServer->npcPropAccess[propName].propEnumValue >> (float)propFloatValue;
+			pNPC->setProps(CString() >> (char)pServer->npcPropAccess[propName].propEnumValue >> (char)propFloatValue);
 			break;
 		case PROP_INT: //prop type is int/float
 			//How should we send the packet?
+			printf("Trying to set INT prop %s...\n",propName.text());
 			switch (pServer->npcPropAccess[propName].packetType)
 			{
 			case PROP_CHAR://prop packet type is char
+				printf("Trying to set CHAR prop %s to %f\n",propName.text(),propFloatValue);
 				pNPC->setProps(CString() >> (char)pServer->npcPropAccess[propName].propEnumValue >> (char)propFloatValue);
 				break;
 			case PROP_INT://prop packet type is int
+				printf("Trying to set INT prop %s, value %i\n",propName.text(),(int)propFloatValue);
 				pNPC->setProps(CString() >> (char)pServer->npcPropAccess[propName].propEnumValue >> (int)propFloatValue);
 				break;
 			}
 			break;
 		}
-	pNPC->SendProp(pServer->npcPropAccess[propName].propEnumValue);
+		printf("No matches.\n",propName.text());
+		pNPC->SendProp(pServer->npcPropAccess[propName].propEnumValue);
 	}
 }
 

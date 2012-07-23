@@ -45,7 +45,11 @@
 	#define SHUT_RDWR			SD_BOTH
 
 	#define sleep Sleep
-	#define snprintf _snprintf
+	//defining snprintf as _snprintf cause MinGW to spit:
+	//include/c++/cstdio:166:11: error: '::snprintf' has not been declared
+	#ifndef __GNUC__
+		#define snprintf _snprintf
+	#endif
 #else
 	#include <netdb.h>
 	#include <errno.h>

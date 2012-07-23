@@ -1,5 +1,6 @@
 #include "gmThread.h"
 #include "MiscFunctions.h"
+#include "md5.h"
 
 //Function getPlayers();
 //Returns: table of all player objects
@@ -27,9 +28,9 @@ int GM_CDECL func_getPlayers(gmThread * a_thread)
 	return GM_OK;	
 }
 
-//Function: sendtorc(text);
+//Function: echo(text);
 //Returns: void
-int GM_CDECL func_sendtorc(gmThread * a_thread)
+int GM_CDECL func_sendtorc_echo(gmThread * a_thread)
 {
 	TNPCServer * server = (TNPCServer*)a_thread->GetFunctionObject()->m_cUserData;
 	CString message;
@@ -49,7 +50,51 @@ int GM_CDECL func_sendtorc(gmThread * a_thread)
   return GM_OK;                                        
 }
 
-//Function: sendPM(account,text);
+//Function: sendtorc(text);
+//Returns: void
+int GM_CDECL func_sendtorc(gmThread * a_thread)
+{
+	TNPCServer * server = (TNPCServer*)a_thread->GetFunctionObject()->m_cUserData;
+	CString message;
+	if(a_thread->ParamType(0) == GM_INT)
+	{
+		message = a_thread->Param(0).m_value.m_int;
+	}
+	else if(a_thread->ParamType(0) == GM_FLOAT)
+	{
+		message = a_thread->Param(0).m_value.m_float;
+	}
+	else 
+		message = a_thread->Param(0).GetCStringSafe();
+
+	server->rcChat("NPC (Server): " + message);
+
+  return GM_OK;                                        
+}
+
+//Function: sendtonc(text);
+//Returns: void
+int GM_CDECL func_sendtonc(gmThread * a_thread)
+{
+	TNPCServer * server = (TNPCServer*)a_thread->GetFunctionObject()->m_cUserData;
+	CString message;
+	if(a_thread->ParamType(0) == GM_INT)
+	{
+		message = a_thread->Param(0).m_value.m_int;
+	}
+	else if(a_thread->ParamType(0) == GM_FLOAT)
+	{
+		message = a_thread->Param(0).m_value.m_float;
+	}
+	else 
+		message = a_thread->Param(0).GetCStringSafe();
+
+	server->ncChat(message);
+
+  return GM_OK;                                        
+}
+
+//Function: sendpm(account,text);
 //Returns: void
 int GM_CDECL func_sendPM(gmThread * a_thread)
 {
@@ -58,6 +103,19 @@ int GM_CDECL func_sendPM(gmThread * a_thread)
 	CString message = a_thread->Param(1).GetCStringSafe();
 
 	server->sendPlayerPM(account,message);
+
+	return GM_OK;   
+}
+
+//Function: sendrpgmessage(account,text);
+//Returns: void
+int GM_CDECL func_sendRPGMessage(gmThread * a_thread)
+{
+	TNPCServer * server = (TNPCServer*)a_thread->GetFunctionObject()->m_cUserData;
+	CString account = a_thread->Param(0).GetCStringSafe();
+	CString message = a_thread->Param(1).GetCStringSafe();
+
+	server->sendPlayerRPGMessage(account,message);
 
 	return GM_OK;   
 }
@@ -126,8 +184,50 @@ int GM_CDECL func_tokenize(gmThread * a_thread)
 	return GM_OK;    
 }
 
+//Function: uppercase(string);
+//Returns: returns string in uppercase
+int GM_CDECL func_uppercase(gmThread * a_thread)
+{
+	CString stringToConvert = a_thread->Param(0).GetCStringSafe();
+	CString upperString = stringToConvert.toUpper();
 
+	gmMachine * machine = a_thread->GetMachine();
+	a_thread->PushString(machine->AllocStringObject(upperString.text()));
 
+	return GM_OK;    
+}
+
+//Function: lowercase(string);
+//Returns: returns string in lowercase
+int GM_CDECL func_lowercase(gmThread * a_thread)
+{
+	CString stringToConvert = a_thread->Param(0).GetCStringSafe();
+	CString lowerString = stringToConvert.toLower();
+
+	gmMachine * machine = a_thread->GetMachine();
+	a_thread->PushString(machine->AllocStringObject(lowerString.text()));
+
+	return GM_OK;    
+}
+
+//Function: md5(string);
+//Returns: returns string as an md5 hash
+int GM_CDECL func_md5(gmThread * a_thread)
+{
+	CString stringToConvert = a_thread->Param(0).GetCStringSafe();
+	MD5String(stringToConvert.text(),stringToConvert.length());
+
+    // CString md5String = (char*)md5sum;
+
+	// TNPCServer * server = (TNPCServer*)a_thread->GetFunctionObject()->m_cUserData;
+	// server->rcChat(md5String);
+
+	// printf("MD5: %s\n", (char*)md5sum);
+	//gmMachine * machine = a_thread->GetMachine();
+	// a_thread->PushString(machine->AllocStringObject(md5String.text()));
+
+	return GM_OK;    
+}
 
 
 

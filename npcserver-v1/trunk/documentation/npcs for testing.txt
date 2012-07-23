@@ -1,0 +1,217 @@
+NPC alienking.png 15 39
+function onCreated()
+{
+   this.chat = "I am a serverside alien!";
+}
+
+function onPlayerenters(player)
+{
+   this.chat = "Hello " + player.nick;
+}
+
+function onPlayerchats(player)
+{
+  if (player.chat == "alien")
+{
+this.chat = "What is it " + player.nick + "?";
+}
+if (player.chat == "nothing")
+{
+this.chat = "FINE!";
+}
+
+}
+
+
+//#CLIENTSIDE
+NPCEND
+NPC aliendown.png 35 39
+function onCreated()
+{
+  }
+
+function onPlayerenters(player)
+{
+ }
+
+function onPlayerchats(player)
+{
+  this.chat = player.nick + ": " + player.chat;
+}
+
+
+//#CLIENTSIDE
+NPCEND
+NPC amz_chair.gif 37 23
+function onCreated()
+  {
+  this.val = 0;
+  this.chat = this.val;
+
+  this.setTimer(.1);
+
+}
+
+function onTimeout()
+{
+  this.val+=1;
+  this.chat = this.val;
+  this.setTimer(1);
+}
+
+//#CLIENTSIDE
+NPCEND
+NPC chest.png 21 28
+function onCreated()
+{
+
+  this.setshape(32,32);
+  this.chat = "Hello";
+}
+
+function onPlayertouchsme(player)
+{
+this.chat = "Hit";
+
+
+}
+
+function onPlayerchats(player)
+{
+
+}
+//#CLIENTSIDE
+NPCEND
+NPC amz_chair.gif 33 23
+function onCreated()
+  {
+  this.val = 0;
+  this.chat = this.val;
+
+  this.setTimer(.1);
+
+}
+
+function onTimeout()
+{
+  this.val+=1;
+  this.chat = this.val;
+  this.setTimer(1);
+}
+
+//#CLIENTSIDE
+NPCEND
+NPC amz_chair.gif 33 27
+function onCreated()
+  {
+  this.val = 0;
+  this.chat = this.val;
+
+  this.setTimer(.1);
+
+}
+
+function onTimeout()
+{
+  this.val+=1;
+  this.chat = this.val;
+  this.setTimer(1);
+}
+
+//#CLIENTSIDE
+NPCEND
+NPC amz_chair.gif 37 27
+function onCreated()
+  {
+  this.val = 0;
+  this.chat = this.val;
+
+  this.setTimer(.1);
+
+}
+
+function onTimeout()
+{
+  this.val+=1;
+  this.chat = this.val;
+  this.setTimer(1);
+}
+
+//#CLIENTSIDE
+NPCEND
+NPC amz_chair.gif 37 31
+function onCreated()
+  {
+  this.val = 0;
+  this.chat = this.val;
+
+  this.setTimer(.1);
+
+}
+
+function onTimeout()
+{
+  this.val+=1;
+  this.chat = this.val;
+  this.setTimer(1);
+}
+
+//#CLIENTSIDE
+NPCEND
+NPC amz_chair.gif 33 31
+function onCreated()
+  {
+  this.val = 0;
+  this.chat = this.val;
+
+  this.setTimer(.1);
+
+}
+
+function onTimeout()
+{
+  this.val+=1;
+  this.chat = this.val;
+  this.setTimer(1);
+}
+
+//#CLIENTSIDE
+NPCEND
+NPC amz_chair.gif 33 35
+function onCreated()
+  {
+  this.val = 0;
+  this.chat = this.val;
+
+  this.setTimer(.1);
+
+}
+
+function onTimeout()
+{
+  this.val+=1;
+  this.chat = this.val;
+  this.setTimer(1);
+}
+
+//#CLIENTSIDE
+NPCEND
+NPC amz_chair.gif 37 35
+function onCreated()
+  {
+  this.val = 0;
+  this.chat = this.val;
+
+  this.setTimer(.1);
+
+}
+
+function onTimeout()
+{
+  this.val+=1;
+  this.chat = this.val;
+  this.setTimer(1);
+}
+
+//#CLIENTSIDE
+NPCEND

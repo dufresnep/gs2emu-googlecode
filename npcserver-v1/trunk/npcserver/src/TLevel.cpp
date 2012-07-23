@@ -232,8 +232,8 @@ void TLevel::callSpecificNPC(float x, float y,CString function,TPlayer * player,
 	{
 		TNPC * pNPC = *i;
 		if (pNPC == 0) continue;
-
-		if (pNPC->getX() == x && pNPC->getY() == y)
+ 
+		if ((pNPC->getX() == x && pNPC->getY() == y))
 		{
 			pNPC->callFunction(function,player,params);
 		}
@@ -346,13 +346,14 @@ bool TLevel::addNPC(TNPC* npc)
 	}
 	levelNPCs.push_back(npc);
 
+	/* Deprecated code? Already called in TLevel::addPlayer(TPlayer* player) so this ends up doubling the count of players o_O
 	for (std::vector<TPlayer *>::iterator i = levelPlayerList.begin(); i != levelPlayerList.end(); ++i)
 	{
 		TPlayer* player = *i;
 		
 		npc->callFunction("onPlayerenters",player,"");
 		
-	}
+	}*/
 
 	return true;
 }
