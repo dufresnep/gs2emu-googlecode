@@ -7,5 +7,3 @@ Graal Reborn
 ---
 This document was last updated 2012-07-23.
 ---
-        _
-\_/\_/ |_| \_/\_/
