@@ -312,11 +312,11 @@ void TNPCServer::triggerAction(int playerId,CString action,CString params)
 	  TScriptWeapon * pWeapon = getWeapon(paramList[1]);
 	  for (int i =0; i < paramList.size(); ++i)
 	  {
-		printf("%i: %s\n",i,paramList[i]);
+		printf("%i: %s\n",i,paramList[i].text());
 	  }
 	
 	  if (pWeapon == 0) return;
-	  printf("Called %s\n",pWeapon->getName());
+	  printf("Called %s\n",pWeapon->getName().text());
 		pWeapon->callFunction("onActionServerside",pPlayer,params);
 	}
 

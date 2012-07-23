@@ -35,7 +35,7 @@ void TScriptWeapon::callFunction(CString function,TPlayer * pPlayer,CString para
 
 	if(errors) { return; }
 
-	printf("%s is going to work calling a function\n",mWeaponName); //DEBUG
+	printf("%s is going to work calling a function\n",mWeaponName.text()); //DEBUG
 	
 	gmTableObject * m_table;
 	

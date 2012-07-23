@@ -761,10 +761,10 @@ void GM_CDECL TNPC::TNPCGetDot(gmThread * a_thread, gmVariable * a_operands)
 			case PROP_INT:
 				propReturn.SetInt(propData.readGUInt());
 				a_operands[0] = propReturn;
-				printf("Got known INT prop %s\n",prop);
+				printf("Got known INT prop %s\n",prop.text());
 				break;
 		}
-		printf("Got known CHAR prop %s\n",prop);
+		printf("Got known CHAR prop %s\n",prop.text());
 		break;
 		/*propGet = propData.readGUChar();
 		propReturn.SetString(pNPC->GetMachine()->AllocStringObject(propGet.text(), propGet.length()));
