@@ -14,7 +14,7 @@ The script of npc db_flags has been updated
 The flags of npc db_flags have been updated
 Script gralats saved and all npcs of this class are updated.
 
-- when you load a player object with new TServerPlayer(accountname) (don't forget to call destroy() on it after using it) you can now access the level name via "TServerPlayer.levelname". You can also change that level for offline players although it's in beta (you can set x and y of offline players only to values between 0 and 64 so it will not work fine with gmaps).
+- When you load a player object with new TServerPlayer(accountname) (don't forget to call destroy() on it after using it) you can now access the level name via "TServerPlayer.levelname". You can also change that level for offline players although it's in beta (you can set x and y of offline players only to values between 0 and 64 so it will not work fine with gmaps).
 
 commands.rtf -> ./Graal.exe -listscriptfunctions
 
