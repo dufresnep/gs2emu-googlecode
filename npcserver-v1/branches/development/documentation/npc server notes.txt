@@ -24,10 +24,10 @@ Update: added description of server-side object events to /scripthelp to the nex
 
 if (findweapon("WeaponName").hasSkill())
 {
-  // do some stuff here
+	// do some stuff here
 }  
 
-     this.x, this.y, this.dir, this.hp, this.ap
+    this.x, this.y, this.dir, this.hp, this.ap
     this.hp on serverside
     this.width, this.height, this.image 
 
@@ -62,19 +62,22 @@ Variables without leading are global now. While on clientside that was already t
 
 Is there a way to make findLevel return the actual level instead of the gmap the player's on?
 
-public function getPreciseLevelName() {
-  if (this.level.name.ends(".gmap")) {
-    return this.level.getmappartfile(this.x, this.y);
-  }
-  
-  return this.level.name;
+public function getPreciseLevelName()
+{
+	if (this.level.name.ends(".gmap"))
+	{
+		return this.level.getmappartfile(this.x, this.y);
+	}
+
+	return this.level.name;
 }  
 
 Ok added an event: add an npc GlobalShopControl:
 PHP Code:
-function onReceiveText(texttype, textoption, textlines) {
-  if (texttype=="lister" && textoption=="prepareobserver") 
-    echo("account " @ textlines[0] @ " will be switched to observer mode in 5 seconds!");
+function onReceiveText(texttype, textoption, textlines)
+{
+	if (texttype=="lister" && textoption=="prepareobserver") 
+		echo("account " @ textlines[0] @ " will be switched to observer mode in 5 seconds!");
 }  
 
 
@@ -82,7 +85,7 @@ You can trigger npcs, you just need to know the (serverside) name of the npc: tr
 
 - scripts can now access image files (png, gif, jpeg) and also files inside the levels folder if the npcserver has the rights for that
 
- New NPC-option: newnpcstorage=true
+New NPC-option: newnpcstorage=true
 We have added a new option for optimized storage of npcs (putnpcs2).
 
 By default those npcs are all stored in the same folder and loaded at startup. The problem is that some servers started to use huge amounts of those npcs or storing tons of data in them. That makes the startup take a lot of time, and the server takes a lot of memory.
