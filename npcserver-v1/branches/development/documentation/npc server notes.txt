@@ -337,3 +337,4 @@ waitfor(temp.socket, "onClose", 10);
 temp.answer = temp.socket.data.tokenize('\n'); 
 The URL encoding is already done in the engine, can add a function to use it by script (urlencode)
 Update: added urlencode(url) on Kingdoms, can upload a version for hosted servers end of the week along with the recent /scripthelp improvements.
+.

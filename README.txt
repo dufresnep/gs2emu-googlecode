@@ -4,4 +4,4 @@ http://www.opengraal.com/
 
 Graal Reborn
 
-This document was last updated 2012-07-23
+This document was last updated 2012-07-23.
