@@ -14,8 +14,10 @@ solution "npcserver"
 		includedirs { "../npcserver/include" }
 		
 		-- Dependencies.
+		files { "../dependencies/gamemonkey/**" }
 		files { "../dependencies/zlib/**" }
 		files { "../dependencies/bzip2/**" }
+		includedirs { "../dependencies/gamemonkey" }
 		includedirs { "../dependencies/zlib" }
 		includedirs { "../dependencies/bzip2" }
 
