@@ -5,7 +5,9 @@
 	#if defined(DEBUG) || defined(_DEBUG)
 		#define _CRTDBG_MAP_ALLOC
 		#include <stdlib.h>
-		#include <crtdbg.h>
+		#ifndef __GNUC__
+			#include <crtdbg.h>
+		#endif
 	#endif
 #endif
 
