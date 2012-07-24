@@ -412,7 +412,7 @@ static int GM_CDECL gmfFileInfo(gmThread * a_thread)
   GM_CHECK_NUM_PARAMS(1);
   GM_CHECK_STRING_PARAM(filename, 0);
 
-#if 1 // Compatible with 64bit OS
+#if 0 // Compatible with 64bit OS
   struct _stat32 buf;
   int fh, result;
 
@@ -584,7 +584,7 @@ static int GM_CDECL gmfDeleteFolder(gmThread * a_thread)
 
 static int GM_CDECL gmfTime(gmThread * a_thread)
 {
-#if 1 // Compatible with 64bit OS
+#if 0 // Compatible with 64bit OS
   __time32_t t;
   _time32(&t);
   GM_ASSERT(sizeof(t) <= sizeof(gmint));
