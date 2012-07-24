@@ -33,8 +33,17 @@ solution "npcserver"
 			includedirs { "../dependencies/gamemonkey/platform/win32gcc" }
 		end
 		
+		if os.is64bit then
+		  defines ("IS64BIT")
+		  print("Activating 64 bits code, mostly for gmSystemLibs.cpp")
+		else
+		  print("This is not a 64 bits OS")
+		end
+		
 		-- Windows specific.
 		configuration "windows"
+		-- the following targets Windows XP, would it help with _time32 for gmSystemLib.cpp?
+		defines ( "WINVER=0x0501")
 		
 		-- Libraries.
 		configuration "windows"
