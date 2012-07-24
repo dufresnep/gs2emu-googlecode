@@ -85,6 +85,9 @@
 // basic types
 typedef const char * LPCTSTR;
 typedef unsigned int gmuint;
+//Zartox begin
+typedef int gmint;
+//Zartox end
 typedef char gmint8;
 typedef unsigned char gmuint8;
 typedef short gmint16;

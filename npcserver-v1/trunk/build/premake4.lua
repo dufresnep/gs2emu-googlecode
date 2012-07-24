@@ -16,9 +16,11 @@ solution "npcserver"
 		-- Dependencies.
 		--gamemonkey must finish with just /* not /** because we want to manually choose platform
 		files { "../dependencies/gamemonkey/*" }
+		files { "../dependencies/gamemonkey/binds/*" }
 		files { "../dependencies/zlib/**" }
 		files { "../dependencies/bzip2/**" }
 		includedirs { "../dependencies/gamemonkey" }
+		includedirs { "../dependencies/gamemonkey/binds" }
 		includedirs { "../dependencies/zlib" }
 		includedirs { "../dependencies/bzip2" }
 
