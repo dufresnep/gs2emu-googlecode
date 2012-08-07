@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Release" />
+	<File name="forms\progicon.rc" open="0" top="0" tabpos="0">
+		<Cursor position="69" topLine="0" />
+	</File>
+	<File name="forms\resource.qrc" open="0" top="0" tabpos="0">
+		<Cursor position="6" topLine="0" />
+	</File>
+	<File name="forms\serverlist.ui" open="0" top="0" tabpos="0">
+		<Cursor position="41" topLine="0" />
+	</File>
+	<File name="forms\textedit.ui" open="0" top="0" tabpos="0">
+		<Cursor position="5010" topLine="181" />
+	</File>
+	<File name="forms\viewaccount.ui" open="0" top="0" tabpos="0">
+		<Cursor position="184" topLine="0" />
+	</File>
+	<File name="src\CBuffer.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="15676" topLine="729" />
+	</File>
+	<File name="src\CBuffer.h" open="0" top="0" tabpos="4">
+		<Cursor position="538" topLine="19" />
+	</File>
+	<File name="src\CPacket.h" open="0" top="0" tabpos="0">
+		<Cursor position="3111" topLine="75" />
+	</File>
+	<File name="src\CSocket.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="4779" topLine="193" />
+	</File>
+	<File name="src\CSocket.h" open="0" top="0" tabpos="2">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="src\TLoginWindow.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="699" topLine="0" />
+	</File>
+	<File name="src\TLoginWindow.h" open="0" top="0" tabpos="0">
+		<Cursor position="153" topLine="0" />
+	</File>
+	<File name="src\TPlayer.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="538" topLine="0" />
+	</File>
+	<File name="src\TPlayerTree.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="482" topLine="0" />
+	</File>
+	<File name="src\TPlayerTree.h" open="0" top="0" tabpos="2">
+		<Cursor position="319" topLine="0" />
+	</File>
+	<File name="src\TPlayerWindow.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="573" topLine="0" />
+	</File>
+	<File name="src\TPlayerWindow.h" open="0" top="0" tabpos="0">
+		<Cursor position="92" topLine="0" />
+	</File>
+	<File name="src\TRCListSock.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="2588" topLine="127" />
+	</File>
+	<File name="src\TRCListSock.h" open="0" top="0" tabpos="0">
+		<Cursor position="437" topLine="0" />
+	</File>
+	<File name="src\TRCSock.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="4795" topLine="242" />
+	</File>
+	<File name="src\TRCSock.h" open="0" top="0" tabpos="3">
+		<Cursor position="828" topLine="11" />
+	</File>
+	<File name="src\TRCWindow.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="2149" topLine="84" />
+	</File>
+	<File name="src\TRCWindow.h" open="0" top="0" tabpos="0">
+		<Cursor position="458" topLine="0" />
+	</File>
+	<File name="src\TServer.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="2033" topLine="103" />
+	</File>
+	<File name="src\TServer.h" open="0" top="0" tabpos="0">
+		<Cursor position="36" topLine="0" />
+	</File>
+	<File name="src\TServerList.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="507" topLine="11" />
+	</File>
+	<File name="src\TServerList.h" open="0" top="0" tabpos="0">
+		<Cursor position="104" topLine="0" />
+	</File>
+	<File name="src\TServerWindow.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="4673" topLine="153" />
+	</File>
+	<File name="src\TServerWindow.h" open="0" top="0" tabpos="4">
+		<Cursor position="842" topLine="0" />
+	</File>
+	<File name="src\TSockList.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="467" topLine="21" />
+	</File>
+	<File name="src\TSockList.h" open="0" top="0" tabpos="3">
+		<Cursor position="437" topLine="0" />
+	</File>
+	<File name="src\TSyntaxHighlighter.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="1055" topLine="14" />
+	</File>
+	<File name="src\TSyntaxHighlighter.h" open="0" top="0" tabpos="5">
+		<Cursor position="179" topLine="0" />
+	</File>
+	<File name="src\TTabWidget.h" open="0" top="0" tabpos="0">
+		<Cursor position="339" topLine="0" />
+	</File>
+	<File name="src\TTextEditor.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="370" topLine="0" />
+	</File>
+	<File name="src\TTextEditor.h" open="0" top="0" tabpos="3">
+		<Cursor position="213" topLine="0" />
+	</File>
+	<File name="src\TViewAccount.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="883" topLine="26" />
+	</File>
+	<File name="src\TViewAccount.h" open="0" top="0" tabpos="0">
+		<Cursor position="134" topLine="0" />
+	</File>
+	<File name="src\main.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="1167" topLine="53" />
+	</File>
+	<File name="src\main.h" open="0" top="0" tabpos="6">
+		<Cursor position="35" topLine="19" />
+	</File>
+</CodeBlocks_layout_file>

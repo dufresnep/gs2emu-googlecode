@@ -1,15 +1,15 @@
 #NPC-Server account,password and nickname
 account = (npcserver)
-password = 
+password = npcserver1
 nickname = NPC-Server (Server)
 
 #NPC-Server ip and port to listen on
-npcserver_ip = 
-npcserver_port = 
+npcserver_ip = 192.168.0.13
+npcserver_port = 14900
 
 #Gserver ip and port
-gserver_ip = 
-gserver_port = 
+gserver_ip = 67.19.126.181
+gserver_port = 14900
 
 #MOTD
 # Set blank to have one with the version number auto entered :)

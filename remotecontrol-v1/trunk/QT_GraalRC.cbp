@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="QT_GraalRC" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Option virtualFolders="Custom-Stuff\;Custom-Stuff\Headers\;Custom-Stuff\Sources\;" />
+		<MakeCommands>
+			<Build command="$make -f $makefile.$target" />
+			<CompileFile command="$make -f $makefile $file" />
+			<Clean command="$make -f $makefile.$target clean" />
+			<DistClean command="$make -f $makefile.$target distclean" />
+		</MakeCommands>
+		<Build>
+			<Target title="Release">
+				<Option output="temp\release\QT_GraalRC" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<MakeCommands>
+					<Build command="$make -f $makefile.$target" />
+					<CompileFile command="$make -f $makefile $file" />
+					<Clean command="$make -f $makefile.$target clean" />
+					<DistClean command="$make -f $makefile.$target distclean" />
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Linker>
+			<Add library="libws2_32.a" />
+		</Linker>
+		<Unit filename="forms\login.ui" />
+		<Unit filename="forms\playerlist.ui" />
+		<Unit filename="forms\progicon.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="forms\rcmain.ui" />
+		<Unit filename="forms\rctab.ui" />
+		<Unit filename="forms\resource.qrc" />
+		<Unit filename="forms\serverlist.ui" />
+		<Unit filename="forms\textedit.ui" />
+		<Unit filename="forms\viewaccount.ui" />
+		<Unit filename="src\CBuffer.cpp">
+			<Option virtualFolder="Custom-Stuff\Sources\" />
+		</Unit>
+		<Unit filename="src\CBuffer.h">
+			<Option virtualFolder="Custom-Stuff\Headers\" />
+		</Unit>
+		<Unit filename="src\CPacket.cpp">
+			<Option virtualFolder="Custom-Stuff\Sources\" />
+		</Unit>
+		<Unit filename="src\CPacket.h">
+			<Option virtualFolder="Custom-Stuff\Headers\" />
+		</Unit>
+		<Unit filename="src\CSocket.cpp">
+			<Option virtualFolder="Custom-Stuff\Sources\" />
+		</Unit>
+		<Unit filename="src\CSocket.h">
+			<Option virtualFolder="Custom-Stuff\Headers\" />
+		</Unit>
+		<Unit filename="src\TLoginWindow.cpp" />
+		<Unit filename="src\TLoginWindow.h" />
+		<Unit filename="src\TPlayer.cpp" />
+		<Unit filename="src\TPlayer.h" />
+		<Unit filename="src\TPlayerTree.cpp" />
+		<Unit filename="src\TPlayerTree.h" />
+		<Unit filename="src\TPlayerWindow.cpp" />
+		<Unit filename="src\TPlayerWindow.h" />
+		<Unit filename="src\TRCListSock.cpp" />
+		<Unit filename="src\TRCListSock.h" />
+		<Unit filename="src\TRCSock.cpp" />
+		<Unit filename="src\TRCSock.h" />
+		<Unit filename="src\TRCWindow.cpp" />
+		<Unit filename="src\TRCWindow.h" />
+		<Unit filename="src\TServer.cpp" />
+		<Unit filename="src\TServer.h" />
+		<Unit filename="src\TServerList.cpp" />
+		<Unit filename="src\TServerList.h" />
+		<Unit filename="src\TServerWindow.cpp" />
+		<Unit filename="src\TServerWindow.h" />
+		<Unit filename="src\TSockList.cpp">
+			<Option virtualFolder="Custom-Stuff\Sources\" />
+		</Unit>
+		<Unit filename="src\TSockList.h">
+			<Option virtualFolder="Custom-Stuff\Headers\" />
+		</Unit>
+		<Unit filename="src\TSyntaxHighlighter.cpp" />
+		<Unit filename="src\TSyntaxHighlighter.h" />
+		<Unit filename="src\TTabWidget.cpp" />
+		<Unit filename="src\TTabWidget.h" />
+		<Unit filename="src\TTextEditor.cpp" />
+		<Unit filename="src\TTextEditor.h" />
+		<Unit filename="src\TViewAccount.cpp" />
+		<Unit filename="src\TViewAccount.h" />
+		<Unit filename="src\main.cpp" />
+		<Unit filename="src\main.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<qtworkbench>
+				<enabled value="true" />
+			</qtworkbench>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

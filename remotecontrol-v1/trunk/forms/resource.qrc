@@ -1,0 +1,33 @@
+<RCC>
+    <qresource prefix="/RC" >
+        <file>background.png</file>
+        <file>icon_classic.png</file>
+        <file>icon_gold.png</file>
+        <file>icon_hidden.png</file>
+        <file>rc_accountlist_normal.png</file>
+        <file>rc_accountlist_pressed.png</file>
+        <file>rc_classes_normal.png</file>
+        <file>rc_classes_pressed.png</file>
+        <file>rc_filebrowser_normal.png</file>
+        <file>rc_filebrowser_pressed.png</file>
+        <file>rc_folderconfig_normal.png</file>
+        <file>rc_folderconfig_pressed.png</file>
+        <file>rc_levellist_normal.png</file>
+        <file>rc_levellist_pressed.png</file>
+        <file>rc_npcs_normal.png</file>
+        <file>rc_npcs_pressed.png</file>
+        <file>rc_options_normal.png</file>
+        <file>rc_options_pressed.png</file>
+        <file>rc_playerlist_normal.png</file>
+        <file>rc_playerlist_pressed.png</file>
+        <file>rc_serverflags_normal.png</file>
+        <file>rc_serverflags_pressed.png</file>
+        <file>rc_serveroptions_normal.png</file>
+        <file>rc_serveroptions_pressed.png</file>
+        <file>rc_toalls_normal.png</file>
+        <file>rc_toalls_pressed.png</file>
+        <file>rc_weapons_normal.png</file>
+        <file>rc_weapons_pressed.png</file>
+        <file>remotecontrol.png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,1134 @@
+<ui version="4.0" >
+ <class>FViewAccount</class>
+ <widget class="QWidget" name="FViewAccount" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>430</width>
+    <height>530</height>
+   </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle" >
+   <string>Viewing Account: Joey (127.0.0.1)</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset resource="resource.qrc" >:/RC/remotecontrol.png</iconset>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="leftMargin" >
+    <number>3</number>
+   </property>
+   <property name="topMargin" >
+    <number>3</number>
+   </property>
+   <property name="rightMargin" >
+    <number>3</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>3</number>
+   </property>
+   <item row="0" column="0" colspan="3" >
+    <widget class="QTabWidget" name="tabWidget" >
+     <property name="currentIndex" >
+      <number>3</number>
+     </property>
+     <widget class="QWidget" name="tab_1" >
+      <attribute name="title" >
+       <string>Player Properties</string>
+      </attribute>
+      <widget class="QGroupBox" name="groupBox_5" >
+       <property name="geometry" >
+        <rect>
+         <x>9</x>
+         <y>9</y>
+         <width>401</width>
+         <height>80</height>
+        </rect>
+       </property>
+       <property name="title" >
+        <string>Account Location</string>
+       </property>
+       <layout class="QGridLayout" >
+        <property name="leftMargin" >
+         <number>9</number>
+        </property>
+        <property name="topMargin" >
+         <number>9</number>
+        </property>
+        <property name="rightMargin" >
+         <number>9</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>9</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
+         <number>6</number>
+        </property>
+        <item row="1" column="2" >
+         <widget class="QLabel" name="label_17" >
+          <property name="text" >
+           <string>Y:  </string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" >
+         <widget class="QLineEdit" name="ppX" />
+        </item>
+        <item row="1" column="3" >
+         <widget class="QLineEdit" name="ppY" />
+        </item>
+        <item row="1" column="0" >
+         <widget class="QLabel" name="label_16" >
+          <property name="text" >
+           <string>X: </string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="3" >
+         <widget class="QLineEdit" name="ppLevel" />
+        </item>
+        <item row="0" column="0" >
+         <widget class="QLabel" name="label_15" >
+          <property name="text" >
+           <string>Level Name: </string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_4" >
+       <property name="geometry" >
+        <rect>
+         <x>9</x>
+         <y>88</y>
+         <width>401</width>
+         <height>211</height>
+        </rect>
+       </property>
+       <property name="title" >
+        <string>Account Attributes</string>
+       </property>
+       <widget class="QLabel" name="label_3" >
+        <property name="geometry" >
+         <rect>
+          <x>10</x>
+          <y>24</y>
+          <width>59</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Hearts</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_9" >
+        <property name="geometry" >
+         <rect>
+          <x>204</x>
+          <y>24</y>
+          <width>58</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Full Hearts</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_4" >
+        <property name="geometry" >
+         <rect>
+          <x>10</x>
+          <y>50</y>
+          <width>59</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Alignment</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_10" >
+        <property name="geometry" >
+         <rect>
+          <x>204</x>
+          <y>50</y>
+          <width>58</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Magic Points</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_6" >
+        <property name="geometry" >
+         <rect>
+          <x>10</x>
+          <y>76</y>
+          <width>59</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Gralats</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_11" >
+        <property name="geometry" >
+         <rect>
+          <x>204</x>
+          <y>76</y>
+          <width>58</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Gloves</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_12" >
+        <property name="geometry" >
+         <rect>
+          <x>204</x>
+          <y>102</y>
+          <width>58</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Arrows</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_7" >
+        <property name="geometry" >
+         <rect>
+          <x>10</x>
+          <y>154</y>
+          <width>59</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Shield Power</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_13" >
+        <property name="geometry" >
+         <rect>
+          <x>204</x>
+          <y>128</y>
+          <width>58</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Sword Img.</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_14" >
+        <property name="geometry" >
+         <rect>
+          <x>204</x>
+          <y>154</y>
+          <width>58</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Shield Img.</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="ppMP" >
+        <property name="geometry" >
+         <rect>
+          <x>268</x>
+          <y>50</y>
+          <width>123</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="ppGralats" >
+        <property name="geometry" >
+         <rect>
+          <x>75</x>
+          <y>76</y>
+          <width>123</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="ppGlove" >
+        <property name="geometry" >
+         <rect>
+          <x>268</x>
+          <y>76</y>
+          <width>123</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="ppArrows" >
+        <property name="geometry" >
+         <rect>
+          <x>268</x>
+          <y>102</y>
+          <width>123</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_5" >
+        <property name="geometry" >
+         <rect>
+          <x>10</x>
+          <y>128</y>
+          <width>63</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Sword Power</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_8" >
+        <property name="geometry" >
+         <rect>
+          <x>10</x>
+          <y>102</y>
+          <width>59</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Bombs</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="ppBombs" >
+        <property name="geometry" >
+         <rect>
+          <x>75</x>
+          <y>102</y>
+          <width>123</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="ppSwordImg" >
+        <property name="geometry" >
+         <rect>
+          <x>268</x>
+          <y>128</y>
+          <width>123</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="ppShieldPower" >
+        <property name="geometry" >
+         <rect>
+          <x>75</x>
+          <y>154</y>
+          <width>123</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="ppShieldImg" >
+        <property name="geometry" >
+         <rect>
+          <x>268</x>
+          <y>154</y>
+          <width>123</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="ppPower" >
+        <property name="geometry" >
+         <rect>
+          <x>75</x>
+          <y>24</y>
+          <width>123</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="ppMaxPower" >
+        <property name="geometry" >
+         <rect>
+          <x>268</x>
+          <y>24</y>
+          <width>123</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="ppAP" >
+        <property name="geometry" >
+         <rect>
+          <x>75</x>
+          <y>50</y>
+          <width>123</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="ppSwordPower" >
+        <property name="geometry" >
+         <rect>
+          <x>75</x>
+          <y>128</y>
+          <width>123</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="ppGender" >
+        <property name="geometry" >
+         <rect>
+          <x>11</x>
+          <y>181</y>
+          <width>122</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Male (checked)</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="ppWeapons" >
+        <property name="geometry" >
+         <rect>
+          <x>139</x>
+          <y>181</y>
+          <width>123</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Weapons Enabled</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="ppSpin" >
+        <property name="geometry" >
+         <rect>
+          <x>268</x>
+          <y>181</y>
+          <width>122</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="text" >
+         <string>Spin Attack</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_6" >
+       <property name="geometry" >
+        <rect>
+         <x>9</x>
+         <y>297</y>
+         <width>403</width>
+         <height>154</height>
+        </rect>
+       </property>
+       <property name="title" >
+        <string>Account Look</string>
+       </property>
+       <layout class="QGridLayout" >
+        <property name="leftMargin" >
+         <number>9</number>
+        </property>
+        <property name="topMargin" >
+         <number>9</number>
+        </property>
+        <property name="rightMargin" >
+         <number>9</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>9</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
+         <number>6</number>
+        </property>
+        <item row="4" column="0" >
+         <widget class="QLabel" name="label_26" >
+          <property name="text" >
+           <string>Belt Color</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1" >
+         <widget class="QComboBox" name="ppBelt" />
+        </item>
+        <item row="3" column="3" >
+         <widget class="QComboBox" name="ppShoe" />
+        </item>
+        <item row="3" column="1" >
+         <widget class="QComboBox" name="ppSleeve" />
+        </item>
+        <item row="2" column="3" >
+         <widget class="QComboBox" name="ppCoat" />
+        </item>
+        <item row="0" column="3" >
+         <widget class="QLineEdit" name="ppBody" />
+        </item>
+        <item row="0" column="1" >
+         <widget class="QLineEdit" name="ppHead" />
+        </item>
+        <item row="2" column="1" >
+         <widget class="QComboBox" name="ppSkin" />
+        </item>
+        <item row="1" column="1" >
+         <widget class="QLineEdit" name="ppHat" />
+        </item>
+        <item row="3" column="2" >
+         <widget class="QLabel" name="label_25" >
+          <property name="text" >
+           <string>Shoe Color</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2" >
+         <widget class="QLabel" name="label_24" >
+          <property name="text" >
+           <string>Coat Color</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" >
+         <widget class="QLabel" name="label_23" >
+          <property name="text" >
+           <string>Sleeve Color</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" >
+         <widget class="QLabel" name="label_22" >
+          <property name="text" >
+           <string>Skin Color</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3" >
+         <widget class="QLineEdit" name="ppAni" />
+        </item>
+        <item row="1" column="2" >
+         <widget class="QLabel" name="label_21" >
+          <property name="text" >
+           <string>Animation</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" >
+         <widget class="QLabel" name="label_20" >
+          <property name="enabled" >
+           <bool>true</bool>
+          </property>
+          <property name="text" >
+           <string>Hat Img.</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2" >
+         <widget class="QLabel" name="label_19" >
+          <property name="text" >
+           <string>Body Img.</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" >
+         <widget class="QLabel" name="label_18" >
+          <property name="text" >
+           <string>Head Img.</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tab_2" >
+      <attribute name="title" >
+       <string>Player Attributes</string>
+      </attribute>
+      <widget class="QGroupBox" name="groupBox_8" >
+       <property name="geometry" >
+        <rect>
+         <x>11</x>
+         <y>158</y>
+         <width>400</width>
+         <height>140</height>
+        </rect>
+       </property>
+       <property name="title" >
+        <string>Account Flags</string>
+       </property>
+       <layout class="QGridLayout" >
+        <property name="leftMargin" >
+         <number>9</number>
+        </property>
+        <property name="topMargin" >
+         <number>9</number>
+        </property>
+        <property name="rightMargin" >
+         <number>9</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>9</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
+         <number>6</number>
+        </property>
+        <item row="0" column="0" >
+         <widget class="QTextEdit" name="paFlags" >
+          <property name="lineWrapMode" >
+           <enum>QTextEdit::NoWrap</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_7" >
+       <property name="geometry" >
+        <rect>
+         <x>11</x>
+         <y>10</y>
+         <width>400</width>
+         <height>140</height>
+        </rect>
+       </property>
+       <property name="title" >
+        <string>Account Chests</string>
+       </property>
+       <layout class="QGridLayout" >
+        <property name="leftMargin" >
+         <number>9</number>
+        </property>
+        <property name="topMargin" >
+         <number>9</number>
+        </property>
+        <property name="rightMargin" >
+         <number>9</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>9</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
+         <number>6</number>
+        </property>
+        <item row="0" column="0" >
+         <widget class="QTextEdit" name="paChests" >
+          <property name="lineWrapMode" >
+           <enum>QTextEdit::NoWrap</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_9" >
+       <property name="geometry" >
+        <rect>
+         <x>11</x>
+         <y>304</y>
+         <width>400</width>
+         <height>151</height>
+        </rect>
+       </property>
+       <property name="title" >
+        <string>Account Weapons</string>
+       </property>
+       <layout class="QGridLayout" >
+        <property name="leftMargin" >
+         <number>9</number>
+        </property>
+        <property name="topMargin" >
+         <number>9</number>
+        </property>
+        <property name="rightMargin" >
+         <number>9</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>9</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
+         <number>6</number>
+        </property>
+        <item row="0" column="0" >
+         <widget class="QTextEdit" name="paWeapons" >
+          <property name="lineWrapMode" >
+           <enum>QTextEdit::NoWrap</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tab_3" >
+      <attribute name="title" >
+       <string>Player Rights</string>
+      </attribute>
+      <widget class="QGroupBox" name="groupBox_2" >
+       <property name="geometry" >
+        <rect>
+         <x>9</x>
+         <y>321</y>
+         <width>405</width>
+         <height>131</height>
+        </rect>
+       </property>
+       <property name="title" >
+        <string>Acccount Folders</string>
+       </property>
+       <layout class="QGridLayout" >
+        <property name="leftMargin" >
+         <number>9</number>
+        </property>
+        <property name="topMargin" >
+         <number>9</number>
+        </property>
+        <property name="rightMargin" >
+         <number>9</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>9</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
+         <number>6</number>
+        </property>
+        <item row="0" column="0" >
+         <widget class="QTextEdit" name="prFolders" >
+          <property name="lineWrapMode" >
+           <enum>QTextEdit::NoWrap</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_3" >
+       <property name="geometry" >
+        <rect>
+         <x>9</x>
+         <y>9</y>
+         <width>405</width>
+         <height>80</height>
+        </rect>
+       </property>
+       <property name="title" >
+        <string>Account Information</string>
+       </property>
+       <layout class="QGridLayout" >
+        <property name="leftMargin" >
+         <number>9</number>
+        </property>
+        <property name="topMargin" >
+         <number>9</number>
+        </property>
+        <property name="rightMargin" >
+         <number>9</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>9</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
+         <number>6</number>
+        </property>
+        <item row="1" column="2" >
+         <widget class="QLineEdit" name="prIPRange" />
+        </item>
+        <item row="0" column="0" >
+         <widget class="QLabel" name="label" >
+          <property name="text" >
+           <string>Account Name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" >
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="1" >
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="0" >
+         <widget class="QLabel" name="label_2" >
+          <property name="text" >
+           <string>IP Range</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2" >
+         <widget class="QLineEdit" name="prAccount" />
+        </item>
+       </layout>
+      </widget>
+      <widget class="QGroupBox" name="groupBox" >
+       <property name="geometry" >
+        <rect>
+         <x>9</x>
+         <y>95</y>
+         <width>405</width>
+         <height>220</height>
+        </rect>
+       </property>
+       <property name="title" >
+        <string>Account Rights</string>
+       </property>
+       <layout class="QGridLayout" >
+        <property name="leftMargin" >
+         <number>9</number>
+        </property>
+        <property name="topMargin" >
+         <number>9</number>
+        </property>
+        <property name="rightMargin" >
+         <number>9</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>9</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
+         <number>6</number>
+        </property>
+        <item row="6" column="1" >
+         <widget class="QCheckBox" name="pr17" >
+          <property name="text" >
+           <string>Change server options</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="1" >
+         <widget class="QCheckBox" name="pr19" >
+          <property name="text" >
+           <string>Edit folder rights</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" >
+         <widget class="QCheckBox" name="pr1" >
+          <property name="text" >
+           <string>Warpto x y</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0" >
+         <widget class="QCheckBox" name="pr9" >
+          <property name="text" >
+           <string>Reset attributes</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" >
+         <widget class="QCheckBox" name="pr12" >
+          <property name="text" >
+           <string>Set server flags</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1" >
+         <widget class="QCheckBox" name="pr16" >
+          <property name="text" >
+           <string>Empty 2</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" >
+         <widget class="QCheckBox" name="pr5" >
+          <property name="text" >
+           <string>Disconnect players</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" >
+         <widget class="QCheckBox" name="pr13" >
+          <property name="text" >
+           <string>Change rights</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1" >
+         <widget class="QCheckBox" name="pr14" >
+          <property name="text" >
+           <string>Ban players</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0" >
+         <widget class="QCheckBox" name="pr6" >
+          <property name="text" >
+           <string>View player attributes</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" >
+         <widget class="QCheckBox" name="pr11" >
+          <property name="text" >
+           <string>Empty 1</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1" >
+         <widget class="QCheckBox" name="pr18" >
+          <property name="text" >
+           <string>Edit folder configuration</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0" >
+         <widget class="QCheckBox" name="pr7" >
+          <property name="text" >
+           <string>Set player attributes</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" >
+         <widget class="QCheckBox" name="pr3" >
+          <property name="text" >
+           <string>Warp players</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1" >
+         <widget class="QCheckBox" name="pr15" >
+          <property name="text" >
+           <string>Change comments</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" >
+         <widget class="QCheckBox" name="pr4" >
+          <property name="text" >
+           <string>Update level</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" >
+         <widget class="QCheckBox" name="pr2" >
+          <property name="text" >
+           <string>Warpto player</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0" >
+         <widget class="QCheckBox" name="pr8" >
+          <property name="text" >
+           <string>Set the own attributes</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0" >
+         <widget class="QCheckBox" name="pr10" >
+          <property name="text" >
+           <string>Admin messages</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1" >
+         <widget class="QCheckBox" name="pr20" >
+          <property name="text" >
+           <string>NPC-Control</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tab_4" >
+      <attribute name="title" >
+       <string>Player Comments</string>
+      </attribute>
+      <widget class="QGroupBox" name="groupBox_10" >
+       <property name="geometry" >
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>401</width>
+         <height>151</height>
+        </rect>
+       </property>
+       <property name="title" >
+        <string>Player Ban</string>
+       </property>
+       <layout class="QGridLayout" >
+        <property name="leftMargin" >
+         <number>9</number>
+        </property>
+        <property name="topMargin" >
+         <number>9</number>
+        </property>
+        <property name="rightMargin" >
+         <number>9</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>9</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
+         <number>6</number>
+        </property>
+        <item row="0" column="1" >
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="0" >
+         <widget class="QLabel" name="label_27" >
+          <property name="text" >
+           <string>Predefined Ban Reasons</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2" >
+         <widget class="QCheckBox" name="pcBanned" >
+          <property name="text" >
+           <string>Currently Banned</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="3" >
+         <widget class="QTextEdit" name="pcBanReason" />
+        </item>
+        <item row="1" column="0" colspan="3" >
+         <widget class="QComboBox" name="pcBans" />
+        </item>
+       </layout>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_11" >
+       <property name="geometry" >
+        <rect>
+         <x>10</x>
+         <y>170</y>
+         <width>401</width>
+         <height>281</height>
+        </rect>
+       </property>
+       <property name="title" >
+        <string>Player Comments</string>
+       </property>
+       <layout class="QGridLayout" >
+        <property name="leftMargin" >
+         <number>9</number>
+        </property>
+        <property name="topMargin" >
+         <number>9</number>
+        </property>
+        <property name="rightMargin" >
+         <number>9</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>9</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
+         <number>6</number>
+        </property>
+        <item row="0" column="0" >
+         <widget class="QTextEdit" name="pcComments" />
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="1" >
+    <widget class="QPushButton" name="pApply" >
+     <property name="text" >
+      <string>Apply Changes</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2" >
+    <widget class="QPushButton" name="pCancel" >
+     <property name="text" >
+      <string>Cancel Changes</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="resource.qrc" />
+ </resources>
+ <connections/>
+</ui>

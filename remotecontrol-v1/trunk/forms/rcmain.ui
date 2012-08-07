@@ -1,0 +1,219 @@
+<ui version="4.0" >
+ <class>FRCWindow</class>
+ <widget class="QMainWindow" name="FRCWindow" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>516</width>
+    <height>245</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>RemoteControl - April 11, 2008</string>
+  </property>
+  <widget class="QWidget" name="centralwidget" >
+   <layout class="QGridLayout" >
+    <property name="leftMargin" >
+     <number>0</number>
+    </property>
+    <property name="topMargin" >
+     <number>0</number>
+    </property>
+    <property name="rightMargin" >
+     <number>0</number>
+    </property>
+    <property name="bottomMargin" >
+     <number>0</number>
+    </property>
+    <property name="horizontalSpacing" >
+     <number>0</number>
+    </property>
+    <property name="verticalSpacing" >
+     <number>0</number>
+    </property>
+    <item row="0" column="0" >
+     <widget class="QTabWidget" name="tabWidget" >
+      <property name="windowModality" >
+       <enum>Qt::NonModal</enum>
+      </property>
+      <property name="sizePolicy" >
+       <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="currentIndex" >
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab" >
+       <attribute name="title" >
+        <string>Tab 1</string>
+       </attribute>
+       <layout class="QGridLayout" >
+        <property name="leftMargin" >
+         <number>0</number>
+        </property>
+        <property name="topMargin" >
+         <number>0</number>
+        </property>
+        <property name="rightMargin" >
+         <number>0</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>0</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>0</number>
+        </property>
+        <property name="verticalSpacing" >
+         <number>0</number>
+        </property>
+        <item row="0" column="0" >
+         <widget class="QTextEdit" name="textEdit" >
+          <property name="frameShape" >
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow" >
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="lineWidth" >
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="1" column="0" >
+     <widget class="QLineEdit" name="lineEdit" >
+      <property name="styleSheet" >
+       <string>background: green</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>516</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuPlayers" >
+    <property name="title" >
+     <string>Players</string>
+    </property>
+    <addaction name="actionPlayerlist" />
+    <addaction name="actionAccounts" />
+    <addaction name="actionToalls" />
+   </widget>
+   <widget class="QMenu" name="menuFiles" >
+    <property name="title" >
+     <string>Files</string>
+    </property>
+    <addaction name="actionFile_Browser" />
+   </widget>
+   <widget class="QMenu" name="menuConfiguration" >
+    <property name="title" >
+     <string>Configuration</string>
+    </property>
+    <addaction name="actionRC_Options" />
+    <addaction name="actionServer_Options" />
+    <addaction name="actionFolder_Configuration" />
+   </widget>
+   <widget class="QMenu" name="menuScripts" >
+    <property name="title" >
+     <string>Scripts</string>
+    </property>
+    <addaction name="actionClasses" />
+    <addaction name="actionNPCs" />
+    <addaction name="actionWeapons_GUI" />
+   </widget>
+   <widget class="QMenu" name="menuMisc" >
+    <property name="title" >
+     <string>Misc</string>
+    </property>
+    <addaction name="actionServer_Flags" />
+    <addaction name="actionLevel_List" />
+    <addaction name="actionLevel_NPC_Dump" />
+   </widget>
+   <addaction name="menuPlayers" />
+   <addaction name="menuFiles" />
+   <addaction name="menuConfiguration" />
+   <addaction name="menuScripts" />
+   <addaction name="menuMisc" />
+  </widget>
+  <action name="actionPlayerlist" >
+   <property name="text" >
+    <string>Playerlist</string>
+   </property>
+  </action>
+  <action name="actionAccounts" >
+   <property name="text" >
+    <string>Accounts</string>
+   </property>
+  </action>
+  <action name="actionToalls" >
+   <property name="text" >
+    <string>Toalls</string>
+   </property>
+  </action>
+  <action name="actionFile_Browser" >
+   <property name="text" >
+    <string>File Browser</string>
+   </property>
+  </action>
+  <action name="actionRC_Options" >
+   <property name="text" >
+    <string>RC Options</string>
+   </property>
+  </action>
+  <action name="actionServer_Options" >
+   <property name="text" >
+    <string>Server Options</string>
+   </property>
+  </action>
+  <action name="actionFolder_Configuration" >
+   <property name="text" >
+    <string>Folder Config</string>
+   </property>
+  </action>
+  <action name="actionNPCs" >
+   <property name="text" >
+    <string>NPCs</string>
+   </property>
+  </action>
+  <action name="actionClasses" >
+   <property name="text" >
+    <string>Classes</string>
+   </property>
+  </action>
+  <action name="actionWeapons_GUI" >
+   <property name="text" >
+    <string>Weapons (GUI)</string>
+   </property>
+  </action>
+  <action name="actionServer_Flags" >
+   <property name="text" >
+    <string>Server Flags</string>
+   </property>
+  </action>
+  <action name="actionLevel_List" >
+   <property name="text" >
+    <string>Level List</string>
+   </property>
+  </action>
+  <action name="actionLevel_NPC_Dump" >
+   <property name="text" >
+    <string>Level-NPC dump</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
