@@ -39,5 +39,10 @@ namespace CS_NPCServer
 			Server = null;
 			Application.Exit();
 		}
+
+        private void richTextBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

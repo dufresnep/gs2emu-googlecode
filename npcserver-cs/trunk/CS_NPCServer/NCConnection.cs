@@ -10,7 +10,7 @@ namespace CS_NPCServer
 {
 	public class NCConnection : GraalSocket
 	{
-		#region Enumerators		/// <summary>
+		/// <summary>
 		/// Enumerator -> Packet In
 		/// </summary>
 		public enum PacketIn
@@ -55,8 +55,6 @@ namespace CS_NPCServer
 			NC_CLASSDELETE = 188,	// {188}{class}
 			NC_WEAPONGET = 192,	// {192}{CHAR name length}{name}{CHAR image length}{image}{script}
 		};
-		#endregion
-
 
 		/// <summary>
 		/// Member Variables
@@ -73,6 +71,16 @@ namespace CS_NPCServer
 		{
 			this.Server = Server;
 		}
+
+		~NCConnection()
+		{
+			System.Console.WriteLine("KILLED");
+		}
+
+		//public override void Disconnect()
+		//{
+		//	base.Disconnect();
+		//}
 
 		/// <summary>
 		/// Handle Login Packet
@@ -104,10 +112,6 @@ namespace CS_NPCServer
 				if (nc != this)
 					SendPacket(new DataBuffer() + (byte)PacketOut.NC_CHAT + "New NC: " + Account);
 			}
-
-			// Send Classes
-			foreach (KeyValuePair<string, ServerClass> obj in Server.ClassList)
-				SendPacket(new DataBuffer() + (byte)PacketOut.NC_CLASSADD + obj.Value.Name);
 
 			/*
 			// Send Classes
@@ -149,13 +153,25 @@ namespace CS_NPCServer
 				// Run Internal Packet Function
 				switch ((PacketIn)PacketId)
 				{
+					//case PacketIn.NPCWEAPONADD: // Add Class to List
+					//	{
+							//String className = CurPacket.ReadString().Text;
+							//if (RemoteControl.ClassList.IndexOf(className) == -1)
+							//	RemoteControl.ClassList.Add(className);
+					//		break;
+					//	}
+
+					//case PacketIn.NEWWORLDTIME: // Remove Class from List
+						//RemoteControl.ClassList.Remove(CurPacket.ReadString().Text);
+					//	break;
+
 					// Retrieve Class
 					case PacketIn.NC_CLASSGET:
 					{
 						String Name = CurPacket.ReadString().Text;
 						ServerClass Class = Server.FindClass(Name);
 						if (Class != null)
-							SendPacket(new DataBuffer() + (byte)PacketOut.NC_CLASSGET + (byte)Class.Name.Length + Class.Name + DataBuffer.tokenize(Class.Script));
+							SendPacket(new DataBuffer() + (byte)PacketOut.NC_WEAPONGET + (byte)Class.Name.Length + Class.Name + Class.Script);
 						else
 							Server.SendNCChat(Account + " prob: script " + Name + " doesn't exist", null);
 						break;
@@ -166,7 +182,7 @@ namespace CS_NPCServer
 					{
 						String ClassName = CurPacket.ReadChars(CurPacket.ReadGUByte1());
 						String ClassScript = CurPacket.ReadString().Text;
-						int res = Server.SetClass(ClassName, DataBuffer.untokenize(ClassScript), true);
+						int res = Server.SetClass(ClassName, ClassScript, true);
 						if (res >= 0)
 							Server.SendNCChat("Script " + ClassName + " " + (res == 1 ? "added" : "updated") + " by " + this.Account);
 						break;
@@ -202,7 +218,7 @@ namespace CS_NPCServer
 						String Name = CurPacket.ReadString().Text;
 						ServerWeapon Weapon = Server.FindWeapon(Name);
 						if (Weapon != null)
-							SendPacket(new DataBuffer() + (byte)PacketOut.NC_WEAPONGET + (byte)Weapon.Name.Length + Weapon.Name + (byte)Weapon.Image.Length + Weapon.Image + Weapon.Script.Replace("\n", "\xa7"));
+							SendPacket(new DataBuffer() + (byte)PacketOut.NC_WEAPONGET + (byte)Weapon.Name.Length + Weapon.Name + (byte)Weapon.Image.Length + Weapon.Image + Weapon.Script);
 						else
 							Server.SendNCChat(Account + " prob: weapon " + Name + " doesn't exist", null);
 						break;

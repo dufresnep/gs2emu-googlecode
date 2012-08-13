@@ -76,7 +76,7 @@ namespace CS_NPCServer
 		{
 			if (!GraalSock.Connected)
 			{
-				IPHostEntry ip = Dns.GetHostEntry("127.0.0.1");
+				IPHostEntry ip = Dns.GetHostEntry(Hostname);
 				foreach (IPAddress addr in ip.AddressList)
 				{
 					if (addr.AddressFamily == AddressFamily.InterNetwork)

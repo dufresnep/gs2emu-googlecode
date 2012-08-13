@@ -6,7 +6,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{57D25FD1-EA2E-46AA-8B48-57931A3E9436}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CS_NPCServer</RootNamespace>
     <AssemblyName>CS_NPCServer</AssemblyName>
@@ -28,10 +28,6 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -61,9 +57,6 @@
   <PropertyGroup>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.84.0.0, Culture=neutral, PublicKeyToken=1b03e6acf1164f73">
       <SpecificVersion>False</SpecificVersion>
@@ -81,27 +74,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GraalLibrary\IniFile.cs" />
-    <Compile Include="Levels\GraalMap.cs" />
-    <Compile Include="Levels\GraalObject.cs" />
+    <Compile Include="GraalLibrary\GraalMap.cs" />
     <Compile Include="NCConnection.cs" />
-    <Compile Include="ScriptSystem\GameCompiler.cs" />
-    <Compile Include="ScriptSystem\GameScript.cs" />
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GameCompiler.cs" />
+    <Compile Include="GameScript.cs" />
     <Compile Include="GraalLibrary\DataBuffer.cs" />
     <Compile Include="GraalLibrary\Encryption.cs" />
-    <Compile Include="Players\ColorManager.cs" />
-    <Compile Include="Players\FlagManager.cs" />
-    <Compile Include="Levels\GraalLevel.cs" />
-    <Compile Include="Levels\GraalLevelNPC.cs" />
-    <Compile Include="Players\GraalPlayer.cs" />
-    <Compile Include="Players\GraalPlayerList.cs" />
+    <Compile Include="GraalLibrary\FlagManager.cs" />
+    <Compile Include="GraalLibrary\GraalLevel.cs" />
+    <Compile Include="GraalLibrary\GraalLevelNPC.cs" />
+    <Compile Include="GraalLibrary\GraalPlayer.cs" />
+    <Compile Include="GraalLibrary\GraalPlayerList.cs" />
     <Compile Include="GraalLibrary\GraalSocket.cs" />
     <Compile Include="GServerConnection.cs" />
     <Compile Include="NPCServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScriptSystem\ServerClass.cs" />
-    <Compile Include="ScriptSystem\ServerWeapon.cs" />
+    <Compile Include="ServerClass.cs" />
+    <Compile Include="ServerWeapon.cs" />
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

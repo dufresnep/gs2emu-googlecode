@@ -42,7 +42,7 @@ namespace CS_NPCServer
 		/// Member Variables
 		/// </summary>
 		Int32 mReadCount = 0;
-		List<byte> mBuffer = new List<byte>();
+		List<Byte> mBuffer = new List<Byte>();
 
 		/// <summary>
 		/// Operator Function -> [INDEX]

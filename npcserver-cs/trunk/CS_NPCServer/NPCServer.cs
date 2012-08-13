@@ -14,7 +14,6 @@ namespace CS_NPCServer
 		/// </summary>
 		protected AsyncCallback cNCAccept;
 		internal GameCompiler Compiler;
-		private IniFile ConfigFile;
 		protected GServerConnection GSConn;
 		protected TcpListener NCListen;
 		
@@ -25,76 +24,48 @@ namespace CS_NPCServer
 		// NC Variables
 		public int NWTime = 0;
 		public List<NCConnection> NCList = new List<NCConnection>();
-		public String NCMsg = "I am the npcserver for\",\"this game server. Almost\",\"all npc actions are controled\",\"by me.";
+		public String NCMsg;
 
 		// Dictionarys
-		internal Dictionary<int, ScriptObj> ScriptList = new Dictionary<int, ScriptObj>();
-		internal Dictionary<String, GraalLevel> LevelList = new Dictionary<String, GraalLevel>();
-		internal Dictionary<String, GraalMap> MapList = new Dictionary<String, GraalMap>();
-		internal Dictionary<String, ServerClass> ClassList = new Dictionary<String, ServerClass>();
-		internal Dictionary<String, ServerWeapon> WeaponList = new Dictionary<String, ServerWeapon>();
-		internal GraalPlayerList PlayerManager;
-
-		/// <summary>
-		/// Variable -> NPC Port
-		/// </summary>
-		public int NPCPort
-		{
-			get { return ConfigFile.GetValueInt("server", "nc_port", 14852); }
-		}
+		public Dictionary<int, ScriptObj> ScriptList = new Dictionary<int, ScriptObj>();
+		public Dictionary<String, GraalLevel> LevelList = new Dictionary<String, GraalLevel>();
+		public Dictionary<String, ServerClass> ClassList = new Dictionary<String, ServerClass>();
+		public Dictionary<String, ServerWeapon> WeaponList = new Dictionary<String, ServerWeapon>();
+		public GraalPlayerList PlayerManager = null;
 
 		/// <summary>
 		/// Creates a new NPCServer
 		/// </summary>
 		internal NPCServer(string OptionsFile)
 		{
-			// Load Options
-			ConfigFile = new IniFile();
-			ConfigFile.Load(OptionsFile);
+			// Default PM
+			this.NCMsg = DataBuffer.tokenize("I am the npcserver for\nthis game server. Almost\nall npc actions are controled\nby me.");
 
-			// Create Compiler / GServer Connection / PlayerManager
+			// Create Compiler
 			Compiler = new GameCompiler(this);
-			GSConn = new GServerConnection(this);
+
+			// Create Player Manager
 			PlayerManager = new GraalPlayerList(this);
-
-			// Setup Timer
-			timeBeginPeriod(50);
-			TimerHandle = new TimerEventHandler(RunScripts);
-			TimerId = timeSetEvent(50, 0, TimerHandle, IntPtr.Zero, EVENT_TYPE);
-		}
-
-		/// <summary>
-		/// Function -> Connect to Server
-		/// </summary>
-		/// <returns></returns>
-		internal bool Connect()
-		{
-			// already connected?
-			if (GSConn.Connected)
-				return false;
-
-			// read settings
-			String addr = ConfigFile.GetValue("server", "server_ip", "localhost");
-			String key = ConfigFile.GetValue("server", "server_key", "testkey");
-			int port = ConfigFile.GetValueInt("server", "server_port", 14800);
-			int ncport = this.NPCPort;
-			System.Console.WriteLine("Connecting to " + addr + ":" + port);
 			
-			// connect to server
-			GSConn.Connect(addr, port);
+			// Connect to GServer
+			GSConn = new GServerConnection(this);
+			GSConn.Connect("hosting.opengraal.com", 14908);
 			if (GSConn.Connected)
 			{
-				GSConn.SendLogin("(npcserver)", key, "NPC-Server (Server)");
+                GSConn.SendLogin("(npcserver)", "", "NPC-Server (Server)");
 				GSConn.ReceiveData();
-				System.Console.WriteLine("Connected to server");
 			}
 
 			// Setup NPC-Control Listener
 			cNCAccept = new AsyncCallback(NCControl_Accept);
-			NCListen = new TcpListener(IPAddress.Parse("0.0.0.0"), ncport);
+			NCListen = new TcpListener(IPAddress.Parse("0.0.0.0"), 14852);
 			NCListen.Start();
 			NCListen.BeginAcceptSocket(cNCAccept, NCListen);
-			return true;
+
+			// Setup Timer
+			timeBeginPeriod(50);
+			TimerHandle = new TimerEventHandler(RunServer);
+			TimerId = timeSetEvent(50, 0, TimerHandle, IntPtr.Zero, EVENT_TYPE);
 		}
 
 		/// <summary>
@@ -121,20 +92,10 @@ namespace CS_NPCServer
 			NCListen.BeginAcceptSocket(cNCAccept, NCListen);
 		}
 
-		public bool RunServer()
-		{
-			// Manage Active Compilers
-			this.Compiler.ManageCompilers();
-
-			// Send Prop Changes
-			this.RunPropChanges();
-			return true;
-		}
-
 		/// <summary>
-		/// Run NPC Scripts
+		/// Run NPC Server
 		/// </summary>
-		public void RunScripts(int id, int msg, IntPtr user, int dw1, int dw2)
+		public void RunServer(int id, int msg, IntPtr user, int dw1, int dw2)
 		{
 			// Run Timeouts
 			foreach (KeyValuePair<String, ServerWeapon> wep in WeaponList)
@@ -168,30 +129,14 @@ namespace CS_NPCServer
 		}
 
 		/// <summary>
-		/// Run Prop Changes
-		/// </summary>
-		public void RunPropChanges()
-		{
-			// send player prop changes
-			foreach (GraalPlayer pl in PlayerManager)
-				pl.SendPropBuffer();
-		}
-
-		/// <summary>
-		/// Check if level is already loaded
-		/// </summary>
-		public bool LevelExists(String Name)
-		{
-			return LevelList.ContainsKey(Name);
-		}
-
-		/// <summary>
 		/// FindLevel
 		/// </summary>
+		/// <param name="Name"></param>
+		/// <returns></returns>
 		public GraalLevel FindLevel(String Name)
 		{
 			GraalLevel Level = null;
-			if (Name != String.Empty && !LevelList.TryGetValue(Name, out Level))
+			if (!LevelList.TryGetValue(Name, out Level))
 			{
 				Level = new GraalLevel(this, Name);
 				lock (TimerLock)
@@ -201,21 +146,6 @@ namespace CS_NPCServer
 			}
 
 			return Level;
-		}
-
-		/// <summary>
-		/// FindMap
-		/// </summary>
-		public GraalMap FindMap(String Name)
-		{
-			GraalMap Map = null;
-			if (!MapList.TryGetValue(Name, out Map))
-			{
-				Map = new GraalMap(Name);
-				MapList[Name] = Map;
-			}
-
-			return Map;
 		}
 		
 		/// <summary>
@@ -248,7 +178,7 @@ namespace CS_NPCServer
 			if (ClassList.Remove(ClassName))
 			{
 				SendPacket(new DataBuffer() + (byte)NCConnection.PacketOut.NC_CLASSDELETE + ClassName, null);
-				SendGSPacket(new DataBuffer() + (byte)GServerConnection.PacketOut.NCQUERY + (byte)GServerConnection.NCREQ.CLASSSET + (byte)ClassName.Length + ClassName);
+				// TODO: Send to GServer
 				return true;
 			}
 			return false;
@@ -291,8 +221,8 @@ namespace CS_NPCServer
 			if (Class != null)
 			{
 				// Send to GServer
-				if (SendToGS)
-					this.SendGSPacket(new DataBuffer() + (byte)GServerConnection.PacketOut.NCQUERY + (byte)GServerConnection.NCREQ.CLASSSET + (byte)ClassName.Length + ClassName + ClassScript.Replace("\r", "").Replace("\n", "\xa7"));
+				//if (SendToGS)
+				//	this.SendGSPacket(new DataBuffer() + (byte)GServerConnection.PacketOut.NCQUERY + (byte)GServerConnection.NCREQ.WEAPONADD + (byte)ClassName.Length + ClassName + ClassScript);
 			}
 
 			// Added or Updated?
@@ -371,13 +301,10 @@ namespace CS_NPCServer
 		/// </summary>
 		public void SendPacket(DataBuffer Packet, NCConnection Sender)
 		{
-			lock (NCList)
+			foreach (NCConnection nc in NCList)
 			{
-				foreach (NCConnection nc in NCList)
-				{
-					if (nc != Sender)
-						nc.SendPacket(Packet, true);
-				}
+				if (nc != Sender)
+					nc.SendPacket(Packet, true);
 			}
 		}
 
