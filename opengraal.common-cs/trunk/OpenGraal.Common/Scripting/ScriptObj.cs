@@ -1,184 +1,98 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using OpenGraal.Common.Players;
 using System.Reflection;
-using OpenGraal;
-using OpenGraal.Core;
-using OpenGraal.NpcServer;
-using OpenGraal.NpcServer.Players;
 
-namespace OpenGraal.NpcServer
+namespace OpenGraal.Common.Scripting
 {
-	public class ScriptEvent
-	{
-		/// <summary>
-		/// Member Variables
-		/// </summary>
-		public double FunctionTimer = 0.0;
-		public object[] FunctionArgs;
-		public string FunctionName;
-
-		/// <summary>
-		/// Constructor - Create Event
-		/// </summary>
-		public ScriptEvent(double Timeout, String Name, Object[] Args)
-		{
-			this.FunctionTimer = Timeout;
-			this.FunctionName = Name;
-			this.FunctionArgs = Args;
-		}
-	};
-
-	/// <summary>
-	/// Reference Interface
-	/// </summary>
-	public abstract class IRefObject
-	{
-		/// <summary>
-		/// Script Type
-		/// </summary>
-		internal enum ScriptType
-		{
-			WEAPON = 0,
-			LEVELNPC = 1,
-		}
-
-		/// <summary>
-		/// Member Variables
-		/// </summary>
-		internal ScriptObj ScriptObject;
-		internal ScriptType Type;
-		internal String Script;
-
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		internal IRefObject(ScriptType Type)
-		{
-			this.Type = Type;
-		}
-
-		/// <summary>
-		/// Call Function
-		/// </summary>
-		internal void Call(string Event, object[] Args)
-		{
-			if (ScriptObject == null)
-				return;
-
-			try
-			{
-				ScriptObject.Call(Event, Args);
-			}
-			catch (TargetInvocationException e)
-			{
-				ScriptObject.SendToNC("Script runtime error occurred:\rerror: " + e.InnerException.Message);
-			}
-		}
-
-		/// <summary>
-		/// Get Error Text
-		/// </summary>
-		/// <returns></returns>
-		internal abstract string GetErrorText();
-	}
-
-	public static class ExtensionMethods
-	{
-		/// <summary>
-		/// Extension Method -> ToInt
-		/// </summary>
-		public static int ToInt(this String str)
-		{
-			try
-			{
-				return Convert.ToInt32(str);
-			}
-			catch (System.FormatException)
-			{
-				return 0;
-			}
-		}
-
-		/// <summary>
-		/// Extension Method -> ToInt
-		/// </summary>
-		public static double ToDouble(this String str)
-		{
-			try
-			{
-				return Convert.ToDouble(str);
-			}
-			catch (System.FormatException)
-			{
-				return 0;
-			}
-		}
-
-		/// <summary>
-		/// Extension Method -> Case-insensitive compare
-		/// </summary>
-		public static bool comparei(this String str, String str2)
-		{
-			return string.Equals(str, str2, StringComparison.OrdinalIgnoreCase);
-		}
-
-		/// <summary>
-		/// Extension Method -> Case-insensitive compare
-		/// </summary>
-		public static bool startswith(this String str, String str2)
-		{
-			return str.StartsWith(str2, StringComparison.OrdinalIgnoreCase);
-		}
-	}
-
 	/// <summary>
 	/// ScriptObject Class
 	/// </summary>
 	public class ScriptObj
 	{
 		// -- Member Variables -- //
-		static internal Random rand = new Random();
-		internal readonly Framework Server = null;
-		internal List<ScriptEvent> ScriptEvents = new List<ScriptEvent>();
+		static public Random rand = new Random();
+		public List<ScriptEvent> ScriptEvents = new List<ScriptEvent>();
+		private Dictionary<String, ServerWeapon> _weaponList;
+		public Dictionary<String, ServerWeapon> WeaponList
+		{
+			get
+			{
+				return _weaponList;
+			}
+			set
+			{
+				_weaponList = value;
+			}
+		}
 		public double timeout = 0.0;
+		private int _nwTime = 0;
+		public int NWTime
+		{
+			get
+			{
+				return _nwTime;
+			}
+			set
+			{
+				_nwTime = value;
+			}
+		}
+		private GraalPlayerList _playerManager = null;
+		public GraalPlayerList PlayerManager
+		{
+			get
+			{
+				return _playerManager;
+			}
+			set
+			{
+				_playerManager = value;
+			}
+		}
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		public ScriptObj() { }
-		public ScriptObj(Framework Server)
+		public ScriptObj(){}
+		public ScriptObj(GraalPlayerList PL, int NWTime) 
 		{
-			this.Server = Server;
+			this.PlayerManager = PL;
+			this.NWTime = NWTime;
 		}
 
 		/// <summary>
 		/// Function -> Call Event for Object
 		/// </summary>
-		internal void Call(String Event, Object[] Args)
+		public void Call(String Event, Object[] Args)
 		{
 			Type type = this.GetType();
-			try {
+			try
+			{
 				MethodInfo m = type.GetMethod(Event);
 				if (m != null)
 					type.InvokeMember(Event, BindingFlags.InvokeMethod, null, this, Args);
-			} catch (Exception) { }
+			}
+			catch (Exception) { }
 		}
 
 		/// <summary>
 		/// Function -> Run Scheduled Events
 		/// </summary>
-		internal void RunEvents()
+		public void RunEvents()
 		{
 			// Run Timeout
-			if (timeout > 0.0)
+			if (this.timeout > 0.0)
 			{
-				timeout -= 0.05;
-				if (timeout <= 0.0)
-					Call("onTimeout", null);
+				this.timeout -= 0.05;
+				if (this.timeout <= 0.0)
+					this.Call("onTimeout", null);
 			}
 
 			// Run Scheduled Events
-			for (int i = ScriptEvents.Count-1; i >= 0; i--)
+			for (int i = ScriptEvents.Count - 1; i >= 0; i--)
 			{
 				ScriptEvent e = ScriptEvents[i];
 				if (e.FunctionTimer > 0.0)
@@ -199,8 +113,8 @@ namespace OpenGraal.NpcServer
 		public dynamic FindWeapon(string Name)
 		{
 			ServerWeapon wep;
-			if (Server.WeaponList.TryGetValue(Name, out wep))
-				return (dynamic)wep.ScriptObject;
+			if (this.WeaponList.TryGetValue(Name, out wep))
+			return (dynamic)wep.ScriptObject;
 			return null;
 		}
 
@@ -209,7 +123,7 @@ namespace OpenGraal.NpcServer
 		/// </summary>
 		public GraalPlayer FindPlayer(string Account)
 		{
-			return Server.PlayerManager.FindPlayer(Account);
+			return this.PlayerManager.FindPlayer(Account);
 		}
 
 		/// <summary>
@@ -217,7 +131,7 @@ namespace OpenGraal.NpcServer
 		/// </summary>
 		public GraalPlayer FindPlayer(short Id)
 		{
-			return Server.PlayerManager.FindPlayer(Id);
+			return this.PlayerManager.FindPlayer(Id);
 		}
 
 		/// <summary>
@@ -271,7 +185,7 @@ namespace OpenGraal.NpcServer
 		/// <summary>
 		/// Library Function -> Trigger Event
 		/// </summary>
-		internal void trigger(GraalPlayer player, string Event, string[] args)
+		public void trigger(GraalPlayer player, string Event, string[] args)
 		{
 			this.Call(Event, new object[] { player, args });
 		}
@@ -289,7 +203,7 @@ namespace OpenGraal.NpcServer
 		/// </summary>
 		public void SendToNC(String Message)
 		{
-			Server.SendNCChat(Message, null);
+			//Server.SendNCChat(Message, null);
 		}
 
 		/// <summary>
@@ -297,7 +211,7 @@ namespace OpenGraal.NpcServer
 		/// </summary>
 		public void SendToRC(String Message)
 		{
-			Server.SendRCChat(Message);
+			//Server.SendRCChat(Message);
 		}
 
 		/// <summary>
@@ -305,7 +219,7 @@ namespace OpenGraal.NpcServer
 		/// </summary>
 		public GraalPlayerList allplayers
 		{
-			get { return Server.PlayerManager; }
+			get { return this.PlayerManager; }
 		}
 
 		/// <summary>
@@ -313,7 +227,7 @@ namespace OpenGraal.NpcServer
 		/// </summary>
 		public int timevar
 		{
-			get { return Server.NWTime; }
+			get { return this.NWTime; }
 		}
 
 		/// <summary>

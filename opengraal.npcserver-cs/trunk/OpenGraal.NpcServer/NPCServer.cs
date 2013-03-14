@@ -6,7 +6,10 @@ using System.Runtime.InteropServices;
 using OpenGraal;
 using OpenGraal.Core;
 using OpenGraal.NpcServer;
-using OpenGraal.NpcServer.Players;
+using OpenGraal.Common;
+using OpenGraal.Common.Levels;
+using OpenGraal.Common.Scripting;
+using OpenGraal.Common.Players;
 
 namespace OpenGraal.NpcServer
 {
@@ -49,7 +52,7 @@ namespace OpenGraal.NpcServer
 			Compiler = new GameCompiler(this);
 
 			// Create Player Manager
-			PlayerManager = new GraalPlayerList(this);
+			PlayerManager = new GraalPlayerList();
 			
 			// Connect to GServer
 			GSConn = new GServerConnection(this);
@@ -144,8 +147,8 @@ namespace OpenGraal.NpcServer
 			GraalLevel Level = null;
 			if (!LevelList.TryGetValue(Name, out Level))
 			{
-				Level = new GraalLevel(this, Name);
-				lock (TimerLock)
+				Level = new GraalLevel(Name, this.TimerLock);
+				lock (this.TimerLock)
 				{
 					LevelList[Name] = Level;
 				}
@@ -250,7 +253,7 @@ namespace OpenGraal.NpcServer
 			}
 				else
 			{
-				Weapon = new ServerWeapon(this, WeaponName, WeaponImage, WeaponCode);
+				Weapon = new ServerWeapon(WeaponName, WeaponImage, WeaponCode);
 				WeaponList[WeaponName] = Weapon;
 			}
 

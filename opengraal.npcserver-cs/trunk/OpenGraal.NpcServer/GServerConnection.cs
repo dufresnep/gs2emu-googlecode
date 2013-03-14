@@ -5,7 +5,8 @@ using System.Text;
 using OpenGraal;
 using OpenGraal.Core;
 using OpenGraal.NpcServer;
-using OpenGraal.NpcServer.Players;
+using OpenGraal.Common.Players;
+using OpenGraal.Common.Levels;
 
 namespace OpenGraal.NpcServer
 {

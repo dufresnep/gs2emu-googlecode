@@ -2,20 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using OpenGraal;
+using OpenGraal.Core;
+using OpenGraal.Common;
+using OpenGraal.Common.Players;
 
-namespace OpenGraal.NpcServer
+namespace OpenGraal.Common.Scripting
 {
 	public class ServerClass
 	{
 		/// <summary>
 		/// Member Variables
 		/// </summary>
-		internal String Name, Script;
+		public String Name, Script;
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		internal ServerClass(String ClassName, String ClassScript)
+		public ServerClass(String ClassName, String ClassScript)
 		{
 			this.UpdateClass(ClassName, ClassScript);
 		}
@@ -23,7 +27,7 @@ namespace OpenGraal.NpcServer
 		/// <summary>
 		/// Update Weapon Properties
 		/// </summary>
-		internal void UpdateClass(String ClassName, String ClassScript)
+		public void UpdateClass(String ClassName, String ClassScript)
 		{
 			this.Name = ClassName;
 			this.Script = ClassScript;

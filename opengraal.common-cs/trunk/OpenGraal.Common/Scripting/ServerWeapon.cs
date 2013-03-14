@@ -2,10 +2,10 @@
 using System.Text;
 using OpenGraal;
 using OpenGraal.Core;
-using OpenGraal.NpcServer;
-using OpenGraal.NpcServer.Players;
+using OpenGraal.Common;
+using OpenGraal.Common.Players;
 
-namespace OpenGraal.NpcServer
+namespace OpenGraal.Common.Scripting
 {
 	/// <summary>
 	/// Class: ServerWeapon Reference
@@ -15,23 +15,21 @@ namespace OpenGraal.NpcServer
 		/// <summary>
 		/// Member Variables
 		/// </summary>
-		internal Framework Server;
-		internal String Image, Name;
+		public String Image, Name;
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		internal ServerWeapon(Framework Server, String WeaponName, String WeaponImage, String WeaponScript)
+		public ServerWeapon(String WeaponName, String WeaponImage, String WeaponScript)
 			: base(ScriptType.WEAPON)
 		{
-			this.Server = Server;
 			this.UpdateWeapon(WeaponName, WeaponImage, WeaponScript);
 		}
 
 		/// <summary>
 		/// Update Weapon Properties
 		/// </summary>
-		internal void UpdateWeapon(String WeaponName, String WeaponImage, String WeaponScript)
+		public void UpdateWeapon(String WeaponName, String WeaponImage, String WeaponScript)
 		{
 			this.Name = WeaponName;
 			this.Image = WeaponImage;
@@ -41,7 +39,7 @@ namespace OpenGraal.NpcServer
 		/// <summary>
 		/// Override -> Error Text
 		/// </summary>
-		override internal string GetErrorText()
+		public override string GetErrorText()
 		{
 			return new StringBuilder(Name).ToString();
 		}
@@ -53,7 +51,7 @@ namespace OpenGraal.NpcServer
 	public class ScriptWeapon : ScriptObj
 	{
 		// -- Member Variables -- //
-		internal readonly ServerWeapon Ref;
+		public readonly ServerWeapon Ref;
 		public readonly bool isweapon = true;
 
 		/// <summary>
@@ -76,8 +74,7 @@ namespace OpenGraal.NpcServer
 		/// Constructor
 		/// </summary>
 		public ScriptWeapon() { }
-		public ScriptWeapon(Framework Server, IRefObject Ref)
-			: base(Server)
+		public ScriptWeapon(IRefObject Ref)
 		{
 			this.Ref = (ServerWeapon)Ref;
 		}

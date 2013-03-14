@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using OpenGraal;
 using OpenGraal.Core;
 using OpenGraal.NpcServer;
-using OpenGraal.NpcServer.Players;
+using OpenGraal.Common.Players;
 
 namespace OpenGraal.NpcServer
 {

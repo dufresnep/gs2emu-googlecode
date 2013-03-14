@@ -2,19 +2,19 @@
 using System.Text;
 using OpenGraal;
 using OpenGraal.Core;
-using OpenGraal.NpcServer;
-using OpenGraal.NpcServer.Players;
 using OpenGraal.Common;
 using OpenGraal.Common.Scripting;
+using OpenGraal.Common.Players;
+using System.Runtime.InteropServices;
 
-namespace OpenGraal.NpcServer
+namespace OpenGraal.Common.Levels
 {
 	public class GraalLevelNPC : IRefObject
 	{
 		/// <summary>
 		/// NPC Properties Enum
 		/// </summary>
-		internal enum Properties
+		public enum Properties
 		{
 			IMAGE = 0,
 			SCRIPT = 1,
@@ -71,13 +71,12 @@ namespace OpenGraal.NpcServer
 		/// <summary>
 		/// Member Variables
 		/// </summary>
-		private Framework Server;
-		internal byte GMapX = 0, GMapY = 0;
-		internal sbyte BlockFlags = 0, VisFlags = 17;
-		internal double
+		public byte GMapX = 0, GMapY = 0;
+		public sbyte BlockFlags = 0, VisFlags = 17;
+		public double
 			Hearts = 3.0;
 
-		internal int
+		public int
 			Ap = 50,
 			Arrows = 10,
 			Bombs = 5,
@@ -94,7 +93,7 @@ namespace OpenGraal.NpcServer
 			Width = 2,
 			Height = 2;
 
-		internal string
+		public string
 			Animation = "idle",
 			BodyImage = "body.png",
 			Chat = String.Empty,
@@ -102,14 +101,14 @@ namespace OpenGraal.NpcServer
 			Image = String.Empty,
 			Nickname = "unknown";
 
-		internal CString ImagePart;
-		internal GraalLevel Level = null;
-		internal SaveIndex Save = null;
+		public CString ImagePart;
+		public GraalLevel Level = null;
+		public SaveIndex Save = null;
 
 		/// <summary>
 		/// Override -> Error Text
 		/// </summary>
-		override internal string GetErrorText()
+		public override string GetErrorText()
 		{
 			return new StringBuilder(Level.name).Append(" (").Append(PixelX/16).Append(',').Append(PixelY/16).Append(')').ToString();
 		}
@@ -117,10 +116,9 @@ namespace OpenGraal.NpcServer
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		internal GraalLevelNPC(Framework Server, GraalLevel Level, int Id)
+		public GraalLevelNPC(GraalLevel Level, int Id)
 			: base(ScriptType.LEVELNPC)
 		{
-			this.Server = Server;
 			this.Level = Level;
 			this.Id = Id;
 			this.Save = new SaveIndex(this, 10);
@@ -129,15 +127,15 @@ namespace OpenGraal.NpcServer
 		/// <summary>
 		/// Send Prop to GServer
 		/// </summary>
-		internal void SendProp(Properties PropId)
+		public void SendProp(Properties PropId)
 		{
-			Server.SendGSPacket(new CString() + (byte)GServerConnection.PacketOut.NCQUERY + (byte)GServerConnection.NCREQ.NPCPROPSET + (int)this.Id + (byte)PropId + GetProp(PropId));
+			//Server.SendGSPacket(new CString() + (byte)GServerConnection.PacketOut.NCQUERY + (byte)GServerConnection.NCREQ.NPCPROPSET + (int)this.Id + (byte)PropId + GetProp(PropId));
 		}
 
 		/// <summary>
 		/// Get Property
 		/// </summary>
-		internal CString GetProp(Properties PropId)
+		public CString GetProp(Properties PropId)
 		{
 			switch (PropId)
 			{
@@ -220,7 +218,7 @@ namespace OpenGraal.NpcServer
 		/// Set Properties
 		/// </summary>
 		/// <param name="Packet"></param>
-		internal void SetProps(CString Packet)
+		public void SetProps(CString Packet)
 		{
 			bool compileScript = false;
 
@@ -404,8 +402,8 @@ namespace OpenGraal.NpcServer
 			}
 
 			// Compile script if script changed.
-			if (compileScript)
-				Server.Compiler.CompileAdd(this);
+			//if (compileScript)
+			//	Server.Compiler.CompileAdd(this);
 		}
 	}
 
@@ -443,7 +441,7 @@ namespace OpenGraal.NpcServer
 	public class ScriptLevelNpc : ScriptObj
 	{
 		// -- Member Variables -- //
-		internal readonly GraalLevelNPC Ref;
+		public readonly GraalLevelNPC Ref;
 		public readonly bool isweapon = true;
 
 		/// <summary>
@@ -555,8 +553,8 @@ namespace OpenGraal.NpcServer
 		/// </summary>
 		public void attachplayer(GraalPlayer player)
 		{
-			if (player != null)
-				Server.SendGSPacket(new CString() + (byte)GServerConnection.PacketOut.NCQUERY + (byte)GServerConnection.NCREQ.PLSETPROPS + (short)player.id + (byte)GraalPlayer.Properties.PLATTACHNPC + (byte)0 + (int)this.id);
+			//if (player != null)
+			//	Server.SendGSPacket(new CString() + (byte)GServerConnection.PacketOut.NCQUERY + (byte)GServerConnection.NCREQ.PLSETPROPS + (short)player.id + (byte)GraalPlayer.Properties.PLATTACHNPC + (byte)0 + (int)this.id);
 		}
 
 		/// <summary>
@@ -564,8 +562,8 @@ namespace OpenGraal.NpcServer
 		/// </summary>
 		public void detachplayer(GraalPlayer player)
 		{
-			if (player != null)
-				Server.SendGSPacket(new CString() + (byte)GServerConnection.PacketOut.NCQUERY + (byte)GServerConnection.NCREQ.PLSETPROPS + (short)player.id + (byte)GraalPlayer.Properties.PLATTACHNPC + (byte)0 + (int)0);
+			//if (player != null)
+			//	Server.SendGSPacket(new CString() + (byte)GServerConnection.PacketOut.NCQUERY + (byte)GServerConnection.NCREQ.PLSETPROPS + (short)player.id + (byte)GraalPlayer.Properties.PLATTACHNPC + (byte)0 + (int)0);
 		}
 
 		/// <summary>
@@ -578,7 +576,7 @@ namespace OpenGraal.NpcServer
 			int pdx = (((short)Math.Abs(dx) * 16) << 1) | (dx < 0 ? 0x0001 : 0x0000);
 			int pdy = (((short)Math.Abs(dy) * 16) << 1) | (dy < 0 ? 0x0001 : 0x0000);
 			int itime = (short)(time / 0.05);
-			Server.SendGSPacket(new CString() + (byte)GServerConnection.PacketOut.NCQUERY + (byte)GServerConnection.NCREQ.NPCMOVE + (int)this.id + (short)start_x + (short)start_y + (short)pdx + (short)pdy + (short)itime + (byte)options);
+			//Server.SendGSPacket(new CString() + (byte)GServerConnection.PacketOut.NCQUERY + (byte)GServerConnection.NCREQ.NPCMOVE + (int)this.id + (short)start_x + (short)start_y + (short)pdx + (short)pdy + (short)itime + (byte)options);
 
 			Ref.PixelX = Ref.PixelX + Convert.ToInt32(dx * 16);
 			Ref.PixelY = Ref.PixelY + Convert.ToInt32(dy * 16);
@@ -594,7 +592,15 @@ namespace OpenGraal.NpcServer
 			Ref.Width = width;
 			Ref.Height = height;
 		}
-
+		/*
+		/// <summary>
+		/// Send Packet to GServer
+		/// </summary>
+		public void SendGSPacket(CString Packet)
+		{
+			this.GSConn.SendPacket(Packet);
+		}
+		*/
 		/// <summary>
 		/// Set Image
 		/// </summary>

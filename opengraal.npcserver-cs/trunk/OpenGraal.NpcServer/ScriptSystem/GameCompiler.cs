@@ -5,6 +5,12 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.CSharp;
+using OpenGraal;
+using OpenGraal.Core;
+using OpenGraal.Common;
+using OpenGraal.Common.Players;
+using OpenGraal.Common.Levels;
+using OpenGraal.Common.Scripting;
 
 namespace OpenGraal.NpcServer
 {

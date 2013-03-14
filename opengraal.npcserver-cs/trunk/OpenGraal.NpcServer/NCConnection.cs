@@ -6,6 +6,8 @@ using System.Net.Sockets;
 using System.Text;
 using OpenGraal;
 using OpenGraal.Core;
+using OpenGraal.Common;
+using OpenGraal.Common.Scripting;
 using OpenGraal.NpcServer;
 
 namespace OpenGraal.NpcServer

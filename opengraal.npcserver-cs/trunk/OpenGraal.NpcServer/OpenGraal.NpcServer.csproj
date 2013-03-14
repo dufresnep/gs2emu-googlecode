@@ -76,23 +76,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Levels\GraalLevel.cs" />
-    <Compile Include="Levels\GraalLevelNPC.cs" />
-    <Compile Include="Levels\GraalMap.cs" />
-    <Compile Include="Levels\GraalObject.cs" />
     <Compile Include="NCConnection.cs" />
     <Compile Include="GServerConnection.cs" />
     <Compile Include="NPCServer.cs" />
-    <Compile Include="Players\ColorManager.cs" />
-    <Compile Include="Players\FlagManager.cs" />
-    <Compile Include="Players\GraalPlayer.cs" />
-    <Compile Include="Players\GraalPlayerList.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptSystem\GameCompiler.cs" />
-    <Compile Include="ScriptSystem\GameScript.cs" />
-    <Compile Include="ScriptSystem\ServerClass.cs" />
-    <Compile Include="ScriptSystem\ServerWeapon.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -137,6 +126,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\opengraal.common-cs\trunk\OpenGraal.Common\OpenGraal.Common.csproj">
+      <Project>{BF323091-36E1-4A64-97A2-A62E5F5ABC1B}</Project>
+      <Name>OpenGraal.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\opengraal.core-cs\trunk\OpenGraal.Core\OpenGraal.Core.csproj">
       <Project>{CC4AF8B5-BECF-4562-A0E5-94FBE0FBAB8F}</Project>
       <Name>OpenGraal.Core</Name>
