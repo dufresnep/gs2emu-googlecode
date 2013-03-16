@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("OpenGraal.NpcServer")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Graal Map Generator")]
+[assembly: AssemblyDescription("Map Generator for Graal")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("OpenGraal.NpcServer")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2010")]
+[assembly: AssemblyCompany("OpenGraal")]
+[assembly: AssemblyProduct("OpenGraal Map Generator")]
+[assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("1eebe1a8-72f9-44a0-b762-bb31cd7e0e20")]
+[assembly: Guid("0c08505c-0172-42e1-824e-42e5319f235b")]
 
 // Version information for an assembly consists of the following four values:
 //
