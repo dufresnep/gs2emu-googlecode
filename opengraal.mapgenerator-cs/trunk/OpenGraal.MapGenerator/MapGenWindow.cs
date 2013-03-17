@@ -36,7 +36,7 @@ namespace OpenGraal.MapGenerator
 		{
 			this.InitializeComponent();
 			this._appVersion = this.GetProductVersion();
-			this._appVersionLabel.Text = "Graal Map Generator v" + this.AppVersion + "\nCreator: Emera (Aaron Yarborough)";
+			this._appVersionLabel.Text = "Graal Map Generator v" + this.AppVersion + "";
 		}
 
 		~MapGenWindow()
@@ -60,6 +60,12 @@ namespace OpenGraal.MapGenerator
 			this.CheckIfCanGenerate();
 		}
 
+		private void StatusTextScroll()
+		{
+			this._statusText.SelectionStart = this._statusText.Text.Length;
+			this._statusText.ScrollToCaret();
+		}
+
 		private void MapGenerateButton_Click(object sender, EventArgs e)
 		{
 			String TemplateFileName = "template.nw";
@@ -73,11 +79,11 @@ namespace OpenGraal.MapGenerator
 			GMap.AutoMapping = _autoMappingCheck.Checked;
 			GMap.LoadFullMap = _loadFullMapCheck.Checked;
 
-			int ret = GMap.Generate(TemplateFileName);
-
 			String ApplicationDirectory = AppDomain.CurrentDomain.BaseDirectory;
 			String TemplateFile = (ApplicationDirectory + TemplateFileName);
 			String GmapDirectory = ApplicationDirectory + (GMap.MapName + "/");
+
+			int ret = GMap.Generate(TemplateFile);
 			
 			if (ret == 0) //Throw an error and close program if template not found
 			{
@@ -86,8 +92,12 @@ namespace OpenGraal.MapGenerator
 			}
 
 			this.Enabled = false;
+			this._statusText.AppendText(Environment.NewLine + "Finishing...");
+			StatusTextScroll();
 
 			int ret2 = GMap.Save(GmapDirectory);
+			this._statusText.AppendText(Environment.NewLine + "Finished generating");
+			StatusTextScroll();
 			if (ret2 == 0) //Throw an error if the directory already exists
 			{
 				MessageBox.Show("That map is already saved under this new map's directory. Please choose another name for your gmap or delete the old directory", "Application Error");
