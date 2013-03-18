@@ -69,6 +69,7 @@
 			this._mapPrefixTextBox.Name = "_mapPrefixTextBox";
 			this._mapPrefixTextBox.Size = new System.Drawing.Size(116, 20);
 			this._mapPrefixTextBox.TabIndex = 1;
+			this._mapPrefixTextBox.TextChanged += new System.EventHandler(this.MapPrefixTextBox_TextChanged);
 			// 
 			// _mapWidthNumeric
 			// 
@@ -201,5 +202,6 @@
 
 		}
 		#endregion
+
 	}
 }

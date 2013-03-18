@@ -101,6 +101,7 @@ namespace OpenGraal.MapGenerator
 			if (ret2 == 0) //Throw an error if the directory already exists
 			{
 				MessageBox.Show("That map is already saved under this new map's directory. Please choose another name for your gmap or delete the old directory", "Application Error");
+				this.Enabled = true;
 				return;
 			}
 
@@ -110,7 +111,7 @@ namespace OpenGraal.MapGenerator
 			{
 				System.Diagnostics.Process.Start(@GmapDirectory);
 			}
-			MessageBox.Show(GMap.GetLevelAt(2,3));
+
 			this.Enabled = true;
 		}
 
@@ -140,8 +141,9 @@ namespace OpenGraal.MapGenerator
 		}
 		#endregion
 
+
 		#region Public functions
-		
+
 		#endregion
 	}
 }
