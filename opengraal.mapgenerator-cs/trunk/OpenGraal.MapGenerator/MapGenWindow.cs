@@ -37,6 +37,7 @@ namespace OpenGraal.MapGenerator
 			this.InitializeComponent();
 			this._appVersion = this.GetProductVersion();
 			this._appVersionLabel.Text = "Graal Map Generator v" + this.AppVersion + "";
+			this.Show();
 		}
 
 		~MapGenWindow()
@@ -56,7 +57,8 @@ namespace OpenGraal.MapGenerator
 			this.CheckIfCanGenerate();
 		}
 
-		private void MapHeightNumeric_ValueChanged(object sender, EventArgs e) {
+		private void MapHeightNumeric_ValueChanged(object sender, EventArgs e)
+		{
 			this.CheckIfCanGenerate();
 		}
 
@@ -68,7 +70,7 @@ namespace OpenGraal.MapGenerator
 
 		private void MapGenerateButton_Click(object sender, EventArgs e)
 		{
-			String TemplateFileName = "template.nw";
+			String TemplateFileName = "village4.zelda";
 			
 			String GmapPrefix = _mapPrefixTextBox.Text;
 			String GmapFileName = GmapPrefix + ".gmap";
@@ -119,7 +121,7 @@ namespace OpenGraal.MapGenerator
 		{
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-			return fvi.FileVersion.Substring(0, 3) + ((fvi.FileVersion.Substring(4, 1) != "0") ? fvi.FileVersion.Substring(4, 1) : "") + ((fvi.FileVersion.Substring(6, 1) != "0")?"r" + fvi.FileVersion.Substring(6, 1):"");
+			return fvi.FileVersion.Substring(0, 3) + ((fvi.FileVersion.Substring(4, 1) != "0") ? fvi.FileVersion.Substring(4, 1) : "") + ((fvi.FileVersion.Substring(6, 1) != "0") ? "r" + fvi.FileVersion.Substring(6, 1) : "");
 		}
 
 		private void CheckIfCanGenerate()

@@ -1,0 +1,29 @@
+﻿Date: 15 March 2013
+	- First compilation
+
+Date: 16 March 2013
+	- Added a status box that gives the user an insight into what the program is doing and how long the program is going to take to generate the required files.
+	- Removed unused variables
+
+Date: 18 March 2013
+	- Added so that it generates links for each level.
+	- Fixed so that it also saves in bigmap.txt format.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
