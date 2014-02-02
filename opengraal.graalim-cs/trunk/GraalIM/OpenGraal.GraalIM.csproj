@@ -1,0 +1,302 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{57D25FD1-EA2E-46AA-8B48-57931A3E9436}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenGraal.GraalIM</RootNamespace>
+    <AssemblyName>GraalIM</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>2</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>OpenGraal.GraalIM.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\rcicon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>bin\Release\</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>E7ED820F0269D92F0AB6DEB369D091C5CDBFA1C3</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>OpenGraal.GraalIM_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Mono.Posix" />
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="gtk-dotnet, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Connections\Interfaces\IGameServer.cs" />
+    <Compile Include="Connections\GraalServer.cs" />
+    <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Framework.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Windows\ToallsWindow.cs" />
+    <None Include="OpenGraal.GraalIM_TemporaryKey.pfx" />
+    <None Include="Resources\rcicon.png" />
+    <Compile Include="Windows\LoginWindow.cs" />
+    <Compile Include="Windows\LoginWindow.Designer.cs">
+      <DependentUpon>LoginWindow.cs</DependentUpon>
+    </Compile>
+    <None Include="packages.config" />
+    <EmbeddedResource Include="Resources\rcicon.ico" />
+    <Compile Include="Windows\PMWindow.cs" />
+    <Compile Include="Connections\ListServerConnection.cs" />
+    <None Include="Connections\GServerConnection_.cs" />
+    <None Include="Connections\NCConnection.cs" />
+    <Compile Include="Windows\PMWindowList.cs" />
+    <Compile Include="Settings\Control2Config.cs" />
+    <Compile Include="Windows\MainWindow.cs" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonhiding.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_opengraal.jpg" />
+    <EmbeddedResource Include="Resources\rcicon_bronze.png" />
+    <EmbeddedResource Include="Resources\rcicon_gold.png" />
+    <EmbeddedResource Include="Resources\rcicon_nuclear.png" />
+    <EmbeddedResource Include="Resources\rcicon_silver.png" />
+    <EmbeddedResource Include="Resources\rcicon_uc.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticondnd.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticoneating.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonevent.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonfree to chat.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonheart.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonin an event.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonno pms.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticononline.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonooc.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonpking.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonpming.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonquesting.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonrole-playing.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonscripting.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonsparring.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticontest2.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticontest2-old.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonworking.png" />
+    <EmbeddedResource Include="Resources\rc_images\pmicon_admin.png" />
+    <EmbeddedResource Include="Resources\rc_images\pmicon_guild.png" />
+    <EmbeddedResource Include="Resources\rc_images\pmicon_mass.png" />
+    <EmbeddedResource Include="Resources\rc_images\pmicon_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\pmicon_tray.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_accounts_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_accounts_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_classlist_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_classlist_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_datablocks_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_datablocks_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_filebrowser_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_filebrowser_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_folderoptions_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_folderoptions_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_guiscripts_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_guiscripts_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_help_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_help_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_levellist_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_levellist_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_localnpcs_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_localnpcs_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_npclist_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_npclist_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_options_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_options_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_playerlist_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_playerlist_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_serverflags_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_serverflags_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_serveroptions_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_serveroptions_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_toalls_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_toalls_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_weaponlist_normal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rc_weaponlist_pressed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rcfiles_folderclosed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rcfiles_folderopen.png" />
+    <EmbeddedResource Include="Resources\rc_images\rcfiles_gmap.png" />
+    <EmbeddedResource Include="Resources\rc_images\rcfiles_graal.png" />
+    <EmbeddedResource Include="Resources\rc_images\rcfiles_nw.png" />
+    <EmbeddedResource Include="Resources\rc_images\rcfiles_text.png" />
+    <EmbeddedResource Include="Resources\rc_images\rcicon.png" />
+    <EmbeddedResource Include="Resources\rc_images\rcicon_banned.png" />
+    <EmbeddedResource Include="Resources\rc_images\rcicon_channelclosed.png" />
+    <EmbeddedResource Include="Resources\rc_images\rcicon_channelopen.png" />
+    <EmbeddedResource Include="Resources\rc_images\rcicon_gold.png" />
+    <EmbeddedResource Include="Resources\rc_images\rcicon_uc.png" />
+    <EmbeddedResource Include="Resources\rc_images\rcicon_unbanned.png" />
+    <Compile Include="TServer.cs" />
+    <Compile Include="TServerList.cs" />
+    <Compile Include="Windows\ErrorWindow.cs" />
+    <Compile Include="Windows\ServerWindow.cs" />
+    <Compile Include="Windows\ServerWindow.Designer.cs">
+      <DependentUpon>..\..\trunk\GraalIM\Windows\ServerWindow.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="Properties\app.manifest" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Players\GraalPlayer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Players\GraalPlayerList.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Windows\ErrorWindow.Designer.cs">
+      <DependentUpon>..\..\trunk\GraalIM\Windows\ErrorWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\OpenGraal.GraalIM.MainWindow.cs" />
+    <Compile Include="Windows\OpenGraal.GraalIM.PMWindow.cs" />
+    <Compile Include="Windows\Abstraction.cs" />
+    <Compile Include="Windows\RCWindow.cs" />
+    <Compile Include="Windows\RCPlayerList.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\rc_images\plisticonaway.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonbored.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonbowling.png" />
+    <EmbeddedResource Include="Resources\rc_images\plisticonctf.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\rc_images\rc_graalonline.jpg" />
+    <EmbeddedResource Include="Resources\rc_images\rc_graalonline.png" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <TextStylePolicy TabsToSpaces="False" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
+          <CSharpFormattingPolicy IndentSwitchBody="True" AnonymousMethodBraceStyle="NextLine" PropertyBraceStyle="NextLine" PropertyGetBraceStyle="NextLine" PropertySetBraceStyle="NextLine" EventBraceStyle="NextLine" EventAddBraceStyle="NextLine" EventRemoveBraceStyle="NextLine" StatementBraceStyle="NextLine" ElseNewLinePlacement="NewLine" CatchNewLinePlacement="NewLine" FinallyNewLinePlacement="NewLine" WhileNewLinePlacement="DoNotCare" ArrayInitializerBraceStyle="NextLine" BeforeMethodDeclarationParentheses="False" BeforeMethodCallParentheses="False" BeforeConstructorDeclarationParentheses="False" BeforeDelegateDeclarationParentheses="False" NewParentheses="False" SpacesBeforeBrackets="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\opengraal.common-cs\trunk\OpenGraal.Common\OpenGraal.Common.csproj">
+      <Project>{BF323091-36E1-4A64-97A2-A62E5F5ABC1B}</Project>
+      <Name>OpenGraal.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\opengraal.core-cs\trunk\OpenGraal.Core\OpenGraal.Core.csproj">
+      <Project>{CC4AF8B5-BECF-4562-A0E5-94FBE0FBAB8F}</Project>
+      <Name>OpenGraal.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
+</Project>
