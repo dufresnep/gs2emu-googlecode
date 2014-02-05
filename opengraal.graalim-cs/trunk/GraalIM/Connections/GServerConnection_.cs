@@ -539,10 +539,10 @@ namespace OpenGraal.GraalIM
 			CString keyPacket = new CString() + (byte)versionInt + (byte)mCodec.Key + versionStr + (byte)Account.Length + Account + (byte)Password.Length + Password + new CString("win").Tokenize() + ",";
 
 			// Unknown hash.
-			keyPacket += new CString(this.GetMD5Hash("stefanisabuttmunch")).Tokenize() + ",";
+			keyPacket += new CString(this.GetMD5Hash("unknown1")).Tokenize() + ",";
 
 			// MD5 hash.
-			keyPacket += new CString(this.GetMD5Hash("unixmadlovesboys")).Tokenize() + "," + new CString(this.GetMD5Hash("suckonthis")).Tokenize() + ",";
+			keyPacket += new CString(this.GetMD5Hash("md5-1")).Tokenize() + "," + new CString(this.GetMD5Hash("md5-2")).Tokenize() + ",";
 			keyPacket += new CString("10.4.0  Darwin Kernel Version 10.4.0: Wed Oct 20 20:14:45 PDT 2010; root:xnu-1504.58.28~3/RELEASE_ARM_S5L8930X").Tokenize();
 			keyPacket += "\n";
 
