@@ -47,67 +47,73 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-      <Package>gtk-sharp-2.0</Package>
-    </Reference>
-    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-      <Package>gtk-sharp-2.0</Package>
-    </Reference>
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="Mono.Posix" />
+    <Reference Include="OpenGraal.Common">
+      <HintPath>..\..\..\opengraal.common-cs\trunk\OpenGraal.Common\bin\Debug\OpenGraal.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="gtk-dotnet, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\MapGenWindow.cs">
+    <Compile Include="MapGenWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\MapGenWindow.Designer.cs">
-      <DependentUpon>..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\MapGenWindow.cs</DependentUpon>
+    <Compile Include="MapGenWindow.Designer.cs">
+      <DependentUpon>MapGenWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\Program.cs" />
-    <Compile Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\MapGenWindow.resx">
-      <DependentUpon>..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\MapGenWindow.cs</DependentUpon>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="MapGenWindow.resx">
+      <DependentUpon>MapGenWindow.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\Properties\Resources.resx">
+    <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\Properties\Resources.Designer.cs">
-      <DependentUpon>..\..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\Properties\Resources.resx</DependentUpon>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <None Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\Properties\Settings.settings">
+    <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Compile Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\Properties\Settings.Designer.cs">
-      <DependentUpon>..\..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\Properties\Settings.settings</DependentUpon>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Content Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\changelog.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\readme.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\template.nw">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\village4.zelda">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <EmbeddedResource Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\Resources\tileeditor_pencil_1-1.ico" />
-    <EmbeddedResource Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\gtk-gui\gui.stetic">
+    <Content Include="changelog.txt" />
+    <Content Include="readme.txt" />
+    <Content Include="template.nw" />
+    <Content Include="village4.zelda" />
+    <EmbeddedResource Include="Resources\tileeditor_pencil_1-1.ico" />
+    <EmbeddedResource Include="gtk-gui\gui.stetic">
       <LogicalName>gui.stetic</LogicalName>
     </EmbeddedResource>
-    <Compile Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\gtk-gui\generated.cs" />
-    <Compile Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\TestWindow.cs" />
-    <Compile Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.mapgenerator-cs\trunk\OpenGraal.MapGenerator\gtk-gui\OpenGraal.MapGenerator.TestWindow.cs" />
+    <Compile Include="gtk-gui\generated.cs" />
+    <Compile Include="gtk-gui\OpenGraal.MapGenerator.TestWindow.cs" />
+    <Compile Include="TestWindow.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.common-cs\trunk\OpenGraal.Common\OpenGraal.Common.csproj">
+    <ProjectReference Include="..\..\..\opengraal.common-cs\trunk\OpenGraal.Common\OpenGraal.Common.csproj">
       <Project>{BF323091-36E1-4A64-97A2-A62E5F5ABC1B}</Project>
       <Name>OpenGraal.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\..\marlon%40eevul.org\graal\googlecodegserver\opengraal.core-cs\trunk\OpenGraal.Core\OpenGraal.Core.csproj">
+    <ProjectReference Include="..\..\..\opengraal.core-cs\trunk\OpenGraal.Core\OpenGraal.Core.csproj">
       <Project>{CC4AF8B5-BECF-4562-A0E5-94FBE0FBAB8F}</Project>
       <Name>OpenGraal.Core</Name>
     </ProjectReference>

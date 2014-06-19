@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<stetic-interface>
+  <configuration>
+    <images-root-path>..</images-root-path>
+    <target-gtk-version>2.12</target-gtk-version>
+  </configuration>
+  <import>
+    <widget-library name="../bin/Debug/GMapGenerator.exe" internal="true" />
+    <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+  </import>
+  <widget class="Gtk.Window" id="OpenGraal.MapGenerator.TestWindow" design-size="400 300">
+    <property name="MemberName" />
+    <property name="Title" translatable="yes">TestWindow</property>
+    <property name="WindowPosition">CenterOnParent</property>
+    <child>
+      <widget class="Gtk.IconView" id="iconview1">
+        <property name="MemberName" />
+        <property name="CanFocus">True</property>
+      </widget>
+    </child>
+  </widget>
+</stetic-interface>
